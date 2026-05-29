@@ -57,7 +57,7 @@ class ProductIndex extends Component
             'description' => 'nullable|string|max:1000',
             'price' => 'required|integer|min:1',
             'stock' => 'required|integer|min:0',
-            'category' => 'required|in:retail,wholesale,gifting',
+            'category' => 'nullable|in:retail,wholesale,gifting,uncategorized',
             'unit_type' => 'required|in:arrangement,stem,bundle,hamper',
             'grade' => 'nullable|string|max:20',
             'image_url' => 'nullable|string|max:500',

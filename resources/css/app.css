@@ -10,80 +10,83 @@
   --font-sans: 'Plus Jakarta Sans', sans-serif;
 }
 
-:root, .midnight {
-  --bg-base: #09090C;
-  --bg-card: #121215;
-  --border-base: #1F1F24;
-  --text-primary: #FAFAFA;
-  --text-secondary: #A1A1AA;
-  --brand-accent: #D4AF37;
+:root, .onyx {
+  --bg-base: #050507;
+  --bg-card: #0A0A0E;
+  --border-base: #18181C;
+  --text-primary: #F4F4F5;
+  --text-secondary: #9CA3AF;
+  --brand-accent: #C5A880; /* Gilded Gold */
 }
 
-.alabaster {
-  --bg-base: #FAFAFA;
+.champagne {
+  --bg-base: #FAF7F0; /* Cream Silk */
   --bg-card: #FFFFFF;
-  --border-base: #E4E4E7;
-  --text-primary: #18181B;
-  --text-secondary: #71717A;
-  --brand-accent: #18181B;
+  --border-base: #E8E2D5;
+  --text-primary: #1C1917; /* Warm Slate */
+  --text-secondary: #78716C;
+  --brand-accent: #B59A7A; /* Bronze Silk */
 }
 
-.floral {
-  --bg-base: #0E1512;
-  --bg-card: #141E19;
-  --border-base: #1E2E25;
-  --text-primary: #EDF2EF;
-  --text-secondary: #8FA89B;
-  --brand-accent: #10B981;
+.jade {
+  --bg-base: #06130F; /* Deep Imperial Jade */
+  --bg-card: #0A1C16;
+  --border-base: #142E24;
+  --text-primary: #ECFDF5;
+  --text-secondary: #86EFAC;
+  --brand-accent: #D4AF37; /* Metallic Gold */
 }
 
-.love {
-  --bg-base: #160B0E;
-  --bg-card: #221217;
-  --border-base: #381A24;
-  --text-primary: #FDF4F7;
-  --text-secondary: #C89FA9;
-  --brand-accent: #E11D48;
+/* Background Glow Keyframes */
+@keyframes onyx-glow {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.35; }
+  33% { transform: translate(40px, -60px) scale(1.15); opacity: 0.5; }
+  66% { transform: translate(-30px, 30px) scale(0.9); opacity: 0.4; }
 }
 
-.cute {
-  --bg-base: #1A1013;
-  --bg-card: #26181C;
-  --border-base: #402830;
-  --text-primary: #FFF5F7;
-  --text-secondary: #D4A8B6;
-  --brand-accent: #F472B6;
-}
-
-@keyframes blob-breathing {
+@keyframes champagne-glow {
   0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-  33% { transform: translate(30px, -50px) scale(1.15); opacity: 0.6; }
-  66% { transform: translate(-20px, 20px) scale(0.9); opacity: 0.5; }
+  33% { transform: translate(-30px, 40px) scale(1.1); opacity: 0.6; }
+  66% { transform: translate(45px, -20px) scale(0.95); opacity: 0.5; }
 }
 
-@keyframes petal-float {
-  0% { transform: translateY(110vh) translateX(0) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.15; }
-  90% { opacity: 0.15; }
-  100% { transform: translateY(-10vh) translateX(100px) rotate(360deg); opacity: 0; }
+@keyframes jade-glow {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  33% { transform: translate(50px, -30px) scale(1.2); opacity: 0.55; }
+  66% { transform: translate(-40px, 50px) scale(0.85); opacity: 0.4; }
 }
 
-.animate-blob-breathing {
-  animation: blob-breathing 20s infinite ease-in-out;
+.animate-onyx-glow {
+  animation: onyx-glow 22s infinite ease-in-out;
 }
 
-.animate-petal-float {
-  animation: petal-float 18s infinite linear;
+.animate-champagne-glow {
+  animation: champagne-glow 20s infinite ease-in-out;
 }
 
-/* Custom elastic ease hover transitions */
+.animate-jade-glow {
+  animation: jade-glow 24s infinite ease-in-out;
+}
+
+/* Staggered Navigation Item Entrance */
+@keyframes nav-item-entrance {
+  0% { transform: translateY(-15px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-nav-item {
+  animation: nav-item-entrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+/* Elastic Transition Utility */
 .transition-elastic {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
   transition-duration: 500ms;
 }
 
-/* Scrollbar customizations */
+/* Scrollbar customization */
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }

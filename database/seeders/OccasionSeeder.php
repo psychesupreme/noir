@@ -5,12 +5,19 @@ namespace Database\Seeders;
 use App\Models\Occasion;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class OccasionSeeder extends Seeder
 {
     public function run(): void
     {
+        // ── Clean Existing Occasions Safely ────────────────────────────
+        Schema::disableForeignKeyConstraints();
+        Occasion::truncate();
+        DB::table('occasion_product')->truncate();
+        Schema::enableForeignKeyConstraints();
+
         // 1. Create Luxury Occasions mapped to specific brand colors
         $corporate = Occasion::create([
             'name' => 'Corporate Atelier',
@@ -34,24 +41,24 @@ class OccasionSeeder extends Seeder
         ]);
 
         // 2. Attach existing products to these occasions safely
-        $crimson = Product::where('sku', 'NB-RET-CRM-01')->first();
-        if ($crimson) {
-            $crimson->occasions()->sync([$valentines->id]);
+        $noirClassic = Product::where('sku', 'NB-RET-NCL-01')->first();
+        if ($noirClassic) {
+            $noirClassic->occasions()->sync([$valentines->id]);
         }
 
-        $orchid = Product::where('sku', 'NB-RET-ORC-02')->first();
-        if ($orchid) {
-            $orchid->occasions()->sync([$corporate->id]);
+        $alabasterDream = Product::where('sku', 'NB-RET-ADR-02')->first();
+        if ($alabasterDream) {
+            $alabasterDream->occasions()->sync([$corporate->id]);
         }
         
-        $calla = Product::where('sku', 'NB-RET-CAL-03')->first();
-        if ($calla) {
-            $calla->occasions()->sync([$sympathy->id]);
+        $safariSunset = Product::where('sku', 'NB-RET-SSN-03')->first();
+        if ($safariSunset) {
+            $safariSunset->occasions()->sync([$sympathy->id]);
         }
 
-        $emerald = Product::where('sku', 'NB-RET-EMR-04')->first();
-        if ($emerald) {
-            $emerald->occasions()->sync([$corporate->id]);
+        $riftValley = Product::where('sku', 'NB-RET-RVM-04')->first();
+        if ($riftValley) {
+            $riftValley->occasions()->sync([$corporate->id]);
         }
     }
 }
