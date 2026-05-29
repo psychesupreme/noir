@@ -72,7 +72,7 @@
     </style>
 
     <!-- Ambient Background Blobs -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+    <div x-show="theme !== 'champagne'" class="absolute inset-0 overflow-hidden pointer-events-none z-0" style="display: none;">
         <!-- Blob 1 -->
         <div 
             :class="{
@@ -261,54 +261,78 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12" wire:loading.class="opacity-40" wire:target="search, selectedCategory, filterByOccasion">
             @forelse($products as $product)
-                <div class="flex flex-col space-y-3 group text-left">
-                    <div :class="theme === 'champagne' ? 'border-neutral-200 bg-white' : 'border-neutral-900 bg-neutral-900/10'" 
-                         class="aspect-[4/5] border rounded-3xl relative overflow-hidden transition-all duration-500 shadow-sm hover:shadow-xl">
-                        
-                        <!-- Clean image by default, scales slightly on hover -->
-                        <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
-                             class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 z-0">
-                        
-                        <!-- Dark glassmorphic overlay on hover -->
-                        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 flex flex-col justify-between p-5 text-white">
-                            <!-- Top row on hover overlay -->
-                            <div class="flex justify-between items-start">
-                                <span class="bg-white/15 border border-white/10 text-neutral-200 px-2 py-0.5 rounded text-[8px] font-mono uppercase tracking-widest backdrop-blur-md">
+                <div x-data="{ selectedSize: 'standard', basePrice: {{ $product->price }}, numberFormat(val) { return new Intl.NumberFormat().format(val); } }" 
+                     :class="theme === 'champagne' ? 'border-neutral-200 bg-white/70 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/50'"
+                     class="flex flex-col p-3 rounded-[32px] border relative transition-all duration-500 hover:shadow-2xl hover:border-neutral-500/20 group text-left backdrop-blur-md"
+                >
+                    <!-- Product Image Frame: double border floral museum aesthetic -->
+                    <div class="p-1 border border-neutral-500/10 rounded-[24px] overflow-hidden relative">
+                        <div class="aspect-[4/5] rounded-[20px] relative overflow-hidden bg-neutral-950/5">
+                            <!-- Product Image -->
+                            <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
+                                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 z-0">
+                            
+                            <!-- Subtle Category tag on image (pristine look, no glassmorphic blur) -->
+                            <div class="absolute top-3 inset-x-3 flex justify-between items-start z-10">
+                                <span class="bg-[#050507]/60 border border-white/5 text-neutral-200 px-2 py-0.5 rounded text-[8px] font-mono uppercase tracking-widest backdrop-blur-md">
                                     {{ $product->category }}
                                 </span>
                                 @if($product->grade)
-                                    <span class="bg-[#D4AF37] text-black px-2 py-0.5 rounded text-[8px] font-mono font-bold tracking-wide uppercase">
+                                    <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded text-[8px] font-mono font-bold tracking-wide uppercase shadow-sm">
                                         {{ $product->grade }}
                                     </span>
                                 @endif
                             </div>
-
-                            <!-- Bottom section on hover overlay -->
-                            <div class="space-y-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                                <div class="flex justify-between items-baseline">
-                                    <span class="text-[9px] uppercase tracking-[0.2em] text-neutral-300 font-mono">Price</span>
-                                    <span class="font-mono text-base font-semibold tracking-tight">{{ number_format($product->price) }} KSH</span>
-                                </div>
-                                <button 
-                                    wire:click="addToCuration({{ $product->id }})"
-                                    @click="drawerOpen = true; checkoutMode = false;"
-                                    class="w-full bg-transparent border border-white hover:bg-white hover:text-black text-white text-[9px] font-semibold tracking-[0.2em] uppercase py-3 cursor-pointer transition-all duration-300 rounded-full"
-                                >
-                                    Curate Selection
-                                </button>
-                            </div>
                         </div>
                     </div>
 
-                    <!-- Info below card -->
-                    <div class="px-1 space-y-1.5">
-                        <span class="text-[9px] uppercase tracking-[0.3em] text-neutral-400 font-mono block font-light">Noir & Bloom Atelier</span>
-                        <h3 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" class="text-base font-serif italic tracking-wide leading-snug">
-                            {{ $product->name }}
-                        </h3>
-                        <p class="text-neutral-500 font-light text-xs leading-relaxed line-clamp-2">
-                            {{ $product->description ?? 'Premium luxury floral batch curation.' }}
-                        </p>
+                    <!-- Details Section: Animated below the image -->
+                    <div class="px-1.5 pt-3 pb-1 transition-all duration-500 flex-1 flex flex-col justify-between">
+                        <div class="space-y-1">
+                            <span class="text-[9px] uppercase tracking-[0.3em] text-neutral-400 font-mono block font-light">Noir & Bloom Atelier</span>
+                            <h3 :class="theme === 'champagne' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-base font-serif italic tracking-wide leading-snug">
+                                {{ $product->name }}
+                            </h3>
+                            <p class="text-neutral-500 font-light text-xs leading-relaxed line-clamp-2">
+                                {{ $product->description ?? 'Premium luxury floral batch curation.' }}
+                            </p>
+                        </div>
+
+                        <!-- Pricing & Size Details - Slide down smoothly on card hover -->
+                        <div class="mt-3 space-y-3">
+                            <!-- Always visible price based on active size -->
+                            <div class="flex justify-between items-baseline pt-1.5 border-t border-neutral-500/10">
+                                <span class="text-[9px] uppercase tracking-[0.2em] text-neutral-400 font-mono">Curation Price</span>
+                                <span class="font-mono text-sm font-semibold tracking-tight text-amber-500">
+                                    <span x-text="numberFormat(selectedSize === 'standard' ? basePrice : (selectedSize === 'deluxe' ? Math.round(basePrice * 1.5) : Math.round(basePrice * 2.2)))"></span> KSH
+                                </span>
+                            </div>
+
+                            <!-- Interactive controls that slide out on hover -->
+                            <div class="max-h-0 opacity-0 group-hover:max-h-32 group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden space-y-3">
+                                @if($product->category !== 'wholesale')
+                                    <!-- Size Picker -->
+                                    <div class="space-y-1">
+                                        <span class="text-[9px] uppercase tracking-wider text-neutral-500 font-mono">Curated Size</span>
+                                        <div class="flex items-center space-x-1.5">
+                                            <button type="button" @click="selectedSize = 'standard'" :class="selectedSize === 'standard' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" class="px-2.5 py-0.5 border text-[9px] font-mono uppercase tracking-wider rounded-full cursor-pointer transition-all">Std</button>
+                                            <button type="button" @click="selectedSize = 'deluxe'" :class="selectedSize === 'deluxe' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" class="px-2.5 py-0.5 border text-[9px] font-mono uppercase tracking-wider rounded-full cursor-pointer transition-all">Dlx</button>
+                                            <button type="button" @click="selectedSize = 'grand'" :class="selectedSize === 'grand' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" class="px-2.5 py-0.5 border text-[9px] font-mono uppercase tracking-wider rounded-full cursor-pointer transition-all">Gnd</button>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- Add to Curation Button -->
+                                <button 
+                                    type="button"
+                                    @click="$wire.addToCuration({{ $product->id }}, selectedSize); drawerOpen = true; checkoutMode = false;"
+                                    :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'"
+                                    class="w-full text-[9px] font-semibold tracking-[0.2em] uppercase py-2.5 cursor-pointer transition-all duration-300 rounded-full flex items-center justify-center"
+                                >
+                                    <span>Curate Selection</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             @empty
@@ -434,7 +458,11 @@
                     <h2 class="text-sm uppercase tracking-[0.2em] text-white">Profile Portal</h2>
                     <span class="text-[10px] text-neutral-500 font-mono">Loyalty Tier: {{ auth()->user()->loyalty_tier }}</span>
                 </div>
-                <button @click="accountPanelOpen = false" class="text-neutral-500 hover:text-white font-mono text-[10px] uppercase tracking-widest cursor-pointer">[ Close Portal ]</button>
+                <button @click="accountPanelOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Portal">
+                    <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
             </div>
 
             <div class="flex-1 overflow-y-auto my-6 space-y-6 scrollbar-none max-h-[calc(100vh-160px)] pr-1">
@@ -523,7 +551,11 @@
                     <h2 class="text-sm uppercase tracking-[0.2em] text-white">Profile Portal</h2>
                     <span class="text-[10px] text-neutral-500 font-mono">Authentication Required</span>
                 </div>
-                <button @click="accountPanelOpen = false" class="text-neutral-500 hover:text-white font-mono text-[10px] uppercase tracking-widest cursor-pointer">[ Close Portal ]</button>
+                <button @click="accountPanelOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Portal">
+                    <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
             </div>
 
             <div class="flex-1 flex flex-col justify-center space-y-6 py-12 text-center">
@@ -558,7 +590,11 @@
     >
         <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
             <div><h3 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Selected Curations</h3><span class="text-[9px] text-neutral-500 font-light">Bespoke Arrangement Hub</span></div>
-            <button @click="drawerOpen = false" class="text-neutral-500 hover:text-neutral-400 text-[10px] font-mono tracking-widest uppercase cursor-pointer">[ Close ]</button>
+            <button @click="drawerOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Drawer">
+                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
         </div>
 
         <div x-show="!checkoutMode && !@json($orderSubmitted)" class="flex-1 flex flex-col justify-between overflow-hidden">
@@ -570,9 +606,9 @@
                             <p class="text-neutral-500 font-mono">{{ number_format($item['product']->price) }} KSH &bull; <span class="uppercase text-[10px]">Pack/{{ $item['product']->unit_type }}</span></p>
                         </div>
                         <div :class="theme === 'champagne' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="flex items-center space-x-3 px-2.5 py-1.5 border rounded-full">
-                            <button wire:click="removeFromCuration({{ $item['product']->id }})" class="text-neutral-400 font-bold font-mono cursor-pointer select-none">-</button>
+                            <button wire:click="removeFromCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="text-neutral-400 font-bold font-mono cursor-pointer select-none">-</button>
                             <span class="text-xs font-mono min-w-[15px] text-center">{{ $item['quantity'] }}</span>
-                            <button wire:click="addToCuration({{ $item['product']->id }})" class="text-neutral-400 font-bold font-mono cursor-pointer select-none">+</button>
+                            <button wire:click="addToCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="text-neutral-400 font-bold font-mono cursor-pointer select-none">+</button>
                         </div>
                     </div>
                 @empty
@@ -752,9 +788,13 @@
 
     <div x-show="!drawerOpen" x-transition class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
         <button @click="chatOpen = !chatOpen" class="px-5 h-11 rounded-full bg-black text-white border border-neutral-800 shadow-2xl flex items-center space-x-3 text-[10px] uppercase font-mono tracking-[0.2em] cursor-pointer hover:bg-neutral-900 transition-all duration-300">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+            <span x-show="!chatOpen" class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
             <span x-show="!chatOpen">Aura Curation Companion</span>
-            <span x-show="chatOpen" style="display: none;">[ Close Dialogue ]</span>
+            <span x-show="chatOpen" style="display: none;" class="flex items-center justify-center">
+                <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </span>
         </button>
  
         <div x-show="chatOpen" style="display: none;" x-transition class="mt-3 w-80 md:w-96 h-[420px] bg-[#0F0F0F] border border-neutral-800 rounded-3xl shadow-2xl flex flex-col justify-between overflow-hidden">

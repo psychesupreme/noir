@@ -80,7 +80,15 @@ class Storefront extends Component
 
     public function mount(): void
     {
-        $this->cart = session()->get('noir_bloom_cart', []);
+        $rawCart = session()->get('noir_bloom_cart', []);
+        $this->cart = [];
+        foreach ($rawCart as $key => $qty) {
+            if (is_numeric($key)) {
+                $this->cart[$key . '-standard'] = $qty;
+            } else {
+                $this->cart[$key] = $qty;
+            }
+        }
         $this->updatedDeliveryType();
 
         // Load authenticated user profile data if available
@@ -115,26 +123,29 @@ class Storefront extends Component
         $this->selectedCategory = $category;
     }
 
-    public function addToCuration(int $productId): void
+    public function addToCuration(int $productId, string $size = 'standard'): void
     {
         $this->orderSubmitted = false;
         $this->mpesaErrorMessage = null;
 
-        if (isset($this->cart[$productId])) {
-            $this->cart[$productId]++;
+        $key = $productId . '-' . $size;
+
+        if (isset($this->cart[$key])) {
+            $this->cart[$key]++;
         } else {
-            $this->cart[$productId] = 1;
+            $this->cart[$key] = 1;
         }
 
         session()->put('noir_bloom_cart', $this->cart);
     }
 
-    public function removeFromCuration(int $productId): void
+    public function removeFromCuration(int $productId, string $size = 'standard'): void
     {
-        if (isset($this->cart[$productId])) {
-            $this->cart[$productId]--;
-            if ($this->cart[$productId] <= 0) {
-                unset($this->cart[$productId]);
+        $key = $productId . '-' . $size;
+        if (isset($this->cart[$key])) {
+            $this->cart[$key]--;
+            if ($this->cart[$key] <= 0) {
+                unset($this->cart[$key]);
             }
         }
 
@@ -238,17 +249,34 @@ class Storefront extends Component
             );
 
             $targetBranch = Branch::where('location_city', $this->region)->where('is_active', true)->first();
-            $products = Product::findMany(array_keys($this->cart));
+            $productIds = [];
+            foreach (array_keys($this->cart) as $key) {
+                $parts = explode('-', $key);
+                $productIds[] = $parts[0];
+            }
+            $products = Product::findMany(array_unique($productIds));
+            
             $totalAmount = 0;
-            $pivotPayload = [];
+            $itemsToAttach = [];
 
-            foreach ($this->cart as $productId => $quantity) {
+            foreach ($this->cart as $key => $quantity) {
+                $parts = explode('-', $key);
+                $productId = $parts[0];
+                $size = $parts[1] ?? 'standard';
                 $product = $products->firstWhere('id', $productId);
                 if ($product) {
-                    $totalAmount += ($product->price * $quantity);
-                    $pivotPayload[$productId] = [
-                        'quantity'      => $quantity,
-                        'price_at_sale' => $product->price,
+                    $priceMultiplier = match($size) {
+                        'deluxe' => 1.5,
+                        'grand' => 2.2,
+                        default => 1.0
+                    };
+                    $finalPrice = (int) round($product->price * $priceMultiplier);
+                    $totalAmount += ($finalPrice * $quantity);
+                    
+                    $itemsToAttach[] = [
+                        'product_id' => $productId,
+                        'quantity' => $quantity,
+                        'price_at_sale' => $finalPrice
                     ];
                 }
             }
@@ -267,7 +295,12 @@ class Storefront extends Component
                 'special_instructions' => 'Delivery Package: ' . strtoupper($this->delivery_type),
             ]);
 
-            $order->products()->sync($pivotPayload);
+            foreach ($itemsToAttach as $item) {
+                $order->products()->attach($item['product_id'], [
+                    'quantity' => $item['quantity'],
+                    'price_at_sale' => $item['price_at_sale']
+                ]);
+            }
 
             return $order->id;
         });
@@ -402,16 +435,40 @@ class Storefront extends Component
             return [];
         }
 
-        $products = Product::whereIn('id', array_keys($this->cart))->get()->keyBy('id');
+        $productIds = [];
+        foreach (array_keys($this->cart) as $key) {
+            $parts = explode('-', $key);
+            $productIds[] = $parts[0];
+        }
+
+        $products = Product::whereIn('id', array_unique($productIds))->get()->keyBy('id');
         $items = [];
 
-        foreach ($this->cart as $id => $quantity) {
+        foreach ($this->cart as $key => $quantity) {
+            $parts = explode('-', $key);
+            $id = $parts[0];
+            $size = $parts[1] ?? 'standard';
             $product = $products->get($id);
             if ($product) {
+                $priceMultiplier = match($size) {
+                    'deluxe' => 1.5,
+                    'grand' => 2.2,
+                    default => 1.0
+                };
+                $finalPrice = (int) round($product->price * $priceMultiplier);
+
+                $clonedProduct = clone $product;
+                $clonedProduct->price = $finalPrice;
+                if ($size !== 'standard') {
+                    $clonedProduct->name = $product->name . ' (' . ucfirst($size) . ')';
+                }
+
                 $items[] = [
-                    'product'  => $product,
-                    'quantity' => $quantity,
-                    'subtotal' => $product->price * $quantity,
+                    'product'     => $clonedProduct,
+                    'quantity'    => $quantity,
+                    'subtotal'    => $finalPrice * $quantity,
+                    'size'        => $size,
+                    'original_id' => $id,
                 ];
             }
         }
