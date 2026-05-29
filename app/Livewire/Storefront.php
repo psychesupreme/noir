@@ -248,21 +248,21 @@ class Storefront extends Component
         }
 
         try {
-            $response = $mpesa->sendStkPush(
-                phone: $this->phone,
-                amount: $order->total_amount,
-                orderId: $order->id
-            );
-
-            // Create a pending payment tracking record
-            Payment::create([
+            // Create a pending payment tracking record first
+            $payment = Payment::create([
                 'order_id' => $order->id,
                 'phone_number' => $this->phone,
                 'amount' => $order->total_amount,
                 'status' => 'pending',
-                'merchant_request_id' => $response['MerchantRequestID'] ?? null,
-                'checkout_request_id' => $response['CheckoutRequestID'] ?? null,
             ]);
+
+            // Dispatch background queue job with afterCommit constraint to prevent race conditions
+            \App\Jobs\SendMpesaStkPushJob::dispatch(
+                $payment->id,
+                $this->phone,
+                $order->total_amount,
+                $order->id
+            )->afterCommit();
 
         } catch (\Exception $e) {
             $this->mpesaErrorMessage = 'Payment initiation failed: ' . $e->getMessage();
@@ -278,35 +278,50 @@ class Storefront extends Component
 
     public function render()
     {
-        $occasions = Occasion::all();
-        $productsQuery = Product::with('occasions')->latest();
+        $occasions = \Illuminate\Support\Facades\Cache::remember('occasions_all', 3600, fn() => Occasion::all());
+        
+        $isBaseCatalog = ($this->selectedCategory === 'all' && empty($this->search) && !$this->selectedOccasion);
 
-        if ($this->selectedCategory !== 'all') {
-            $productsQuery->where('category', $this->selectedCategory);
-        }
+        if ($isBaseCatalog) {
+            $showroomProducts = \Illuminate\Support\Facades\Cache::remember('storefront_products_base', 300, function () {
+                return Product::with('occasions')->latest()->get()->map(function($product) {
+                    $product->backdrop_url = $product->image_url ?: match($product->category) {
+                        'wholesale' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600', // Graded bundles
+                        'gifting'   => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600', // Premium hampers
+                        default     => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600', // Architectural retail
+                    };
+                    return $product;
+                });
+            });
+        } else {
+            $productsQuery = Product::with('occasions')->latest();
 
-        if (!empty($this->search)) {
-            $productsQuery->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%');
+            if ($this->selectedCategory !== 'all') {
+                $productsQuery->where('category', $this->selectedCategory);
+            }
+
+            if (!empty($this->search)) {
+                $productsQuery->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                      ->orWhere('description', 'like', '%' . $this->search . '%');
+                });
+            }
+
+            if ($this->selectedOccasion) {
+                $productsQuery->whereHas('occasions', function ($query) {
+                    $query->where('slug', $this->selectedOccasion);
+                });
+            }
+
+            $showroomProducts = $productsQuery->get()->map(function($product) {
+                $product->backdrop_url = $product->image_url ?: match($product->category) {
+                    'wholesale' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600', // Graded bundles
+                    'gifting'   => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600', // Premium hampers
+                    default     => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600', // Architectural retail
+                };
+                return $product;
             });
         }
-
-        if ($this->selectedOccasion) {
-            $productsQuery->whereHas('occasions', function ($query) {
-                $query->where('slug', $this->selectedOccasion);
-            });
-        }
-
-        // Map premium open-source stock image arrays based on category lines
-        $showroomProducts = $productsQuery->get()->map(function($product) {
-            $product->backdrop_url = $product->image_url ?: match($product->category) {
-                'wholesale' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600', // Graded bundles
-                'gifting'   => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600', // Premium hampers
-                default     => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600', // Architectural retail
-            };
-            return $product;
-        });
 
         $userOrders = collect();
         if (auth()->check()) {

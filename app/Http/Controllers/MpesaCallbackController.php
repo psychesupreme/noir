@@ -66,10 +66,11 @@ class MpesaCallbackController extends Controller
                     'result_description'   => $resultDesc,
                 ]);
 
-                // Transition the parent order state automatically to approved status
-                Order::where('id', $payment->order_id)->update([
-                    'status' => 'approved'
-                ]);
+                // Transition the parent order state automatically to approved status via OrderService
+                $order = Order::with(['client', 'products'])->find($payment->order_id);
+                if ($order) {
+                    app(\App\Services\OrderService::class)->approve($order);
+                }
 
                 Log::info("M-Pesa Payment Captured Successfully against Order ID: {$payment->order_id}. Receipt: {$receiptNumber}");
             } else {

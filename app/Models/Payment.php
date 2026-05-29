@@ -28,4 +28,15 @@ class Payment extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    protected static function booted(): void
+    {
+        static::saved(function ($payment) {
+            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        });
+
+        static::deleted(function ($payment) {
+            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        });
+    }
 }

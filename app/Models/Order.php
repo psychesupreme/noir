@@ -60,4 +60,15 @@ class Order extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
+    protected static function booted(): void
+    {
+        static::saved(function ($order) {
+            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        });
+
+        static::deleted(function ($order) {
+            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        });
+    }
 }

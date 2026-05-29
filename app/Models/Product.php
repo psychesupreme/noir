@@ -118,5 +118,14 @@ class Product extends Model
                 ]);
             }
         });
+        static::saved(function ($product) {
+            \Illuminate\Support\Facades\Cache::forget('storefront_products_base');
+            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        });
+
+        static::deleted(function ($product) {
+            \Illuminate\Support\Facades\Cache::forget('storefront_products_base');
+            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        });
     }
 }

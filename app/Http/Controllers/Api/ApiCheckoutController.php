@@ -96,7 +96,7 @@ class ApiCheckoutController extends Controller
             $serviceFee = 500;
             $grandTotal = $subtotal + $serviceFee;
 
-            // Create Order - Auto approved for instant validation & fulfillment simulation
+            // Create Order - set status to pending initially
             $order = Order::create([
                 'client_id' => $client->id,
                 'branch_id' => $targetBranch?->id ?? null,
@@ -105,36 +105,18 @@ class ApiCheckoutController extends Controller
                 'recipient_phone' => $request->is_gift ? $request->recipient_phone : null,
                 'total_amount' => $grandTotal,
                 'service_fee_amount' => $serviceFee,
-                'status' => 'approved', // Auto approved for instant checkouts
+                'status' => 'pending',
                 'special_instructions' => $request->special_instructions ?? 'API Mobile Order',
             ]);
 
             // Associate items
             $order->products()->sync($pivotPayload);
 
-            // 3. Inventory Deduction
-            foreach ($order->products as $product) {
-                $product->decrement('stock', $product->pivot->quantity);
-            }
+            // Reload products relation to ensure they are available in OrderService
+            $order->load('products');
 
-            // 4. Award Loyalty Points
-            $user = User::where('email', $client->email)->first();
-            if ($user) {
-                $pointsEarned = (int) ($order->total_amount / 100);
-                if ($pointsEarned > 0) {
-                    $user->increment('loyalty_points', $pointsEarned);
-                    LoyaltyTransaction::create([
-                        'user_id' => $user->id,
-                        'points' => $pointsEarned,
-                        'type' => 'earn',
-                        'description' => "Points earned on order #NB-ORD-" . str_pad($order->id, 4, '0', STR_PAD_LEFT),
-                    ]);
-                }
-            }
-
-            // 5. KRA eTIMS Transmission
-            $invoice = $etims->initializeFiscalInvoice($order);
-            $etims->transmitToKra($invoice);
+            // Approve order using OrderService (handles stock, loyalty, eTIMS)
+            app(\App\Services\OrderService::class)->approve($order);
 
             return $order;
         });

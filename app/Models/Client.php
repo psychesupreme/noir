@@ -58,4 +58,15 @@ class Client extends Model
     {
         return !empty($this->kra_pin) ? 'Corporate' : 'Individual';
     }
+
+    protected static function booted(): void
+    {
+        static::saved(function ($client) {
+            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        });
+
+        static::deleted(function ($client) {
+            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        });
+    }
 }

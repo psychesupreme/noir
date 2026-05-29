@@ -64,33 +64,9 @@ class PaymentIndex extends Component
                 'result_description' => 'Refunded: ' . $this->refundReason,
             ]);
 
-            // Transition parent order back to cancelled
+            // Transition parent order back to cancelled via OrderService
             if ($payment->order) {
-                $payment->order->update([
-                    'status' => 'cancelled',
-                ]);
-
-                // Revert inventory stock via save to fire model event hooks
-                foreach ($payment->order->products as $product) {
-                    $product->adjustment_reason = "Requisition cancellation (M-Pesa Refund)";
-                    $product->stock = $product->stock + $product->pivot->quantity;
-                    $product->save();
-                }
-
-                // Revoke loyalty points earned
-                $user = \App\Models\User::where('email', $payment->order->client->email)->first();
-                if ($user) {
-                    $pointsEarned = (int) ($payment->order->total_amount / 100);
-                    if ($pointsEarned > 0) {
-                        $user->decrement('loyalty_points', min($user->loyalty_points, $pointsEarned));
-                        \App\Models\LoyaltyTransaction::create([
-                            'user_id' => $user->id,
-                            'points' => -$pointsEarned,
-                            'type' => 'redeem',
-                            'description' => "Points revoked for refunded order #NB-ORD-" . str_pad($payment->order->id, 4, '0', STR_PAD_LEFT),
-                        ]);
-                    }
-                }
+                app(\App\Services\OrderService::class)->cancel($payment->order);
             }
 
             Log::info("Simulated B2C M-Pesa Refund processed for Receipt: {$payment->mpesa_receipt_number}");
