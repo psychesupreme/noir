@@ -11,6 +11,8 @@ class Product extends Model
 {
     use HasFactory;
 
+    public ?string $adjustment_reason = null;
+
     /**
      * The attributes that are mass assignable.
      * Tailored for the Noir & Bloom luxury catalog.
@@ -79,5 +81,42 @@ class Product extends Model
     public function getFormattedPriceAttribute(): string
     {
         return 'Ksh ' . number_format($this->price);
+    }
+
+    /**
+     * Booted method to handle eloquent model events.
+     */
+    protected static function booted(): void
+    {
+        static::updating(function ($product) {
+            if ($product->isDirty('stock')) {
+                $original = (int) $product->getOriginal('stock');
+                $current = (int) $product->stock;
+                $diff = $current - $original;
+
+                // Log details to database
+                \App\Models\InventoryLog::create([
+                    'product_id' => $product->id,
+                    'user_id' => auth()->id(),
+                    'quantity_before' => $original,
+                    'quantity_after' => $current,
+                    'adjustment' => $diff,
+                    'reason' => $product->adjustment_reason ?: 'System adjustment',
+                ]);
+            }
+        });
+
+        static::created(function ($product) {
+            if ($product->stock > 0) {
+                \App\Models\InventoryLog::create([
+                    'product_id' => $product->id,
+                    'user_id' => auth()->id(),
+                    'quantity_before' => 0,
+                    'quantity_after' => $product->stock,
+                    'adjustment' => $product->stock,
+                    'reason' => 'Initial catalog creation',
+                ]);
+            }
+        });
     }
 }

@@ -67,9 +67,11 @@ class OrderIndex extends Component
         $wasFulfillmentStatus = in_array($oldStatus, ['approved', 'processing', 'delivered']);
 
         if ($isFulfillmentStatus && !$wasFulfillmentStatus) {
-            // Decrement Stock
+            // Decrement Stock via save to fire model event hooks
             foreach ($order->products as $product) {
-                $product->decrement('stock', $product->pivot->quantity);
+                $product->adjustment_reason = "Fulfillment of Order #NB-ORD-" . str_pad($order->id, 4, '0', STR_PAD_LEFT);
+                $product->stock = max(0, $product->stock - $product->pivot->quantity);
+                $product->save();
             }
 
             // Award Loyalty Points to corresponding User if registered
@@ -90,9 +92,11 @@ class OrderIndex extends Component
 
         // Transition from Approved/Processing/Delivered to Cancelled (Fulfillment reverted)
         if ($newStatus === 'cancelled' && $wasFulfillmentStatus) {
-            // Revert Stock
+            // Revert Stock via save to fire model event hooks
             foreach ($order->products as $product) {
-                $product->increment('stock', $product->pivot->quantity);
+                $product->adjustment_reason = "Requisition cancellation of Order #NB-ORD-" . str_pad($order->id, 4, '0', STR_PAD_LEFT);
+                $product->stock = $product->stock + $product->pivot->quantity;
+                $product->save();
             }
 
             // Revoke Loyalty Points

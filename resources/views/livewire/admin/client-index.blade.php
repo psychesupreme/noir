@@ -3,10 +3,19 @@
     class="space-y-8"
 >
     {{-- ─── Page Header ─── --}}
-    <div>
-        <p class="text-[10px] uppercase tracking-[0.3em] font-mono text-neutral-600">Client Registry</p>
-        <h2 class="text-xl font-light tracking-wide text-white mt-1">Client Management</h2>
-        <p class="text-xs text-neutral-500 font-light mt-1">Manage your corporate and individual client accounts across all regions.</p>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <p class="text-[10px] uppercase tracking-[0.3em] font-mono text-neutral-600">Client Registry</p>
+            <h2 class="text-xl font-light tracking-wide text-white mt-1">Client Management</h2>
+            <p class="text-xs text-neutral-500 font-light mt-1">Manage your corporate and individual client accounts across all regions.</p>
+        </div>
+        
+        <button
+            wire:click="openCreateModal"
+            class="flex items-center space-x-2 bg-white text-black px-4 py-2.5 text-xs font-mono uppercase tracking-wider rounded-sm hover:bg-neutral-200 transition-colors"
+        >
+            <span>+ Add Client</span>
+        </button>
     </div>
 
     {{-- ─── Stats Row ─── --}}
@@ -47,14 +56,22 @@
     <div class="bg-[#0F0F12] border border-neutral-900 rounded-sm p-4">
         <div class="flex flex-col lg:flex-row items-start lg:items-center gap-4">
             {{-- Search --}}
-            <div class="relative flex-1 w-full lg:max-w-sm">
-                <span class="absolute inset-y-0 left-3 flex items-center text-neutral-600 text-xs">⌕</span>
+            <div class="relative flex-1 w-full lg:max-w-sm group">
                 <input
                     wire:model.live.debounce.300ms="search"
                     type="text"
-                    placeholder="Search clients..."
-                    class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm pl-8 pr-3 py-2 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-colors"
+                    placeholder="Search clients (e.g. type:corporate spent>5000)..."
+                    class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm pl-9 pr-3 py-2 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-700 focus:ring-1 focus:ring-amber-500/20 transition-all duration-300 font-mono"
                 />
+                <div class="absolute left-3 top-2.5 flex items-center justify-center pointer-events-none">
+                    <svg wire:loading.remove wire:target="search" class="w-3.5 h-3.5 text-neutral-600 transition-all duration-300 group-focus-within:text-amber-500 group-focus-within:scale-115" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                    <svg wire:loading wire:target="search" class="w-3.5 h-3.5 text-amber-500 animate-spin" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
             </div>
 
             {{-- Type Filter --}}
@@ -195,13 +212,27 @@
                             </td>
 
                             {{-- Actions --}}
-                            <td class="p-5">
-                                <button
-                                    wire:click.stop="viewClient({{ $client->id }})"
-                                    class="text-[10px] tracking-[0.15em] uppercase font-mono text-neutral-500 hover:text-amber-400 transition-colors"
-                                >
-                                    View →
-                                </button>
+                            <td class="p-5" wire:click.stop>
+                                <div class="flex items-center space-x-3">
+                                    <button
+                                        wire:click="viewClient({{ $client->id }})"
+                                        class="text-[10px] tracking-[0.15em] uppercase font-mono text-neutral-500 hover:text-amber-400 transition-colors"
+                                    >
+                                        View
+                                    </button>
+                                    <button
+                                        wire:click="openEditModal({{ $client->id }})"
+                                        class="text-[10px] tracking-[0.15em] uppercase font-mono text-neutral-500 hover:text-white transition-colors"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        wire:click="confirmDelete({{ $client->id }})"
+                                        class="text-[10px] tracking-[0.15em] uppercase font-mono text-neutral-500 hover:text-rose-400 transition-colors"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -401,4 +432,145 @@
             </div>
         @endif
     </div>
+
+    {{-- Create/Edit Client Modal --}}
+    @if ($showModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm transition-opacity duration-300">
+            <div class="bg-[#0F0F12] border border-neutral-800 rounded-sm w-full max-w-lg p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+                <h3 class="text-base font-light tracking-widest text-white uppercase mb-6">{{ $isEditing ? 'Edit Client Record' : 'Add New Client' }}</h3>
+                
+                <form wire:submit.prevent="save" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">Contact Name</label>
+                            <input 
+                                wire:model="contact_name" 
+                                type="text" 
+                                class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                            >
+                            @error('contact_name') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">Company Name</label>
+                            <input 
+                                wire:model="company_name" 
+                                type="text" 
+                                placeholder="Optional"
+                                class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                            >
+                            @error('company_name') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">Email Address</label>
+                            <input 
+                                wire:model="email" 
+                                type="email" 
+                                class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                            >
+                            @error('email') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">Phone Number</label>
+                            <input 
+                                wire:model="phone" 
+                                type="text" 
+                                class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                            >
+                            @error('phone') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">KRA PIN</label>
+                            <input 
+                                wire:model="kra_pin" 
+                                type="text" 
+                                placeholder="Optional"
+                                class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                            >
+                            @error('kra_pin') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">Region</label>
+                            <select 
+                                wire:model="region" 
+                                class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-neutral-400 focus:outline-none focus:border-neutral-600 font-mono cursor-pointer"
+                            >
+                                <option value="Nairobi">Nairobi</option>
+                                <option value="Kiambu">Kiambu</option>
+                            </select>
+                            @error('region') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">Delivery Address</label>
+                        <textarea 
+                            wire:model="delivery_address" 
+                            rows="3" 
+                            class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                        ></textarea>
+                        @error('delivery_address') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="pt-4 flex justify-end space-x-3">
+                        <button 
+                            type="button" 
+                            wire:click="resetForm"
+                            class="px-4 py-2 text-xs font-mono uppercase tracking-wider text-neutral-500 hover:text-white transition-colors"
+                        >
+                            Reset
+                        </button>
+                        <button 
+                            type="button" 
+                            wire:click="$set('showModal', false)"
+                            class="px-4 py-2 text-xs font-mono uppercase tracking-wider text-neutral-500 hover:text-white transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            type="submit" 
+                            class="bg-white text-black px-6 py-2 text-xs font-mono uppercase tracking-wider rounded-sm hover:bg-neutral-200 transition-colors"
+                        >
+                            Save Client
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    {{-- Delete Client Modal --}}
+    @if ($showDeleteModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm transition-opacity duration-300">
+            <div class="bg-[#0F0F12] border border-neutral-800 rounded-sm w-full max-w-sm p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+                <h3 class="text-base font-light tracking-widest text-white uppercase mb-4">Delete Client Record</h3>
+                <p class="text-xs text-neutral-400 font-light leading-relaxed mb-6">
+                    Are you sure you want to permanently delete this client? Linked orders will remain but will be set as unassigned to client.
+                </p>
+
+                <div class="flex justify-end space-x-3">
+                    <button 
+                        wire:click="$set('showDeleteModal', false)"
+                        class="px-4 py-2 text-xs font-mono uppercase tracking-wider text-neutral-500 hover:text-white transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        wire:click="deleteClient"
+                        class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-sm transition-colors"
+                    >
+                        Delete Client
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

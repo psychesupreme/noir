@@ -70,9 +70,11 @@ class PaymentIndex extends Component
                     'status' => 'cancelled',
                 ]);
 
-                // Revert inventory stock
+                // Revert inventory stock via save to fire model event hooks
                 foreach ($payment->order->products as $product) {
-                    $product->increment('stock', $product->pivot->quantity);
+                    $product->adjustment_reason = "Requisition cancellation (M-Pesa Refund)";
+                    $product->stock = $product->stock + $product->pivot->quantity;
+                    $product->save();
                 }
 
                 // Revoke loyalty points earned

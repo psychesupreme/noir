@@ -21,6 +21,7 @@ class ProductIndex extends Component
     public bool $showModal = false;
     public bool $isEditing = false;
     public ?int $editingProductId = null;
+    public bool $showStockLogModal = false;
 
     // Form fields
     public string $name = '';
@@ -140,7 +141,9 @@ class ProductIndex extends Component
     public function adjustStock(int $productId, int $amount): void
     {
         $product = Product::findOrFail($productId);
-        $product->update(['stock' => max(0, $product->stock + $amount)]);
+        $product->adjustment_reason = "Manual adjustment (ERP Admin)";
+        $product->stock = max(0, $product->stock + $amount);
+        $product->save();
     }
 
     protected function resetForm(): void
@@ -154,6 +157,16 @@ class ProductIndex extends Component
         $this->stock = 0;
         $this->category = 'retail';
         $this->unit_type = 'arrangement';
+    }
+
+    public function openStockLogModal(): void
+    {
+        $this->showStockLogModal = true;
+    }
+
+    public function closeStockLogModal(): void
+    {
+        $this->showStockLogModal = false;
     }
 
     public function render()
@@ -179,6 +192,7 @@ class ProductIndex extends Component
             'occasions' => Occasion::all(),
             'totalProducts' => Product::count(),
             'lowStockCount' => Product::where('stock', '<=', 10)->count(),
+            'inventoryLogs' => \App\Models\InventoryLog::with(['product', 'user'])->latest()->paginate(10, pageName: 'stockLogPage'),
         ])->layout('components.layouts.admin');
     }
 }

@@ -45,6 +45,14 @@
                     <option value="gifting">Gifting</option>
                 </select>
 
+                {{-- Stock Trail --}}
+                <button
+                    wire:click="openStockLogModal"
+                    class="flex items-center space-x-2 border border-neutral-850 text-neutral-400 px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-sm hover:text-white hover:border-neutral-600 transition-colors mr-1"
+                >
+                    <span>Stock Ledger</span>
+                </button>
+
                 {{-- Add Product --}}
                 <button
                     wire:click="openCreateModal"
@@ -201,6 +209,81 @@
             </div>
         @endif
     </div>
+
+    {{-- Stock Ledger Modal --}}
+    @if ($showStockLogModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm transition-opacity duration-300">
+            <div class="bg-[#0F0F12] border border-neutral-800 rounded-sm w-full max-w-4xl p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-base font-light tracking-widest text-white uppercase">Stock Audit Trail</h3>
+                        <p class="text-xs text-neutral-500 font-light mt-1">Live tracking ledger of all manual and system-triggered inventory changes.</p>
+                    </div>
+                    <button 
+                        wire:click="closeStockLogModal"
+                        class="text-neutral-500 hover:text-white transition-colors"
+                    >
+                        ✕ Close
+                    </button>
+                </div>
+
+                {{-- Stock Table --}}
+                <div class="border border-neutral-900 rounded-sm overflow-hidden flex-1 overflow-y-auto mb-4">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-neutral-900 text-neutral-500 text-[9px] uppercase tracking-[0.2em] bg-[#0A0A0A]/50 font-mono">
+                                <th class="p-4">Timestamp</th>
+                                <th class="p-4">Product Name</th>
+                                <th class="p-4 font-mono text-center">Prev</th>
+                                <th class="p-4 font-mono text-center">Adj</th>
+                                <th class="p-4 font-mono text-center">New</th>
+                                <th class="p-4">Reason Details</th>
+                                <th class="p-4">Staff Member</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-900/60 text-xs font-mono">
+                            @forelse ($inventoryLogs as $log)
+                                <tr class="hover:bg-neutral-950/40">
+                                    <td class="p-4 text-neutral-500 font-light">
+                                        {{ $log->created_at->format('d M Y H:i:s') }}
+                                    </td>
+                                    <td class="p-4 text-white">
+                                        {{ $log->product->name ?? 'Deleted Product' }}
+                                    </td>
+                                    <td class="p-4 text-center text-neutral-500">
+                                        {{ $log->quantity_before }}
+                                    </td>
+                                    <td class="p-4 text-center font-bold {{ $log->adjustment > 0 ? 'text-emerald-500' : 'text-rose-500' }}">
+                                        {{ $log->adjustment > 0 ? '+' : '' }}{{ $log->adjustment }}
+                                    </td>
+                                    <td class="p-4 text-center text-neutral-200">
+                                        {{ $log->quantity_after }}
+                                    </td>
+                                    <td class="p-4 text-neutral-400 font-light">
+                                        {{ $log->reason }}
+                                    </td>
+                                    <td class="p-4 text-neutral-500 font-light">
+                                        {{ $log->user->email ?? 'System Engine' }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="p-8 text-center text-neutral-600 font-mono">
+                                        No inventory audit records captured so far.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- Pagination --}}
+                <div class="mt-2 text-[10px]">
+                    {{ $inventoryLogs->links(data: ['scrollTo' => false]) }}
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- ─── Create/Edit Modal ─── --}}
     @if ($showModal)
