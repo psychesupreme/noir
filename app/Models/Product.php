@@ -1,0 +1,83 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Product extends Model
+{
+    use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     * Tailored for the Noir & Bloom luxury catalog.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'sku',
+        'description',
+        'price',
+        'stock',
+        'category',
+        'unit_type',
+        'grade',
+        'image_url',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     * Ensures currency calculations preserve mathematical integrity.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'price' => 'integer',
+        'stock' => 'integer',
+    ];
+
+    // ── Relationships ────────────────────────────────────────────────────
+
+    /**
+     * The luxury events, holidays, and design themes associated with this arrangement.
+     * Establishes the Many-to-Many relationship with the Occasions catalog.
+     */
+    public function occasions(): BelongsToMany
+    {
+        return $this->belongsToMany(Occasion::class);
+    }
+
+    // ── Query Scopes ─────────────────────────────────────────────────────
+
+    /**
+     * Filter products by catalog category (retail, wholesale, gifting).
+     */
+    public function scopeCategory(Builder $query, string $category): Builder
+    {
+        return $query->where('category', $category);
+    }
+
+    /**
+     * Filter products with dangerously low inventory levels.
+     * Default threshold: 10 units.
+     */
+    public function scopeLowStock(Builder $query, int $threshold = 10): Builder
+    {
+        return $query->where('stock', '<=', $threshold);
+    }
+
+    // ── Accessors ────────────────────────────────────────────────────────
+
+    /**
+     * Display price in Kenyan Shillings with proper formatting.
+     * Example: "Ksh 12,500"
+     */
+    public function getFormattedPriceAttribute(): string
+    {
+        return 'Ksh ' . number_format($this->price);
+    }
+}
