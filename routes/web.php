@@ -9,6 +9,10 @@ use App\Livewire\Admin\ProductIndex;
 use App\Livewire\Admin\ClientIndex;
 use App\Livewire\Admin\BranchIndex;
 use App\Livewire\Admin\CampaignIndex;
+use App\Livewire\Admin\PaymentIndex;
+use App\Livewire\Admin\TaxIndex;
+use App\Livewire\Admin\ReportIndex;
+use App\Livewire\Admin\SettingsIndex;
 use App\Http\Controllers\MpesaCallbackController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -45,10 +49,10 @@ Route::middleware(['auth', 'role:admin,staff'])->prefix('admin')->group(function
     // Phase 2+: Future admin routes
     Route::get('/branches', BranchIndex::class)->name('admin.branches');
     Route::get('/campaigns', CampaignIndex::class)->name('admin.campaigns');
-    // Route::get('/payments', PaymentIndex::class)->name('admin.payments');
-    // Route::get('/tax', TaxIndex::class)->name('admin.tax');
-    // Route::get('/reports', ReportIndex::class)->name('admin.reports');
-    // Route::get('/settings', SettingsIndex::class)->name('admin.settings');
+    Route::get('/payments', PaymentIndex::class)->name('admin.payments');
+    Route::get('/tax', TaxIndex::class)->name('admin.tax');
+    Route::get('/reports', ReportIndex::class)->name('admin.reports');
+    Route::get('/settings', SettingsIndex::class)->name('admin.settings');
 });
 
 // ── M-Pesa Webhook (CSRF exempt — configured in bootstrap/app.php) ───────

@@ -7,10 +7,11 @@ use App\Models\Order;
 use App\Services\EtimsService;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Livewire\Admin\Traits\WithIntelligentSearch;
 
 class OrderIndex extends Component
 {
-    use WithPagination;
+    use WithPagination, WithIntelligentSearch;
 
     public string $search = '';
     public string $statusFilter = 'all';
@@ -135,21 +136,24 @@ class OrderIndex extends Component
             }
         }
 
+        // Use intelligent search parser for dynamic text search & commands
         if (!empty($this->search)) {
-            $query->where(function ($q) {
-                $searchTerm = $this->search;
-                if (preg_match('/NB-ORD-(\d+)/i', $searchTerm, $matches)) {
-                    $searchTerm = (int) $matches[1];
-                }
-                
-                $q->where('id', 'like', '%' . $searchTerm . '%')
-                  ->orWhereHas('client', function ($clientQuery) {
-                      $clientQuery->where('contact_name', 'like', '%' . $this->search . '%')
-                                  ->orWhere('company_name', 'like', '%' . $this->search . '%')
-                                  ->orWhere('email', 'like', '%' . $this->search . '%')
-                                  ->orWhere('phone', 'like', '%' . $this->search . '%');
-                  });
-            });
+            // Map order ID parsing specifically if user types ORD- or NB-ORD-
+            $searchTerm = $this->search;
+            if (preg_match('/NB-ORD-(\d+)/i', $searchTerm, $matches)) {
+                $this->parseAndApplySearch($query, $matches[1], ['id'], []);
+            } else {
+                $this->parseAndApplySearch(
+                    $query,
+                    $searchTerm,
+                    ['id', 'client.contact_name', 'client.company_name', 'client.email', 'client.phone'],
+                    [
+                        'status' => 'status',
+                        'amount' => 'total_amount',
+                        'branch' => 'branch_id',
+                    ]
+                );
+            }
         }
 
         return view('livewire.admin.order-index', [

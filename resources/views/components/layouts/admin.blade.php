@@ -48,10 +48,10 @@
                         ['icon' => '◉', 'label' => 'Clients',       'route' => '/admin/clients',   'active' => request()->is('admin/clients*'), 'future' => false],
                         ['icon' => '✉', 'label' => 'Campaigns',     'route' => '/admin/campaigns', 'active' => request()->is('admin/campaigns*'), 'future' => false],
                         ['icon' => '⬡', 'label' => 'Branches',      'route' => '/admin/branches',  'active' => request()->is('admin/branches*'), 'future' => false],
-                        ['icon' => '◎', 'label' => 'Payments',      'route' => '/admin/payments',  'active' => false, 'future' => true],
-                        ['icon' => '▣', 'label' => 'Tax & eTIMS',   'route' => '/admin/tax',       'active' => false, 'future' => true],
-                        ['icon' => '◇', 'label' => 'Reports',       'route' => '/admin/reports',   'active' => false, 'future' => true],
-                        ['icon' => '⚙', 'label' => 'Settings',      'route' => '/admin/settings',  'active' => false, 'future' => true],
+                        ['icon' => '◎', 'label' => 'Payments',      'route' => '/admin/payments',  'active' => request()->is('admin/payments*'), 'future' => false],
+                        ['icon' => '▣', 'label' => 'Tax & eTIMS',   'route' => '/admin/tax',       'active' => request()->is('admin/tax*'), 'future' => false],
+                        ['icon' => '◇', 'label' => 'Reports',       'route' => '/admin/reports',   'active' => request()->is('admin/reports*'), 'future' => false],
+                        ['icon' => '⚙', 'label' => 'Settings',      'route' => '/admin/settings',  'active' => request()->is('admin/settings*'), 'future' => false],
                     ];
                 @endphp
 
