@@ -160,23 +160,65 @@
     </header>
 
     <main class="max-w-7xl w-full mx-auto px-6 pt-32 flex-1">
-        <div :class="theme === 'alabaster' ? 'border-neutral-200' : 'border-neutral-900'" class="mb-12 border-b pb-1 flex flex-wrap gap-x-8 gap-y-4 text-[10px] uppercase tracking-[0.25em] font-medium whitespace-nowrap transition-colors duration-500">
-            <button wire:click="selectCategory('all')" class="pb-3 relative cursor-pointer {{ $selectedCategory === 'all' ? 'text-neutral-400' : 'text-neutral-500 hover:text-neutral-400' }}">
-                The Full Showroom
-                @if($selectedCategory === 'all') <span :class="theme === 'alabaster' ? 'bg-black' : 'bg-white'" class="absolute bottom-0 left-0 w-full h-[1.5px]"></span> @endif
-            </button>
-            <button wire:click="selectCategory('retail')" class="pb-3 relative cursor-pointer {{ $selectedCategory === 'retail' ? 'text-neutral-400' : 'text-neutral-500 hover:text-neutral-400' }}">
-                Bespoke Retail Arrays
-                @if($selectedCategory === 'retail') <span :class="theme === 'alabaster' ? 'bg-black' : 'bg-white'" class="absolute bottom-0 left-0 w-full h-[1.5px]"></span> @endif
-            </button>
-            <button wire:click="selectCategory('wholesale')" class="pb-3 relative cursor-pointer {{ $selectedCategory === 'wholesale' ? 'text-neutral-400' : 'text-neutral-500 hover:text-neutral-400' }}">
-                Wholesale Graded Stems
-                @if($selectedCategory === 'wholesale') <span :class="theme === 'alabaster' ? 'bg-black' : 'bg-white'" class="absolute bottom-0 left-0 w-full h-[1.5px]"></span> @endif
-            </button>
-            <button wire:click="selectCategory('gifting')" class="pb-3 relative cursor-pointer {{ $selectedCategory === 'gifting' ? 'text-neutral-400' : 'text-neutral-500 hover:text-neutral-400' }}">
-                Luxury Giftings
-                @if($selectedCategory === 'gifting') <span :class="theme === 'alabaster' ? 'bg-black' : 'bg-white'" class="absolute bottom-0 left-0 w-full h-[1.5px]"></span> @endif
-            </button>
+        <!-- Apple-Inspired Sub-Navigation Category Bar -->
+        <div class="max-w-2xl mx-auto w-full mb-12" x-data="{ active: @entangle('selectedCategory') }">
+            <div class="grid grid-cols-4 relative border-b border-neutral-500/10 pb-4">
+                <!-- Underline active slider line -->
+                <div class="absolute bottom-0 h-[2px] bg-[#D4AF37] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                     :class="{
+                         'left-0 w-1/4': active === 'all',
+                         'left-1/4 w-1/4': active === 'retail',
+                         'left-2/4 w-1/4': active === 'wholesale',
+                         'left-3/4 w-1/4': active === 'gifting'
+                     }"></div>
+                
+                <button @click="active = 'all'; $wire.selectCategory('all')" class="flex flex-col items-center justify-center space-y-2 cursor-pointer transition-all duration-300" :class="active === 'all' ? 'text-[#D4AF37] scale-105' : 'text-neutral-500 hover:text-neutral-300'">
+                    <svg viewBox="0 0 24 24" class="w-6 h-6 stroke-current fill-none" stroke-width="1.5">
+                        <path d="M12 12c2.5-3.5 1-7-1-8-2 1-3.5 4.5-1 8z" />
+                        <path d="M7.5 10.5c1.5-3-1-6-2.5-6.5-1.5.5-2 3.5 0 6.5z" />
+                        <path d="M16.5 10.5c-1.5-3 1-6 2.5-6.5 1.5.5 2 3.5 0 6.5z" />
+                        <path d="M8 12c-2.5-1.5-4.5.5-5 2 .5 1.5 3 2 5-2z" />
+                        <path d="M16 12c2.5-1.5 4.5.5 5 2-.5 1.5-3 2-5-2z" />
+                        <path d="M12 12c-1.5 4.5.5 8 1 9" />
+                        <path d="M12 12c1.5 4.5-.5 8-1 9" />
+                        <path d="M9 13.5c1.5 2.5.5 5.5 0 7.5" />
+                        <path d="M15 13.5c-1.5 2.5-.5 5.5 0 7.5" />
+                        <path d="M10 16h4" />
+                    </svg>
+                    <span class="text-[10px] font-mono uppercase tracking-[0.2em] font-medium">Showroom</span>
+                </button>
+                <button @click="active = 'retail'; $wire.selectCategory('retail')" class="flex flex-col items-center justify-center space-y-2 cursor-pointer transition-all duration-300" :class="active === 'retail' ? 'text-[#D4AF37] scale-105' : 'text-neutral-500 hover:text-neutral-300'">
+                    <svg viewBox="0 0 24 24" class="w-6 h-6 stroke-current fill-none" stroke-width="1.5">
+                        <path d="M12 9V2M12 2l-2 2M12 2l2 2" />
+                        <path d="M12 5.5c1.5-.5 3-1.5 3-3-1.5 0-2.5 1.5-3 3z" />
+                        <path d="M12 5.5c-1.5-.5-3-1.5-3-3 1.5 0 2.5 1.5 3 3z" />
+                        <path d="M9.5 9h5l1 2v4a3.5 3.5 0 0 1-7 0v-4l1-2z" />
+                        <path d="M10 19h4v2h-4z" />
+                    </svg>
+                    <span class="text-[10px] font-mono uppercase tracking-[0.2em] font-medium">Bespoke</span>
+                </button>
+                <button @click="active = 'wholesale'; $wire.selectCategory('wholesale')" class="flex flex-col items-center justify-center space-y-2 cursor-pointer transition-all duration-300" :class="active === 'wholesale' ? 'text-[#D4AF37] scale-105' : 'text-neutral-500 hover:text-neutral-300'">
+                    <svg viewBox="0 0 24 24" class="w-6 h-6 stroke-current fill-none" stroke-width="1.5">
+                        <path d="M6 3l3 8M9 2l2 9M15 2l-2 9M18 3l-3 8" />
+                        <path d="M8 11h8l-2 10H10L8 11z" />
+                        <path d="M8 11l-2 4 4 6" />
+                        <path d="M16 11l2 4-4 6" />
+                        <path d="M7.5 15h9" />
+                    </svg>
+                    <span class="text-[10px] font-mono uppercase tracking-[0.2em] font-medium">Wholesale</span>
+                </button>
+                <button @click="active = 'gifting'; $wire.selectCategory('gifting')" class="flex flex-col items-center justify-center space-y-2 cursor-pointer transition-all duration-300" :class="active === 'gifting' ? 'text-[#D4AF37] scale-105' : 'text-neutral-500 hover:text-neutral-300'">
+                    <svg viewBox="0 0 24 24" class="w-6 h-6 stroke-current fill-none" stroke-width="1.5">
+                        <rect x="4" y="8" width="16" height="12" rx="1" />
+                        <rect x="3" y="5" width="18" height="3" rx="0.5" />
+                        <path d="M12 5V20" />
+                        <path d="M3 12h18" />
+                        <path d="M12 5c-1.5-2.5-4.5-2.5-4.5 0s3 2.5 4.5 0z" />
+                        <path d="M12 5c1.5-2.5 4.5-2.5 4.5 0s-3 2.5-4.5 0z" />
+                    </svg>
+                    <span class="text-[10px] font-mono uppercase tracking-[0.2em] font-medium">Gifting</span>
+                </button>
+            </div>
         </div>
 
         <div class="mb-16 flex flex-wrap gap-2 text-[9px] font-mono uppercase tracking-wider">
@@ -188,50 +230,79 @@
             @endforeach
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16" wire:loading.class="opacity-40" wire:target="search, selectedCategory, filterByOccasion">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12" wire:loading.class="opacity-40" wire:target="search, selectedCategory, filterByOccasion">
             @forelse($products as $product)
-                <div class="flex flex-col justify-between space-y-4 group text-left">
-                    <div :class="theme === 'alabaster' ? 'border-neutral-200 bg-white' : 'border-neutral-900 bg-neutral-900/10'" class="aspect-[4/5] border rounded-sm relative overflow-hidden flex items-end p-5 transition-all duration-700 shadow-sm hover:shadow-2xl">
+                <div class="flex flex-col space-y-3 group text-left">
+                    <div :class="theme === 'alabaster' ? 'border-neutral-200 bg-white' : 'border-neutral-900 bg-neutral-900/10'" 
+                         class="aspect-[4/5] border rounded-2xl relative overflow-hidden transition-all duration-500 shadow-sm hover:shadow-xl">
                         
-                        <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 z-0">
+                        <!-- Clean image by default, scales slightly on hover -->
+                        <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
+                             class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 z-0">
                         
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
-
-                        <div class="absolute top-4 right-4 flex flex-col items-end space-y-1 text-[8px] font-mono uppercase tracking-widest z-20">
-                            <span class="bg-black/60 border border-white/10 text-neutral-200 px-2 py-0.5 rounded backdrop-blur-md">{{ $product->category }}</span>
-                            @if($product->grade)
-                                <span class="bg-amber-500 text-black px-2 py-0.5 rounded font-bold tracking-wide">{{ $product->grade }}</span>
-                            @endif
-                        </div>
-
-                        <div class="w-full space-y-4 z-20 relative text-white">
-                            <div class="space-y-1">
-                                <span class="text-[8px] uppercase tracking-[0.4em] text-neutral-400 block font-mono">Noir & Bloom Atelier</span>
-                                <h3 class="text-base font-light tracking-wide text-white leading-tight">{{ $product->name }}</h3>
-                                <span class="text-[9px] font-mono text-neutral-300 uppercase bg-white/10 border border-white/5 px-2 py-0.5 rounded-sm inline-block">Pack / {{ $product->unit_type }}</span>
+                        <!-- Dark glassmorphic overlay on hover -->
+                        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 flex flex-col justify-between p-5 text-white">
+                            <!-- Top row on hover overlay -->
+                            <div class="flex justify-between items-start">
+                                <span class="bg-white/15 border border-white/10 text-neutral-200 px-2 py-0.5 rounded text-[8px] font-mono uppercase tracking-widest backdrop-blur-md">
+                                    {{ $product->category }}
+                                </span>
+                                @if($product->grade)
+                                    <span class="bg-[#D4AF37] text-black px-2 py-0.5 rounded text-[8px] font-mono font-bold tracking-wide uppercase">
+                                        {{ $product->grade }}
+                                    </span>
+                                @endif
                             </div>
 
-                            <button 
-                                wire:click="addToCuration({{ $product->id }})"
-                                @click="drawerOpen = true; checkoutMode = false;"
-                                class="w-full bg-white text-black text-[9px] font-semibold tracking-[0.25em] uppercase py-3.5 cursor-pointer shadow-2xl transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 rounded-sm hover:bg-neutral-100"
-                            >
-                                Curate Selection
-                            </button>
+                            <!-- Bottom section on hover overlay -->
+                            <div class="space-y-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <div class="flex justify-between items-baseline">
+                                    <span class="text-[9px] uppercase tracking-[0.2em] text-neutral-300 font-mono">Price</span>
+                                    <span class="font-mono text-base font-semibold tracking-tight">{{ number_format($product->price) }} KSH</span>
+                                </div>
+                                <button 
+                                    wire:click="addToCuration({{ $product->id }})"
+                                    @click="drawerOpen = true; checkoutMode = false;"
+                                    class="w-full bg-transparent border border-white hover:bg-white hover:text-black text-white text-[9px] font-semibold tracking-[0.2em] uppercase py-3 cursor-pointer transition-all duration-300 rounded-xl"
+                                >
+                                    Curate Selection
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-baseline pt-1 text-xs px-1">
-                        <p class="text-neutral-500 font-light truncate max-w-[220px] text-[11px]">{{ $product->description ?? 'Premium luxury floral batch curation.' }}</p>
-                        <span :class="theme === 'alabaster' ? 'text-neutral-900' : 'text-white'" class="font-mono tracking-tight font-medium shrink-0 text-sm">{{ number_format($product->price) }} KSH</span>
+                    <!-- Info below card -->
+                    <div class="px-1 space-y-1.5">
+                        <span class="text-[9px] uppercase tracking-[0.3em] text-neutral-400 font-mono block font-light">Noir & Bloom Atelier</span>
+                        <h3 :class="theme === 'alabaster' ? 'text-neutral-900' : 'text-white'" class="text-base font-serif italic tracking-wide leading-snug">
+                            {{ $product->name }}
+                        </h3>
+                        <p class="text-neutral-500 font-light text-xs leading-relaxed line-clamp-2">
+                            {{ $product->description ?? 'Premium luxury floral batch curation.' }}
+                        </p>
                     </div>
                 </div>
             @empty
-                <div class="col-span-full py-20 text-center border border-dashed border-neutral-800 rounded-sm">
+                <div class="col-span-full py-20 text-center border border-dashed border-neutral-800 rounded-2xl">
                     <p class="text-xs font-light text-neutral-500 font-mono">No computational logs found matching this showroom segment filter query.</p>
                 </div>
             @endforelse
         </div>
+
+        <!-- Infinite Scroll Trigger -->
+        @if(count($products) >= $perPage)
+            <div x-intersect="$wire.loadMore()" class="col-span-full flex flex-col items-center justify-center py-16 space-y-4">
+                <svg class="animate-spin h-8 w-8 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="2.5" class="fill-current" />
+                    <!-- Petals -->
+                    <path d="M12 9.5c0-1.5 1-3 2.5-3s2.5 1.5 2.5 3-1 3-2.5 3-2.5-1.5-2.5-3z" />
+                    <path d="M12 14.5c0 1.5-1 3-2.5 3s-2.5-1.5-2.5-3 1-3 2.5-3 2.5 1.5 2.5 3z" />
+                    <path d="M14.5 12c1.5 0 3 1 3 2.5s-1.5 2.5-3 2.5-3-1-3-2.5 1.5-3 3-3z" />
+                    <path d="M9.5 12c-1.5 0-3-1-3-2.5s1.5-2.5 3-2.5 3 1 3 2.5-1.5 3-3 3z" />
+                </svg>
+                <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-neutral-500">Unveiling More Curation...</span>
+            </div>
+        @endif
     </main>
 
     <!-- Luxury Atelier Footer -->
@@ -652,16 +723,16 @@
         @endif
     </div>
 
-    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
+    <div x-show="!drawerOpen" x-transition class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
         <button @click="chatOpen = !chatOpen" class="px-5 h-11 rounded-full bg-black text-white border border-neutral-800 shadow-2xl flex items-center space-x-3 text-[10px] uppercase font-mono tracking-[0.2em] cursor-pointer hover:bg-neutral-900 transition-all duration-300">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
-            <span x-show="!chatOpen">Concierge Support</span>
+            <span x-show="!chatOpen">Aura Curation Companion</span>
             <span x-show="chatOpen" style="display: none;">[ Close Dialogue ]</span>
         </button>
-
+ 
         <div x-show="chatOpen" style="display: none;" x-transition class="mt-3 w-80 md:w-96 h-[420px] bg-[#0F0F0F] border border-neutral-800 rounded shadow-2xl flex flex-col justify-between overflow-hidden">
             <div class="p-4 border-b border-neutral-800 bg-[#0A0A0A] flex items-center justify-between text-left">
-                <div><span class="text-[10px] uppercase font-mono text-neutral-300 tracking-wider font-semibold">Atelier Concierge AI</span><span class="block text-[9px] text-emerald-400 font-mono mt-0.5">&bull; Active Operational Node</span></div>
+                <div><span class="text-[10px] uppercase font-mono text-neutral-300 tracking-wider font-semibold">Aura Concierge AI</span><span class="block text-[9px] text-emerald-400 font-mono mt-0.5">&bull; Active Curation Companion</span></div>
             </div>
             <div class="flex-1 p-4 overflow-y-auto space-y-4 text-[11px] font-light scrollbar-none flex flex-col text-left">
                 @foreach($chatHistory as $msg)
@@ -669,7 +740,7 @@
                 @endforeach
             </div>
             <form wire:submit.prevent="sendChatMessage" class="p-3 border-t border-neutral-800 bg-[#0A0A0A] flex items-center gap-2">
-                <input type="text" wire:model="chatMessage" placeholder="Ask about surprise packages, KRA PIN inputs..." class="flex-1 bg-[#141414] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 font-light">
+                <input type="text" wire:model="chatMessage" placeholder="Ask Aura about arrangements, branches, points..." class="flex-1 bg-[#141414] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 font-light">
                 <button type="submit" class="bg-white text-black font-mono text-[9px] uppercase font-bold px-3 py-2 rounded-sm cursor-pointer hover:bg-neutral-200 transition-colors">Ask</button>
             </form>
         </div>

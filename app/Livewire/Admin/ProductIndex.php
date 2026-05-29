@@ -6,10 +6,12 @@ use App\Models\Product;
 use App\Models\Occasion;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 
 class ProductIndex extends Component
 {
     use WithPagination;
+    use WithFileUploads;
 
     // Filters
     public string $search = '';
@@ -33,6 +35,7 @@ class ProductIndex extends Component
     public string $unit_type = 'arrangement';
     public ?string $grade = null;
     public ?string $image_url = null;
+    public $image_file = null;
     public array $selectedOccasions = [];
 
     // Delete confirmation
@@ -57,7 +60,8 @@ class ProductIndex extends Component
             'category' => 'required|in:retail,wholesale,gifting',
             'unit_type' => 'required|in:arrangement,stem,bundle,hamper',
             'grade' => 'nullable|string|max:20',
-            'image_url' => 'nullable|url|max:500',
+            'image_url' => 'nullable|string|max:500',
+            'image_file' => 'nullable|image|max:2048',
         ];
     }
 
@@ -110,6 +114,13 @@ class ProductIndex extends Component
     {
         $validated = $this->validate();
 
+        if ($this->image_file) {
+            $path = $this->image_file->store('products', 'public');
+            $validated['image_url'] = '/storage/' . $path;
+        }
+
+        unset($validated['image_file']);
+
         if ($this->isEditing && $this->editingProductId) {
             $product = Product::findOrFail($this->editingProductId);
             $product->update($validated);
@@ -151,7 +162,7 @@ class ProductIndex extends Component
         $this->reset([
             'editingProductId', 'name', 'sku', 'description',
             'price', 'stock', 'category', 'unit_type', 'grade',
-            'image_url', 'selectedOccasions', 'isEditing'
+            'image_url', 'image_file', 'selectedOccasions', 'isEditing'
         ]);
         $this->price = 0;
         $this->stock = 0;

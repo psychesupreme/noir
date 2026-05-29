@@ -414,8 +414,8 @@
                         </div>
                     </div>
 
-                    {{-- Row: Stock + Image URL --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {{-- Row: Stock + Image URL + File Upload --}}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Stock *</label>
                             <input
@@ -431,11 +431,36 @@
                             <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Image URL</label>
                             <input
                                 wire:model="image_url"
-                                type="url"
+                                type="text"
                                 class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 transition-colors"
-                                placeholder="https://..."
+                                placeholder="/storage/products/..."
                             >
                             @error('image_url') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Or Upload Image</label>
+                            <div 
+                                x-data="{ isUploading: false, progress: 0 }"
+                                x-on:livewire-upload-start="isUploading = true"
+                                x-on:livewire-upload-finish="isUploading = false"
+                                x-on:livewire-upload-error="isUploading = false"
+                                x-on:livewire-upload-progress="progress = $event.detail.progress"
+                                class="relative"
+                            >
+                                <input
+                                    wire:model="image_file"
+                                    type="file"
+                                    accept="image/*"
+                                    class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 transition-colors file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-mono file:bg-neutral-800 file:text-white hover:file:bg-neutral-700 cursor-pointer"
+                                >
+                                <div x-show="isUploading" class="w-full bg-neutral-900 rounded-full h-1 mt-2 overflow-hidden" style="display: none;">
+                                    <div class="bg-amber-500 h-1 transition-all duration-300" :style="`width: ${progress}%`"></div>
+                                </div>
+                                <div wire:loading wire:target="image_file" class="text-amber-500 text-[10px] font-mono mt-1">
+                                    Uploading...
+                                </div>
+                            </div>
+                            @error('image_file') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>
                     </div>
 

@@ -50,12 +50,20 @@ class Storefront extends Component
     public ?int $trackedOrderId = null;
     public ?string $mpesaErrorMessage = null;
     
+    // Catalog Pagination
+    public int $perPage = 8;
+    
     // Support Chat logs
     public bool $chatOpen = false;
     public string $chatMessage = '';
     public array $chatHistory = [
-        ['sender' => 'bot', 'text' => 'Welcome to the Noir & Bloom Concierge. How may I assist you with your flower curation or corporate delivery specification today?']
+        ['sender' => 'bot', 'text' => 'Welcome to Aura — your luxury curation companion. Ask me about popular arrangements, locations, my latest order status, or loyalty rewards!']
     ];
+
+    public function loadMore(): void
+    {
+        $this->perPage += 4;
+    }
 
     public array $addressSuggestions = [
         "Riverside Drive, Office Park Complexes, Nairobi",
@@ -141,8 +149,8 @@ class Storefront extends Component
         $this->chatHistory[] = ['sender' => 'user', 'text' => $userQuery];
         $this->chatMessage = '';
 
-        $reply = "Our concierge agents have received your message and will follow up shortly via phone line.";
         $lowerQuery = strtolower($userQuery);
+        $reply = "I'm Aura, your luxury curation companion. I am currently consulting the database to assist you.";
 
         if (str_contains($lowerQuery, 'delivery') || str_contains($lowerQuery, 'route')) {
             $reply = "We offer standard delivery via our Nairobi and Kiambu hubs. You can also upgrade to a Secret Admirer delivery or an elegant Uniformed Concierge drop-off at checkout.";
@@ -150,6 +158,49 @@ class Storefront extends Component
             $reply = "Noir & Bloom is fully eTIMS compliant. Simply choose 'Corporate eTIMS' during checkout to input your KRA PIN and automatically generate a tax invoice.";
         } elseif (str_contains($lowerQuery, 'grade') || str_contains($lowerQuery, 'wholesale')) {
             $reply = "Our wholesale line features premium export Grade A stem bundles sourced directly from Naivasha and Limuru growers.";
+        } elseif (str_contains($lowerQuery, 'product') || str_contains($lowerQuery, 'flower') || str_contains($lowerQuery, 'rose') || str_contains($lowerQuery, 'catalog')) {
+            $products = Product::where('stock', '>', 0)->limit(3)->get();
+            if ($products->count() > 0) {
+                $names = $products->map(fn($p) => "• {$p->name} ({$p->formatted_price})")->join("\n");
+                $reply = "Here are some of our popular available arrangements:\n" . $names . "\nYou can click 'Curate Selection' to add them to your basket.";
+            } else {
+                $reply = "We offer a curated selection of retail arrangements, wholesale stems, and custom luxury hampers. Explore our showroom tags below!";
+            }
+        } elseif (str_contains($lowerQuery, 'branch') || str_contains($lowerQuery, 'location') || str_contains($lowerQuery, 'where')) {
+            $branches = Branch::where('is_active', true)->get();
+            if ($branches->count() > 0) {
+                $locs = $branches->map(fn($b) => "• {$b->name} in {$b->location_city}")->join("\n");
+                $reply = "Noir & Bloom operates from the following physical design ateliers:\n" . $locs;
+            } else {
+                $reply = "We deliver across Nairobi and Kiambu regions, fulfilled by our local design hubs.";
+            }
+        } elseif (str_contains($lowerQuery, 'price') || str_contains($lowerQuery, 'cheapest') || str_contains($lowerQuery, 'cost')) {
+            $cheapest = Product::orderBy('price', 'asc')->first();
+            $expensive = Product::orderBy('price', 'desc')->first();
+            if ($cheapest && $expensive) {
+                $reply = "Our pricing starts at {$cheapest->formatted_price} for the '{$cheapest->name}' up to {$expensive->formatted_price} for our premium '{$expensive->name}'.";
+            }
+        } elseif (str_contains($lowerQuery, 'loyalty') || str_contains($lowerQuery, 'points') || str_contains($lowerQuery, 'tier')) {
+            if (auth()->check()) {
+                $user = auth()->user();
+                $reply = "Hello " . $user->name . "! You currently have " . $user->loyalty_points . " loyalty points (Tier: " . ($user->account_tier->value ?? 'Standard') . "). You earn 1 point for every 100 KSH spent!";
+            } else {
+                $reply = "Our Loyalty Program rewards you with 1 point for every 100 KSH spent. Sign up or log in at checkout to start earning points towards exclusive tiers!";
+            }
+        } elseif (str_contains($lowerQuery, 'status') || str_contains($lowerQuery, 'track') || str_contains($lowerQuery, 'order')) {
+            if (auth()->check()) {
+                $client = Client::where('email', auth()->user()->email)->first();
+                $latestOrder = $client ? $client->orders()->latest()->first() : null;
+                if ($latestOrder) {
+                    $reply = "Your latest order is #NB-ORD-" . str_pad($latestOrder->id, 4, '0', STR_PAD_LEFT) . ". Status: " . strtoupper($latestOrder->status) . " (placed on " . $latestOrder->created_at->format('d M Y') . ").";
+                } else {
+                    $reply = "You don't have any orders yet. Place an order to track its status!";
+                }
+            } else {
+                $reply = "To track your order, please log in to your account, or refer to the email updates sent by our logistics team.";
+            }
+        } else {
+            $reply = "I'm Aura, your luxury curation assistant. Ask me about popular arrangements, locations, my latest order status, or loyalty rewards!";
         }
 
         $this->chatHistory[] = ['sender' => 'bot', 'text' => $reply];
@@ -283,8 +334,8 @@ class Storefront extends Component
         $isBaseCatalog = ($this->selectedCategory === 'all' && empty($this->search) && !$this->selectedOccasion);
 
         if ($isBaseCatalog) {
-            $showroomProducts = \Illuminate\Support\Facades\Cache::remember('storefront_products_base', 300, function () {
-                return Product::with('occasions')->latest()->get()->map(function($product) {
+            $showroomProducts = \Illuminate\Support\Facades\Cache::remember('storefront_products_base_' . $this->perPage, 300, function () {
+                return Product::with('occasions')->latest()->take($this->perPage)->get()->map(function($product) {
                     $product->backdrop_url = $product->image_url ?: match($product->category) {
                         'wholesale' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600', // Graded bundles
                         'gifting'   => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600', // Premium hampers
@@ -313,7 +364,7 @@ class Storefront extends Component
                 });
             }
 
-            $showroomProducts = $productsQuery->get()->map(function($product) {
+            $showroomProducts = $productsQuery->take($this->perPage)->get()->map(function($product) {
                 $product->backdrop_url = $product->image_url ?: match($product->category) {
                     'wholesale' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600', // Graded bundles
                     'gifting'   => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600', // Premium hampers

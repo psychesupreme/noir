@@ -8,8 +8,16 @@
     <link href="https://fonts.bunny.net/css?family=instrument-serif:400,400i|plus-jakarta-sans:300,400,500" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    <!-- Persistent Theme Bootstrap -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('nb_theme') || 'midnight';
+            document.documentElement.className = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
 </head>
-<body class="bg-[#0A0A0A] text-neutral-100 antialiased selection:bg-rose-950 selection:text-rose-200" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+<body class="bg-bg-base text-text-primary antialiased font-sans transition-colors duration-500 selection:bg-rose-950 selection:text-rose-200">
     <div x-data="{ sidebarOpen: false }" class="flex min-h-screen">
 
         {{-- ─── Mobile Overlay ─── --}}
@@ -29,13 +37,13 @@
         {{-- ─── Sidebar ─── --}}
         <aside
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-            class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-neutral-900 bg-[#0C0C0E] transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto"
+            class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border-base bg-bg-card transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto"
         >
             {{-- Brand Mark --}}
-            <div class="px-6 pt-8 pb-6 border-b border-neutral-900/50">
-                <p class="text-[10px] font-light tracking-[0.35em] uppercase text-neutral-600 mb-1">Atelier</p>
-                <h1 class="text-sm font-medium tracking-[0.2em] uppercase text-neutral-100">Noir & Bloom</h1>
-                <p class="text-[10px] tracking-[0.25em] uppercase text-neutral-600 mt-1" style="font-family: ui-monospace, SFMono-Regular, monospace;">ERP Operations</p>
+            <div class="px-6 pt-8 pb-6 border-b border-border-base/50">
+                <p class="text-[10px] font-light tracking-[0.35em] uppercase text-text-secondary mb-1">Atelier</p>
+                <h1 class="text-sm font-medium tracking-[0.2em] uppercase text-text-primary">Noir & Bloom</h1>
+                <p class="text-[10px] tracking-[0.25em] uppercase text-text-secondary mt-1" style="font-family: ui-monospace, SFMono-Regular, monospace;">ERP Operations</p>
             </div>
 
             {{-- Navigation --}}
@@ -78,7 +86,7 @@
             </nav>
 
             {{-- User Info Block --}}
-            <div class="border-t border-neutral-900/50 px-5 py-5">
+            <div class="border-t border-border-base px-5 py-5">
                 @auth
                     <div class="mb-3">
                         <p class="text-xs font-medium text-neutral-200 truncate">{{ auth()->user()->name }}</p>
@@ -108,7 +116,7 @@
         <div class="flex-1 flex flex-col min-w-0">
 
             {{-- Top Bar --}}
-            <header class="sticky top-0 z-30 flex items-center justify-between border-b border-neutral-900/50 bg-[#0A0A0A]/80 backdrop-blur-md px-6 py-4 lg:px-10">
+            <header class="sticky top-0 z-30 flex items-center justify-between border-b border-border-base bg-bg-base/80 backdrop-blur-md px-6 py-4 lg:px-10">
                 {{-- Left: Hamburger + Breadcrumb --}}
                 <div class="flex items-center space-x-4">
                     <button

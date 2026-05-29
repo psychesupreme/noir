@@ -17,22 +17,6 @@
             const theme = localStorage.getItem('nb_theme') || 'midnight';
             document.documentElement.className = theme;
             document.documentElement.setAttribute('data-theme', theme);
-            const bgColors = {
-                'midnight': '#09090B',
-                'alabaster': '#F4F4F6',
-                'floral': '#121A16',
-                'love': '#1C0D12',
-                'cute': '#24181B'
-            };
-            const textColors = {
-                'midnight': '#FAFAFA',
-                'alabaster': '#1C1C1E',
-                'floral': '#EDF2EF',
-                'love': '#FDF4F7',
-                'cute': '#FFF5F7'
-            };
-            document.documentElement.style.backgroundColor = bgColors[theme];
-            document.documentElement.style.color = textColors[theme];
         })();
     </script>
 
@@ -83,16 +67,7 @@
         }
     </style>
 </head>
-<body 
-    x-data="{ theme: localStorage.getItem('nb_theme') || 'midnight' }"
-    :class="{
-        'bg-[#09090B] text-[#FAFAFA]': theme === 'midnight',
-        'bg-[#F4F4F6] text-[#1C1C1E]': theme === 'alabaster',
-        'bg-[#121A16] text-[#EDF2EF]': theme === 'floral',
-        'bg-[#1C0D12] text-[#FDF4F7]': theme === 'love',
-        'bg-[#24181B] text-[#FFF5F7]': theme === 'cute'
-    }"
-    class="antialiased selection:bg-rose-950 selection:text-rose-200 min-h-screen font-[Plus_Jakarta_Sans] transition-colors duration-500"
+<body class="bg-bg-base text-text-primary antialiased font-sans transition-colors duration-500 selection:bg-rose-950 selection:text-rose-200 min-h-screen">
 >
 
     <div class="min-h-screen flex flex-col lg:flex-row">
