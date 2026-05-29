@@ -17,7 +17,49 @@
                 <p class="text-xs text-neutral-500 font-light mt-1">Real-time procurement logs for Nairobi and Kiambu distribution hubs.</p>
             </div>
             <div class="bg-[#0F0F0F] border border-neutral-900 rounded px-4 py-2 font-mono text-xs text-neutral-400">
-                Total Logs: <span class="text-white">{{ $orders->count() }}</span>
+                Total Logs: <span class="text-white">{{ $orders->total() }}</span>
+            </div>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Search -->
+            <div class="md:col-span-2">
+                <input 
+                    wire:model.live.debounce.300ms="search" 
+                    type="text" 
+                    placeholder="Search by Order #, Client, email or phone..."
+                    class="w-full bg-[#0F0F0F] border border-neutral-900 rounded px-4 py-2.5 text-xs text-neutral-300 focus:outline-none focus:border-neutral-700 font-mono"
+                >
+            </div>
+            
+            <!-- Status Filter -->
+            <div>
+                <select 
+                    wire:model.live="statusFilter"
+                    class="w-full bg-[#0F0F0F] border border-neutral-900 rounded px-4 py-2.5 text-xs text-neutral-300 focus:outline-none focus:border-neutral-700 font-mono cursor-pointer"
+                >
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="processing">Processing</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+
+            <!-- Branch Filter -->
+            <div>
+                <select 
+                    wire:model.live="branchFilter"
+                    class="w-full bg-[#0F0F0F] border border-neutral-900 rounded px-4 py-2.5 text-xs text-neutral-300 focus:outline-none focus:border-neutral-700 font-mono cursor-pointer"
+                >
+                    <option value="all">All Branches</option>
+                    <option value="unassigned">Unassigned</option>
+                    @foreach($branches as $b)
+                        <option value="{{ $b->id }}">{{ $b->name }} ({{ $b->code }})</option>
+                    @endforeach
+                </select>
             </div>
         </div>
 
@@ -135,6 +177,11 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Pagination Links -->
+        <div class="mt-6 font-mono text-xs">
+            {{ $orders->links() }}
         </div>
     </main>
 </div>

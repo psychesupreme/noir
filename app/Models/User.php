@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -14,7 +14,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable(['name', 'email', 'password', 'phone_number', 'account_tier', 'kra_pin', 'default_delivery_address', 'default_region'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
@@ -84,6 +84,14 @@ class User extends Authenticatable
             return 'Atelier';
         }
         return 'Bloom';
+    }
+
+    /**
+     * Get the client CRM record associated with the user.
+     */
+    public function client()
+    {
+        return $this->hasOne(Client::class);
     }
 }
 

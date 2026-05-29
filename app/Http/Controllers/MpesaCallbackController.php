@@ -15,6 +15,15 @@ class MpesaCallbackController extends Controller
      */
     public function handleCallback(Request $request)
     {
+        // Optional IP Validation (e.g. for production safety)
+        if (config('services.mpesa.validate_ip', false)) {
+            $allowedIps = array_map('trim', explode(',', config('services.mpesa.allowed_ips', '')));
+            if (!in_array($request->ip(), $allowedIps)) {
+                Log::warning('Unauthorized M-Pesa Callback IP Blocked', ['ip' => $request->ip()]);
+                return response()->json(['ResultCode' => 1, 'ResultDesc' => 'Unauthorized IP Address'], 403);
+            }
+        }
+
         Log::info('Incoming M-Pesa Callback Received', ['payload' => $request->all()]);
 
         $body = $request->json()->all();

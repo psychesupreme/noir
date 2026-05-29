@@ -176,6 +176,7 @@ class Storefront extends Component
             $client = Client::updateOrCreate(
                 ['email' => trim(strtolower($this->email))],
                 [
+                    'user_id'          => auth()->check() ? auth()->id() : null,
                     'company_name'     => $this->checkoutType === 'corporate' ? $this->company_name : null,
                     'kra_pin'          => $this->checkoutType === 'corporate' ? strtoupper(trim($this->kra_pin)) : null,
                     'contact_name'     => $this->full_name,
@@ -315,23 +316,31 @@ class Storefront extends Component
             }
         }
 
+        $cartItems = $this->compileCartItems();
+        $cartTotal = array_sum(array_column($cartItems, 'subtotal'));
+
         return view('livewire.storefront', [
             'occasions'    => $occasions,
             'products'     => $showroomProducts,
-            'cartItems'    => $this->compileCartItems(),
-            'cartTotal'    => $this->getCartTotal(),
+            'cartItems'    => $cartItems,
+            'cartTotal'    => $cartTotal,
             'cartCount'    => array_sum($this->cart),
             'activeColor'  => $this->selectedOccasion ? $occasions->firstWhere('slug', $this->selectedOccasion)?->accent_color : '#E5E5E5',
             'userOrders'   => $userOrders,
         ])->layout('components.layouts.app');
     }
 
-
     protected function compileCartItems(): array
     {
+        if (empty($this->cart)) {
+            return [];
+        }
+
+        $products = Product::whereIn('id', array_keys($this->cart))->get()->keyBy('id');
         $items = [];
+
         foreach ($this->cart as $id => $quantity) {
-            $product = Product::find($id);
+            $product = $products->get($id);
             if ($product) {
                 $items[] = [
                     'product'  => $product,
@@ -340,18 +349,7 @@ class Storefront extends Component
                 ];
             }
         }
-        return $items;
-    }
 
-    protected function getCartTotal(): int
-    {
-        $total = 0;
-        foreach ($this->cart as $id => $quantity) {
-            $product = Product::find($id);
-            if ($product) {
-                $total += ($product->price * $quantity);
-            }
-        }
-        return $total;
+        return $items;
     }
 }

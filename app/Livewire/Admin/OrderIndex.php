@@ -6,9 +6,30 @@ use App\Models\Branch;
 use App\Models\Order;
 use App\Services\EtimsService;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class OrderIndex extends Component
 {
+    use WithPagination;
+
+    public string $search = '';
+    public string $statusFilter = 'all';
+    public string $branchFilter = 'all';
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingBranchFilter(): void
+    {
+        $this->resetPage();
+    }
     /**
      * Manually override the assigned branch hub allocation for fulfillment optimizations.
      */
@@ -100,8 +121,39 @@ class OrderIndex extends Component
 
     public function render()
     {
+        $query = Order::with(['client', 'products', 'etimsInvoice', 'branch']);
+
+        if ($this->statusFilter !== 'all') {
+            $query->where('status', $this->statusFilter);
+        }
+
+        if ($this->branchFilter !== 'all') {
+            if ($this->branchFilter === 'unassigned') {
+                $query->whereNull('branch_id');
+            } else {
+                $query->where('branch_id', $this->branchFilter);
+            }
+        }
+
+        if (!empty($this->search)) {
+            $query->where(function ($q) {
+                $searchTerm = $this->search;
+                if (preg_match('/NB-ORD-(\d+)/i', $searchTerm, $matches)) {
+                    $searchTerm = (int) $matches[1];
+                }
+                
+                $q->where('id', 'like', '%' . $searchTerm . '%')
+                  ->orWhereHas('client', function ($clientQuery) {
+                      $clientQuery->where('contact_name', 'like', '%' . $this->search . '%')
+                                  ->orWhere('company_name', 'like', '%' . $this->search . '%')
+                                  ->orWhere('email', 'like', '%' . $this->search . '%')
+                                  ->orWhere('phone', 'like', '%' . $this->search . '%');
+                  });
+            });
+        }
+
         return view('livewire.admin.order-index', [
-            'orders'   => Order::with(['client', 'products', 'etimsInvoice', 'branch'])->latest()->get(),
+            'orders'   => $query->latest()->paginate(15),
             'branches' => Branch::where('is_active', true)->get()
         ])->layout('components.layouts.admin');
     }

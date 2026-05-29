@@ -51,6 +51,21 @@ class Register extends Component
             'default_region' => 'Nairobi',
         ]);
 
+        // Link User to Client CRM record
+        $client = \App\Models\Client::where('email', $user->email)->first();
+        if ($client) {
+            $client->update(['user_id' => $user->id]);
+        } else {
+            \App\Models\Client::create([
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'contact_name' => $user->name,
+                'phone' => $user->phone_number,
+                'region' => 'Nairobi',
+                'delivery_address' => 'Pending first order',
+            ]);
+        }
+
         event(new Registered($user));
         Auth::login($user);
         session()->regenerate();

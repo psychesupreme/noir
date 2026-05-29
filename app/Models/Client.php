@@ -11,7 +11,12 @@ class Client extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['company_name', 'kra_pin', 'contact_name', 'email', 'phone', 'region', 'delivery_address'];
+    protected $fillable = ['user_id', 'company_name', 'kra_pin', 'contact_name', 'email', 'phone', 'region', 'delivery_address'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function orders(): HasMany
     {

@@ -42,6 +42,8 @@ return [
         'shortcode'    => env('MPESA_SHORTCODE', '174379'),
         'passkey'      => env('MPESA_PASSKEY'),
         'callback_url' => env('MPESA_CALLBACK_URL'),
+        'validate_ip'  => env('MPESA_VALIDATE_IP', false),
+        'allowed_ips'  => env('MPESA_ALLOWED_IPS', ''),
     ],
 
 ];
