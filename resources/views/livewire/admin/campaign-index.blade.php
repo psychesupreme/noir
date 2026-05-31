@@ -1,5 +1,5 @@
 <div 
-    x-data="{ showModal: @entangle('showModal') }" 
+    x-data="{ showModal: @entangle('showModal'), showDeleteModal: @entangle('showDeleteModal') }" 
     class="space-y-8"
 >
     {{-- Page Header --}}
@@ -324,7 +324,7 @@
 
     {{-- Delete Modal --}}
     <div 
-        x-show="@entangle('showDeleteModal')" 
+        x-show="showDeleteModal" 
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
         style="display: none;"
     >
@@ -333,6 +333,8 @@
             <p class="text-neutral-400 mt-2 font-light text-[11px]">This operation is irreversible. The campaign record will be permanently purged.</p>
             <div class="flex items-center justify-end space-x-3 mt-6">
                 <button 
+                    type="button"
+                    @click="showDeleteModal = false"
                     wire:click="$set('showDeleteModal', false)"
                     class="px-3 py-1.5 border border-neutral-850 text-neutral-400 hover:text-white rounded-sm font-mono text-[10px] uppercase cursor-pointer"
                 >

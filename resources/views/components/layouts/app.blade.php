@@ -17,7 +17,7 @@
     <!-- Persistent Theme Bootstrap -->
     <script>
         (function() {
-            const theme = localStorage.getItem('nb_theme') || 'midnight';
+            const theme = localStorage.getItem('nb_theme') || 'onyx';
             document.documentElement.className = theme;
             document.documentElement.setAttribute('data-theme', theme);
         })();

@@ -22,6 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->redirectGuestsTo('/login');
+
+        $middleware->web(append: [
+            \App\Http\Middleware\SessionTimeoutMiddleware::class,
+        ]);
     })
     
     ->withExceptions(function (Exceptions $exceptions): void {

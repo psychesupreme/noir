@@ -51,7 +51,7 @@ class Storefront extends Component
     public ?string $mpesaErrorMessage = null;
     
     // Catalog Pagination
-    public int $perPage = 8;
+    public int $perPage = 6;
     
     // Support Chat logs
     public bool $chatOpen = false;
@@ -128,7 +128,22 @@ class Storefront extends Component
         $this->orderSubmitted = false;
         $this->mpesaErrorMessage = null;
 
+        $product = Product::find($productId);
+        if (!$product) return;
+
+        $stock = match($size) {
+            'deluxe' => (int) floor($product->stock * 0.7),
+            'grand' => (int) floor($product->stock * 0.4),
+            default => $product->stock,
+        };
+
         $key = $productId . '-' . $size;
+        $currentQty = $this->cart[$key] ?? 0;
+
+        if ($currentQty >= $stock) {
+            session()->flash('error', 'Cannot add more of this size due to stock limits.');
+            return;
+        }
 
         if (isset($this->cart[$key])) {
             $this->cart[$key]++;
@@ -370,10 +385,13 @@ class Storefront extends Component
             $showroomProducts = \Illuminate\Support\Facades\Cache::remember('storefront_products_base_' . $this->perPage, 300, function () {
                 return Product::with('occasions')->latest()->take($this->perPage)->get()->map(function($product) {
                     $product->backdrop_url = $product->image_url ?: match($product->category) {
-                        'wholesale' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600', // Graded bundles
-                        'gifting'   => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600', // Premium hampers
-                        default     => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600', // Architectural retail
+                        'wholesale' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
+                        'gifting'   => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
+                        default     => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
                     };
+                    $product->stock_standard = $product->stock;
+                    $product->stock_deluxe = (int) floor($product->stock * 0.7);
+                    $product->stock_grand = (int) floor($product->stock * 0.4);
                     return $product;
                 });
             });
@@ -399,12 +417,40 @@ class Storefront extends Component
 
             $showroomProducts = $productsQuery->take($this->perPage)->get()->map(function($product) {
                 $product->backdrop_url = $product->image_url ?: match($product->category) {
-                    'wholesale' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600', // Graded bundles
-                    'gifting'   => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600', // Premium hampers
-                    default     => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600', // Architectural retail
+                    'wholesale' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
+                    'gifting'   => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
+                    default     => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
                 };
+                $product->stock_standard = $product->stock;
+                $product->stock_deluxe = (int) floor($product->stock * 0.7);
+                $product->stock_grand = (int) floor($product->stock * 0.4);
                 return $product;
             });
+        }
+        
+        $totalMatchingProducts = 0;
+        if ($isBaseCatalog) {
+            $totalMatchingProducts = \Illuminate\Support\Facades\Cache::remember('storefront_products_base_count', 3600, fn() => Product::count());
+        } else {
+            $productsQueryCount = Product::query();
+
+            if ($this->selectedCategory !== 'all') {
+                $productsQueryCount->where('category', $this->selectedCategory);
+            }
+
+            if (!empty($this->search)) {
+                $productsQueryCount->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                      ->orWhere('description', 'like', '%' . $this->search . '%');
+                });
+            }
+
+            if ($this->selectedOccasion) {
+                $productsQueryCount->whereHas('occasions', function ($query) {
+                    $query->where('slug', $this->selectedOccasion);
+                });
+            }
+            $totalMatchingProducts = $productsQueryCount->count();
         }
 
         $userOrders = collect();
@@ -426,6 +472,7 @@ class Storefront extends Component
             'cartCount'    => array_sum($this->cart),
             'activeColor'  => $this->selectedOccasion ? $occasions->firstWhere('slug', $this->selectedOccasion)?->accent_color : '#E5E5E5',
             'userOrders'   => $userOrders,
+            'hasMore'      => $showroomProducts->count() < $totalMatchingProducts,
         ])->layout('components.layouts.app');
     }
 

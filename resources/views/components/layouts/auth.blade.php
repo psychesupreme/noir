@@ -14,7 +14,7 @@
     <!-- Persistent Theme Bootstrap -->
     <script>
         (function() {
-            const theme = localStorage.getItem('nb_theme') || 'midnight';
+            const theme = localStorage.getItem('nb_theme') || 'onyx';
             document.documentElement.className = theme;
             document.documentElement.setAttribute('data-theme', theme);
         })();
@@ -44,49 +44,40 @@
             pointer-events: none;
             z-index: 1;
         }
-        .auth-gradient-midnight {
-            background: radial-gradient(ellipse at 20% 80%, rgba(212, 175, 55, 0.04) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 20%, rgba(16, 185, 129, 0.03) 0%, transparent 50%),
-                        linear-gradient(180deg, #0A0A0A 0%, #0F0F12 50%, #09090B 100%);
+        .auth-gradient-onyx {
+            background: radial-gradient(ellipse at 20% 80%, rgba(197, 168, 128, 0.05) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
+                        linear-gradient(180deg, #050507 0%, #0A0A0E 50%, #050507 100%);
         }
-        .auth-gradient-alabaster {
-            background: radial-gradient(ellipse at 20% 80%, rgba(212, 175, 55, 0.06) 0%, transparent 50%),
-                        linear-gradient(180deg, #F4F4F6 0%, #E4E4E7 50%, #D4D4D8 100%);
+        .auth-gradient-champagne {
+            background: radial-gradient(ellipse at 20% 80%, rgba(181, 154, 122, 0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(212, 175, 55, 0.04) 0%, transparent 50%),
+                        linear-gradient(180deg, #FAF7F0 0%, #F5F0E8 50%, #FAF7F0 100%);
         }
-        .auth-gradient-floral {
-            background: radial-gradient(ellipse at 20% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
-                        linear-gradient(180deg, #121A16 0%, #1A2620 50%, #0F1412 100%);
-        }
-        .auth-gradient-love {
-            background: radial-gradient(ellipse at 20% 80%, rgba(244, 63, 94, 0.08) 0%, transparent 50%),
-                        linear-gradient(180deg, #1C0D12 0%, #2A141B 50%, #15090C 100%);
-        }
-        .auth-gradient-cute {
-            background: radial-gradient(ellipse at 20% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
-                        linear-gradient(180deg, #24181B 0%, #352328 50%, #1B1214 100%);
+        .auth-gradient-jade {
+            background: radial-gradient(ellipse at 20% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(212, 175, 55, 0.04) 0%, transparent 50%),
+                        linear-gradient(180deg, #06130F 0%, #0A1C16 50%, #06130F 100%);
         }
     </style>
 </head>
-<body class="bg-bg-base text-text-primary antialiased font-sans transition-colors duration-500 selection:bg-rose-950 selection:text-rose-200 min-h-screen">
->
+<body x-data="{ theme: localStorage.getItem('nb_theme') || 'onyx' }" class="bg-bg-base text-text-primary antialiased font-sans transition-colors duration-500 selection:bg-rose-950 selection:text-rose-200 min-h-screen">
 
     <div class="min-h-screen flex flex-col lg:flex-row">
 
         {{-- Left Brand Panel — desktop only --}}
         <div 
             :class="{
-                'auth-gradient-midnight border-neutral-900/40': theme === 'midnight',
-                'auth-gradient-alabaster border-neutral-200/50': theme === 'alabaster',
-                'auth-gradient-floral border-emerald-950/30': theme === 'floral',
-                'auth-gradient-love border-[#3D1A27]/30': theme === 'love',
-                'auth-gradient-cute border-[#4A323A]/30': theme === 'cute'
+                'auth-gradient-onyx border-neutral-900/40': theme === 'onyx',
+                'auth-gradient-champagne border-[#E8E2D5]/50': theme === 'champagne',
+                'auth-gradient-jade border-[#142E24]/30': theme === 'jade'
             }"
             class="hidden lg:flex lg:w-[45%] xl:w-[42%] relative overflow-hidden grain transition-colors duration-500"
         >
 
             {{-- Decorative border line --}}
             <div 
-                :class="theme === 'alabaster' ? 'via-neutral-300/40' : 'via-neutral-800/50'"
+                :class="theme === 'champagne' ? 'via-[#E8E2D5]/40' : 'via-neutral-800/50'"
                 class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent to-transparent"
             ></div>
 
@@ -95,9 +86,9 @@
 
                 {{-- Top area --}}
                 <div>
-                    <div :class="theme === 'alabaster' ? 'bg-neutral-300' : 'bg-neutral-800'" class="w-8 h-px mb-6 transition-colors"></div>
+                    <div :class="theme === 'champagne' ? 'bg-[#E8E2D5]' : 'bg-neutral-800'" class="w-8 h-px mb-6 transition-colors"></div>
                     <span 
-                        :class="theme === 'alabaster' ? 'text-neutral-500' : 'text-neutral-600'"
+                        :class="theme === 'champagne' ? 'text-[#78716C]' : 'text-neutral-600'"
                         class="text-[9px] font-mono tracking-[0.4em] uppercase block transition-colors"
                     >Est. Nairobi</span>
                 </div>
@@ -107,7 +98,7 @@
                     <div class="space-y-3">
                         <span class="text-[9px] font-mono tracking-[0.4em] text-[#D4AF37]/60 uppercase block">Atelier</span>
                         <h1 
-                            :class="theme === 'alabaster' ? 'text-neutral-900' : 'text-white/90'"
+                            :class="theme === 'champagne' ? 'text-[#1C1917]' : 'text-white/90'"
                             class="text-[22px] xl:text-[26px] font-semibold uppercase tracking-[0.3em] leading-tight transition-colors"
                         >
                             Noir &amp; Bloom
@@ -123,13 +114,13 @@
 
                     <div class="space-y-4">
                         <p 
-                            :class="theme === 'alabaster' ? 'text-neutral-600' : 'text-neutral-500'"
+                            :class="theme === 'champagne' ? 'text-[#78716C]' : 'text-neutral-500'"
                             class="text-[11px] font-light tracking-[0.15em] uppercase leading-relaxed max-w-[280px] transition-colors"
                         >
                             Premium Floral &amp; Gifting Concierge
                         </p>
                         <p 
-                            :class="theme === 'alabaster' ? 'text-neutral-700' : 'text-neutral-650'"
+                            :class="theme === 'champagne' ? 'text-[#1C1917]/70' : 'text-neutral-600'"
                             class="text-[10px] font-light leading-relaxed max-w-[260px] transition-colors"
                         >
                             Bespoke arrangements, curated luxury giftings, and concierge dispatch across Kenya.
@@ -139,15 +130,15 @@
 
                 {{-- Bottom footer --}}
                 <div class="space-y-4">
-                    <div :class="theme === 'alabaster' ? 'bg-neutral-300' : 'bg-neutral-850'" class="w-16 h-px transition-colors"></div>
+                    <div :class="theme === 'champagne' ? 'bg-[#E8E2D5]' : 'bg-neutral-850'" class="w-16 h-px transition-colors"></div>
                     <div class="flex items-center gap-6">
                         <span 
-                            :class="theme === 'alabaster' ? 'text-neutral-600' : 'text-neutral-700'"
+                            :class="theme === 'champagne' ? 'text-[#78716C]' : 'text-neutral-700'"
                             class="text-[8px] font-mono tracking-[0.3em] uppercase transition-colors"
                         >Nairobi</span>
-                        <span :class="theme === 'alabaster' ? 'text-neutral-400' : 'text-neutral-800'" class="text-[8px] transition-colors">&bull;</span>
+                        <span :class="theme === 'champagne' ? 'text-[#E8E2D5]' : 'text-neutral-800'" class="text-[8px] transition-colors">&bull;</span>
                         <span 
-                            :class="theme === 'alabaster' ? 'text-neutral-600' : 'text-neutral-700'"
+                            :class="theme === 'champagne' ? 'text-[#78716C]' : 'text-neutral-700'"
                             class="text-[8px] font-mono tracking-[0.3em] uppercase transition-colors"
                         >Kiambu</span>
                     </div>
@@ -163,10 +154,10 @@
             <div class="lg:hidden px-6 pt-10 pb-6 text-center space-y-2">
                 <span class="text-[8px] font-mono tracking-[0.4em] text-[#D4AF37]/50 uppercase block">Atelier</span>
                 <h1 
-                    :class="theme === 'alabaster' ? 'text-neutral-900' : 'text-white/90'"
+                    :class="theme === 'champagne' ? 'text-[#1C1917]' : 'text-white/90'"
                     class="text-sm font-semibold uppercase tracking-[0.3em] transition-colors"
                 >Noir &amp; Bloom</h1>
-                <div :class="theme === 'alabaster' ? 'bg-neutral-300' : 'bg-neutral-800'" class="w-8 h-px mx-auto mt-3 transition-colors"></div>
+                <div :class="theme === 'champagne' ? 'bg-[#E8E2D5]' : 'bg-neutral-800'" class="w-8 h-px mx-auto mt-3 transition-colors"></div>
             </div>
 
             {{-- Centered form slot --}}
@@ -179,7 +170,7 @@
             {{-- Bottom bar --}}
             <div class="px-6 pb-6 text-center">
                 <p 
-                    :class="theme === 'alabaster' ? 'text-neutral-500' : 'text-neutral-700'"
+                    :class="theme === 'champagne' ? 'text-[#78716C]' : 'text-neutral-700'"
                     class="text-[9px] font-mono tracking-[0.2em] uppercase transition-colors"
                 >
                     &copy; {{ date('Y') }} Noir &amp; Bloom &mdash; All rights reserved

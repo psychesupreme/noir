@@ -26,6 +26,14 @@
             <div :class="theme === 'alabaster' ? 'bg-neutral-200' : 'bg-neutral-800'" class="w-10 h-px transition-colors"></div>
         </div>
 
+        {{-- Session expired notification --}}
+        @if(session('session_expired'))
+            <div class="mb-4 p-3 border border-amber-500/30 bg-amber-950/20 rounded-xl text-amber-400 text-[11px] font-mono text-center">
+                <span class="block font-bold uppercase tracking-wider text-[9px] mb-1">Session Expired</span>
+                Your session has timed out for security. Please sign in again.
+            </div>
+        @endif
+
         {{-- Global error --}}
         @if ($errors->has('email'))
             <div class="border border-rose-900/50 bg-rose-950/20 rounded-sm px-4 py-3 space-y-1">
