@@ -393,3 +393,59 @@ html { scroll-behavior: smooth; }
 .rose tr:hover {
   background-color: rgba(45, 18, 31, 0.3) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   STOREFRONT GRAIN & BUTTON GLOW STYLINGS
+   ═══════════════════════════════════════════════════════════ */
+
+.storefront-grain {
+  overflow: hidden;
+}
+
+.btn-curate {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateZ(0);
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.champagne .btn-curate {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Hover effects with vivid theme-matching glow */
+.btn-curate:hover:not(:disabled) {
+  transform: scale(1.04);
+}
+
+.onyx .btn-curate:hover:not(:disabled) {
+  background: linear-gradient(135deg, #C5A880, #E5C1CD);
+  color: #000000;
+  box-shadow: 0 0 20px rgba(197, 168, 128, 0.6), 0 0 40px rgba(229, 193, 205, 0.3);
+}
+
+.champagne .btn-curate:hover:not(:disabled) {
+  background: linear-gradient(135deg, #B59A7A, #F5EFE4);
+  color: #000000;
+  box-shadow: 0 0 20px rgba(181, 154, 122, 0.6), 0 0 40px rgba(245, 239, 228, 0.3);
+}
+
+.rose .btn-curate:hover:not(:disabled) {
+  background: linear-gradient(135deg, #EC4899, #F43F5E);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.75), 0 0 40px rgba(244, 63, 94, 0.35);
+}
+
+/* Active interaction click animations */
+.btn-curate:active:not(:disabled) {
+  transform: scale(0.96);
+  filter: brightness(1.15);
+}
+
+.btn-curate:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

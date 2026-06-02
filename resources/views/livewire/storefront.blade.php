@@ -59,7 +59,7 @@
     </script>
 @endsection
 
-<div 
+<div class="relative min-h-screen flex flex-col justify-between" 
     x-data="{ 
         drawerOpen: false, 
         checkoutMode: false, 
@@ -384,9 +384,8 @@
         </div>
     </header>
 
-    <main class="max-w-7xl w-full mx-auto px-6 pt-32 flex-1 flex flex-col">
-        <h1 class="sr-only">Noir &amp; Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier</h1>
-        <!-- Interactive Advertisements Carousel (3 Luxury Slides with images, custom textures, colors, and controls) -->
+    <!-- Interactive Advertisements Carousel (3 Luxury Slides with images, custom textures, colors, and controls) -->
+    <div class="w-full px-4 pt-32 pb-6 shrink-0">
         <section x-data="{ 
                      activeSlide: 0, 
                      slidesCount: 3, 
@@ -404,7 +403,7 @@
                          this.startTimer();
                      }
                  }" 
-                 class="w-full relative overflow-hidden mb-12 rounded-sm border border-neutral-500/10 h-[calc(100vh-180px)] min-h-[580px] flex items-center shadow-2xl"
+                 class="w-full relative overflow-hidden rounded-none border border-neutral-500/10 h-[calc(100vh-180px)] min-h-[580px] flex items-center shadow-2xl"
         >
             <!-- Slide 1: Naivasha Rift Valley Stems (Jade/Emerald Theme with fresh rose bundles image) -->
             <div x-show="activeSlide === 0" 
@@ -529,6 +528,10 @@
                 </template>
             </div>
         </section>
+    </div>
+
+    <main class="max-w-7xl w-full mx-auto px-6 pt-0 flex-1 flex flex-col">
+        <h1 class="sr-only">Noir &amp; Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier</h1>
 
         <!-- Double Column Layout: Left Sticky Sidebar, Right Catalog showroom -->
         <div id="product-showroom" class="flex flex-col lg:flex-row gap-8 w-full items-start">
@@ -806,8 +809,7 @@
                                                 type="button"
                                                 :disabled="(selectedSize === 'standard' && {{ $product->stock_standard }} <= 0) || (selectedSize === 'deluxe' && {{ $product->stock_deluxe }} <= 0) || (selectedSize === 'grand' && {{ $product->stock_grand }} <= 0)"
                                                 @click="$wire.addToCuration({{ $product->id }}, selectedSize); drawerOpen = true; checkoutMode = false;"
-                                                :class="theme === 'champagne' ? 'bg-black text-white hover:bg-[#B59A7A] hover:text-black hover:shadow-[0_0_15px_rgba(181,154,122,0.5)]' : 'bg-white text-black hover:bg-[#C5A880] hover:text-black hover:shadow-[0_0_15px_rgba(197,168,128,0.5)]'"
-                                                class="w-full text-[12px] font-semibold tracking-[0.2em] uppercase py-2.5 transition-all duration-300 rounded-full flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transform hover:scale-[1.02]"
+                                                class="w-full text-[12px] font-semibold tracking-[0.2em] uppercase py-2.5 rounded-full flex items-center justify-center font-outfit btn-curate"
                                             >
                                                 <span x-text="(selectedSize === 'standard' && {{ $product->stock_standard }} <= 0) || (selectedSize === 'deluxe' && {{ $product->stock_deluxe }} <= 0) || (selectedSize === 'grand' && {{ $product->stock_grand }} <= 0) ? 'Out of Stock' : 'Curate Selection'"></span>
                                             </button>
@@ -1252,7 +1254,6 @@
             </form>
         </div>
     </div>
-</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
