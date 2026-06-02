@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Route;
 
 // ── Public Storefront ────────────────────────────────────────────────────
 Route::get('/', Storefront::class)->name('storefront');
+Route::get('/services-gifts', \App\Livewire\ServicesGifts::class)->name('services-gifts');
+Route::get('/profile-portal', \App\Livewire\ProfilePortal::class)->middleware('auth')->name('profile-portal');
 
 // ── Authentication ───────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {

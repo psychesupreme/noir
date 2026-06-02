@@ -41,22 +41,22 @@ class OccasionSeeder extends Seeder
         ]);
 
         // 2. Attach existing products to these occasions safely
-        $noirClassic = Product::where('sku', 'NB-RET-NCL-01')->first();
+        $noirClassic = Product::where('sku', 'NB-BQT-NOD-01')->first();
         if ($noirClassic) {
             $noirClassic->occasions()->sync([$valentines->id]);
         }
 
-        $alabasterDream = Product::where('sku', 'NB-RET-ADR-02')->first();
+        $alabasterDream = Product::where('sku', 'NB-BQT-ALW-02')->first();
         if ($alabasterDream) {
             $alabasterDream->occasions()->sync([$corporate->id]);
         }
         
-        $safariSunset = Product::where('sku', 'NB-RET-SSN-03')->first();
+        $safariSunset = Product::where('sku', 'NB-BQT-RVG-03')->first();
         if ($safariSunset) {
             $safariSunset->occasions()->sync([$sympathy->id]);
         }
 
-        $riftValley = Product::where('sku', 'NB-RET-RVM-04')->first();
+        $riftValley = Product::where('sku', 'NB-STM-NRO-01')->first();
         if ($riftValley) {
             $riftValley->occasions()->sync([$corporate->id]);
         }

@@ -1,3 +1,64 @@
+@section('meta')
+    <meta name="description" content="Explore Noir & Bloom's premium floral curations, Naivasha Rift Valley wholesale stems, and custom luxury gift hampers. Live eTIMS integration and instant M-Pesa checkout.">
+    <meta name="keywords" content="premium bouquets, naivasha roses, flower shop Nairobi, luxury gift hampers Kenya, flower delivery Nairobi, eTIMS VAT invoices, safaricom mpesa checkout">
+    <meta name="author" content="Noir & Bloom Atelier">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    <!-- Open Graph (Facebook / Pinterest / LinkedIn) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="Noir &amp; Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier">
+    <meta property="og:description" content="Explore Noir & Bloom's premium floral curations, Naivasha volcanic roses, and custom luxury gift hampers. Sourcing fresh stems from Limuru and Naivasha with elite concierge delivery.">
+    <meta property="og:image" content="{{ asset('media/og-storefront.jpg') }}">
+    <meta property="og:site_name" content="Noir & Bloom">
+    <meta property="og:locale" content="en_KE">
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ url()->current() }}">
+    <meta name="twitter:title" content="Noir &amp; Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier">
+    <meta name="twitter:description" content="Explore Noir & Bloom's premium floral curations, Naivasha volcanic roses, and custom luxury gift hampers. Sourcing fresh stems from Limuru and Naivasha with elite concierge delivery.">
+    <meta name="twitter:image" content="{{ asset('media/og-storefront.jpg') }}">
+    <meta name="twitter:site" content="@NoirAndBloom">
+
+    <!-- Google Search Engine Structured Product Catalog Schema (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "Noir & Bloom Showroom Catalog",
+      "description": "Showcase of premium floral designs, export-quality volcanic stems, and custom luxury hampers.",
+      "url": "{{ url()->current() }}",
+      "numberOfItems": {{ count($products) }},
+      "itemListElement": [
+        @foreach($products as $index => $prod)
+        {
+          "@type": "ListItem",
+          "position": {{ $index + 1 }},
+          "item": {
+            "@type": "Product",
+            "@id": "{{ url('/') }}/products/{{ $prod->id }}",
+            "name": "{{ $prod->name }}",
+            "image": "{{ $prod->backdrop_url ?? $prod->image_url }}",
+            "description": "{{ Str::limit(strip_tags($prod->description), 150) }}",
+            "sku": "{{ $prod->sku }}",
+            "offers": {
+              "@type": "Offer",
+              "priceCurrency": "KES",
+              "price": "{{ $prod->price }}",
+              "itemCondition": "https://schema.org/NewCondition",
+              "availability": "{{ $prod->stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}",
+              "url": "{{ url('/') }}/products/{{ $prod->id }}"
+            }
+          }
+        }@if(!$loop->last),@endif
+        @endforeach
+      ]
+    }
+    </script>
+@endsection
+
 <div 
     x-data="{ 
         drawerOpen: false, 
@@ -63,7 +124,7 @@
         'bg-[#FAF7F0] text-[#1C1C20]': theme === 'champagne',
         'bg-[#15060A] text-[#FCE7EC]': theme === 'rose'
     }"
-    class="min-h-screen font-sans antialiased relative text-left flex flex-col justify-between transition-colors duration-500 overflow-hidden"
+    class="min-h-screen font-sans antialiased relative text-left flex flex-col justify-between transition-colors duration-500 overflow-x-clip"
 >
     <!-- Hidden logout form for inactivity auto-logout -->
     <form id="logout-form-session" method="POST" action="{{ route('logout') }}" class="hidden">
@@ -169,16 +230,18 @@
     
     <header 
         :class="{
-            'border-neutral-900 bg-[#050507]/80 shadow-2xl': theme === 'onyx',
-            'border-neutral-200 bg-white/80 shadow-sm': theme === 'champagne',
-            'border-[#2D0D19]/60 bg-[#15060A]/80 shadow-2xl': theme === 'rose'
+            'bg-[#050507]/75 border-neutral-950/20 shadow-2xl': theme === 'onyx',
+            'bg-white/75 border-neutral-200/50 shadow-sm': theme === 'champagne',
+            'bg-[#15060A]/75 border-[#2D0D19]/30 shadow-2xl': theme === 'rose'
         }"
-        class="fixed top-0 inset-x-0 h-20 backdrop-blur-xl border-b z-50 transition-all duration-500 flex items-center"
+        class="fixed top-4 inset-x-4 h-16 backdrop-blur-md border rounded-full z-50 transition-all duration-500 flex items-center shadow-lg hover:shadow-xl group"
     >
+        <!-- Gold Accent Bottom Glow Line -->
+        <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-[#C5A880]/30 to-transparent"></div>
         <div class="max-w-7xl w-full mx-auto px-6 flex items-center justify-between gap-8">
             <a href="/" class="shrink-0 flex items-baseline space-x-2 animate-nav-item select-none cursor-pointer" style="animation-delay: 100ms;">
-                <span class="text-[11px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
-                <h1 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-base font-semibold uppercase tracking-[0.35em] transition-colors">NOIR & BLOOM</h1>
+                <span class="text-[11px] font-mono tracking-[0.4em] text-[#C5A880] uppercase">Atelier</span>
+                <span :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-base font-semibold uppercase tracking-[0.35em] transition-colors font-outfit">NOIR & BLOOM</span>
             </a>
             
             <div class="flex-1 max-w-sm hidden md:block animate-nav-item" style="animation-delay: 200ms;">
@@ -237,49 +300,111 @@
                     @endif
                 </button>
 
-                <!-- Profile Portal Sign In / User button -->
-                @auth
-                    <!-- Profile Portal - Logged In (Show user silhouette SVG) -->
-                    <button @click="accountPanelOpen = true" 
-                            class="hover:text-neutral-300 transition-colors cursor-pointer select-none w-8 h-8 flex items-center justify-center border border-neutral-500/10 rounded-full bg-neutral-500/5 animate-nav-item"
-                            style="animation-delay: 500ms;"
-                            title="Profile Portal"
+                <!-- Profile Portal Dropdown Card Popover -->
+                <div x-data="{ profileMenuOpen: false }" class="relative inline-block text-left animate-nav-item" style="animation-delay: 500ms;">
+                    @auth
+                        <!-- Silhouette Button for Authenticated User -->
+                        <button @click="profileMenuOpen = !profileMenuOpen" 
+                                class="hover:text-neutral-300 transition-colors cursor-pointer select-none w-8 h-8 flex items-center justify-center border border-neutral-500/10 rounded-full bg-neutral-500/5"
+                                title="Profile Portal Options"
+                        >
+                            <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="12" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </button>
+                    @else
+                        <!-- Log In / Sign In Button for Guests -->
+                        <button @click="profileMenuOpen = !profileMenuOpen" 
+                                class="hover:text-neutral-300 transition-colors cursor-pointer select-none px-3.5 h-8 flex items-center justify-center space-x-1.5 border border-neutral-500/10 rounded-full bg-neutral-500/5 text-xs font-mono font-medium tracking-wider"
+                                title="Log In or Sign In"
+                        >
+                            <svg class="w-3.5 h-3.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3M15 12" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span class="hidden sm:inline">Log In / Sign In</span>
+                        </button>
+                    @endauth
+
+                    <!-- Popover Dropdown Card -->
+                    <div 
+                        x-show="profileMenuOpen" 
+                        @click.away="profileMenuOpen = false" 
+                        x-transition:enter="transition ease-out duration-150"
+                        x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                        x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                        x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+                        :class="theme === 'champagne' ? 'bg-white border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#0F0F12] border-neutral-900 text-white shadow-2xl'"
+                        class="absolute right-0 mt-3.5 w-72 rounded-2xl border p-4 text-left z-50 text-xs text-neutral-350 space-y-3"
+                        style="display: none;"
                     >
-                        <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke-linecap="round" stroke-linejoin="round" />
-                            <circle cx="12" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </button>
-                @else
-                    <!-- Profile Portal - Logged Out (Show sign-in text and arrow entry SVG) -->
-                    <button @click="accountPanelOpen = true" 
-                            class="hover:text-neutral-300 transition-colors cursor-pointer select-none px-3.5 h-8 flex items-center justify-center space-x-1.5 border border-neutral-500/10 rounded-full bg-neutral-500/5 animate-nav-item text-xs font-mono font-medium tracking-wider"
-                            style="animation-delay: 500ms;"
-                            title="Log In or Sign In"
-                    >
-                        <svg class="w-3.5 h-3.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3M15 12" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <span class="hidden sm:inline">Log In / Sign In</span>
-                    </button>
-                @endauth
+                        @auth
+                            <div>
+                                <span class="font-medium block text-sm text-neutral-900 dark:text-white" x-text="'{{ auth()->user()->name }}'"></span>
+                                <span class="text-[10px] text-neutral-550 block font-mono" x-text="'{{ auth()->user()->email }}'"></span>
+                            </div>
+                            <div class="border-t border-neutral-500/10 pt-2.5 space-y-1 font-mono text-[11px]">
+                                <div class="flex justify-between">
+                                    <span class="text-neutral-500">Tier:</span>
+                                    <span class="text-neutral-400 font-bold" x-text="'{{ auth()->user()->loyalty_tier }}'"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-neutral-500">Loyalty Points:</span>
+                                    <span class="text-amber-500 font-bold" x-text="'{{ number_format(auth()->user()->loyalty_points) }} PTS'"></span>
+                                </div>
+                            </div>
+                            <a href="/profile-portal" class="block w-full text-center bg-black text-white dark:bg-white dark:text-black font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] hover:opacity-90 transition-all">
+                                [ View Profile Dashboard ]
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full text-center text-neutral-500 hover:text-rose-500 font-mono text-[9px] uppercase tracking-wider pt-1.5 block cursor-pointer">
+                                    [ Sign Out of Atelier ]
+                                </button>
+                            </form>
+                        @else
+                            <div class="text-center py-2 space-y-2">
+                                <span class="text-amber-500 font-serif text-lg italic block">Atelier Loyalty Circle</span>
+                                <p class="text-neutral-550 font-light text-[11px] leading-relaxed">Sign in to track orders, manage eTIMS profiles, and earn loyalty rewards.</p>
+                                <div class="flex flex-col gap-2 pt-1">
+                                    <a href="/login" class="bg-black text-white dark:bg-white dark:text-black font-mono font-bold uppercase tracking-wider py-2 rounded-xl text-[10px] hover:opacity-90 transition-all text-center block">
+                                        Sign In
+                                    </a>
+                                    <a href="/register" class="border border-neutral-850 text-neutral-400 font-mono font-bold uppercase tracking-wider py-2 rounded-xl text-[10px] hover:text-white transition-all text-center block">
+                                        Create Account
+                                    </a>
+                                </div>
+                            </div>
+                        @endauth
+                    </div>
+                </div>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl w-full mx-auto px-6 pt-32 flex-1 flex flex-col">
+        <h1 class="sr-only">Noir &amp; Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier</h1>
         <!-- Interactive Advertisements Carousel (3 Luxury Slides with images, custom textures, colors, and controls) -->
         <section x-data="{ 
                      activeSlide: 0, 
                      slidesCount: 3, 
                      timer: null,
                      init() {
+                         this.startTimer();
+                     },
+                     startTimer() {
                          this.timer = setInterval(() => {
                              this.activeSlide = (this.activeSlide + 1) % this.slidesCount;
                          }, 8000);
+                     },
+                     resetTimer() {
+                         clearInterval(this.timer);
+                         this.startTimer();
                      }
                  }" 
-                 class="w-full relative overflow-hidden mb-12 rounded-sm border border-neutral-500/10 min-h-[550px] flex items-center shadow-2xl"
+                 class="w-full relative overflow-hidden mb-12 rounded-sm border border-neutral-500/10 h-[calc(100vh-180px)] min-h-[580px] flex items-center shadow-2xl"
         >
             <!-- Slide 1: Naivasha Rift Valley Stems (Jade/Emerald Theme with fresh rose bundles image) -->
             <div x-show="activeSlide === 0" 
@@ -296,7 +421,7 @@
                 
                 <div class="max-w-xl space-y-4 z-10 animate-hero-rise">
                     <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-emerald-400 block">Wholesale Premium Export</span>
-                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif italic text-white leading-tight tracking-wider">
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-outfit font-semibold uppercase tracking-wider text-white leading-none">
                         Rift Valley Stems
                     </h2>
                     <div class="h-[1px] w-16 bg-emerald-500/30"></div>
@@ -326,7 +451,7 @@
                 
                 <div class="max-w-xl space-y-4 z-10">
                     <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-rose-400 block">Bespoke Delivery Protocol</span>
-                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif italic text-white leading-tight tracking-wider">
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-outfit font-semibold uppercase tracking-wider text-white leading-none">
                         The Secret Admirer
                     </h2>
                     <div class="h-[1px] w-16 bg-rose-500/30"></div>
@@ -356,7 +481,7 @@
 
                 <div class="max-w-xl space-y-4 z-10">
                     <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-amber-800 block">Elite Concierge Logistics</span>
-                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif italic text-neutral-900 leading-tight tracking-wider">
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-outfit font-semibold uppercase tracking-wider text-neutral-900 leading-none">
                         Uniformed Presentation
                     </h2>
                     <div class="h-[1px] w-16 bg-amber-800/30"></div>
@@ -370,6 +495,29 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Edge Navigation Chevrons -->
+            <button 
+                @click="activeSlide = (activeSlide - 1 + slidesCount) % slidesCount; resetTimer();"
+                class="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full flex items-center justify-center border transition-all duration-300 cursor-pointer shadow-lg hover:scale-105 backdrop-blur-md"
+                :class="activeSlide === 2 ? 'border-neutral-800/20 bg-neutral-900/5 hover:bg-neutral-900/10 text-neutral-850' : 'border-white/10 bg-white/5 hover:bg-white/10 text-white'"
+                title="Previous Slide"
+            >
+                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+
+            <button 
+                @click="activeSlide = (activeSlide + 1) % slidesCount; resetTimer();"
+                class="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full flex items-center justify-center border transition-all duration-300 cursor-pointer shadow-lg hover:scale-105 backdrop-blur-md"
+                :class="activeSlide === 2 ? 'border-neutral-800/20 bg-neutral-900/5 hover:bg-neutral-900/10 text-neutral-850' : 'border-white/10 bg-white/5 hover:bg-white/10 text-white'"
+                title="Next Slide"
+            >
+                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
 
             <!-- Slide Controls (Dots) -->
             <div class="absolute bottom-6 right-8 md:right-16 flex items-center space-x-2 z-20">
@@ -388,52 +536,64 @@
             <!-- Sticky Sidebar Navigator (Desktop only) -->
             <aside :class="theme === 'champagne' ? 'border-neutral-200 bg-white/50' : 'border-neutral-900/60 bg-[#0C0C0E]/40'" class="hidden lg:block w-64 shrink-0 sticky top-28 p-6 border rounded-[32px] backdrop-blur-md space-y-6 text-left transition-all duration-500 shadow-sm z-10 max-h-[calc(100vh-130px)] overflow-y-auto scrollbar-none">
                 <!-- Sidebar Title -->
-                <div class="border-b border-neutral-500/10 pb-4">
-                    <span class="text-[12px] font-mono uppercase tracking-[0.2em] text-neutral-500 block">Workspace Navigator</span>
-                    <h4 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-sm font-semibold uppercase tracking-wider mt-1">Curation Desk</h4>
+                <div class="border-b border-neutral-500/10 pb-3">
+                    <h4 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs font-semibold uppercase tracking-wider">Curation Desk</h4>
                 </div>
 
-                <!-- Navigation Links -->
-                <div class="space-y-1.5" x-data="{ active: @entangle('selectedCategory') }">
-                    <span class="text-[11px] font-mono uppercase tracking-widest text-neutral-500 block mb-2">Showroom Segments</span>
-                    <button @click="active = 'all'; $wire.selectCategory('all')" 
-                            :class="active === 'all' ? 'bg-neutral-500/10 text-amber-500 font-semibold' : 'text-neutral-400 hover:text-neutral-200'"
-                            class="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left">
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
-                            <path d="M12 12c2.5-3.5 1-7-1-8-2 1-3.5 4.5-1 8z" />
-                        </svg>
-                        <span>All Showroom</span>
-                    </button>
-                    <button @click="active = 'retail'; $wire.selectCategory('retail')" 
-                            :class="active === 'retail' ? 'bg-neutral-500/10 text-amber-500 font-semibold' : 'text-neutral-400 hover:text-neutral-200'"
-                            class="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left">
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
-                            <path d="M9.5 9h5l1 2v4a3.5 3.5 0 0 1-7 0v-4l1-2z" />
-                        </svg>
-                        <span>Bespoke Retail</span>
-                    </button>
-                    <button @click="active = 'wholesale'; $wire.selectCategory('wholesale')" 
-                            :class="active === 'wholesale' ? 'bg-neutral-500/10 text-amber-500 font-semibold' : 'text-neutral-400 hover:text-neutral-200'"
-                            class="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left">
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
-                            <path d="M8 11h8l-2 10H10L8 11z" />
-                        </svg>
-                        <span>Wholesale Stems</span>
-                    </button>
-                    <button @click="active = 'gifting'; $wire.selectCategory('gifting')" 
-                            :class="active === 'gifting' ? 'bg-neutral-500/10 text-amber-500 font-semibold' : 'text-neutral-400 hover:text-neutral-200'"
-                            class="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left">
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
-                            <rect x="4" y="8" width="16" height="12" rx="1" />
-                        </svg>
-                        <span>Luxury Gifting</span>
-                    </button>
+                <!-- Product Directory Tree sidebar navigator -->
+                <div class="space-y-3 font-mono text-left" x-data="{ active: @entangle('selectedCategory') }">
+                    <span class="text-[11px] font-mono uppercase tracking-widest text-neutral-500 block mb-1">Catalog Directory</span>
+                    
+                    <!-- Department: Floral Collections -->
+                    <div class="space-y-0.5">
+                        <span class="text-[10px] text-neutral-500 uppercase tracking-wider block font-bold px-2 mb-1">✦ Floral Catalog</span>
+                        <button @click="active = 'all'; $wire.selectCategory('all')" 
+                                :class="active === 'all' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
+                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left">
+                            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                            <span>All Showroom</span>
+                        </button>
+                        <button @click="active = 'stems'; $wire.selectCategory('stems')" 
+                                :class="active === 'stems' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
+                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left pl-6">
+                            <span>&bull; Fresh Stems</span>
+                        </button>
+                        <button @click="active = 'bouquets'; $wire.selectCategory('bouquets')" 
+                                :class="active === 'bouquets' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
+                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left pl-6">
+                            <span>&bull; Bespoke Bouquets</span>
+                        </button>
+                    </div>
+
+                    <!-- Department: Luxury Gifting -->
+                    <div class="space-y-0.5 pt-2 border-t border-neutral-500/10">
+                        <span class="text-[10px] text-neutral-500 uppercase tracking-wider block font-bold px-2 mb-1">✦ Luxury Gifting</span>
+                        <button @click="active = 'hampers'; $wire.selectCategory('hampers')" 
+                                :class="active === 'hampers' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
+                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left pl-6">
+                            <span>&bull; Gifting Hampers</span>
+                        </button>
+                        <button @click="active = 'home_decor'; $wire.selectCategory('home_decor')" 
+                                :class="active === 'home_decor' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
+                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left pl-6">
+                            <span>&bull; Home & Vases</span>
+                        </button>
+                    </div>
+
+                    <!-- Department: Specialized Consultations -->
+                    <div class="space-y-0.5 pt-2 border-t border-neutral-500/10">
+                        <span class="text-[10px] text-neutral-500 uppercase tracking-wider block font-bold px-2 mb-1">✦ Specializations</span>
+                        <button @click="active = 'specializations'; $wire.selectCategory('specializations')" 
+                                :class="active === 'specializations' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
+                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left pl-6">
+                            <span>&bull; Custom Services</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Expanded Workspace Config mini preview listing actual items -->
-                <div class="border-t border-neutral-500/10 pt-4 space-y-3">
-                    <span class="text-[11px] font-mono uppercase tracking-widest text-neutral-500 block">Workspace Config</span>
-                    <div :class="theme === 'champagne' ? 'bg-neutral-100/60 text-black' : 'bg-neutral-900/40 text-neutral-300'" class="p-4 rounded-2xl border border-neutral-500/10 space-y-3">
+                <div class="border-t border-neutral-500/10 pt-3">
+                    <div :class="theme === 'champagne' ? 'bg-neutral-100/60 text-black' : 'bg-neutral-900/40 text-neutral-300'" class="p-3 rounded-2xl border border-neutral-500/10 space-y-2">
                         
                         <!-- List of Cart Items -->
                         @if(count($cartItems) > 0)
@@ -456,8 +616,11 @@
                                 @endforeach
                             </div>
                         @else
-                            <div class="text-center py-4">
-                                <span class="text-[12px] text-neutral-500 font-mono block">&bull; Workspace Empty &bull;</span>
+                            <div class="text-center py-5 flex flex-col items-center justify-center space-y-1.5 animate-pulse">
+                                <svg class="w-6 h-6 text-neutral-500 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                                <span class="text-[10px] text-neutral-500 font-mono tracking-widest uppercase">Empty</span>
                             </div>
                         @endif
 
@@ -490,41 +653,14 @@
             <div class="flex-1 w-full space-y-8">
                 
                 <!-- Category sub-nav selector (mobile / tablet view) -->
-                <div class="lg:hidden max-w-2xl mx-auto w-full" x-data="{ active: @entangle('selectedCategory') }">
-                    <div class="grid grid-cols-4 relative border-b border-neutral-500/10 pb-4">
-                        <!-- Underline active slider line -->
-                        <div class="absolute bottom-0 h-[2px] bg-[#D4AF37] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-                             :class="{
-                                 'left-0 w-1/4': active === 'all',
-                                 'left-1/4 w-1/4': active === 'retail',
-                                 'left-2/4 w-1/4': active === 'wholesale',
-                                 'left-3/4 w-1/4': active === 'gifting'
-                             }"></div>
-                        
-                        <button @click="active = 'all'; $wire.selectCategory('all')" class="flex flex-col items-center justify-center space-y-2 cursor-pointer transition-all duration-300" :class="active === 'all' ? 'text-[#D4AF37] scale-105' : 'text-neutral-500 hover:text-neutral-300'">
-                            <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-current fill-none" stroke-width="1.5">
-                                <path d="M12 12c2.5-3.5 1-7-1-8-2 1-3.5 4.5-1 8z" />
-                            </svg>
-                            <span class="text-[11px] font-mono uppercase tracking-[0.1em]">Showroom</span>
-                        </button>
-                        <button @click="active = 'retail'; $wire.selectCategory('retail')" class="flex flex-col items-center justify-center space-y-2 cursor-pointer transition-all duration-300" :class="active === 'retail' ? 'text-[#D4AF37] scale-105' : 'text-neutral-500 hover:text-neutral-300'">
-                            <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-current fill-none" stroke-width="1.5">
-                                <path d="M9.5 9h5l1 2v4a3.5 3.5 0 0 1-7 0v-4l1-2z" />
-                            </svg>
-                            <span class="text-[11px] font-mono uppercase tracking-[0.1em]">Bespoke</span>
-                        </button>
-                        <button @click="active = 'wholesale'; $wire.selectCategory('wholesale')" class="flex flex-col items-center justify-center space-y-2 cursor-pointer transition-all duration-300" :class="active === 'wholesale' ? 'text-[#D4AF37] scale-105' : 'text-neutral-500 hover:text-neutral-300'">
-                            <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-current fill-none" stroke-width="1.5">
-                                <path d="M8 11h8l-2 10H10L8 11z" />
-                            </svg>
-                            <span class="text-[11px] font-mono uppercase tracking-[0.1em]">Wholesale</span>
-                        </button>
-                        <button @click="active = 'gifting'; $wire.selectCategory('gifting')" class="flex flex-col items-center justify-center space-y-2 cursor-pointer transition-all duration-300" :class="active === 'gifting' ? 'text-[#D4AF37] scale-105' : 'text-neutral-500 hover:text-neutral-300'">
-                            <svg viewBox="0 0 24 24" class="w-5 h-5 stroke-current fill-none" stroke-width="1.5">
-                                <rect x="4" y="8" width="16" height="12" rx="1" />
-                            </svg>
-                            <span class="text-[11px] font-mono uppercase tracking-[0.1em]">Gifting</span>
-                        </button>
+                <div class="lg:hidden max-w-2xl mx-auto w-full overflow-x-auto scrollbar-none pb-4 border-b border-neutral-500/10" x-data="{ active: @entangle('selectedCategory') }">
+                    <div class="flex space-x-2.5 min-w-max px-2 font-mono text-[11px] uppercase tracking-wider">
+                        <button @click="active = 'all'; $wire.selectCategory('all')" :class="active === 'all' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">All</button>
+                        <button @click="active = 'stems'; $wire.selectCategory('stems')" :class="active === 'stems' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Stems</button>
+                        <button @click="active = 'bouquets'; $wire.selectCategory('bouquets')" :class="active === 'bouquets' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Bouquets</button>
+                        <button @click="active = 'hampers'; $wire.selectCategory('hampers')" :class="active === 'hampers' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Hampers</button>
+                        <button @click="active = 'home_decor'; $wire.selectCategory('home_decor')" :class="active === 'home_decor' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Decor</button>
+                        <button @click="active = 'specializations'; $wire.selectCategory('specializations')" :class="active === 'specializations' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Specializations</button>
                     </div>
                 </div>
 
@@ -538,99 +674,167 @@
                     @endforeach
                 </div>
 
-                <!-- Showroom Grid (Cathedral Arched product cards, 3 columns) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" wire:loading.class="opacity-40" wire:target="search, selectedCategory, filterByOccasion">
+                <!-- Showroom Grid (Cathedral Arched product cards & Landscape custom rectangular cards) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid-flow-dense gap-6 animate-hero-fade" wire:loading.class="opacity-40" wire:target="search, selectedCategory, filterByOccasion">
                     @forelse($products as $product)
-                        <div x-data="{ selectedSize: 'standard', basePrice: {{ $product->price }}, numberFormat(val) { return new Intl.NumberFormat().format(val); } }" 
-                             :class="theme === 'champagne' ? 'border-neutral-200 bg-white/70 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/50'"
-                             class="flex flex-col p-3 rounded-t-[200px] rounded-b-[32px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5 group text-left backdrop-blur-md"
-                        >
-                            <!-- Product Image Frame: Cathedral Arch floral museum aesthetic -->
-                            <div class="p-1 border border-neutral-500/10 rounded-t-[190px] rounded-b-[28px] overflow-hidden relative">
-                                <div class="aspect-[4/5] rounded-t-[180px] rounded-b-[24px] relative overflow-hidden bg-neutral-950/5">
-                                    <!-- Product Image -->
+                        @if($product->category === 'specializations')
+                            <!-- Rectangular Landscape Layout for specialized custom services -->
+                            <div x-data="{ selectedSize: 'standard', basePrice: {{ $product->price }}, numberFormat(val) { return new Intl.NumberFormat().format(val); } }" 
+                                 :class="theme === 'champagne' ? 'border-neutral-200 bg-white/70 shadow-sm text-neutral-900' : 'border-neutral-900/60 bg-[#0C0C0E]/50 text-white'"
+                                 class="col-span-1 sm:col-span-2 flex flex-col md:flex-row p-4 rounded-[32px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group text-left backdrop-blur-md"
+                            >
+                                <!-- Left side: Image Frame -->
+                                <div class="w-full md:w-[40%] aspect-[4/3] md:aspect-auto rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 min-h-[220px]">
                                     <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
-                                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 z-0">
+                                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-all duration-700 z-0">
                                     
-                                    <!-- Subtle Category and Grade tags at the bottom of the image frame (safe from arch clipping) -->
-                                    <div class="absolute bottom-3 inset-x-3 flex justify-between items-end z-10">
-                                        <span class="bg-[#050507]/60 border border-white/5 text-neutral-200 px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-widest backdrop-blur-md">
-                                            {{ $product->category }}
+                                    <div class="absolute bottom-3 left-3 z-10">
+                                        <span class="bg-[#C5A880] text-black px-2.5 py-1 rounded-full text-[10px] font-outfit font-bold tracking-wider uppercase shadow-md">
+                                            {{ $product->grade ?? 'Specialization' }}
                                         </span>
-                                        @if($product->grade)
-                                            <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wide uppercase shadow-sm">
-                                                {{ $product->grade }}
+                                    </div>
+                                </div>
+                                <!-- Right side: Details -->
+                                <div class="flex-1 px-4 py-2 flex flex-col justify-between space-y-4">
+                                    <div class="space-y-2">
+                                        <span class="text-[11px] uppercase tracking-[0.3em] text-[#C5A880] font-outfit block font-bold">Atelier Specialization</span>
+                                        <h3 :class="theme === 'champagne' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-2xl font-serif italic tracking-wider leading-snug">
+                                            {{ $product->name }}
+                                        </h3>
+                                        <p class="text-neutral-500 font-light text-sm leading-relaxed">
+                                            {{ $product->description }}
+                                        </p>
+                                        <!-- Social Sharing Direct Links for SMM -->
+                                        <div class="flex items-center space-x-3 text-[10px] font-outfit uppercase tracking-wider text-neutral-400 mt-2">
+                                            <span class="text-neutral-500 text-[9px] uppercase tracking-widest font-bold">Share:</span>
+                                            <a href="https://api.whatsapp.com/send?text=Check%20out%20this%20exclusive%20{{ urlencode($product->name) }}%20service%20at%20Noir%20%26%20Bloom:%20{{ urlencode(url('/')) }}" 
+                                               target="_blank" rel="noopener" class="hover:text-emerald-500 transition-colors font-bold" title="Share via WhatsApp">WA</a>
+                                            <a href="https://twitter.com/intent/tweet?text=Consulting%20with%20@NoirAndBloom%20for%20{{ urlencode($product->name) }}:&url={{ urlencode(url('/')) }}" 
+                                               target="_blank" rel="noopener" class="hover:text-white transition-colors font-bold" title="Share on X">X</a>
+                                            <a href="https://pinterest.com/pin/create/button/?url={{ urlencode(url('/')) }}&media={{ urlencode($product->backdrop_url) }}&description=Bespoke%20Floral%20Service%20-%20{{ urlencode($product->name) }}" 
+                                               target="_blank" rel="noopener" class="hover:text-rose-500 transition-colors font-bold" title="Pin to Pinterest">PIN</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between pt-4 border-t border-neutral-500/10">
+                                        <div>
+                                            <span class="text-[10px] font-outfit uppercase tracking-[0.2em] text-neutral-400 block">Service Base Fee</span>
+                                            <span class="font-outfit text-lg font-bold text-amber-500">
+                                                {{ number_format($product->price) }} KSH
                                             </span>
-                                        @endif
+                                        </div>
+
+                                        <a href="/profile-portal"
+                                           :class="theme === 'champagne' ? 'bg-black text-white hover:bg-[#B59A7A] hover:text-black' : 'bg-white text-black hover:bg-[#C5A880] hover:text-black'"
+                                           class="px-5 py-2.5 rounded-full text-[11px] font-outfit uppercase font-bold tracking-wider transition-all duration-300 shadow-md flex items-center space-x-1"
+                                        >
+                                            <span>Request Curation</span>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Details Section: Animated below the image (without blur) -->
-                            <div class="px-2 pt-4 pb-2 flex-1 flex flex-col justify-between">
-                                <div class="space-y-1.5">
-                                    <span class="text-[12px] uppercase tracking-[0.3em] text-neutral-400 font-mono block font-light">Noir & Bloom Atelier</span>
-                                    <h3 :class="theme === 'champagne' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-xl font-serif italic tracking-wider leading-snug">
-                                        {{ $product->name }}
-                                    </h3>
-                                    <p class="text-neutral-500 font-light text-sm leading-relaxed line-clamp-2">
-                                        {{ $product->description ?? 'Premium luxury floral batch curation.' }}
-                                    </p>
+                        @else
+                            <!-- Standard Cathedral Arch Layout -->
+                            <div x-data="{ selectedSize: 'standard', basePrice: {{ $product->price }}, numberFormat(val) { return new Intl.NumberFormat().format(val); } }" 
+                                 :class="theme === 'champagne' ? 'border-neutral-200 bg-white/70 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/50'"
+                                 class="flex flex-col p-3 rounded-t-[200px] rounded-b-[32px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5 group text-left backdrop-blur-md"
+                            >
+                                <!-- Product Image Frame -->
+                                <div class="p-1 border border-neutral-500/10 rounded-t-[190px] rounded-b-[28px] overflow-hidden relative">
+                                    <div class="aspect-[4/5] rounded-t-[180px] rounded-b-[24px] relative overflow-hidden bg-neutral-950/5">
+                                        <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
+                                             class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 z-0">
+                                        
+                                        <div class="absolute bottom-3 inset-x-3 flex justify-between items-end z-10">
+                                            <span class="bg-[#050507]/60 border border-white/5 text-neutral-200 px-2 py-0.5 rounded text-[10px] font-outfit uppercase tracking-widest backdrop-blur-md">
+                                                {{ $product->category }}
+                                            </span>
+                                            @if($product->grade)
+                                                <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded text-[10px] font-outfit font-bold tracking-wide uppercase shadow-sm">
+                                                    {{ $product->grade }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <!-- Pricing & Size Details - Slide down smoothly on card hover -->
-                                <div class="mt-4 space-y-3">
-                                    <!-- Always visible price based on active size -->
-                                    <div class="flex justify-between items-baseline pt-2 border-t border-neutral-500/10">
-                                        <span class="text-[12px] uppercase tracking-[0.2em] text-neutral-400 font-mono">Curation Price</span>
-                                        <span class="font-mono text-base font-semibold tracking-wide text-amber-500">
-                                            <span x-text="numberFormat(selectedSize === 'standard' ? basePrice : (selectedSize === 'deluxe' ? Math.round(basePrice * 1.5) : Math.round(basePrice * 2.2)))"></span> KSH
-                                        </span>
+                                <!-- Details Section -->
+                                <div class="px-2 pt-4 pb-2 flex-1 flex flex-col justify-between">
+                                    <div class="space-y-1.5">
+                                        <span class="text-[12px] uppercase tracking-[0.3em] text-neutral-400 font-outfit block font-light">Noir & Bloom Atelier</span>
+                                        <h3 :class="theme === 'champagne' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-xl font-serif italic tracking-wider leading-snug">
+                                            {{ $product->name }}
+                                        </h3>
+                                        <p class="text-neutral-500 font-light text-sm leading-relaxed line-clamp-2">
+                                            {{ $product->description ?? 'Premium luxury floral batch curation.' }}
+                                        </p>
                                     </div>
 
-                                    <!-- Size selector & add to cart button (reveal on hover) -->
-                                    <div class="max-h-0 opacity-0 group-hover:max-h-32 group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden space-y-3">
-                                        @if($product->category !== 'wholesale')
-                                            <!-- Size Picker with Stock Check -->
-                                            <div class="space-y-1">
-                                                <span class="text-[12px] uppercase tracking-wider text-neutral-500 font-mono">Curated Size</span>
-                                                <div class="flex items-center space-x-1.5">
-                                                    <!-- Standard -->
-                                                    <button type="button" @click="selectedSize = 'standard'" 
-                                                            :class="selectedSize === 'standard' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" 
-                                                            @if($product->stock_standard <= 0) disabled title="Standard size out of stock" class="px-2.5 py-0.5 border text-[11px] font-mono uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-mono uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
-                                                        Std
-                                                     </button>
-                                                    <!-- Deluxe -->
-                                                    <button type="button" @click="selectedSize = 'deluxe'" 
-                                                            :class="selectedSize === 'deluxe' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" 
-                                                            @if($product->stock_deluxe <= 0) disabled title="Deluxe size out of stock" class="px-2.5 py-0.5 border text-[11px] font-mono uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-mono uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
-                                                        Dlx
-                                                    </button>
-                                                    <!-- Grand -->
-                                                    <button type="button" @click="selectedSize = 'grand'" 
-                                                            :class="selectedSize === 'grand' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" 
-                                                            @if($product->stock_grand <= 0) disabled title="Grand size out of stock" class="px-2.5 py-0.5 border text-[11px] font-mono uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-mono uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
-                                                        Gnd
-                                                    </button>
+                                    <div class="mt-4 space-y-3">
+                                        <div class="flex justify-between items-baseline pt-2 border-t border-neutral-500/10">
+                                            <span class="text-[12px] uppercase tracking-[0.2em] text-neutral-400 font-outfit">Curation Price</span>
+                                            <span class="font-outfit text-base font-semibold tracking-wide text-amber-500">
+                                                <span x-text="numberFormat(selectedSize === 'standard' ? basePrice : (selectedSize === 'deluxe' ? Math.round(basePrice * 1.5) : Math.round(basePrice * 2.2)))"></span> KSH
+                                            </span>
+                                        </div>
+
+                                        <div class="max-h-0 opacity-0 group-hover:max-h-64 group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden space-y-3">
+                                            @if($product->category !== 'stems')
+                                                <div class="space-y-1">
+                                                    <span class="text-[12px] uppercase tracking-wider text-neutral-500 font-outfit">Curated Size</span>
+                                                    <div class="flex items-center space-x-1.5">
+                                                        <button type="button" @click="selectedSize = 'standard'" 
+                                                                :class="selectedSize === 'standard' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" 
+                                                                @if($product->stock_standard <= 0) disabled title="Standard size out of stock" class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
+                                                            Std
+                                                         </button>
+                                                        <button type="button" @click="selectedSize = 'deluxe'" 
+                                                                :class="selectedSize === 'deluxe' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" 
+                                                                @if($product->stock_deluxe <= 0) disabled title="Deluxe size out of stock" class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
+                                                            Dlx
+                                                        </button>
+                                                        <button type="button" @click="selectedSize = 'grand'" 
+                                                                :class="selectedSize === 'grand' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" 
+                                                                @if($product->stock_grand <= 0) disabled title="Grand size out of stock" class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
+                                                            Gnd
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            @endif
+
+                                            <button 
+                                                type="button"
+                                                :disabled="(selectedSize === 'standard' && {{ $product->stock_standard }} <= 0) || (selectedSize === 'deluxe' && {{ $product->stock_deluxe }} <= 0) || (selectedSize === 'grand' && {{ $product->stock_grand }} <= 0)"
+                                                @click="$wire.addToCuration({{ $product->id }}, selectedSize); drawerOpen = true; checkoutMode = false;"
+                                                :class="theme === 'champagne' ? 'bg-black text-white hover:bg-[#B59A7A] hover:text-black hover:shadow-[0_0_15px_rgba(181,154,122,0.5)]' : 'bg-white text-black hover:bg-[#C5A880] hover:text-black hover:shadow-[0_0_15px_rgba(197,168,128,0.5)]'"
+                                                class="w-full text-[12px] font-semibold tracking-[0.2em] uppercase py-2.5 transition-all duration-300 rounded-full flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transform hover:scale-[1.02]"
+                                            >
+                                                <span x-text="(selectedSize === 'standard' && {{ $product->stock_standard }} <= 0) || (selectedSize === 'deluxe' && {{ $product->stock_deluxe }} <= 0) || (selectedSize === 'grand' && {{ $product->stock_grand }} <= 0) ? 'Out of Stock' : 'Curate Selection'"></span>
+                                            </button>
+
+                                            <!-- Social Sharing Direct Links for SMM -->
+                                            <div class="flex items-center justify-between border-t border-neutral-500/10 pt-2.5 text-[10px] font-outfit text-neutral-400 uppercase tracking-widest">
+                                                <span>Share:</span>
+                                                <div class="flex items-center space-x-3">
+                                                    <a href="https://api.whatsapp.com/send?text=Check%20out%20this%20stunning%20{{ urlencode($product->name) }}%20arrangement%20at%20Noir%20%26%20Bloom:%20{{ urlencode(url('/')) }}" 
+                                                       target="_blank" rel="noopener" class="hover:text-emerald-500 transition-colors font-bold" title="Share via WhatsApp">
+                                                        WA
+                                                    </a>
+                                                    <a href="https://twitter.com/intent/tweet?text=Loving%20the%20premium%20{{ urlencode($product->name) }}%20curation%20from%20@NoirAndBloom.%20Check%20it%20out:&url={{ urlencode(url('/')) }}" 
+                                                       target="_blank" rel="noopener" class="hover:text-white transition-colors font-bold" title="Share on X">
+                                                        X
+                                                    </a>
+                                                    <a href="https://pinterest.com/pin/create/button/?url={{ urlencode(url('/')) }}&media={{ urlencode($product->backdrop_url) }}&description=Noir%20%26%20Bloom%20-%20{{ urlencode($product->name) }}" 
+                                                       target="_blank" rel="noopener" class="hover:text-rose-500 transition-colors font-bold" title="Pin to Pinterest">
+                                                        PIN
+                                                    </a>
                                                 </div>
                                             </div>
-                                        @endif
-
-                                        <!-- Add to Curation Button with active click suggestion colour change -->
-                                        <button 
-                                            type="button"
-                                            :disabled="(selectedSize === 'standard' && {{ $product->stock_standard }} <= 0) || (selectedSize === 'deluxe' && {{ $product->stock_deluxe }} <= 0) || (selectedSize === 'grand' && {{ $product->stock_grand }} <= 0)"
-                                            @click="$wire.addToCuration({{ $product->id }}, selectedSize); drawerOpen = true; checkoutMode = false;"
-                                            :class="theme === 'champagne' ? 'bg-black text-white hover:bg-[#B59A7A] hover:text-black hover:shadow-[0_0_15px_rgba(181,154,122,0.5)]' : 'bg-white text-black hover:bg-[#C5A880] hover:text-black hover:shadow-[0_0_15px_rgba(197,168,128,0.5)]'"
-                                            class="w-full text-[12px] font-semibold tracking-[0.2em] uppercase py-2.5 transition-all duration-300 rounded-full flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transform hover:scale-[1.02]"
-                                        >
-                                            <span x-text="(selectedSize === 'standard' && {{ $product->stock_standard }} <= 0) || (selectedSize === 'deluxe' && {{ $product->stock_deluxe }} <= 0) || (selectedSize === 'grand' && {{ $product->stock_grand }} <= 0) ? 'Out of Stock' : 'Curate Selection'"></span>
-                                        </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     @empty
                         <div class="col-span-full py-20 text-center border border-dashed border-neutral-800 rounded-2xl">
                             <p class="text-xs font-light text-neutral-500 font-mono">No computational logs found matching this showroom segment filter query.</p>
@@ -762,153 +966,18 @@
         </div>
     </footer>
 
-    <!-- Overlay backdrop for Account Panel -->
-    <div x-show="accountPanelOpen" @click="accountPanelOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50" style="display: none;"></div>
+    <!-- No Account Drawer here (Profile details managed inside dedicated /profile-portal) -->
     
-    <!-- Account Portal Side Drawer -->
-    <div 
-        x-show="accountPanelOpen"
-        x-transition:enter="transition transform ease-in-out duration-500" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
-        x-transition:leave="transition transform ease-in-out duration-500" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
-        class="fixed inset-y-0 right-0 w-full sm:w-[600px] bg-[#0A0A0C] border-l border-neutral-900 shadow-2xl z-50 flex flex-col justify-between text-left p-8 text-neutral-200 h-full rounded-l-3xl"
-        style="display: none;"
-    >
-        @auth
-            <div class="border-b border-neutral-900 pb-4 flex items-center justify-between shrink-0">
-                <div>
-                    <h2 class="text-sm uppercase tracking-[0.2em] text-white">Profile Portal</h2>
-                    <span class="text-[10px] text-neutral-500 font-mono">Loyalty Tier: {{ auth()->user()->loyalty_tier }}</span>
-                </div>
-                <button @click="accountPanelOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Portal">
-                    <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </button>
-            </div>
-
-            <div class="flex-1 overflow-y-auto my-6 space-y-6 scrollbar-none max-h-[calc(100vh-160px)] pr-1">
-                <!-- Profile Info + Loyalty Stats -->
-                <div class="bg-neutral-900/30 border border-neutral-900 p-5 rounded-xl space-y-4">
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="space-y-1">
-                            <span class="text-white font-medium block text-sm">{{ auth()->user()->name }}</span>
-                            <span class="text-xs text-neutral-400 font-mono block">{{ auth()->user()->email }} &bull; {{ auth()->user()->phone_number }}</span>
-                            <span class="text-[10px] text-neutral-500 font-mono block">{{ auth()->user()->default_delivery_address }}</span>
-                        </div>
-                        <div class="text-right shrink-0">
-                            <span class="bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-[9px] uppercase tracking-widest px-2 py-1 rounded block">
-                                {{ auth()->user()->display_tier ?? 'Retail Member' }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-neutral-900/60 font-mono">
-                        <div>
-                            <span class="text-[9px] uppercase text-neutral-500 block">Atelier Points</span>
-                            <span class="text-sm text-amber-400 font-bold mt-1 block">{{ number_format(auth()->user()->loyalty_points) }} PTS</span>
-                        </div>
-                        <div>
-                            <span class="text-[9px] uppercase text-neutral-500 block">Referral Code</span>
-                            <span class="text-sm text-neutral-200 mt-1 block tracking-wider uppercase">{{ auth()->user()->referral_code ?? 'None' }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Historical Orders -->
-                <div class="space-y-3">
-                    <h3 class="text-[10px] uppercase font-mono tracking-wider text-neutral-400 font-bold">&bull; Historical Dispatch Logs Matrix</h3>
-                    
-                    @forelse ($userOrders as $order)
-                        <div class="bg-neutral-900/40 border border-neutral-900 rounded-xl p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-3 text-xs">
-                            <div class="space-y-1">
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-white font-mono font-semibold">#NB-ORD-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</span>
-                                    @php
-                                        $statusColors = [
-                                            'pending' => 'bg-amber-950/40 text-amber-400 border-amber-900/30',
-                                            'approved' => 'bg-blue-950/40 text-blue-400 border-blue-900/30',
-                                            'processing' => 'bg-purple-950/40 text-purple-400 border-purple-900/30',
-                                            'delivered' => 'bg-emerald-950/40 text-emerald-400 border-emerald-900/30',
-                                            'cancelled' => 'bg-neutral-900/60 text-neutral-500 border-neutral-800',
-                                        ];
-                                        $colorClass = $statusColors[$order->status] ?? $statusColors['pending'];
-                                    @endphp
-                                    <span class="text-[9px] px-1.5 py-0.5 rounded font-mono border {{ $colorClass }} uppercase tracking-wider">{{ $order->status }}</span>
-                                </div>
-                                <p class="text-neutral-400 text-[11px]">
-                                    @foreach ($order->products as $product)
-                                        {{ $product->pivot->quantity }}x {{ $product->name }}@if(!$loop->last), @endif
-                                    @endforeach
-                                </p>
-                                @if ($order->etimsInvoice)
-                                    <span class="text-[10px] text-neutral-500 font-mono block">eTIMS Receipt: {{ $order->etimsInvoice->invoice_number }}</span>
-                                @endif
-                            </div>
-                            <div class="sm:text-right shrink-0">
-                                <span class="text-white font-mono font-bold block">{{ number_format($order->total_amount) }} KSH</span>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-10 bg-neutral-900/20 border border-neutral-900 rounded-sm">
-                            <span class="text-[9px] font-mono uppercase tracking-[0.2em] text-neutral-500">&bull; No Orders Recorded &bull;</span>
-                            <p class="text-[11px] text-neutral-400 font-light mt-1">Place an order in the showroom to record your first transaction.</p>
-                        </div>
-                    @endforelse
-                </div>
-
-                <!-- Sign Out -->
-                <div class="pt-6 border-t border-neutral-900">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="w-full bg-neutral-900 hover:bg-neutral-850 border border-neutral-850 hover:border-neutral-700 text-neutral-300 py-2.5 text-[10px] font-mono uppercase tracking-[0.2em] rounded-full transition-all cursor-pointer">
-                            [ Sign Out of Portal ]
-                        </button>
-                    </form>
-                </div>
-            </div>
-        @else
-            <div class="border-b border-neutral-900 pb-4 flex items-center justify-between shrink-0">
-                <div>
-                    <h2 class="text-sm uppercase tracking-[0.2em] text-white">Profile Portal</h2>
-                    <span class="text-[10px] text-neutral-500 font-mono">Authentication Required</span>
-                </div>
-                <button @click="accountPanelOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Portal">
-                    <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </button>
-            </div>
-
-            <div class="flex-1 flex flex-col justify-center space-y-6 py-12 text-center">
-                <div class="space-y-2">
-                    <span class="text-amber-500 font-serif text-3xl italic block">Atelier Loyalty Circle</span>
-                    <p class="text-neutral-400 font-light text-xs max-w-sm mx-auto">
-                        Authenticate your membership to earn points on each purchase, unlock premium pricing tiers, and manage corporate tax details.
-                    </p>
-                </div>
-
-                <div class="flex flex-col space-y-3 max-w-xs mx-auto w-full pt-4">
-                    <a href="{{ route('login') }}" class="bg-white text-black hover:bg-neutral-250 py-3 text-[10px] font-mono uppercase tracking-[0.25em] rounded-full transition-all text-center">
-                        Sign In
-                    </a>
-                    <a href="{{ route('register') }}" class="border border-neutral-850 hover:border-neutral-700 hover:bg-neutral-900/30 text-neutral-300 py-3 text-[10px] font-mono uppercase tracking-[0.25em] rounded-full transition-all text-center">
-                        Create Account
-                    </a>
-                </div>
-            </div>
-        @endauth
-    </div>
-
-    <!-- Overlay backdrop for Curation Drawer -->
-    <div x-show="drawerOpen" @click="drawerOpen = false" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" style="display: none;"></div>
+    <!-- Backdrop for Curation Drawer -->
+    <div x-show="drawerOpen" @click="drawerOpen = false" class="fixed inset-0 z-45 bg-black/40 backdrop-blur-xl" style="display: none;"></div>
     
-    <!-- Curation Selection Sidebar Drawer -->
+    <!-- Floating Cart Overlay Panel (Center Modal) -->
     <div 
         x-show="drawerOpen"
-        x-transition:enter="transition transform ease-in-out duration-500" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
-        x-transition:leave="transition transform ease-in-out duration-500" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
-        :class="theme === 'champagne' ? 'bg-white border-neutral-200 text-neutral-900' : 'bg-[#0F0F12] border-l border-neutral-900 text-white'"
-        class="fixed inset-y-0 right-0 w-full sm:w-[480px] shadow-2xl z-50 flex flex-col justify-between text-left transition-colors duration-500 h-full rounded-l-3xl"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+        :class="theme === 'champagne' ? 'bg-white border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/95 border border-neutral-900 text-white shadow-2xl'"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[520px] max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
         style="display: none;"
     >
         <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
@@ -925,7 +994,7 @@
 
         <!-- Cart items list (visible if not checking out) -->
         <div x-show="!checkoutMode && !@json($orderSubmitted)" class="flex-1 flex flex-col justify-between overflow-hidden">
-            <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(100vh-220px)] scrollbar-none">
+            <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-220px)] scrollbar-none">
                 @forelse($cartItems as $item)
                     <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900/60'" class="flex items-center justify-between space-x-4 border-b pb-4 text-xs animate-hero-fade">
                         <div class="flex-1 space-y-0.5">
@@ -939,9 +1008,12 @@
                         </div>
                     </div>
                 @empty
-                    <div class="h-full flex flex-col items-center justify-center text-center space-y-2 pt-24 text-neutral-500">
-                        <span class="text-[9px] font-mono uppercase tracking-[0.2em]">&bull; Selection Empty &bull;</span>
-                        <p class="text-[11px] font-light max-w-[200px]">Browse the showroom to compile premium items into your workspace configuration.</p>
+                    <div class="h-full flex flex-col items-center justify-center text-center space-y-3 pt-28 text-neutral-500 animate-pulse">
+                        <svg class="w-10 h-10 text-neutral-500 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        <span class="text-[10px] font-mono uppercase tracking-[0.2em]">Empty</span>
+                        <p class="text-[11px] font-light max-w-[220px]">Browse the showroom to compile premium items into your workspace configuration.</p>
                     </div>
                 @endforelse
             </div>
@@ -963,7 +1035,7 @@
         <div x-show="checkoutMode && !@json($orderSubmitted)" class="flex-1 flex flex-col justify-between overflow-hidden" style="display: none;">
             <form wire:submit.prevent="submitCurationRequest" class="flex-1 flex flex-col justify-between overflow-hidden">
                 
-                <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(100vh-210px)] scrollbar-none text-xs">
+                <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-210px)] scrollbar-none text-xs">
                     <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="flex items-center justify-between pb-2 border-b">
                         <span class="text-xs uppercase tracking-wider text-neutral-400">Atelier Delivery Profile</span>
                         <button type="button" @click="checkoutMode = false" class="text-neutral-500 hover:text-neutral-400 text-xs font-mono cursor-pointer flex items-center space-x-1">
@@ -1074,7 +1146,7 @@
         <!-- Mpesa Payment Initiation Page (Visible once orderSubmitted is true) -->
         @if($orderSubmitted)
             <div class="flex-1 flex flex-col justify-between overflow-hidden shrink-0 h-full">
-                <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(100vh-200px)] scrollbar-none w-full text-xs">
+                <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-200px)] scrollbar-none w-full text-xs">
                     <div class="space-y-6 max-w-sm mx-auto w-full pt-4">
                         <div class="w-10 h-10 rounded-full border border-neutral-800 flex items-center justify-center bg-neutral-900/50 mx-auto">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10B981]"></span>
@@ -1116,7 +1188,7 @@
                 </div>
 
                 <div class="text-center p-4 border-t border-neutral-500/5 shrink-0 bg-black/10 flex justify-center">
-                    <button @click="drawerOpen = false; checkoutMode = false;" wire:click="returnToCollections" class="text-neutral-500 hover:text-neutral-400 text-xs font-mono tracking-widest uppercase cursor-pointer flex items-center space-x-1">
+                    <button @click="drawerOpen = false; checkoutMode = false;" wire:click="returnToCollections" class="text-neutral-500 hover:text-neutral-450 text-xs font-mono tracking-widest uppercase cursor-pointer flex items-center space-x-1">
                         <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
                             <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
@@ -1126,6 +1198,8 @@
             </div>
         @endif
     </div>
+
+    <!-- Redundant Floating Round Cart Button removed in favor of header navigation cart -->
 
     <!-- Floating Chat Widget -->
     <div x-show="!drawerOpen" x-transition class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
@@ -1194,9 +1268,10 @@
             });
 
             // Physics and mouse interactive configuration
-            const particleCount = 96;
+            const particleCount = 72; // Optimized count for clean scattering and lower cpu overhead
             const particles = [];
             const mouse = { x: -1000, y: -1000, active: false };
+            let frameCount = 0;
 
             window.addEventListener('mousemove', (e) => {
                 mouse.x = e.clientX;
@@ -1221,20 +1296,18 @@
 
             for (let i = 0; i < particleCount; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 1.2 + 0.4;
+                const speed = Math.random() * 0.3 + 0.15; // Slow luxury ambient floating speed
                 particles.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
                     vx: Math.cos(angle) * speed,
                     vy: Math.sin(angle) * speed,
-                    r: Math.random() * 12 + 6, // Larger sizes for premium visual impact (6 to 18px radius)
-                    d: Math.random() * particleCount,
-                    baseSpeed: Math.random() * 0.5 + 0.3,
-                    sway: Math.random() * 0.6 - 0.3,
+                    r: Math.random() * 10 + 5, // 5px to 15px radius for elegant balance
+                    d: Math.random() * 100, // sway phase offset
+                    rotationSpeed: Math.random() * 0.4 - 0.2, // slow independent spin
                     angle: Math.random() * 360,
-                    rotationSpeed: Math.random() * 1.2 - 0.6,
                     color: '',
-                    type: Math.random() > 0.4 ? 'petal' : 'flower'
+                    type: Math.random() > 0.45 ? 'petal' : 'flower'
                 });
             }
 
@@ -1249,7 +1322,7 @@
                     ctx.ellipse(0, -radius, radius * 0.5, radius * 0.9, 0, 0, Math.PI * 2);
                 }
                 ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
                 ctx.beginPath();
                 ctx.arc(0, 0, radius * 0.25, 0, Math.PI * 2);
                 ctx.fill();
@@ -1273,10 +1346,11 @@
             function animate() {
                 ctx.clearRect(0, 0, width, height);
                 const colors = getPetalColors();
+                frameCount++;
 
                 particles.forEach((p, idx) => {
-                    // Increase visibility opacity from 15% (26) to 46% (77)
-                    p.color = colors[idx % colors.length] + '77';
+                    // Soft, subtle ambient background transparency (20%)
+                    p.color = colors[idx % colors.length] + '33';
 
                     if (p.type === 'flower') {
                         drawFlower(p.x, p.y, p.r, 5, p.color, p.angle);
@@ -1284,112 +1358,30 @@
                         drawPetal(p.x, p.y, p.r, p.color, p.angle);
                     }
 
-                    // Reynolds Flocking Algorithm implementation (Separation, Cohesion, Alignment)
-                    let flockVx = 0;
-                    let flockVy = 0;
-                    let flockX = 0;
-                    let flockY = 0;
-                    let avoidX = 0;
-                    let avoidY = 0;
-                    let neighbors = 0;
-                    let closeNeighbors = 0;
+                    // Smooth independent drift and harmonic sine wave sway
+                    const sway = Math.sin(p.d + frameCount * 0.008) * 0.2;
+                    let currentVx = p.vx + sway;
+                    let currentVy = p.vy;
 
-                    const visualRange = 100;
-                    const minDistance = 35;
-
-                    particles.forEach(other => {
-                        if (other === p) return;
-                        
-                        let dx = other.x - p.x;
-                        let dy = other.y - p.y;
-                        let dist = Math.sqrt(dx*dx + dy*dy);
-                        
-                        if (dist < visualRange) {
-                            flockX += other.x;
-                            flockY += other.y;
-                            flockVx += other.vx;
-                            flockVy += other.vy;
-                            neighbors++;
-
-                            if (dist < minDistance) {
-                                avoidX -= dx;
-                                avoidY -= dy;
-                                closeNeighbors++;
-                            }
-                        }
-                    });
-
-                    let ax = 0;
-                    let ay = 0;
-
-                    if (neighbors > 0) {
-                        // Cohesion
-                        let avgX = flockX / neighbors;
-                        let avgY = flockY / neighbors;
-                        ax += (avgX - p.x) * 0.005;
-                        ay += (avgY - p.y) * 0.005;
-
-                        // Alignment
-                        let avgVx = flockVx / neighbors;
-                        let avgVy = flockVy / neighbors;
-                        ax += (avgVx - p.vx) * 0.03;
-                        ay += (avgVy - p.vy) * 0.03;
-                    }
-
-                    if (closeNeighbors > 0) {
-                        // Separation
-                        ax += avoidX * 0.05;
-                        ay += avoidY * 0.05;
-                    }
-
-                    // Mouse interaction repulsion/avoidance
+                    // Mouse avoidance: smooth vector repulsion from cursor
                     if (mouse.active) {
-                        let mDx = p.x - mouse.x;
-                        let mDy = p.y - mouse.y;
-                        let mDist = Math.sqrt(mDx*mDx + mDy*mDy);
-                        if (mDist < 220) {
-                            let force = (220 - mDist) / 220;
-                            let angle = Math.atan2(mDy, mDx);
-                            ax += Math.cos(angle) * force * 1.5;
-                            ay += Math.sin(angle) * force * 1.5;
+                        let dx = p.x - mouse.x;
+                        let dy = p.y - mouse.y;
+                        let dist = Math.sqrt(dx*dx + dy*dy);
+                        if (dist < 180) {
+                            let force = (180 - dist) / 180;
+                            let pushAngle = Math.atan2(dy, dx);
+                            currentVx += Math.cos(pushAngle) * force * 1.2;
+                            currentVy += Math.sin(pushAngle) * force * 1.2;
                         }
                     }
 
-                    // Default subtle wind/drift flow to keep motion alive
-                    const ambientWindX = 0.04;
-                    const ambientWindY = -0.04;
-                    ax += ambientWindX;
-                    ay += ambientWindY;
+                    // Apply smooth movement
+                    p.x += currentVx;
+                    p.y += currentVy;
 
-                    // Update velocities
-                    p.vx += ax;
-                    p.vy += ay;
-
-                    // Bound boid velocity speed
-                    let speed = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
-                    const minSpeed = 0.6;
-                    const maxSpeed = 2.4;
-
-                    if (speed > maxSpeed) {
-                        p.vx = (p.vx / speed) * maxSpeed;
-                        p.vy = (p.vy / speed) * maxSpeed;
-                    } else if (speed < minSpeed) {
-                        if (speed === 0) {
-                            let theta = Math.random() * Math.PI * 2;
-                            p.vx = Math.cos(theta) * minSpeed;
-                            p.vy = Math.sin(theta) * minSpeed;
-                        } else {
-                            p.vx = (p.vx / speed) * minSpeed;
-                            p.vy = (p.vy / speed) * minSpeed;
-                        }
-                    }
-
-                    // Update positions
-                    p.x += p.vx;
-                    p.y += p.vy;
-
-                    // Dynamic orientation - rotate to point in direction of velocity vector
-                    p.angle = Math.atan2(p.vy, p.vx) * (180 / Math.PI) + 90;
+                    // Slowly spin independently over time
+                    p.angle += p.rotationSpeed;
 
                     // Boundaries wrapping checks with margins
                     const margin = p.r * 2 + 10;
@@ -1410,6 +1402,7 @@
             }
 
             animate();
+        }
         }
     });
 </script>

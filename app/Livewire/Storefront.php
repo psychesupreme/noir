@@ -385,9 +385,10 @@ class Storefront extends Component
             $showroomProducts = \Illuminate\Support\Facades\Cache::remember('storefront_products_base_' . $this->perPage, 300, function () {
                 return Product::with('occasions')->latest()->take($this->perPage)->get()->map(function($product) {
                     $product->backdrop_url = $product->image_url ?: match($product->category) {
-                        'wholesale' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
-                        'gifting'   => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
-                        default     => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
+                        'stems'           => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
+                        'hampers'         => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
+                        'specializations' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=600',
+                        default           => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
                     };
                     $product->stock_standard = $product->stock;
                     $product->stock_deluxe = (int) floor($product->stock * 0.7);
@@ -417,9 +418,10 @@ class Storefront extends Component
 
             $showroomProducts = $productsQuery->take($this->perPage)->get()->map(function($product) {
                 $product->backdrop_url = $product->image_url ?: match($product->category) {
-                    'wholesale' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
-                    'gifting'   => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
-                    default     => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
+                    'stems'           => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
+                    'hampers'         => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
+                    'specializations' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=600',
+                    default           => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
                 };
                 $product->stock_standard = $product->stock;
                 $product->stock_deluxe = (int) floor($product->stock * 0.7);

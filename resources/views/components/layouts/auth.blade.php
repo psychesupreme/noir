@@ -54,10 +54,10 @@
                         radial-gradient(ellipse at 80% 20%, rgba(212, 175, 55, 0.04) 0%, transparent 50%),
                         linear-gradient(180deg, #FAF7F0 0%, #F5F0E8 50%, #FAF7F0 100%);
         }
-        .auth-gradient-jade {
-            background: radial-gradient(ellipse at 20% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 20%, rgba(212, 175, 55, 0.04) 0%, transparent 50%),
-                        linear-gradient(180deg, #06130F 0%, #0A1C16 50%, #06130F 100%);
+        .auth-gradient-rose {
+            background: radial-gradient(ellipse at 20% 80%, rgba(244, 114, 182, 0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(183, 110, 121, 0.04) 0%, transparent 50%),
+                        linear-gradient(180deg, #15060A 0%, #2D0D19 50%, #15060A 100%);
         }
     </style>
 </head>
@@ -70,7 +70,7 @@
             :class="{
                 'auth-gradient-onyx border-neutral-900/40': theme === 'onyx',
                 'auth-gradient-champagne border-[#E8E2D5]/50': theme === 'champagne',
-                'auth-gradient-jade border-[#142E24]/30': theme === 'jade'
+                'auth-gradient-rose border-[#2D0D19]/30': theme === 'rose'
             }"
             class="hidden lg:flex lg:w-[45%] xl:w-[42%] relative overflow-hidden grain transition-colors duration-500"
         >

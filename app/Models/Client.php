@@ -23,6 +23,16 @@ class Client extends Model
         return $this->hasMany(Order::class);
     }
 
+    public function deals(): HasMany
+    {
+        return $this->hasMany(Deal::class);
+    }
+
+    public function crmTimelineLogs(): HasMany
+    {
+        return $this->hasMany(CrmTimelineLog::class);
+    }
+
     /**
      * Total revenue from this client (excluding cancelled orders).
      */
