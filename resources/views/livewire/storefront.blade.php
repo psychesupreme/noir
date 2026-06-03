@@ -316,7 +316,7 @@
 
 
     <!-- Interactive SVG ambient floral background overlay -->
-    <svg id="flower-ambient-svg" class="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden"></svg>
+    <svg id="flower-ambient-svg" class="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden" style="perspective: 800px; transform-style: preserve-3d;"></svg>
 
     <!-- Fine Linen Organic Grid Overlay -->
     <div class="absolute inset-0 pointer-events-none fine-linen z-0 opacity-80"></div>
@@ -1833,7 +1833,8 @@
             ];
 
             const particles = [];
-            const particleCount = 26; // High fidelity but lightweight
+            // Optimal particle count based on screen real-estate
+            const particleCount = Math.min(45, Math.max(16, Math.floor((width * height) / 55000)));
 
             // Create particles
             for (let i = 0; i < particleCount; i++) {
@@ -1842,11 +1843,12 @@
 
                 const pathD = petalPaths[Math.floor(Math.random() * petalPaths.length)];
                 path.setAttribute("d", pathD);
-                path.setAttribute("stroke", "currentColor");
+                path.setAttribute("stroke", "var(--brand-accent)");
                 path.setAttribute("stroke-dasharray", Math.random() > 0.85 ? "2,2" : "none");
-                path.setAttribute("stroke-width", Math.random() * 0.4 + 0.5);
-                path.setAttribute("fill", "currentColor");
-                path.setAttribute("fill-opacity", Math.random() * 0.05 + 0.02);
+                path.setAttribute("stroke-width", Math.random() * 0.4 + 0.4);
+                path.setAttribute("stroke-opacity", Math.random() * 0.15 + 0.1);
+                path.setAttribute("fill", "var(--brand-accent)");
+                path.setAttribute("fill-opacity", Math.random() * 0.04 + 0.012);
 
                 group.style.position = "absolute";
                 group.style.transformOrigin = "center";
@@ -1857,16 +1859,16 @@
                 particles.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
-                    baseVx: Math.random() * 0.3 - 0.15, // Slow horizontal drift
-                    baseVy: -(Math.random() * 0.35 + 0.15), // Upward drift by default
+                    baseVx: Math.random() * 0.24 - 0.12, // Slow horizontal drift
+                    baseVy: -(Math.random() * 0.28 + 0.12), // Upward drift by default
                     vx: 0,
                     vy: 0,
                     angle: Math.random() * 360,
-                    rotationSpeed: (Math.random() * 0.3 + 0.1) * (Math.random() > 0.5 ? 1 : -1),
-                    scale: Math.random() * 0.6 + 0.4, // 0.4x to 1.0x
-                    opacity: Math.random() * 0.28 + 0.12, // Subtle transparency layer
-                    swaySpeed: Math.random() * 0.006 + 0.002,
-                    swayAmount: Math.random() * 0.5 + 0.1,
+                    rotationSpeed: (Math.random() * 0.15 + 0.05) * (Math.random() > 0.5 ? 1 : -1),
+                    scale: Math.random() * 0.55 + 0.35,
+                    opacity: Math.random() * 0.25 + 0.15,
+                    swaySpeed: Math.random() * 0.005 + 0.002,
+                    swayAmount: Math.random() * 0.4 + 0.1,
                     phase: Math.random() * 100,
                     element: group
                 });
@@ -1914,8 +1916,8 @@
 
                     // Scroll drag force: scrolling down (delta > 0) drifts petals UP.
                     // Scrolling up (delta < 0) drifts petals DOWN.
-                    const scrollEffectY = -scrollVelocity * 0.16;
-                    const scrollEffectX = scrollVelocity * 0.03 * Math.sin(p.phase + frameCount * 0.015);
+                    const scrollEffectY = -scrollVelocity * 0.18;
+                    const scrollEffectX = scrollVelocity * 0.04 * Math.sin(p.phase + frameCount * 0.015);
 
                     // Cursor displacement force (gentle repulsion)
                     let pushX = 0;
@@ -1927,15 +1929,23 @@
                         if (dist < 180) {
                             const force = (180 - dist) / 180;
                             const pushAngle = Math.atan2(dy, dx);
-                            pushX = Math.cos(pushAngle) * force * 1.6;
-                            pushY = Math.sin(pushAngle) * force * 1.6;
+                            pushX = Math.cos(pushAngle) * force * 1.8;
+                            pushY = Math.sin(pushAngle) * force * 1.8;
                         }
                     }
 
                     // Total updates
                     p.x += p.vx + scrollEffectX + pushX;
                     p.y += p.vy + scrollEffectY + pushY;
-                    p.angle += p.rotationSpeed + (scrollVelocity * 0.08); // Spin during scroll wind
+                    p.angle += p.rotationSpeed + (scrollVelocity * 0.08);
+
+                    // Dynamic 3D tilt mimicking organic falling
+                    const rotateX = Math.sin(p.phase + frameCount * p.swaySpeed * 1.4) * 35;
+                    const rotateY = Math.cos(p.phase * 0.8 + frameCount * p.swaySpeed * 1.1) * 35;
+
+                    // Adjust tilt under scroll drag
+                    const windTiltX = Math.max(-75, Math.min(75, rotateX + (scrollVelocity * 0.5)));
+                    const windTiltY = Math.max(-75, Math.min(75, rotateY + (scrollVelocity * 0.15)));
 
                     // Wrap-around screen margins
                     const margin = 60;
@@ -1953,8 +1963,8 @@
                         p.x = Math.random() * width;
                     }
 
-                    // Apply visual transforms via GPU accelerated CSS properties
-                    p.element.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) rotate(${p.angle}deg) scale(${p.scale})`;
+                    // Apply visual transforms via GPU accelerated CSS properties with 3D tilt
+                    p.element.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) rotateX(${windTiltX}deg) rotateY(${windTiltY}deg) rotateZ(${p.angle}deg) scale(${p.scale})`;
                     p.element.style.opacity = p.opacity;
                 });
 
