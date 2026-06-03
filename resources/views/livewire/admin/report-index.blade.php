@@ -225,4 +225,86 @@
         </div>
 
     </div>
+
+    {{-- Corporate Profit & Loss (P&L) Statement --}}
+    <div class="mt-8 bg-[#0F0F12] border border-neutral-900 rounded p-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b border-neutral-900 pb-4">
+            <div>
+                <h3 class="text-xs font-mono uppercase tracking-[0.2em] text-white">Corporate Profit & Loss (P&L) Statement</h3>
+                <p class="text-[10px] text-neutral-500 font-light mt-0.5">Summary of operational revenues, cost margins, and net profitability metrics.</p>
+            </div>
+            <button 
+                wire:click="exportPL" 
+                class="bg-amber-500 hover:bg-amber-400 text-neutral-950 px-4 py-2 rounded text-[10px] font-mono uppercase tracking-wider font-semibold shadow-md transition-all duration-300 flex items-center gap-2 cursor-pointer"
+            >
+                <svg class="w-3.5 h-3.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5 5-5m-5 5V3"></path>
+                </svg>
+                <span>Export P&L CSV</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 font-mono text-xs">
+            <div class="bg-[#0A0A0A] border border-neutral-900 rounded p-4 flex flex-col justify-between">
+                <div>
+                    <span class="text-neutral-500 block uppercase tracking-wider text-[9px]">Gross Revenue</span>
+                    <span class="text-neutral-400 text-[10px] font-light block mt-0.5">Total approved sales volume</span>
+                </div>
+                <div class="text-lg text-emerald-400 font-semibold mt-4">
+                    KES {{ number_format($totalSales) }}
+                </div>
+            </div>
+
+            <div class="bg-[#0A0A0A] border border-neutral-900 rounded p-4 flex flex-col justify-between">
+                <div>
+                    <span class="text-neutral-500 block uppercase tracking-wider text-[9px]">Cost of Goods Sold (COGS)</span>
+                    <span class="text-neutral-400 text-[10px] font-light block mt-0.5">Product units acquisition cost</span>
+                </div>
+                <div class="text-lg text-rose-500 font-semibold mt-4">
+                    - KES {{ number_format($cogs) }}
+                </div>
+            </div>
+
+            <div class="bg-[#0A0A0A] border border-neutral-900 rounded p-4 flex flex-col justify-between">
+                <div>
+                    <span class="text-neutral-500 block uppercase tracking-wider text-[9px]">Inventory Wastage</span>
+                    <span class="text-neutral-400 text-[10px] font-light block mt-0.5">Spoiled/damaged product costs</span>
+                </div>
+                <div class="text-lg text-rose-500 font-semibold mt-4">
+                    - KES {{ number_format($wastage) }}
+                </div>
+            </div>
+
+            <div class="bg-[#0A0A0A] border border-neutral-900 rounded p-4 flex flex-col justify-between relative overflow-hidden">
+                <div class="absolute right-0 top-0 h-16 w-16 bg-gradient-to-bl from-amber-500/5 to-transparent pointer-events-none"></div>
+                <div>
+                    <span class="text-neutral-500 block uppercase tracking-wider text-[9px]">Net Operating Profit</span>
+                    <span class="text-neutral-400 text-[10px] font-light block mt-0.5">Residual corporate earnings</span>
+                </div>
+                <div class="text-lg font-bold mt-4 {{ $netProfit >= 0 ? 'text-[#D4AF37]' : 'text-red-500' }}">
+                    KES {{ number_format($netProfit) }}
+                </div>
+            </div>
+        </div>
+
+        {{-- Profitability Margin Progress Bar --}}
+        @php
+            $profitMargin = $totalSales > 0 ? (int)(($netProfit / $totalSales) * 100) : 0;
+            $progressColor = $profitMargin >= 30 ? 'bg-emerald-500' : ($profitMargin >= 10 ? 'bg-amber-500' : 'bg-rose-500');
+        @endphp
+        <div class="mt-6 bg-[#0A0A0A] border border-neutral-900 rounded p-4">
+            <div class="flex justify-between items-center text-[10px] font-mono text-neutral-400 mb-2">
+                <span>Atelier Net Profit Margin Indicator</span>
+                <span class="font-bold {{ $profitMargin >= 0 ? 'text-emerald-400' : 'text-rose-500' }}">{{ $profitMargin }}% Margin</span>
+            </div>
+            <div class="w-full bg-neutral-950 h-2 rounded overflow-hidden">
+                <div class="h-full {{ $progressColor }} transition-all duration-1000" style="width: {{ max(0, min(100, $profitMargin)) }}%"></div>
+            </div>
+            <div class="flex justify-between text-[8px] font-mono text-neutral-600 mt-1">
+                <span>0% Break-Even</span>
+                <span>25% Target Margin</span>
+                <span>50%+ Elite Tier</span>
+            </div>
+        </div>
+    </div>
 </div>

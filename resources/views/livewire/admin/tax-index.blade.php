@@ -68,7 +68,7 @@
     {{-- Filters & Search --}}
     <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
         {{-- Intelligent Search --}}
-        <div class="md:col-span-3 relative group">
+        <div class="md:col-span-2 relative group">
             <input 
                 wire:model.live.debounce.300ms="search" 
                 type="text" 
@@ -97,6 +97,19 @@
                 <option value="failed">Failed</option>
                 <option value="pending">Pending</option>
             </select>
+        </div>
+
+        {{-- Export Button --}}
+        <div>
+            <button 
+                wire:click="exportAudits"
+                class="w-full bg-[#0F0F12] border border-neutral-900 hover:border-neutral-800 rounded-sm px-4 py-2.5 text-xs text-amber-500 hover:text-amber-400 focus:outline-none font-mono cursor-pointer flex items-center justify-center space-x-2 transition-all duration-300"
+            >
+                <svg class="w-4 h-4 text-amber-600 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                <span>Export Audit CSV</span>
+            </button>
         </div>
     </div>
 

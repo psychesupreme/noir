@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', Storefront::class)->name('storefront');
 Route::get('/services-gifts', \App\Livewire\ServicesGifts::class)->name('services-gifts');
 Route::get('/profile-portal', \App\Livewire\ProfilePortal::class)->middleware('auth')->name('profile-portal');
+Route::get('/receipt/{order}/download', [\App\Http\Controllers\ReceiptController::class, 'download'])
+    ->name('receipt.download');
 
 // ── Authentication ───────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
@@ -50,8 +52,12 @@ Route::middleware(['auth', 'role:admin,staff'])->prefix('admin')->group(function
 
     // Phase 2+: Future admin routes
     Route::get('/branches', BranchIndex::class)->name('admin.branches');
+    Route::get('/vendors', \App\Livewire\Admin\VendorIndex::class)->name('admin.vendors');
+    Route::get('/purchase-orders', \App\Livewire\Admin\PurchaseOrderIndex::class)->name('admin.purchase-orders');
+    Route::get('/wastage', \App\Livewire\Admin\WastageIndex::class)->name('admin.wastage');
     Route::get('/campaigns', CampaignIndex::class)->name('admin.campaigns');
     Route::get('/payments', PaymentIndex::class)->name('admin.payments');
+    Route::get('/accounts-receivable', \App\Livewire\Admin\AccountsReceivableIndex::class)->name('admin.accounts-receivable');
     Route::get('/tax', TaxIndex::class)->name('admin.tax');
     Route::get('/reports', ReportIndex::class)->name('admin.reports');
     Route::get('/settings', SettingsIndex::class)->name('admin.settings');

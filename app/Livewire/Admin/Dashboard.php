@@ -6,6 +6,9 @@ use App\Models\Order;
 use App\Models\Client;
 use App\Models\Product;
 use App\Models\Payment;
+use App\Models\WastageLog;
+use App\Models\PurchaseOrder;
+use App\Models\BranchProductStock;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -30,6 +33,31 @@ class Dashboard extends Component
             $allTimeRevenue = Order::where('status', '!=', 'cancelled')
                 ->sum('total_amount');
 
+            // Month COGS & Margin calculations
+            $monthCogs = DB::table('order_product')
+                ->join('orders', 'order_product.order_id', '=', 'orders.id')
+                ->join('products', 'order_product.product_id', '=', 'products.id')
+                ->where('orders.status', '!=', 'cancelled')
+                ->where('orders.created_at', '>=', now()->startOfMonth())
+                ->sum(DB::raw('order_product.quantity * products.cost_price'));
+
+            $monthMargin = $monthRevenue - $monthCogs;
+            $monthMarginPercent = $monthRevenue > 0 ? round(($monthMargin / $monthRevenue) * 100, 1) : 0;
+
+            // Monthly Wastage
+            $monthWastage = WastageLog::where('created_at', '>=', now()->startOfMonth())->sum('cost_estimate');
+
+            // Supply Chain Statistics
+            $openPosCount = PurchaseOrder::whereIn('status', ['draft', 'ordered', 'partial'])->count();
+            $pendingDeliveriesCount = PurchaseOrder::where('status', 'ordered')->count();
+
+            // Low branch stock alerts
+            $lowBranchStocks = BranchProductStock::whereColumn('stock', '<=', 'min_stock_level')
+                ->with(['branch', 'product'])
+                ->orderBy('stock')
+                ->limit(10)
+                ->get();
+
             // Order pipeline counts
             $ordersByStatus = Order::select('status', DB::raw('count(*) as count'))
                 ->groupBy('status')
@@ -43,11 +71,6 @@ class Dashboard extends Component
                 ->groupBy('products.id', 'products.name', 'products.sku', 'products.price', 'products.stock')
                 ->orderByDesc('total_sold')
                 ->limit(5)
-                ->get();
-
-            // Low stock alerts (stock <= 10)
-            $lowStockProducts = Product::where('stock', '<=', 10)
-                ->orderBy('stock')
                 ->get();
 
             // Recent orders
@@ -71,9 +94,15 @@ class Dashboard extends Component
                 'weekRevenue' => $weekRevenue,
                 'monthRevenue' => $monthRevenue,
                 'allTimeRevenue' => $allTimeRevenue,
+                'monthCogs' => $monthCogs,
+                'monthMargin' => $monthMargin,
+                'monthMarginPercent' => $monthMarginPercent,
+                'monthWastage' => $monthWastage,
+                'openPosCount' => $openPosCount,
+                'pendingDeliveriesCount' => $pendingDeliveriesCount,
+                'lowBranchStocks' => $lowBranchStocks,
                 'ordersByStatus' => $ordersByStatus,
                 'topProducts' => $topProducts,
-                'lowStockProducts' => $lowStockProducts,
                 'recentOrders' => $recentOrders,
                 'completedPayments' => $completedPayments,
                 'pendingPayments' => $pendingPayments,
@@ -87,3 +116,4 @@ class Dashboard extends Component
         return view('livewire.admin.dashboard', $stats)->layout('components.layouts.admin');
     }
 }
+

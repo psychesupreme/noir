@@ -22,6 +22,13 @@ class PaymentIndex extends Component
     public ?int $selectedPaymentId = null;
     public string $refundReason = '';
 
+    // Edit Modal state
+    public bool $showEditModal = false;
+    public ?int $editingPaymentId = null;
+    public string $editingStatus = 'pending';
+    public string $editingReceiptNumber = '';
+    public string $editingResultDesc = '';
+
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -75,6 +82,61 @@ class PaymentIndex extends Component
         $this->showRefundModal = false;
         $this->selectedPaymentId = null;
         session()->flash('message', 'M-Pesa refund simulated successfully. Requisition status reverted.');
+    }
+
+    /**
+     * Open confirmation modal to edit payment status.
+     */
+    public function openEditModal(int $paymentId): void
+    {
+        $payment = Payment::findOrFail($paymentId);
+        $this->editingPaymentId = $payment->id;
+        $this->editingStatus = $payment->status;
+        $this->editingReceiptNumber = $payment->mpesa_receipt_number ?? '';
+        $this->editingResultDesc = $payment->result_description ?? '';
+        $this->showEditModal = true;
+    }
+
+    /**
+     * Save payment status edits and trigger order transitions.
+     */
+    public function savePaymentStatus(): void
+    {
+        $this->validate([
+            'editingStatus' => 'required|in:pending,completed,failed',
+            'editingReceiptNumber' => 'nullable|string|max:100',
+            'editingResultDesc' => 'nullable|string|max:255',
+        ]);
+
+        if (!$this->editingPaymentId) {
+            return;
+        }
+
+        $payment = Payment::with('order')->findOrFail($this->editingPaymentId);
+        $oldStatus = $payment->status;
+        $newStatus = $this->editingStatus;
+
+        DB::transaction(function () use ($payment, $oldStatus, $newStatus) {
+            $payment->update([
+                'status' => $newStatus,
+                'mpesa_receipt_number' => $newStatus === 'completed' ? $this->editingReceiptNumber : ($newStatus === 'pending' ? null : $payment->mpesa_receipt_number),
+                'result_description' => $this->editingResultDesc,
+            ]);
+
+            // If transitioning to completed, approve the order
+            if ($newStatus === 'completed' && $oldStatus !== 'completed' && $payment->order) {
+                app(\App\Services\OrderService::class)->approve($payment->order);
+            }
+
+            // If transitioning to failed, cancel the order
+            if ($newStatus === 'failed' && $oldStatus !== 'failed' && $payment->order) {
+                app(\App\Services\OrderService::class)->cancel($payment->order);
+            }
+        });
+
+        $this->showEditModal = false;
+        $this->editingPaymentId = null;
+        session()->flash('message', 'Payment details updated successfully.');
     }
 
     public function render()

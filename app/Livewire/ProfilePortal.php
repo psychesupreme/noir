@@ -127,6 +127,11 @@ class ProfilePortal extends Component
 
     public function updateLogisticsStatus(int $orderId, string $status): void
     {
+        $user = auth()->user();
+        if (!$user || !$user->account_tier->isStaff()) {
+            abort(403, 'Unauthorized: Only internal staff can manage logistics runs.');
+        }
+
         $order = Order::find($orderId);
         if ($order) {
             $order->update(['status' => $status]);
@@ -149,7 +154,9 @@ class ProfilePortal extends Component
             }
 
             // Load Logistics runs (All orders pending/processing/delivered for drivers/riders dashboard)
-            $assignedRuns = Order::with(['client', 'products'])->latest()->limit(15)->get();
+            if ($user->account_tier->isStaff()) {
+                $assignedRuns = Order::with(['client', 'products'])->latest()->limit(15)->get();
+            }
         }
 
         return view('livewire.profile-portal', [

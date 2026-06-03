@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Product;
 use App\Models\Occasion;
+use App\Models\Branch;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -25,11 +26,19 @@ class ProductIndex extends Component
     public ?int $editingProductId = null;
     public bool $showStockLogModal = false;
 
+    // Manual Adjust Modal state
+    public bool $showAdjustModal = false;
+    public ?int $adjustProductId = null;
+    public ?int $adjustBranchId = null;
+    public int $adjustAmount = 1;
+    public string $adjustReason = 'Manual adjustment';
+
     // Form fields
     public string $name = '';
     public string $sku = '';
     public string $description = '';
     public int $price = 0;
+    public int $cost_price = 0;
     public int $stock = 0;
     public string $category = 'retail';
     public string $unit_type = 'arrangement';
@@ -56,6 +65,7 @@ class ProductIndex extends Component
             'sku' => $skuRule,
             'description' => 'nullable|string|max:1000',
             'price' => 'required|integer|min:1',
+            'cost_price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
             'category' => 'nullable|in:retail,wholesale,gifting,uncategorized',
             'unit_type' => 'required|in:arrangement,stem,bundle,hamper',
@@ -100,6 +110,7 @@ class ProductIndex extends Component
         $this->sku = $product->sku ?? '';
         $this->description = $product->description ?? '';
         $this->price = $product->price;
+        $this->cost_price = $product->cost_price;
         $this->stock = $product->stock;
         $this->category = $product->category ?? 'retail';
         $this->unit_type = $product->unit_type ?? 'arrangement';
@@ -149,22 +160,43 @@ class ProductIndex extends Component
         $this->deletingProductId = null;
     }
 
-    public function adjustStock(int $productId, int $amount): void
+    public function openAdjustModal(int $productId): void
     {
-        $product = Product::findOrFail($productId);
-        $product->adjustment_reason = "Manual adjustment (ERP Admin)";
-        $product->stock = max(0, $product->stock + $amount);
+        $this->resetErrorBag();
+        $this->adjustProductId = $productId;
+        $this->adjustBranchId = Branch::where('is_active', true)->first()?->id ?: Branch::first()?->id;
+        $this->adjustAmount = 1;
+        $this->adjustReason = 'Manual adjustment';
+        $this->showAdjustModal = true;
+    }
+
+    public function saveAdjustment(): void
+    {
+        $this->validate([
+            'adjustBranchId' => 'required|exists:branches,id',
+            'adjustAmount' => 'required|integer',
+            'adjustReason' => 'required|string|min:3|max:255',
+        ]);
+
+        $product = Product::findOrFail($this->adjustProductId);
+        $product->adjustment_reason = $this->adjustReason;
+        $product->adjustment_branch_id = $this->adjustBranchId;
+        $product->stock = max(0, $product->stock + $this->adjustAmount);
         $product->save();
+
+        $this->showAdjustModal = false;
+        session()->flash('message', "Stock updated successfully for {$product->name}.");
     }
 
     protected function resetForm(): void
     {
         $this->reset([
             'editingProductId', 'name', 'sku', 'description',
-            'price', 'stock', 'category', 'unit_type', 'grade',
+            'price', 'cost_price', 'stock', 'category', 'unit_type', 'grade',
             'image_url', 'image_file', 'selectedOccasions', 'isEditing'
         ]);
         $this->price = 0;
+        $this->cost_price = 0;
         $this->stock = 0;
         $this->category = 'retail';
         $this->unit_type = 'arrangement';
@@ -182,7 +214,7 @@ class ProductIndex extends Component
 
     public function render()
     {
-        $query = Product::with('occasions');
+        $query = Product::with(['occasions', 'branchStocks.branch']);
 
         if ($this->categoryFilter !== 'all') {
             $query->where('category', $this->categoryFilter);
@@ -201,9 +233,11 @@ class ProductIndex extends Component
         return view('livewire.admin.product-index', [
             'products' => $query->paginate(12),
             'occasions' => Occasion::all(),
+            'branches' => Branch::all(),
             'totalProducts' => Product::count(),
             'lowStockCount' => Product::where('stock', '<=', 10)->count(),
-            'inventoryLogs' => \App\Models\InventoryLog::with(['product', 'user'])->latest()->paginate(10, pageName: 'stockLogPage'),
+            'inventoryLogs' => \App\Models\InventoryLog::with(['product', 'user', 'branch'])->latest()->paginate(10, pageName: 'stockLogPage'),
         ])->layout('components.layouts.admin');
     }
 }
+

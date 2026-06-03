@@ -37,10 +37,21 @@ class SendMpesaStkPushJob implements ShouldQueue
         }
 
         try {
+            $order = \App\Models\Order::with('products')->find($this->orderId);
+            $firstProduct = $order?->products?->first();
+            $productName = $firstProduct ? $firstProduct->name : 'AtelierOrder';
+            
+            // Clean it: remove spaces and non-alphanumeric characters, max 12 chars
+            $reference = preg_replace('/[^A-Za-z0-9]/', '', $productName);
+            $reference = substr($reference, 0, 12);
+            if (empty($reference)) {
+                $reference = 'AtelierOrder';
+            }
+
             $response = $mpesa->sendStkPush(
                 phone: $this->phone,
                 amount: $this->amount,
-                orderId: $this->orderId
+                reference: $reference
             );
 
             $payment->update([

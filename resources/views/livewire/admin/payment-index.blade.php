@@ -162,16 +162,22 @@
 
                             {{-- Action --}}
                             <td class="p-6 text-center">
-                                @if ($payment->status === 'completed')
+                                <div class="flex items-center justify-center gap-2">
                                     <button 
-                                        wire:click="confirmRefund({{ $payment->id }})"
-                                        class="text-[10px] font-mono uppercase tracking-widest text-neutral-400 border border-neutral-800 rounded px-2.5 py-1 hover:text-rose-400 hover:border-rose-950 hover:bg-rose-950/10 transition-all duration-300"
+                                        wire:click="openEditModal({{ $payment->id }})"
+                                        class="text-[10px] font-mono uppercase tracking-widest text-neutral-400 border border-neutral-800 rounded px-2.5 py-1 hover:text-amber-500 hover:border-amber-950 hover:bg-amber-950/10 transition-all duration-300"
                                     >
-                                        Refund Push
+                                        Edit Status
                                     </button>
-                                @else
-                                    <span class="text-neutral-700 text-xs">-</span>
-                                @endif
+                                    @if ($payment->status === 'completed')
+                                        <button 
+                                            wire:click="confirmRefund({{ $payment->id }})"
+                                            class="text-[10px] font-mono uppercase tracking-widest text-neutral-400 border border-neutral-800 rounded px-2.5 py-1 hover:text-rose-400 hover:border-rose-950 hover:bg-rose-950/10 transition-all duration-300"
+                                        >
+                                            Refund Push
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -225,6 +231,71 @@
                         class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-sm transition-colors"
                     >
                         Simulate Refund
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Edit Payment Status Modal --}}
+    @if ($showEditModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm transition-opacity duration-300">
+            <div class="bg-[#0F0F12] border border-neutral-800 rounded-sm w-full max-w-md p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+                <h3 class="text-base font-light tracking-widest text-white uppercase mb-6 font-mono">Edit Payment Record</h3>
+                
+                <div class="mb-4">
+                    <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Payment Status</label>
+                    <select 
+                        wire:model="editingStatus"
+                        class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                    >
+                        <option value="pending">PENDING</option>
+                        <option value="completed">COMPLETED</option>
+                        <option value="failed">FAILED</option>
+                    </select>
+                    @error('editingStatus')
+                        <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">M-Pesa Receipt Number</label>
+                    <input 
+                        type="text" 
+                        wire:model="editingReceiptNumber"
+                        placeholder="e.g. REC-12345 (Required for completed payments)"
+                        class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                    >
+                    @error('editingReceiptNumber')
+                        <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="mb-6">
+                    <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Result Description / Log</label>
+                    <textarea 
+                        wire:model="editingResultDesc" 
+                        rows="3" 
+                        placeholder="STK push successful / user canceled / manual admin override..."
+                        class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                    ></textarea>
+                    @error('editingResultDesc')
+                        <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button 
+                        wire:click="$set('showEditModal', false)"
+                        class="px-4 py-2 text-xs font-mono uppercase tracking-wider text-neutral-500 hover:text-white transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        wire:click="savePaymentStatus"
+                        class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 text-xs font-mono uppercase tracking-wider rounded-sm transition-colors"
+                    >
+                        Save Details
                     </button>
                 </div>
             </div>

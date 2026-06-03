@@ -3,6 +3,9 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Branch;
+use App\Models\BranchProductStock;
+use App\Models\Product;
+use App\Models\InventoryLog;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -30,6 +33,13 @@ class BranchIndex extends Component
     // Delete confirmation
     public bool $showDeleteModal = false;
     public ?int $deletingBranchId = null;
+
+    // Transfer Stock state
+    public bool $showTransferModal = false;
+    public ?int $transferSourceBranchId = null;
+    public ?int $transferDestBranchId = null;
+    public ?int $transferProductId = null;
+    public int $transferQuantity = 1;
 
     protected function rules(): array
     {
@@ -123,6 +133,82 @@ class BranchIndex extends Component
         $branch->update(['is_active' => !$branch->is_active]);
     }
 
+    public function openTransferModal(int $sourceBranchId): void
+    {
+        $this->resetErrorBag();
+        $this->transferSourceBranchId = $sourceBranchId;
+        $this->transferDestBranchId = Branch::where('id', '!=', $sourceBranchId)->first()?->id;
+        $this->transferProductId = Product::orderBy('name')->first()?->id;
+        $this->transferQuantity = 1;
+        $this->showTransferModal = true;
+    }
+
+    public function saveTransfer(): void
+    {
+        $this->validate([
+            'transferDestBranchId' => 'required|exists:branches,id|different:transferSourceBranchId',
+            'transferProductId' => 'required|exists:products,id',
+            'transferQuantity' => 'required|integer|min:1',
+        ]);
+
+        \DB::transaction(function () {
+            $sourceStock = BranchProductStock::where('branch_id', $this->transferSourceBranchId)
+                ->where('product_id', $this->transferProductId)
+                ->first();
+
+            $available = $sourceStock ? $sourceStock->stock : 0;
+
+            if ($available < $this->transferQuantity) {
+                $this->addError('transferQuantity', "Insufficient stock at source branch. Available: {$available} units.");
+                throw new \Exception("Insufficient stock");
+            }
+
+            $product = Product::findOrFail($this->transferProductId);
+            $sourceBranch = Branch::findOrFail($this->transferSourceBranchId);
+            $destBranch = Branch::findOrFail($this->transferDestBranchId);
+
+            // 1. Decrement source branch stock
+            $sourceStock->stock -= $this->transferQuantity;
+            $sourceStock->save();
+
+            // 2. Increment destination branch stock
+            $destStock = BranchProductStock::firstOrCreate(
+                ['branch_id' => $this->transferDestBranchId, 'product_id' => $this->transferProductId],
+                ['stock' => 0]
+            );
+            $destStock->stock += $this->transferQuantity;
+            $destStock->save();
+
+            // 3. Log Source movement
+            InventoryLog::create([
+                'product_id' => $this->transferProductId,
+                'branch_id' => $this->transferSourceBranchId,
+                'user_id' => auth()->id(),
+                'quantity_before' => $available,
+                'quantity_after' => $sourceStock->stock,
+                'adjustment' => -$this->transferQuantity,
+                'reason' => "Transfer OUT to {$destBranch->code}",
+            ]);
+
+            // 4. Log Destination movement
+            InventoryLog::create([
+                'product_id' => $this->transferProductId,
+                'branch_id' => $this->transferDestBranchId,
+                'user_id' => auth()->id(),
+                'quantity_before' => $destStock->stock - $this->transferQuantity,
+                'quantity_after' => $destStock->stock,
+                'adjustment' => $this->transferQuantity,
+                'reason' => "Transfer IN from {$sourceBranch->code}",
+            ]);
+
+            // 5. Product stock remains identical, but force cache/sync update
+            $product->syncGlobalStock();
+        });
+
+        $this->showTransferModal = false;
+        session()->flash('message', 'Inter-branch stock transfer completed successfully.');
+    }
+
     protected function resetForm(): void
     {
         $this->reset([
@@ -151,8 +237,20 @@ class BranchIndex extends Component
 
         $query->orderBy($this->sortField, $this->sortDirection);
 
+        // Fetch branches for modal options
+        $allBranches = Branch::all();
+        // Fetch products that have stock in the source branch
+        $sourceProducts = [];
+        if ($this->transferSourceBranchId) {
+            $sourceProducts = Product::whereHas('branchStocks', function ($bq) {
+                $bq->where('branch_id', $this->transferSourceBranchId)->where('stock', '>', 0);
+            })->orderBy('name')->get();
+        }
+
         return view('livewire.admin.branch-index', [
             'branches' => $query->paginate(12),
+            'allBranches' => $allBranches,
+            'sourceProducts' => $sourceProducts,
             'totalBranches' => Branch::count(),
             'activeBranches' => Branch::where('is_active', true)->count(),
         ])->layout('components.layouts.admin');

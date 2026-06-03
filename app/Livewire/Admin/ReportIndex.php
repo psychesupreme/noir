@@ -20,6 +20,51 @@ class ReportIndex extends Component
         $this->endDate = now()->format('Y-m-d');
     }
 
+    /**
+     * Stream P&L operational metrics as a CSV file.
+     */
+    public function exportPL()
+    {
+        $start = $this->startDate . ' 00:00:00';
+        $end = $this->endDate . ' 23:59:59';
+
+        $revenue = Order::where('status', '!=', 'cancelled')->whereBetween('created_at', [$start, $end])->sum('total_amount');
+        
+        $cogs = (int) DB::table('order_product')
+            ->join('orders', 'order_product.order_id', '=', 'orders.id')
+            ->join('products', 'order_product.product_id', '=', 'products.id')
+            ->where('orders.status', '!=', 'cancelled')
+            ->whereBetween('orders.created_at', [$start, $end])
+            ->sum(DB::raw('order_product.quantity * products.cost_price'));
+
+        $wastage = (int) \App\Models\WastageLog::whereBetween('created_at', [$start, $end])->sum('cost_estimate');
+        $netProfit = $revenue - $cogs - $wastage;
+
+        $filename = 'corporate_pl_statement_' . date('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        return response()->streamDownload(function() use ($start, $end, $revenue, $cogs, $wastage, $netProfit) {
+            $file = fopen('php://output', 'w');
+            
+            fputcsv($file, ['Noir & Bloom - B2B Operational Profit & Loss Statement']);
+            fputcsv($file, ['Reporting Period', $start . ' to ' . $end]);
+            fputcsv($file, []);
+            fputcsv($file, ['Financial Ledger Metric', 'Amount (KES)']);
+            fputcsv($file, ['Total Gross Sales Revenue', number_format($revenue, 2, '.', '')]);
+            fputcsv($file, ['Cost of Goods Sold (COGS)', number_format($cogs, 2, '.', '')]);
+            fputcsv($file, ['Inventory Wastage Costs', number_format($wastage, 2, '.', '')]);
+            fputcsv($file, ['Net Operating Profit', number_format($netProfit, 2, '.', '')]);
+            
+            fclose($file);
+        }, $filename, $headers);
+    }
+
     public function render()
     {
         $start = $this->startDate . ' 00:00:00';
@@ -77,6 +122,17 @@ class ReportIndex extends Component
             ->groupBy('branches.id', 'branches.name', 'branches.code')
             ->get();
 
+        // 5. P&L Financial Calculations
+        $cogs = (int) DB::table('order_product')
+            ->join('orders', 'order_product.order_id', '=', 'orders.id')
+            ->join('products', 'order_product.product_id', '=', 'products.id')
+            ->where('orders.status', '!=', 'cancelled')
+            ->whereBetween('orders.created_at', [$start, $end])
+            ->sum(DB::raw('order_product.quantity * products.cost_price'));
+
+        $wastage = (int) \App\Models\WastageLog::whereBetween('created_at', [$start, $end])->sum('cost_estimate');
+        $netProfit = $totalSales - $cogs - $wastage;
+
         return view('livewire.admin.report-index', [
             'totalSales' => $totalSales,
             'orderCount' => $orderCount,
@@ -85,6 +141,9 @@ class ReportIndex extends Component
             'dailySalesTrend' => $dailySalesTrend,
             'categoryBreakdown' => $categoryBreakdown,
             'hubPerformance' => $hubPerformance,
+            'cogs' => $cogs,
+            'wastage' => $wastage,
+            'netProfit' => $netProfit,
         ])->layout('components.layouts.admin');
     }
 }

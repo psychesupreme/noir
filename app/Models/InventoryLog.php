@@ -12,6 +12,7 @@ class InventoryLog extends Model
 
     protected $fillable = [
         'product_id',
+        'branch_id',
         'user_id',
         'quantity_before',
         'quantity_after',
@@ -28,6 +29,14 @@ class InventoryLog extends Model
     }
 
     /**
+     * Get the branch associated with this stock adjustment.
+     */
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    /**
      * Get the system user/staff member who authorized this stock adjustment.
      */
     public function user(): BelongsTo
@@ -35,3 +44,4 @@ class InventoryLog extends Model
         return $this->belongsTo(User::class);
     }
 }
+

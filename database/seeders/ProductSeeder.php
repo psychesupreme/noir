@@ -6,7 +6,6 @@ use App\Models\Product;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-
 class ProductSeeder extends Seeder
 {
     public function run(): void
@@ -15,27 +14,28 @@ class ProductSeeder extends Seeder
         Schema::disableForeignKeyConstraints();
         Product::truncate();
         DB::table('occasion_product')->truncate();
+        DB::table('branch_product_stock')->truncate();
+        DB::table('inventory_logs')->truncate();
         Schema::enableForeignKeyConstraints();
-
         // ── 1. Fresh Stems Category ───────────────────
         Product::create([
-            'name' => 'Naomi Red Rose Stems (Grade A)',
+            'name' => 'Naivasha Volcanic Red Roses (Grade A)',
             'sku' => 'NB-STM-NRO-01',
-            'description' => 'Premium high-altitude red rose stems cut daily from Naivasha highland growers. Sold per stem.',
-            'price' => 250,
+            'description' => 'Premium, long-stemmed Naomi red roses grown in the nutrient-dense volcanic soils of Lake Naivasha. Cut daily and shipped via cold chain. Sold per stem.',
+            'price' => 300,
             'stock' => 500,
             'category' => 'stems',
             'unit_type' => 'stem',
             'grade' => 'Grade A',
-            'image_url' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
+            'image_url' => 'https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?auto=format&fit=crop&q=80&w=600',
         ]);
 
         Product::create([
-            'name' => 'White Gypsophila Million Star Stems',
-            'sku' => 'NB-STM-GWS-02',
-            'description' => 'Volumetric sprays of Million Star baby breath, perfect for filler volume or cloud vases. Sold per stem.',
-            'price' => 180,
-            'stock' => 400,
+            'name' => 'Limuru Pure White Lilies (Grade A)',
+            'sku' => 'NB-STM-LWL-02',
+            'description' => 'Stunning, multi-bloom white Oriental Lilies sourced from the misty highlands of Limuru. Offers a rich, clean fragrance. Sold per stem.',
+            'price' => 450,
+            'stock' => 300,
             'category' => 'stems',
             'unit_type' => 'stem',
             'grade' => 'Grade A',
@@ -43,11 +43,11 @@ class ProductSeeder extends Seeder
         ]);
 
         Product::create([
-            'name' => 'Marginpar Clematis Amazing® Blue Stems',
-            'sku' => 'NB-STM-CBS-03',
-            'description' => 'A beautiful bell-shaped Clematis in violet-blue tone, perfect for premium arrangements. Sold per stem.',
-            'price' => 320,
-            'stock' => 150,
+            'name' => 'Watamu Coral Hibiscus Stems',
+            'sku' => 'NB-STM-WCH-03',
+            'description' => 'Vibrant coral hibiscus stems harvested from the warm coastal gardens of Watamu. Brings a tropical breeze to any vase. Sold per stem.',
+            'price' => 350,
+            'stock' => 200,
             'category' => 'stems',
             'unit_type' => 'stem',
             'grade' => 'Grade A',
@@ -56,9 +56,9 @@ class ProductSeeder extends Seeder
 
         // ── 2. Bespoke Bouquets Category ───────────────────
         Product::create([
-            'name' => 'The Obsidian Dome (Noir Signature)',
+            'name' => 'The Nairobi Obsidian Dome (Noir Signature)',
             'sku' => 'NB-BQT-NOD-01',
-            'description' => 'A dense, low dome of 24 velvet red roses, styled in our custom matte black ceramic container.',
+            'description' => 'A dramatic arrangement of 24 velvet Naivasha red roses, tightly structured in our matte black ceramic container. The ultimate luxury statement.',
             'price' => 9500,
             'stock' => 30,
             'category' => 'bouquets',
@@ -68,9 +68,9 @@ class ProductSeeder extends Seeder
         ]);
 
         Product::create([
-            'name' => 'Alabaster Whisper (White Astrantia & Orchid)',
-            'sku' => 'NB-BQT-ALW-02',
-            'description' => 'An ethereal, all-white arrangement of orchids, clematis, and delicate astrantia in an elegant vase.',
+            'name' => 'Limuru Alabaster Orchid Spray',
+            'sku' => 'NB-BQT-LAO-02',
+            'description' => 'An ethereal, all-white arrangement of highland orchids, clematis, and delicate astrantia in an elegant ceramic vase.',
             'price' => 14000,
             'stock' => 15,
             'category' => 'bouquets',
@@ -80,9 +80,9 @@ class ProductSeeder extends Seeder
         ]);
 
         Product::create([
-            'name' => 'Rift Valley Glow (Safari Sunset Spray)',
-            'sku' => 'NB-BQT-RVG-03',
-            'description' => 'Eucalyptus sprays, sunset proteas, and craspedia paintball globes embodying the Rift Valley landscape.',
+            'name' => 'Rift Valley Sunset Proteas',
+            'sku' => 'NB-BQT-RVS-03',
+            'description' => 'Eucalyptus sprays, sunset proteas, and craspedia paintballs embodying the golden hour landscape of the Great Rift Valley.',
             'price' => 7800,
             'stock' => 20,
             'category' => 'bouquets',
@@ -93,21 +93,21 @@ class ProductSeeder extends Seeder
 
         // ── 3. Luxury Hampers Category ───────────────────
         Product::create([
-            'name' => 'Gold & Velvet Truffle Box',
-            'sku' => 'NB-HMP-GVT-01',
-            'description' => 'Premium luxury storage box containing red spray roses, imported chocolate truffles, and a customized greeting card.',
+            'name' => 'Kericho Gold Premium Gift Box',
+            'sku' => 'NB-HMP-KGG-01',
+            'description' => 'Premium luxury storage box containing red spray roses, Kericho gold special reserve tea, imported truffles, and a custom greeting card.',
             'price' => 18500,
             'stock' => 15,
             'category' => 'hampers',
             'unit_type' => 'hamper',
             'grade' => null,
-            'image_url' => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
+            'image_url' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600',
         ]);
 
         Product::create([
-            'name' => 'Moët Champagne & White Orchid Trunk',
-            'sku' => 'NB-HMP-MCT-02',
-            'description' => 'Bespoke leather/linen trunk case housing a bottle of Moët & Chandon champagne surrounded by white phalaenopsis orchids.',
+            'name' => 'Limuru Berry & Bloom Luxury Trunk',
+            'sku' => 'NB-HMP-LBB-02',
+            'description' => 'Bespoke leather/linen trunk case housing premium highland tea infusions, local gourmet berry jams, and white phalaenopsis orchids.',
             'price' => 26000,
             'stock' => 8,
             'category' => 'hampers',
@@ -118,9 +118,9 @@ class ProductSeeder extends Seeder
 
         // ── 4. Home & Vases Category ───────────────────
         Product::create([
-            'name' => 'Matte Clay Ceramic Vase',
-            'sku' => 'NB-DEC-MCV-01',
-            'description' => 'Minimalist handcrafted matte finish clay vase. Fits tall stems and structural branches perfectly.',
+            'name' => 'Matte Clay Rift Valley Vase',
+            'sku' => 'NB-DEC-MRV-01',
+            'description' => 'Minimalist, artisan-crafted clay vase made from Rift Valley volcanic soils. Fits tall structural stems and branches perfectly.',
             'price' => 4500,
             'stock' => 40,
             'category' => 'home_decor',
@@ -130,9 +130,9 @@ class ProductSeeder extends Seeder
         ]);
 
         Product::create([
-            'name' => 'Hand-Poured Soy Wax Sandalwood Candle',
-            'sku' => 'NB-DEC-SCS-02',
-            'description' => 'Signature atelier candle featuring warm notes of sandalwood, amber, and cedarwood inside a dark glass jar.',
+            'name' => 'Tsavo Amber Hand-Poured Candle',
+            'sku' => 'NB-DEC-TAC-02',
+            'description' => 'Signature atelier candle hand-poured inside a dark glass jar, featuring warm, earthy notes of sandalwood, cedarwood, and Tsavo amber.',
             'price' => 3200,
             'stock' => 60,
             'category' => 'home_decor',
@@ -143,9 +143,9 @@ class ProductSeeder extends Seeder
 
         // ── 5. Bespoke Specializations Category (Wide Cards Layout) ───────────────────
         Product::create([
-            'name' => 'Custom Curation & Consultation Session',
-            'sku' => 'NB-SPC-BCF-01',
-            'description' => 'A dedicated 1-on-1 virtual or in-atelier consulting session with our design lead. We plan and spec your custom floral requirements, select varieties, and budget.',
+            'name' => 'Nairobi Atelier Custom Curation Session',
+            'sku' => 'NB-SPC-NCC-01',
+            'description' => 'A 1-on-1 design consultation session at our Nairobi showroom or online. We plan, budget, and select varieties for your custom floral requirements.',
             'price' => 5000,
             'stock' => 100, // Consultation slots
             'category' => 'specializations',
@@ -157,7 +157,7 @@ class ProductSeeder extends Seeder
         Product::create([
             'name' => 'Atelier Grand Gala Event Styling Package',
             'sku' => 'NB-SPC-GGE-02',
-            'description' => 'Bespoke event planning, venue walkthroughs, and custom flower installations (arches, backdrops, centerpieces, ceiling suspensions) led by our expert team.',
+            'description' => 'Bespoke event planning, venue walkthroughs, and custom flower installations (arches, centerpieces, suspensions) led by our expert team.',
             'price' => 95000,
             'stock' => 5,
             'category' => 'specializations',
@@ -169,13 +169,13 @@ class ProductSeeder extends Seeder
         Product::create([
             'name' => 'VIP Corporate Weekly Curation Subscription',
             'sku' => 'NB-SPC-VCS-03',
-            'description' => 'Tailored weekly rotation of corporate workspace flower arrangements, entry lobby structures, and meeting desk bowls, matching company brand guidelines.',
+            'description' => 'Tailored weekly rotation of corporate workspace flower arrangements, entry lobby structures, and meeting desk bowls matching brand guidelines.',
             'price' => 45000,
             'stock' => 10,
             'category' => 'specializations',
             'unit_type' => 'arrangement',
             'grade' => 'Subscription',
-            'image_url' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=600',
+            'image_url' => 'https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&q=80&w=600',
         ]);
     }
 }

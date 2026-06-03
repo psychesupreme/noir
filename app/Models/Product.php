@@ -6,12 +6,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
     use HasFactory;
 
     public ?string $adjustment_reason = null;
+    public ?int $adjustment_branch_id = null;
 
     /**
      * The attributes that are mass assignable.
@@ -24,6 +26,7 @@ class Product extends Model
         'sku',
         'description',
         'price',
+        'cost_price',
         'stock',
         'category',
         'unit_type',
@@ -39,6 +42,7 @@ class Product extends Model
      */
     protected $casts = [
         'price' => 'integer',
+        'cost_price' => 'integer',
         'stock' => 'integer',
     ];
 
@@ -51,6 +55,30 @@ class Product extends Model
     public function occasions(): BelongsToMany
     {
         return $this->belongsToMany(Occasion::class);
+    }
+
+    /**
+     * Get branch-specific stock levels for this product.
+     */
+    public function branchStocks(): HasMany
+    {
+        return $this->hasMany(BranchProductStock::class);
+    }
+
+    /**
+     * Get purchase order line items for this product.
+     */
+    public function purchaseOrderItems(): HasMany
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
+    }
+
+    /**
+     * Get wastage logs for this product.
+     */
+    public function wastageLogs(): HasMany
+    {
+        return $this->hasMany(WastageLog::class);
     }
 
     // ── Query Scopes ─────────────────────────────────────────────────────
@@ -84,6 +112,44 @@ class Product extends Model
     }
 
     /**
+     * Display cost price in Kenyan Shillings with proper formatting.
+     */
+    public function getFormattedCostPriceAttribute(): string
+    {
+        return 'Ksh ' . number_format($this->cost_price);
+    }
+
+    /**
+     * Get the gross margin in KSH.
+     */
+    public function getGrossMarginAttribute(): int
+    {
+        return $this->price - $this->cost_price;
+    }
+
+    /**
+     * Get the margin percentage.
+     */
+    public function getMarginPercentAttribute(): float
+    {
+        if ($this->price <= 0) {
+            return 0;
+        }
+        return round(($this->getGrossMarginAttribute() / $this->price) * 100, 2);
+    }
+
+    /**
+     * Sync global stock field from branch-level stock records.
+     */
+    public function syncGlobalStock(): void
+    {
+        $totalStock = $this->branchStocks()->sum('stock');
+        static::withoutEvents(function () use ($totalStock) {
+            $this->update(['stock' => $totalStock]);
+        });
+    }
+
+    /**
      * Booted method to handle eloquent model events.
      */
     protected static function booted(): void
@@ -94,9 +160,26 @@ class Product extends Model
                 $current = (int) $product->stock;
                 $diff = $current - $original;
 
+                $branchId = $product->adjustment_branch_id ?: (
+                    \App\Models\Branch::where('is_active', true)->value('id') ?: \App\Models\Branch::value('id')
+                );
+
+                if ($branchId) {
+                    $branchStock = \App\Models\BranchProductStock::firstOrCreate(
+                        ['branch_id' => $branchId, 'product_id' => $product->id],
+                        ['stock' => 0]
+                    );
+
+                    \App\Models\BranchProductStock::withoutEvents(function () use ($branchStock, $diff) {
+                        $branchStock->stock = max(0, $branchStock->stock + $diff);
+                        $branchStock->save();
+                    });
+                }
+
                 // Log details to database
                 \App\Models\InventoryLog::create([
                     'product_id' => $product->id,
+                    'branch_id' => $branchId,
                     'user_id' => auth()->id(),
                     'quantity_before' => $original,
                     'quantity_after' => $current,
@@ -107,9 +190,21 @@ class Product extends Model
         });
 
         static::created(function ($product) {
-            if ($product->stock > 0) {
+            $branchId = $product->adjustment_branch_id ?: (
+                \App\Models\Branch::where('is_active', true)->value('id') ?: \App\Models\Branch::value('id')
+            );
+
+            if ($product->stock > 0 && $branchId) {
+                \App\Models\BranchProductStock::create([
+                    'branch_id' => $branchId,
+                    'product_id' => $product->id,
+                    'stock' => $product->stock,
+                    'min_stock_level' => 5,
+                ]);
+
                 \App\Models\InventoryLog::create([
                     'product_id' => $product->id,
+                    'branch_id' => $branchId,
                     'user_id' => auth()->id(),
                     'quantity_before' => 0,
                     'quantity_after' => $product->stock,
@@ -118,6 +213,7 @@ class Product extends Model
                 ]);
             }
         });
+
         static::saved(function ($product) {
             \Illuminate\Support\Facades\Cache::forget('storefront_products_base');
             \Illuminate\Support\Facades\Cache::forget('dashboard_stats');

@@ -90,6 +90,7 @@
                                 @endif
                             </span>
                         </th>
+                        <th class="p-5 font-medium">Cost / Margin</th>
                         <th class="p-5 font-medium cursor-pointer hover:text-neutral-300 transition-colors" wire:click="sortBy('stock')">
                             <span class="flex items-center space-x-1">
                                 <span>Stock</span>
@@ -157,20 +158,27 @@
                                 <span class="text-neutral-600 text-[10px] ml-1">Ksh</span>
                             </td>
 
-                            {{-- Stock with inline adjustment --}}
+                            {{-- Cost / Margin --}}
+                            <td class="p-5 font-mono text-xs">
+                                <div class="text-neutral-400">Cost: Ksh {{ number_format($product->cost_price) }}</div>
+                                <div class="text-neutral-500 mt-1">Margin: <span class="text-emerald-400 font-semibold">{{ $product->margin_percent }}%</span></div>
+                            </td>
+
+                            {{-- Stock with branch breakdown --}}
                             <td class="p-5">
                                 <div class="flex items-center space-x-2">
-                                    <button
-                                        wire:click="adjustStock({{ $product->id }}, -1)"
-                                        class="w-6 h-6 flex items-center justify-center rounded-sm bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-white hover:border-neutral-600 transition-colors text-xs"
-                                    >−</button>
-                                    <span class="font-mono text-sm min-w-[2rem] text-center
-                                        {{ $product->stock <= 5 ? 'text-rose-400 font-medium' : ($product->stock <= 10 ? 'text-amber-400' : 'text-white') }}
+                                    <span class="font-mono text-sm min-w-[2rem] text-left font-semibold
+                                        {{ $product->stock <= 5 ? 'text-rose-400' : ($product->stock <= 10 ? 'text-amber-400' : 'text-white') }}
                                     ">{{ $product->stock }}</span>
                                     <button
-                                        wire:click="adjustStock({{ $product->id }}, 1)"
-                                        class="w-6 h-6 flex items-center justify-center rounded-sm bg-neutral-900 border border-neutral-800 text-neutral-500 hover:text-white hover:border-neutral-600 transition-colors text-xs"
-                                    >+</button>
+                                        wire:click="openAdjustModal({{ $product->id }})"
+                                        class="text-[9px] uppercase font-mono tracking-wider border border-neutral-850 px-1.5 py-0.5 rounded-sm bg-neutral-900 hover:bg-neutral-800 text-amber-500 hover:text-amber-400 transition-colors"
+                                    >Adjust</button>
+                                </div>
+                                <div class="text-[9px] font-mono text-neutral-600 uppercase mt-1.5 space-y-0.5">
+                                    @foreach($product->branchStocks as $bs)
+                                        <div>{{ substr($bs->branch->name, 0, 3) }}: {{ $bs->stock }}</div>
+                                    @endforeach
                                 </div>
                             </td>
 
@@ -234,6 +242,7 @@
                             <tr class="border-b border-neutral-900 text-neutral-500 text-[9px] uppercase tracking-[0.2em] bg-[#0A0A0A]/50 font-mono">
                                 <th class="p-4">Timestamp</th>
                                 <th class="p-4">Product Name</th>
+                                <th class="p-4">Branch</th>
                                 <th class="p-4 font-mono text-center">Prev</th>
                                 <th class="p-4 font-mono text-center">Adj</th>
                                 <th class="p-4 font-mono text-center">New</th>
@@ -249,6 +258,9 @@
                                     </td>
                                     <td class="p-4 text-white">
                                         {{ $log->product->name ?? 'Deleted Product' }}
+                                    </td>
+                                    <td class="p-4 text-neutral-400 font-light">
+                                        {{ $log->branch->code ?? 'Global' }}
                                     </td>
                                     <td class="p-4 text-center text-neutral-500">
                                         {{ $log->quantity_before }}
@@ -402,7 +414,7 @@
                             @error('grade') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>
                         <div>
-                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Price (Ksh) *</label>
+                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Selling Price (Ksh) *</label>
                             <input
                                 wire:model="price"
                                 type="number"
@@ -412,6 +424,19 @@
                             >
                             @error('price') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>
+                    </div>
+
+                    {{-- Row: Cost Price --}}
+                    <div>
+                        <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Cost Price (Ksh) *</label>
+                        <input
+                            wire:model="cost_price"
+                            type="number"
+                            min="0"
+                            class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 transition-colors font-mono"
+                            placeholder="2000"
+                        >
+                        @error('cost_price') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
                     {{-- Row: Stock + Image URL + File Upload --}}
@@ -571,6 +596,67 @@
                         >Delete Product</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- ─── Manual Stock Adjustment Modal ─── --}}
+    @if ($showAdjustModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm transition-opacity duration-300 font-sans">
+            <div class="bg-[#0F0F12] border border-neutral-800 rounded-sm w-full max-w-md p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+                <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-white mb-6">Manual Stock Adjustment</h3>
+                
+                <form wire:submit.prevent="saveAdjustment" class="space-y-4">
+                    {{-- Branch Selection --}}
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5 font-mono">Select Fulfilling Branch</label>
+                        <select 
+                            wire:model="adjustBranchId" 
+                            class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 font-mono cursor-pointer"
+                        >
+                            @foreach($branches as $b)
+                                <option value="{{ $b->id }}">{{ $b->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('adjustBranchId') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    {{-- Adjustment Quantity --}}
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5 font-mono">Adjustment Quantity (+/-)</label>
+                        <input 
+                            wire:model="adjustAmount" 
+                            type="number" 
+                            class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 font-mono text-center"
+                            placeholder="e.g. 10 or -5"
+                        >
+                        @error('adjustAmount') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    {{-- Reason --}}
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5 font-mono">Audit Log Reason</label>
+                        <input 
+                            wire:model="adjustReason" 
+                            type="text" 
+                            class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 font-mono"
+                            placeholder="Manual recount, stock damage, transfer..."
+                        >
+                        @error('adjustReason') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-3 pt-6 border-t border-neutral-900 mt-6 font-mono">
+                        <button
+                            type="button"
+                            wire:click="$set('showAdjustModal', false)"
+                            class="px-5 py-2 text-xs uppercase tracking-wider text-neutral-500 hover:text-white transition-colors"
+                        >Cancel</button>
+                        <button
+                            type="submit"
+                            class="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-black text-xs font-medium uppercase tracking-wider rounded-sm transition-colors"
+                        >Apply Stock</button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif

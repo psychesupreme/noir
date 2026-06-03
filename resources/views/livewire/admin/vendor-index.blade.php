@@ -1,0 +1,308 @@
+<div class="min-h-screen text-neutral-100 font-sans antialiased">
+    {{-- Header --}}
+    <div class="mb-10">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div>
+                <h1 class="text-2xl font-extralight tracking-tight text-white uppercase">Supplier & Vendor Directory</h1>
+                <p class="text-xs text-neutral-500 font-light mt-1">Manage external wholesalers, track reliability ratings, and configure payment terms for purchase ordering.</p>
+            </div>
+            <div class="flex items-center gap-4">
+                @if (session()->has('message'))
+                    <div class="bg-emerald-950/40 border border-emerald-900/30 text-emerald-400 px-4 py-2 text-xs font-mono rounded-sm animate-pulse">
+                        ✓ {{ session('message') }}
+                    </div>
+                @endif
+                @if (session()->has('error'))
+                    <div class="bg-rose-950/40 border border-rose-900/30 text-rose-400 px-4 py-2 text-xs font-mono rounded-sm">
+                        ✕ {{ session('error') }}
+                    </div>
+                @endif
+
+                <button 
+                    wire:click="create"
+                    class="bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-sm transition-all duration-300 transform active:scale-95 shadow-[0_0_15px_rgba(245,158,11,0.1)] hover:shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                >
+                    + Add New Vendor
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Filters & Search --}}
+    <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+        {{-- Search --}}
+        <div class="md:col-span-3 relative group">
+            <input 
+                wire:model.live.debounce.300ms="search" 
+                type="text" 
+                placeholder="Search vendors by name, contact, email or phone..."
+                class="w-full bg-[#0F0F12] border border-neutral-900 rounded-sm pl-10 pr-4 py-2.5 text-xs text-neutral-300 placeholder-neutral-600 focus:outline-none focus:border-neutral-700 focus:ring-1 focus:ring-amber-500/20 transition-all duration-300 font-mono"
+            >
+            <div class="absolute left-3 top-3 flex items-center justify-center pointer-events-none">
+                <svg class="w-4 h-4 text-neutral-600 transition-all duration-300 group-focus-within:text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+            </div>
+        </div>
+
+        {{-- Status Filter --}}
+        <div>
+            <select 
+                wire:model.live="activeFilter"
+                class="w-full bg-[#0F0F12] border border-neutral-900 rounded-sm px-4 py-2.5 text-xs text-neutral-400 focus:outline-none focus:border-neutral-700 font-mono cursor-pointer"
+            >
+                <option value="all">All Vendors</option>
+                <option value="active">Active Only</option>
+                <option value="inactive">Inactive Only</option>
+            </select>
+        </div>
+    </div>
+
+    {{-- Vendors Directory --}}
+    <div class="bg-[#0F0F12] border border-neutral-900 rounded-sm overflow-hidden shadow-2xl">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-neutral-900 text-neutral-500 text-[10px] uppercase tracking-[0.2em] bg-[#0A0A0A]/50">
+                        <th class="p-6 font-medium">Vendor Details</th>
+                        <th class="p-6 font-medium">Primary Contact</th>
+                        <th class="p-6 font-medium">Contact Details</th>
+                        <th class="p-6 font-medium">Payment Terms</th>
+                        <th class="p-6 font-medium">Reliability</th>
+                        <th class="p-6 font-medium">Purchase Orders</th>
+                        <th class="p-6 font-medium">Status</th>
+                        <th class="p-6 font-medium text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-900/60 text-sm font-light">
+                    @forelse ($vendors as $vendor)
+                        <tr class="hover:bg-neutral-950/40 transition-colors">
+                            {{-- Vendor Details --}}
+                            <td class="p-6">
+                                <span class="text-white font-normal block">{{ $vendor->name }}</span>
+                                <span class="text-neutral-500 text-xs block truncate max-w-[200px]" title="{{ $vendor->address }}">{{ $vendor->address ?: 'No Address Stated' }}</span>
+                            </td>
+
+                            {{-- Contact Person --}}
+                            <td class="p-6">
+                                <span class="text-neutral-200 block">{{ $vendor->contact_person }}</span>
+                            </td>
+
+                            {{-- Contact Details --}}
+                            <td class="p-6 font-mono text-xs">
+                                <span class="text-neutral-400 block">{{ $vendor->email ?: '-' }}</span>
+                                <span class="text-neutral-500 block mt-0.5">{{ $vendor->phone ?: '-' }}</span>
+                            </td>
+
+                            {{-- Payment Terms --}}
+                            <td class="p-6">
+                                <span class="inline-block text-[10px] tracking-wider uppercase font-mono px-2.5 py-1 rounded-sm bg-neutral-900 text-neutral-400 border border-neutral-800">
+                                    {{ $vendor->payment_terms }}
+                                </span>
+                            </td>
+
+                            {{-- Reliability --}}
+                            <td class="p-6">
+                                <div class="flex text-amber-500" title="{{ $vendor->reliability_rating }} of 5 rating">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        @if ($i <= $vendor->reliability_rating)
+                                            <span class="text-xs">★</span>
+                                        @else
+                                            <span class="text-xs text-neutral-800">★</span>
+                                        @endif
+                                    @endfor
+                                </div>
+                            </td>
+
+                            {{-- Purchase Orders --}}
+                            <td class="p-6 font-mono text-neutral-400">
+                                {{ $vendor->purchaseOrders()->count() }} POs
+                            </td>
+
+                            {{-- Status --}}
+                            <td class="p-6">
+                                @if ($vendor->is_active)
+                                    <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500" title="Active"></span>
+                                    <span class="text-xs font-mono text-emerald-500 uppercase tracking-wider ml-1.5">Active</span>
+                                @else
+                                    <span class="inline-flex h-2 w-2 rounded-full bg-neutral-800" title="Inactive"></span>
+                                    <span class="text-xs font-mono text-neutral-500 uppercase tracking-wider ml-1.5">Inactive</span>
+                                @endif
+                            </td>
+
+                            {{-- Actions --}}
+                            <td class="p-6 text-right space-x-2">
+                                <button 
+                                    wire:click="edit({{ $vendor->id }})"
+                                    class="text-xs text-neutral-400 hover:text-amber-500 transition-colors uppercase tracking-wider font-mono border border-neutral-800 hover:border-amber-500 px-2 py-1 rounded"
+                                >
+                                    Edit
+                                </button>
+                                <button 
+                                    wire:click="delete({{ $vendor->id }})"
+                                    onclick="confirm('Are you sure you want to delete this vendor?') || event.stopImmediatePropagation()"
+                                    class="text-xs text-neutral-600 hover:text-rose-500 transition-colors uppercase tracking-wider font-mono border border-neutral-800 hover:border-rose-500 px-2 py-1 rounded"
+                                >
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="p-12 text-center text-neutral-500 font-light font-mono">
+                                No suppliers registered in the database directory.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {{-- Pagination --}}
+    <div class="mt-6 font-mono text-xs">
+        {{ $vendors->links() }}
+    </div>
+
+    {{-- Create/Edit Modal --}}
+    @if($showModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                {{-- Backdrop --}}
+                <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" aria-hidden="true" wire:click="$set('showModal', false)"></div>
+
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                {{-- Modal Panel --}}
+                <div class="inline-block align-middle bg-[#0B0B0E] border border-neutral-900 rounded-sm text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="px-6 py-6">
+                        <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-white mb-6">
+                            {{ $isEditMode ? 'Edit Vendor Details' : 'Register New Vendor' }}
+                        </h3>
+
+                        <form wire:submit.prevent="save" class="space-y-4">
+                            {{-- Name --}}
+                            <div>
+                                <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5">Supplier Company Name</label>
+                                <input 
+                                    wire:model="name" 
+                                    type="text" 
+                                    class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3.5 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 focus:ring-1 focus:ring-amber-500/20"
+                                >
+                                @error('name') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            {{-- Contact Person --}}
+                            <div>
+                                <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5">Primary Contact Representative</label>
+                                <input 
+                                    wire:model="contact_person" 
+                                    type="text" 
+                                    class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3.5 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 focus:ring-1 focus:ring-amber-500/20"
+                                >
+                                @error('contact_person') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                {{-- Email --}}
+                                <div>
+                                    <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5">Email Address</label>
+                                    <input 
+                                        wire:model="email" 
+                                        type="email" 
+                                        class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3.5 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 focus:ring-1 focus:ring-amber-500/20 font-mono"
+                                    >
+                                    @error('email') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+
+                                {{-- Phone --}}
+                                <div>
+                                    <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5">Phone Contact</label>
+                                    <input 
+                                        wire:model="phone" 
+                                        type="text" 
+                                        class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3.5 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 focus:ring-1 focus:ring-amber-500/20 font-mono"
+                                    >
+                                    @error('phone') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            {{-- Address --}}
+                            <div>
+                                <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5">Physical Address</label>
+                                <textarea 
+                                    wire:model="address" 
+                                    rows="2"
+                                    class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3.5 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 focus:ring-1 focus:ring-amber-500/20"
+                                ></textarea>
+                                @error('address') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                {{-- Payment Terms --}}
+                                <div>
+                                    <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5">Payment Terms</label>
+                                    <select 
+                                        wire:model="payment_terms" 
+                                        class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3.5 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 font-mono cursor-pointer"
+                                    >
+                                        <option value="Cash on Delivery">Cash on Delivery</option>
+                                        <option value="Net 7">Net 7</option>
+                                        <option value="Net 14">Net 14</option>
+                                        <option value="Net 30">Net 30</option>
+                                        <option value="Net 60">Net 60</option>
+                                    </select>
+                                    @error('payment_terms') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+
+                                {{-- Reliability Rating --}}
+                                <div>
+                                    <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5">Reliability Rating (1-5)</label>
+                                    <select 
+                                        wire:model="reliability_rating" 
+                                        class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3.5 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 font-mono cursor-pointer"
+                                    >
+                                        <option value="1">1 Star</option>
+                                        <option value="2">2 Stars</option>
+                                        <option value="3">3 Stars</option>
+                                        <option value="4">4 Stars</option>
+                                        <option value="5">5 Stars</option>
+                                    </select>
+                                    @error('reliability_rating') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            {{-- Active Switch --}}
+                            <div class="flex items-center space-x-3 pt-2">
+                                <input 
+                                    wire:model="is_active" 
+                                    type="checkbox" 
+                                    id="is_active"
+                                    class="rounded-sm bg-[#121216] border-neutral-900 text-amber-500 focus:ring-amber-500 focus:ring-opacity-20 cursor-pointer"
+                                >
+                                <label for="is_active" class="text-xs text-neutral-300 cursor-pointer select-none">Active Vendor (available for new POs)</label>
+                            </div>
+
+                            {{-- Form Actions --}}
+                            <div class="flex justify-end gap-3 pt-6 border-t border-neutral-900/60 mt-6">
+                                <button 
+                                    type="button" 
+                                    wire:click="$set('showModal', false)"
+                                    class="bg-neutral-900 hover:bg-neutral-800 text-neutral-400 text-xs font-mono uppercase tracking-wider px-4 py-2 rounded-sm transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    class="bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold uppercase tracking-wider px-5 py-2 rounded-sm transition-all duration-300"
+                                >
+                                    {{ $isEditMode ? 'Update' : 'Register' }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+</div>

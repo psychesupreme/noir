@@ -49,6 +49,10 @@ class Storefront extends Component
     public bool $orderSubmitted = false;
     public ?int $trackedOrderId = null;
     public ?string $mpesaErrorMessage = null;
+    public ?int $activePaymentId = null;
+    public string $paymentStatus = 'idle'; 
+    public ?string $mpesaReceiptNumber = null;
+    public string $paymentMethod = 'mpesa'; // mpesa or net_30
     
     // Catalog Pagination
     public int $perPage = 6;
@@ -65,18 +69,54 @@ class Storefront extends Component
         $this->perPage += 4;
     }
 
-    public array $addressSuggestions = [
-        "Riverside Drive, Office Park Complexes, Nairobi",
-        "Westlands, Delta Corner / PwC Towers, Nairobi",
-        "Gigiri, UN Avenue / Diplomatic Enclave, Nairobi",
-        "Kilimani, Lenana Road Business Hubs, Nairobi",
-        "Karen, Miotoni Road Luxury Residences, Nairobi",
-        "Runda Estate, Pan African Insurance Quadrant, Nairobi",
-        "Muthaiga, Old Muthaiga Road Estates, Nairobi",
-        "Limuru, Tea Estate Curation Ridge, Kiambu",
-        "Thika Road, Garden City Business Quadrant, Nairobi",
-        "Ruaka, Two Rivers Office Tower Matrix, Kiambu"
-    ];
+    public function getAddressSuggestions(): array
+    {
+        $registry = [
+            'Nairobi' => [
+                "Riverside Drive, Office Park Complexes, Nairobi",
+                "Westlands, Delta Corner / PwC Towers, Westlands, Nairobi",
+                "Gigiri, UN Avenue / Diplomatic Enclave, Nairobi",
+                "Kilimani, Lenana Road Business Hubs, Kilimani, Nairobi",
+                "Karen, Miotoni Road Luxury Residences, Karen, Nairobi",
+                "Runda Estate, Pan African Insurance Quadrant, Runda, Nairobi",
+                "Muthaiga, Old Muthaiga Road Estates, Muthaiga, Nairobi",
+                "Thika Road, Garden City Business Quadrant, Nairobi",
+                "Lavington Mall & Restaurants, Lavington, Nairobi",
+                "Yaya Centre Shopping Complex, Kilimani, Nairobi",
+                "Sarit Centre Mall, Karuna Road, Westlands, Nairobi",
+                "Alchemist Bar & Dining, Parklands, Nairobi",
+                "CJ's Restaurant, Koinange Street, CBD, Nairobi",
+                "Mercado Mexican Kitchen, Kenrail Towers, Westlands, Nairobi",
+                "Kitisuru Terrace Apartments, Kitisuru, Nairobi",
+                "Valley Arcade Shopping Centre, Lavington, Nairobi",
+                "Jomo Kenyatta International Airport (JKIA), Embakasi, Nairobi",
+                "Nairobi National Park Main Gate, Langata Road, Nairobi"
+            ],
+            'Kiambu' => [
+                "Limuru, Tea Estate Curation Ridge, Limuru, Kiambu",
+                "Ruaka, Two Rivers Office Tower Matrix, Ruaka, Kiambu",
+                "Two Rivers Mall & Theme Park, Ruaka, Kiambu",
+                "Village Market, Limuru Road, Gigiri Border, Kiambu",
+                "Runda Evergreen Apartments, Kiambu Road, Kiambu",
+                "Ciata City Shopping Mall, Kiambu Road, Kiambu",
+                "Thika Road Mall (TRM), Roysambu Border, Kiambu",
+                "Sigona Golf Club Residences, Kikuyu, Kiambu",
+                "Tatu City Industrial & Residential Zone, Ruiru, Kiambu",
+                "Kasarani-Mwiki Road Apartments, Kiambu Border, Kiambu",
+                "Kiambu Golf Club & Lounge, Kiambu Town, Kiambu",
+                "Zuri Cascades Residences, Tatton Road, Kiambu",
+                "Jomo Kenyatta University (JKUAT) Gate 1, Juja, Kiambu",
+                "Craving Yellow Restaurant, Kiambu Town, Kiambu"
+            ]
+        ];
+
+        return $registry[$this->region] ?? [];
+    }
+
+    public function updatedRegion($value): void
+    {
+        $this->delivery_address = '';
+    }
 
     public function mount(): void
     {
@@ -171,6 +211,18 @@ class Storefront extends Component
     {
         if (empty(trim($this->chatMessage))) return;
 
+        $ipKey = 'aura-chat:' . request()->ip();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($ipKey, 15)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($ipKey);
+            $this->chatHistory[] = [
+                'sender' => 'bot', 
+                'text' => "I am receiving too many requests from your location. Please pause for {$seconds} seconds."
+            ];
+            $this->chatMessage = '';
+            return;
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($ipKey, 60);
+
         $userQuery = $this->chatMessage;
         $this->chatHistory[] = ['sender' => 'user', 'text' => $userQuery];
         $this->chatMessage = '';
@@ -234,6 +286,14 @@ class Storefront extends Component
 
     public function submitCurationRequest(): void
     {
+        $ipKey = 'checkout-attempt:' . request()->ip();
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($ipKey, 5)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($ipKey);
+            $this->addError('paymentMethod', "Too many checkout requests from your IP. Please wait {$seconds} seconds.");
+            return;
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($ipKey, 60);
+
         $this->validate([
             'full_name'        => 'required|string|min:3',
             'email'            => 'required|email',
@@ -249,7 +309,61 @@ class Storefront extends Component
             return;
         }
 
-        $orderId = DB::transaction(function () {
+        // Calculate grand total for credit validation
+        $productIds = [];
+        foreach (array_keys($this->cart) as $key) {
+            $parts = explode('-', $key);
+            $productIds[] = $parts[0];
+        }
+        $products = Product::findMany(array_unique($productIds));
+        
+        $totalAmount = 0;
+        $itemsToAttach = [];
+
+        foreach ($this->cart as $key => $quantity) {
+            $parts = explode('-', $key);
+            $productId = $parts[0];
+            $size = $parts[1] ?? 'standard';
+            $product = $products->firstWhere('id', $productId);
+            if ($product) {
+                $priceMultiplier = match($size) {
+                    'deluxe' => 1.5,
+                    'grand' => 2.2,
+                    default => 1.0
+                };
+                $finalPrice = (int) round($product->price * $priceMultiplier);
+                $totalAmount += ($finalPrice * $quantity);
+                
+                $itemsToAttach[] = [
+                    'product_id' => $productId,
+                    'quantity' => $quantity,
+                    'price_at_sale' => $finalPrice
+                ];
+            }
+        }
+        $grandTotal = $totalAmount + $this->service_fee;
+
+        // B2B credit validation before proceeding
+        if ($this->checkoutType === 'corporate' && $this->paymentMethod === 'net_30') {
+            $existingClient = Client::where('email', trim(strtolower($this->email)))->first();
+            
+            if (!$existingClient) {
+                $this->addError('paymentMethod', 'Corporate credit account not found. Please register or use M-Pesa.');
+                return;
+            }
+
+            if ($existingClient->payment_terms !== 'net_30') {
+                $this->addError('paymentMethod', 'Your corporate profile is not authorized for credit terms (prepaid only).');
+                return;
+            }
+
+            if ($existingClient->outstanding_balance + $grandTotal > $existingClient->credit_limit) {
+                $this->addError('paymentMethod', "Credit limit exceeded. Outstanding: " . number_format($existingClient->outstanding_balance) . " KSH, Order: " . number_format($grandTotal) . " KSH, Limit: " . number_format($existingClient->credit_limit) . " KSH.");
+                return;
+            }
+        }
+
+        $orderId = DB::transaction(function () use ($itemsToAttach, $grandTotal) {
             $client = Client::updateOrCreate(
                 ['email' => trim(strtolower($this->email))],
                 [
@@ -264,39 +378,6 @@ class Storefront extends Component
             );
 
             $targetBranch = Branch::where('location_city', $this->region)->where('is_active', true)->first();
-            $productIds = [];
-            foreach (array_keys($this->cart) as $key) {
-                $parts = explode('-', $key);
-                $productIds[] = $parts[0];
-            }
-            $products = Product::findMany(array_unique($productIds));
-            
-            $totalAmount = 0;
-            $itemsToAttach = [];
-
-            foreach ($this->cart as $key => $quantity) {
-                $parts = explode('-', $key);
-                $productId = $parts[0];
-                $size = $parts[1] ?? 'standard';
-                $product = $products->firstWhere('id', $productId);
-                if ($product) {
-                    $priceMultiplier = match($size) {
-                        'deluxe' => 1.5,
-                        'grand' => 2.2,
-                        default => 1.0
-                    };
-                    $finalPrice = (int) round($product->price * $priceMultiplier);
-                    $totalAmount += ($finalPrice * $quantity);
-                    
-                    $itemsToAttach[] = [
-                        'product_id' => $productId,
-                        'quantity' => $quantity,
-                        'price_at_sale' => $finalPrice
-                    ];
-                }
-            }
-
-            $grandTotal = $totalAmount + $this->service_fee;
 
             $order = Order::create([
                 'client_id'            => $client->id,
@@ -317,11 +398,35 @@ class Storefront extends Component
                 ]);
             }
 
+            // B2B Net 30 Ledger Update
+            if ($this->checkoutType === 'corporate' && $this->paymentMethod === 'net_30') {
+                $client->increment('outstanding_balance', $grandTotal);
+
+                \App\Models\AccountsReceivableInvoice::create([
+                    'order_id' => $order->id,
+                    'client_id' => $client->id,
+                    'amount_due' => $grandTotal,
+                    'due_at' => now()->addDays(30),
+                    'status' => 'unpaid',
+                ]);
+            }
+
             return $order->id;
         });
 
         $this->trackedOrderId = $orderId;
         $this->orderSubmitted = true;
+
+        if ($this->checkoutType === 'corporate' && $this->paymentMethod === 'net_30') {
+            // Approve corporate credit order immediately
+            $order = Order::find($orderId);
+            app(\App\Services\OrderService::class)->approve($order);
+
+            $this->paymentStatus = 'completed';
+            $this->mpesaReceiptNumber = null;
+            $this->cart = [];
+            session()->forget('noir_bloom_cart');
+        }
     }
 
     /**
@@ -334,6 +439,22 @@ class Storefront extends Component
         $this->validate([
             'phone' => 'required|string|min:9',
         ]);
+
+        $ipKey = 'stk-push-ip:' . request()->ip();
+        $phoneKey = 'stk-push-phone:' . preg_replace('/\D/', '', $this->phone);
+        
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($ipKey, 3) || \Illuminate\Support\Facades\RateLimiter::tooManyAttempts($phoneKey, 3)) {
+            $seconds = max(
+                \Illuminate\Support\Facades\RateLimiter::availableIn($ipKey),
+                \Illuminate\Support\Facades\RateLimiter::availableIn($phoneKey)
+            );
+            $this->mpesaErrorMessage = "Too many STK push requests. Please wait {$seconds} seconds before retrying.";
+            $this->paymentStatus = 'idle';
+            return;
+        }
+        
+        \Illuminate\Support\Facades\RateLimiter::hit($ipKey, 60);
+        \Illuminate\Support\Facades\RateLimiter::hit($phoneKey, 60);
 
         if (!$this->trackedOrderId) {
             $this->mpesaErrorMessage = 'No active order found for payment processing.';
@@ -355,6 +476,9 @@ class Storefront extends Component
                 'status' => 'pending',
             ]);
 
+            $this->activePaymentId = $payment->id;
+            $this->paymentStatus = 'pending';
+
             // Dispatch background queue job with afterCommit constraint to prevent race conditions
             \App\Jobs\SendMpesaStkPushJob::dispatch(
                 $payment->id,
@@ -364,7 +488,38 @@ class Storefront extends Component
             )->afterCommit();
 
         } catch (\Exception $e) {
+            $this->paymentStatus = 'failed';
             $this->mpesaErrorMessage = 'Payment initiation failed: ' . $e->getMessage();
+        }
+    }
+
+    public function checkPaymentStatus(): void
+    {
+        if (!$this->activePaymentId) return;
+
+        $payment = Payment::find($this->activePaymentId);
+        if (!$payment) return;
+
+        if ($payment->status === 'completed') {
+            $this->paymentStatus = 'completed';
+            $this->mpesaReceiptNumber = $payment->mpesa_receipt_number;
+            $this->cart = [];
+            session()->forget('noir_bloom_cart');
+        } elseif ($payment->status === 'failed') {
+            $this->paymentStatus = 'failed';
+            $this->mpesaErrorMessage = $payment->result_description ?: 'STK Push rejected or expired.';
+        } else {
+            // Check if 60 seconds have elapsed since payment creation to prevent infinite loop
+            if ($payment->created_at && $payment->created_at->diffInSeconds(now()) > 60) {
+                $payment->update([
+                    'status' => 'failed',
+                    'result_description' => 'Payment transaction timed out (60s).'
+                ]);
+                $this->paymentStatus = 'failed';
+                $this->mpesaErrorMessage = 'STK authorization prompt expired. Please try again.';
+            } else {
+                $this->paymentStatus = 'pending';
+            }
         }
     }
 
@@ -372,7 +527,11 @@ class Storefront extends Component
     {
         $this->cart = [];
         session()->forget('noir_bloom_cart');
-        $this->reset(['is_gift', 'recipient_name', 'recipient_phone', 'delivery_type', 'service_fee', 'orderSubmitted', 'trackedOrderId', 'mpesaErrorMessage']);
+        $this->reset([
+            'is_gift', 'recipient_name', 'recipient_phone', 'delivery_type', 'service_fee', 
+            'orderSubmitted', 'trackedOrderId', 'mpesaErrorMessage',
+            'activePaymentId', 'paymentStatus', 'mpesaReceiptNumber'
+        ]);
     }
 
     public function render()

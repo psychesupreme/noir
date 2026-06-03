@@ -47,7 +47,7 @@ class MpesaService
     /**
      * Initiate a live Lipa Na M-Pesa Online STK Push request.
      */
-    public function sendStkPush(string $phone, int $amount, int $orderId): array
+    public function sendStkPush(string $phone, int $amount, string $reference): array
     {
         $token = $this->getAccessToken();
         $timestamp = now()->format('YmdHis');
@@ -66,8 +66,8 @@ class MpesaService
             'PartyB'            => $this->shortcode,
             'PhoneNumber'       => $formattedPhone,
             'CallBackURL'       => $this->callbackUrl,
-            'AccountReference'  => 'NB-ORD-' . str_pad($orderId, 4, '0', STR_PAD_LEFT),
-            'TransactionDesc'   => 'Noir Bloom Luxury Floral Order'
+            'AccountReference'  => $reference,
+            'TransactionDesc'   => 'Luxury Atelier'
         ];
 
         $response = Http::withToken($token)

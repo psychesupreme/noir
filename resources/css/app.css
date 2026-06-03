@@ -22,6 +22,7 @@
   --text-primary: #F4F4F5;
   --text-secondary: #9CA3AF;
   --brand-accent: #C5A880;
+  --brand-accent-rgb: 197, 168, 128;
   --blob-1: rgba(197, 168, 128, 0.06);
   --blob-2: rgba(88, 28, 135, 0.04);
   --card-bg: rgba(12, 12, 14, 0.45);
@@ -37,6 +38,7 @@
   --text-primary: #1C1917;
   --text-secondary: #78716C;
   --brand-accent: #B59A7A;
+  --brand-accent-rgb: 181, 154, 122;
   --blob-1: rgba(181, 154, 122, 0.12);
   --blob-2: rgba(212, 175, 55, 0.06);
   --card-bg: rgba(255, 255, 255, 0.75);
@@ -52,6 +54,7 @@
   --text-primary: #FCE7EC;
   --text-secondary: #F472B6;
   --brand-accent: #B76E79;
+  --brand-accent-rgb: 183, 110, 121;
   --blob-1: rgba(236, 72, 153, 0.08);
   --blob-2: rgba(244, 63, 94, 0.06);
   --card-bg: rgba(28, 10, 16, 0.55);
@@ -154,7 +157,18 @@
 .product-card:hover {
   transform: translateY(-6px);
   box-shadow: var(--card-hover-shadow);
-  border-color: var(--card-hover-border);
+  border-color: var(--brand-accent) !important;
+}
+
+/* Custom theme-section borders turning to primary color on hover */
+.theme-section {
+  transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-section:hover {
+  border-color: var(--brand-accent) !important;
+  box-shadow: 0 12px 40px -12px rgba(var(--brand-accent-rgb), 0.18) !important;
 }
 
 .product-details-reveal {

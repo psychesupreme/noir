@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             \App\Http\Middleware\SessionTimeoutMiddleware::class,
+            \App\Http\Middleware\SecureHeaders::class,
         ]);
     })
     

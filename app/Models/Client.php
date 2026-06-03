@@ -11,7 +11,10 @@ class Client extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'company_name', 'kra_pin', 'contact_name', 'email', 'phone', 'region', 'delivery_address'];
+    protected $fillable = [
+        'user_id', 'company_name', 'kra_pin', 'contact_name', 'email', 'phone', 'region', 'delivery_address',
+        'payment_terms', 'credit_limit', 'outstanding_balance'
+    ];
 
     public function user()
     {
@@ -21,6 +24,11 @@ class Client extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function arInvoices(): HasMany
+    {
+        return $this->hasMany(AccountsReceivableInvoice::class);
     }
 
     public function deals(): HasMany

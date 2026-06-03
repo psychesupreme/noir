@@ -35,6 +35,7 @@ class OrderService
             // 2. Decrement Stock via save to fire model event hooks
             foreach ($order->products as $product) {
                 $product->adjustment_reason = "Fulfillment of Order #NB-ORD-" . str_pad($order->id, 4, '0', STR_PAD_LEFT);
+                $product->adjustment_branch_id = $order->branch_id;
                 $product->stock = max(0, $product->stock - $product->pivot->quantity);
                 $product->save();
             }
@@ -90,6 +91,7 @@ class OrderService
                 // 2. Revert Stock via save to fire model event hooks
                 foreach ($order->products as $product) {
                     $product->adjustment_reason = "Requisition cancellation of Order #NB-ORD-" . str_pad($order->id, 4, '0', STR_PAD_LEFT);
+                    $product->adjustment_branch_id = $order->branch_id;
                     $product->stock = $product->stock + $product->pivot->quantity;
                     $product->save();
                 }
@@ -112,7 +114,12 @@ class OrderService
                 }
             }
 
-            // 4. Invalidate dashboard stats cache
+            // 4. Cancel eTIMS Invoice if it exists
+            if ($order->etimsInvoice) {
+                $order->etimsInvoice->update(['status' => 'cancelled']);
+            }
+
+            // 5. Invalidate dashboard stats cache
             Cache::forget('dashboard_stats');
 
             Log::info("Order cancelled successfully through OrderService: Order ID: {$order->id}");

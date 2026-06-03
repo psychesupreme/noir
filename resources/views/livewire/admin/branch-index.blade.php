@@ -84,6 +84,8 @@
                                 @endif
                             </span>
                         </th>
+                        <th class="p-5 font-medium">Inventory Stock</th>
+                        <th class="p-5 font-medium text-right font-mono">Stock Value (KSH)</th>
                         <th class="p-5 font-medium cursor-pointer hover:text-neutral-300 transition-colors" wire:click="sortBy('is_active')">
                             <span class="flex items-center space-x-1">
                                 <span>Status</span>
@@ -92,7 +94,7 @@
                                 @endif
                             </span>
                         </th>
-                        <th class="p-5 font-medium">Actions</th>
+                        <th class="p-5 font-medium text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-neutral-900/60 text-sm font-light">
@@ -113,6 +115,26 @@
                                 <span class="text-xs text-neutral-300">{{ $branch->location_city }}</span>
                             </td>
 
+                            {{-- Inventory Stock --}}
+                            @php
+                                $stockedItemsCount = $branch->productStocks()->where('stock', '>', 0)->count();
+                                $lowStockItemsCount = $branch->productStocks()->whereColumn('stock', '<=', 'min_stock_level')->count();
+                            @endphp
+                            <td class="p-5 text-xs font-mono">
+                                <div>Total: {{ $branch->productStocks()->sum('stock') }} units</div>
+                                <div class="text-[10px] text-neutral-500 mt-0.5">{{ $stockedItemsCount }} catalog items</div>
+                                @if($lowStockItemsCount > 0)
+                                    <span class="inline-block bg-rose-950/30 text-rose-400 border border-rose-900/20 text-[9px] px-1.5 py-0.5 mt-1 uppercase rounded-sm tracking-wider">
+                                        {{ $lowStockItemsCount }} Low Stock
+                                    </span>
+                                @endif
+                            </td>
+
+                            {{-- Stock Value --}}
+                            <td class="p-5 text-right font-mono text-emerald-400 font-semibold">
+                                Ksh {{ number_format($branch->total_stock_value) }}
+                            </td>
+
                             {{-- Status toggle --}}
                             <td class="p-5">
                                 <button
@@ -130,15 +152,19 @@
                             </td>
 
                             {{-- Actions --}}
-                            <td class="p-5">
-                                <div class="flex items-center space-x-2">
+                            <td class="p-5 text-right">
+                                <div class="flex items-center justify-end space-x-2">
+                                    <button
+                                        wire:click="openTransferModal({{ $branch->id }})"
+                                        class="px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-wider text-amber-500 bg-amber-950/10 border border-amber-900/20 rounded-sm hover:text-amber-400 hover:border-amber-700/40 transition-colors"
+                                    >Transfer</button>
                                     <button
                                         wire:click="openEditModal({{ $branch->id }})"
-                                        class="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-neutral-400 bg-neutral-900/50 border border-neutral-800 rounded-sm hover:text-white hover:border-neutral-600 transition-colors"
+                                        class="px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-wider text-neutral-400 bg-neutral-900/50 border border-neutral-800 rounded-sm hover:text-white hover:border-neutral-600 transition-colors"
                                     >Edit</button>
                                     <button
                                         wire:click="confirmDelete({{ $branch->id }})"
-                                        class="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-rose-500/60 bg-rose-950/20 border border-rose-900/20 rounded-sm hover:text-rose-400 hover:border-rose-800/40 transition-colors"
+                                        class="px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-wider text-rose-500/60 bg-rose-950/20 border border-rose-900/20 rounded-sm hover:text-rose-400 hover:border-rose-800/40 transition-colors"
                                     >Delete</button>
                                 </div>
                             </td>
@@ -339,6 +365,77 @@
                         >Delete Hub</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- ─── Inter-Branch Stock Transfer Modal ─── --}}
+    @if ($showTransferModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm transition-opacity duration-300 font-sans">
+            <div class="bg-[#0F0F12] border border-neutral-800 rounded-sm w-full max-w-md p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+                <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-white mb-6">Inter-Branch Stock Transfer</h3>
+                
+                <form wire:submit.prevent="saveTransfer" class="space-y-4">
+                    {{-- Destination Branch --}}
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5 font-mono">Destination Branch</label>
+                        <select 
+                            wire:model="transferDestBranchId" 
+                            class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 font-mono cursor-pointer"
+                        >
+                            <option value="">-- Select Destination --</option>
+                            @foreach($allBranches as $b)
+                                @if($b->id !== $transferSourceBranchId)
+                                    <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                        @error('transferDestBranchId') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    {{-- Product Selection --}}
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5 font-mono">Select Product</label>
+                        <select 
+                            wire:model="transferProductId" 
+                            class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 font-mono cursor-pointer"
+                        >
+                            <option value="">-- Choose Product --</option>
+                            @foreach($sourceProducts as $p)
+                                @php
+                                    $qty = $allBranches->firstWhere('id', $transferSourceBranchId)?->getStockForProduct($p->id) ?: 0;
+                                @endphp
+                                <option value="{{ $p->id }}">{{ $p->name }} (Available: {{ $qty }} units)</option>
+                            @endforeach
+                        </select>
+                        @error('transferProductId') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    {{-- Transfer Quantity --}}
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5 font-mono">Quantity to Transfer</label>
+                        <input 
+                            wire:model="transferQuantity" 
+                            type="number" 
+                            min="1"
+                            class="w-full bg-[#121216] border border-neutral-900 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-700 font-mono text-center"
+                            placeholder="1"
+                        >
+                        @error('transferQuantity') <span class="text-rose-500 text-[10px] mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-3 pt-6 border-t border-neutral-900 mt-6 font-mono">
+                        <button
+                            type="button"
+                            wire:click="$set('showTransferModal', false)"
+                            class="px-5 py-2 text-xs uppercase tracking-wider text-neutral-500 hover:text-white transition-colors"
+                        >Cancel</button>
+                        <button
+                            type="submit"
+                            class="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-black text-xs font-medium uppercase tracking-wider rounded-sm transition-colors"
+                        >Execute Transfer</button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif
