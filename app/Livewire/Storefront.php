@@ -63,6 +63,7 @@ class Storefront extends Component
     public array $chatHistory = [
         ['sender' => 'bot', 'text' => 'Welcome to Aura — your luxury curation companion. Ask me about popular arrangements, locations, my latest order status, or loyalty rewards!']
     ];
+    public bool $autoOpenDrawer = false;
 
     public function loadMore(): void
     {
@@ -141,6 +142,11 @@ class Storefront extends Component
             $this->delivery_address = $user->default_delivery_address ?? '';
             $this->region = $user->default_region ?? 'Nairobi';
             $this->checkoutType = $user->account_tier?->value === 'corporate' ? 'corporate' : 'standard';
+        }
+
+        if (session()->get('open_curation_drawer_after_login')) {
+            $this->autoOpenDrawer = true;
+            session()->forget('open_curation_drawer_after_login');
         }
     }
 
@@ -682,5 +688,11 @@ class Storefront extends Component
         }
 
         return $items;
+    }
+
+    public function prepareGuestCheckoutRedirect(string $target): void
+    {
+        session()->put('open_curation_drawer_after_login', true);
+        $this->redirect($target, navigate: true);
     }
 }

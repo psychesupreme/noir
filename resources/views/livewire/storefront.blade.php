@@ -61,8 +61,8 @@
 
 <div class="relative min-h-screen flex flex-col justify-between" 
     x-data="{ 
-        drawerOpen: false, 
-        checkoutMode: false, 
+        drawerOpen: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
+        checkoutMode: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
         theme: localStorage.getItem('nb_theme') || 'onyx', 
         accountPanelOpen: false, 
         chatOpen: false,
@@ -335,18 +335,8 @@
                 <span class="text-[11px] font-mono tracking-[0.4em] text-[#C5A880] uppercase">Atelier</span>
                 <span :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-base font-semibold uppercase tracking-[0.35em] transition-colors font-outfit">NOIR & BLOOM</span>
             </a>
-            
-            <div class="flex-1 max-w-sm hidden md:block animate-nav-item" style="animation-delay: 200ms;">
-                <div class="relative flex items-center">
-                    <input 
-                        type="text" 
-                        wire:model.live.debounce.200ms="search"
-                        placeholder="Search bouquets, stems, custom gifts..."
-                        :class="theme === 'champagne' ? 'bg-neutral-100 text-black placeholder-neutral-400 focus:bg-neutral-200/60' : 'bg-neutral-900/60 text-white placeholder-neutral-700 focus:bg-black'"
-                        class="w-full border-none rounded-full px-5 py-2 text-sm font-light focus:outline-none transition-all shadow-inner"
-                    >
-                </div>
-            </div>
+            <!-- Spacing column to balance layout -->
+            <div class="flex-1 hidden md:block"></div>
 
             <div class="flex items-center space-x-6 text-[12px] font-mono uppercase tracking-widest text-neutral-400">
                 <!-- Theme Switcher Pill (3 options, desktop only) -->
@@ -465,28 +455,33 @@
                             </span>
                         </button>
                     @else
-                        <!-- Log In / Sign In Button for Guests -->
+                        <!-- Log In / Sign In Button for Guests with dynamic theme-aware borders & smooth shadow glows -->
                         <button @click="profileMenuOpen = !profileMenuOpen" 
-                                class="hover:text-neutral-300 transition-colors cursor-pointer select-none px-3.5 h-8 flex items-center justify-center space-x-1.5 border border-neutral-500/10 rounded-full bg-neutral-500/5 text-xs font-mono font-medium tracking-wider"
+                                :class="{
+                                    'border-[#C5A880]/30 hover:border-[#C5A880] hover:shadow-[0_0_15px_rgba(197,168,128,0.25)]': theme === 'onyx',
+                                    'border-[#B59A7A]/30 hover:border-[#B59A7A] hover:shadow-[0_0_15px_rgba(181,154,122,0.25)]': theme === 'champagne',
+                                    'border-[#B76E79]/30 hover:border-[#B76E79] hover:shadow-[0_0_15px_rgba(183,110,121,0.25)]': theme === 'rose'
+                                }"
+                                class="transition-all duration-300 hover:scale-[1.03] cursor-pointer select-none px-4 h-8 flex items-center justify-center space-x-1.5 border rounded-full bg-neutral-500/5 text-[11px] font-sans font-light tracking-widest uppercase"
                                 title="Log In or Sign In"
                         >
-                            <svg class="w-3.5 h-3.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                            <svg class="w-3.5 h-3.5 stroke-current fill-none transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 24 24" stroke-width="1.5">
                                 <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3M15 12" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
-                            <span class="hidden sm:inline">Log In / Sign In</span>
+                            <span class="hidden sm:inline">Sign In</span>
                         </button>
                     @endauth
-
-                    <!-- Popover Dropdown Card -->
+ 
+                    <!-- Popover Dropdown Card with enhanced smooth luxury transition -->
                     <div 
                         x-show="profileMenuOpen" 
                         @click.away="profileMenuOpen = false" 
-                        x-transition:enter="transition ease-out duration-150"
-                        x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                        x-transition:enter="transition cubic-bezier(0.16, 1, 0.3, 1) duration-350"
+                        x-transition:enter-start="opacity-0 scale-95 -translate-y-3"
                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave="transition cubic-bezier(0.16, 1, 0.3, 1) duration-250"
                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                        x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+                        x-transition:leave-end="opacity-0 scale-95 -translate-y-3"
                         :class="theme === 'champagne' ? 'bg-white border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#0F0F12]/95 border-neutral-900 text-white shadow-2xl'"
                         class="absolute right-0 mt-3.5 w-80 rounded-3xl border p-5 text-left z-50 text-xs backdrop-blur-md space-y-4"
                         style="display: none;"
@@ -569,14 +564,35 @@
                                 </form>
                             </div>
                         @else
-                            <div class="text-center py-2 space-y-2">
-                                <span class="text-[#C5A880] font-serif text-lg italic block">Atelier Loyalty Circle</span>
-                                <p class="text-neutral-450 font-light text-[11px] leading-relaxed">Sign in to track orders, manage eTIMS profiles, and earn loyalty rewards.</p>
-                                <div class="flex flex-col gap-2 pt-1">
-                                    <a href="/login" class="bg-[#C5A880] text-black font-mono font-bold uppercase tracking-wider py-2 rounded-xl text-[10px] hover:bg-[#B59A7A] transition-all text-center block">
+                            <div class="text-center py-2.5 space-y-4">
+                                <span class="font-serif text-xl italic block transition-colors duration-500"
+                                      :class="{
+                                          'text-[#C5A880]': theme === 'onyx',
+                                          'text-[#B59A7A]': theme === 'champagne',
+                                          'text-[#B76E79]': theme === 'rose'
+                                      }">Atelier Loyalty Circle</span>
+                                <p class="text-neutral-400 font-light text-[11px] leading-relaxed">Sign in to track orders, manage eTIMS profiles, and earn loyalty rewards.</p>
+                                <div class="flex flex-col gap-2.5 pt-1">
+                                    <!-- Sign In Button with theme-aware hover glow and scale -->
+                                    <a href="/login" 
+                                       :class="{
+                                           'bg-[#C5A880] text-black shadow-[0_0_15px_rgba(197,168,128,0.2)] hover:bg-[#B59A7A] hover:shadow-[0_0_25px_rgba(197,168,128,0.4)]': theme === 'onyx',
+                                           'bg-[#B59A7A] text-white shadow-[0_0_15px_rgba(181,154,122,0.2)] hover:bg-[#FAF7F0] hover:text-black hover:shadow-[0_0_25px_rgba(181,154,122,0.4)] border border-[#B59A7A]': theme === 'champagne',
+                                           'bg-[#B76E79] text-white shadow-[0_0_15px_rgba(183,110,121,0.2)] hover:bg-[#15060A] hover:shadow-[0_0_25px_rgba(183,110,121,0.4)] border border-[#B76E79]': theme === 'rose'
+                                       }"
+                                       class="font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] transition-all duration-300 hover:scale-[1.02] text-center block shadow-md"
+                                    >
                                         Sign In
                                     </a>
-                                    <a href="/register" class="border border-neutral-800 text-neutral-400 font-mono font-bold uppercase tracking-wider py-2 rounded-xl text-[10px] hover:text-white transition-all text-center block">
+                                    <!-- Create Account Button with theme-aware border glow and scale -->
+                                    <a href="/register" 
+                                       :class="{
+                                           'border-neutral-800 text-neutral-400 hover:text-[#C5A880] hover:border-[#C5A880] hover:shadow-[0_0_15px_rgba(197,168,128,0.2)]': theme === 'onyx',
+                                           'border-neutral-200 text-neutral-600 hover:text-[#B59A7A] hover:border-[#B59A7A] hover:shadow-[0_0_15px_rgba(181,154,122,0.1)]': theme === 'champagne',
+                                           'border-[#2D121F] text-pink-300/60 hover:text-[#B76E79] hover:border-[#B76E79] hover:shadow-[0_0_15px_rgba(183,110,121,0.2)]': theme === 'rose'
+                                       }"
+                                       class="border font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] transition-all duration-300 hover:scale-[1.02] text-center block"
+                                    >
                                         Create Account
                                     </a>
                                 </div>
@@ -926,6 +942,41 @@
     <main class="max-w-7xl w-full mx-auto px-6 pt-0 flex-1 flex flex-col">
         <h1 class="sr-only">Noir &amp; Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier</h1>
 
+        <!-- Independent Smart Search Bar -->
+        <div class="w-full max-w-2xl mx-auto mb-10 mt-6 px-4 animate-hero-rise">
+            <div class="relative group" x-data="{ focused: false }">
+                <input 
+                    type="text" 
+                    wire:model.live.debounce.200ms="search"
+                    @focus="focused = true"
+                    @blur="focused = false"
+                    placeholder="Search bouquets, stems, custom gifts..."
+                    :class="{
+                        'bg-neutral-900/40 border-neutral-800/80 text-white placeholder-neutral-500 hover:border-[#C5A880]/50 hover:shadow-[0_0_20px_rgba(197,168,128,0.15)]': theme === 'onyx',
+                        'bg-white border-neutral-250 text-neutral-900 placeholder-neutral-400 hover:border-[#B59A7A]/50 hover:shadow-[0_0_20px_rgba(181,154,122,0.15)]': theme === 'champagne',
+                        'bg-[#1C0A10]/40 border-[#2D121F] text-pink-100 placeholder-pink-300/40 hover:border-[#B76E79]/50 hover:shadow-[0_0_20px_rgba(183,110,121,0.15)]': theme === 'rose',
+                        
+                        'shadow-[0_0_30px_rgba(197,168,128,0.3)] !border-[#C5A880] scale-[1.01]': focused && theme === 'onyx',
+                        'shadow-[0_0_30px_rgba(181,154,122,0.3)] !border-[#B59A7A] scale-[1.01]': focused && theme === 'champagne',
+                        'shadow-[0_0_30px_rgba(183,110,121,0.3)] !border-[#B76E79] scale-[1.01]': focused && theme === 'rose'
+                    }"
+                    class="w-full border rounded-full pl-14 pr-6 py-4.5 text-base font-light font-sans focus:outline-none transition-all duration-550 hover:scale-[1.005]"
+                    style="transition-property: all; font-size: 15px;"
+                >
+                <!-- Search Glass Icon with dynamic color -->
+                <div class="absolute left-5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none transition-colors duration-500"
+                     :class="{
+                         'text-[#C5A880]': theme === 'onyx',
+                         'text-[#B59A7A]': theme === 'champagne',
+                         'text-[#B76E79]': theme === 'rose'
+                     }">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5.5 h-5.5">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
+                     </svg>
+                </div>
+            </div>
+        </div>
+
         <!-- Double Column Layout: Left Sticky Sidebar, Right Catalog showroom -->
         <div id="product-showroom" class="flex flex-col lg:flex-row gap-8 w-full items-start">
             
@@ -933,79 +984,113 @@
             <aside :class="theme === 'champagne' ? 'border-neutral-200 bg-white/50' : 'border-neutral-900/60 bg-[#0C0C0E]/40'" class="hidden lg:block w-64 shrink-0 sticky top-28 p-6 border rounded-[32px] backdrop-blur-md space-y-6 text-left transition-all duration-500 shadow-sm z-10 max-h-[calc(100vh-130px)] overflow-y-auto scrollbar-none theme-section">
                 <!-- Sidebar Title -->
                 <div class="border-b border-neutral-500/10 pb-3">
-                    <h4 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs font-semibold uppercase tracking-wider">Curation Desk</h4>
+                    <h4 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="font-serif text-lg tracking-wider font-semibold">Curation Desk</h4>
                 </div>
 
                 <!-- Product Directory Tree sidebar navigator -->
-                <div class="space-y-3 font-mono text-left" x-data="{ active: @entangle('selectedCategory') }">
-                    <span class="text-[11px] font-mono uppercase tracking-widest text-neutral-500 block mb-1">Catalog Directory</span>
+                <div class="space-y-4 text-left" x-data="{ active: @entangle('selectedCategory') }">
+                    <span class="text-[11px] font-sans uppercase tracking-[0.2em] block mb-2 transition-colors duration-500"
+                          :class="{
+                              'text-[#C5A880]': theme === 'onyx',
+                              'text-[#B59A7A]': theme === 'champagne',
+                              'text-[#B76E79]': theme === 'rose'
+                          }">Catalog Directory</span>
                     
                     <!-- Department: Floral Collections -->
-                    <div class="space-y-0.5">
-                        <span class="text-[10px] text-neutral-500 uppercase tracking-wider block font-bold px-2 mb-1">✦ Floral Catalog</span>
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-serif text-neutral-500 uppercase tracking-widest block font-bold px-2 mb-1.5 italic">✦ Floral Catalog</span>
                         <button @click="active = 'all'; $wire.selectCategory('all')" 
-                                :class="active === 'all' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
-                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left">
-                            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                                :class="{
+                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'all' && theme === 'onyx',
+                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'all' && theme === 'champagne',
+                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'all' && theme === 'rose',
+                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'all'
+                                }"
+                                class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-r-lg text-[10px] uppercase tracking-[0.16em] transition-all cursor-pointer text-left">
                             <span>All Showroom</span>
                         </button>
                         <button @click="active = 'stems'; $wire.selectCategory('stems')" 
-                                :class="active === 'stems' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
-                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left pl-6">
-                            <span>&bull; Fresh Stems</span>
+                                :class="{
+                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'stems' && theme === 'onyx',
+                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'stems' && theme === 'champagne',
+                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'stems' && theme === 'rose',
+                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'stems'
+                                }"
+                                class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-r-lg text-[10px] uppercase tracking-[0.16em] transition-all cursor-pointer text-left">
+                            <span>Fresh Stems</span>
                         </button>
                         <button @click="active = 'bouquets'; $wire.selectCategory('bouquets')" 
-                                :class="active === 'bouquets' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
-                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left pl-6">
-                            <span>&bull; Bespoke Bouquets</span>
+                                :class="{
+                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'bouquets' && theme === 'onyx',
+                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'bouquets' && theme === 'champagne',
+                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'bouquets' && theme === 'rose',
+                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'bouquets'
+                                }"
+                                class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-r-lg text-[10px] uppercase tracking-[0.16em] transition-all cursor-pointer text-left">
+                            <span>Bespoke Bouquets</span>
                         </button>
                     </div>
 
                     <!-- Department: Luxury Gifting -->
-                    <div class="space-y-0.5 pt-2 border-t border-neutral-500/10">
-                        <span class="text-[10px] text-neutral-500 uppercase tracking-wider block font-bold px-2 mb-1">✦ Luxury Gifting</span>
+                    <div class="space-y-1 pt-2 border-t border-neutral-500/10">
+                        <span class="text-[10px] font-serif text-neutral-500 uppercase tracking-widest block font-bold px-2 mb-1.5 italic">✦ Luxury Gifting</span>
                         <button @click="active = 'hampers'; $wire.selectCategory('hampers')" 
-                                :class="active === 'hampers' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
-                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left pl-6">
-                            <span>&bull; Gifting Hampers</span>
+                                :class="{
+                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'hampers' && theme === 'onyx',
+                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'hampers' && theme === 'champagne',
+                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'hampers' && theme === 'rose',
+                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'hampers'
+                                }"
+                                class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-r-lg text-[10px] uppercase tracking-[0.16em] transition-all cursor-pointer text-left">
+                            <span>Gifting Hampers</span>
                         </button>
                         <button @click="active = 'home_decor'; $wire.selectCategory('home_decor')" 
-                                :class="active === 'home_decor' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
-                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left pl-6">
-                            <span>&bull; Home & Vases</span>
+                                :class="{
+                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'home_decor' && theme === 'onyx',
+                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'home_decor' && theme === 'champagne',
+                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'home_decor' && theme === 'rose',
+                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'home_decor'
+                                }"
+                                class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-r-lg text-[10px] uppercase tracking-[0.16em] transition-all cursor-pointer text-left">
+                            <span>Home & Vases</span>
                         </button>
                     </div>
 
                     <!-- Department: Specialized Consultations -->
-                    <div class="space-y-0.5 pt-2 border-t border-neutral-500/10">
-                        <span class="text-[10px] text-neutral-500 uppercase tracking-wider block font-bold px-2 mb-1">✦ Specializations</span>
+                    <div class="space-y-1 pt-2 border-t border-neutral-500/10">
+                        <span class="text-[10px] font-serif text-neutral-500 uppercase tracking-widest block font-bold px-2 mb-1.5 italic">✦ Specializations</span>
                         <button @click="active = 'specializations'; $wire.selectCategory('specializations')" 
-                                :class="active === 'specializations' ? 'text-amber-500 font-bold bg-neutral-500/5' : 'text-neutral-400 hover:text-neutral-200'"
-                                class="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] uppercase tracking-wider transition-all cursor-pointer text-left pl-6">
-                            <span>&bull; Custom Services</span>
+                                :class="{
+                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'specializations' && theme === 'onyx',
+                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'specializations' && theme === 'champagne',
+                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'specializations' && theme === 'rose',
+                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'specializations'
+                                }"
+                                class="w-full flex items-center space-x-2.5 px-3 py-2 rounded-r-lg text-[10px] uppercase tracking-[0.16em] transition-all cursor-pointer text-left">
+                            <span>Custom Services</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Expanded Workspace Config mini preview listing actual items -->
-                <div class="border-t border-neutral-500/10 pt-3">
-                    <div :class="theme === 'champagne' ? 'bg-neutral-100/60 text-black' : 'bg-neutral-900/40 text-neutral-300'" class="p-3 rounded-2xl border border-neutral-500/10 space-y-2">
+                <div class="border-t border-neutral-500/10 pt-4">
+                    <div :class="theme === 'champagne' ? 'bg-neutral-100/60 text-black border-neutral-200' : 'bg-neutral-900/40 text-neutral-300 border-neutral-800/80'" class="p-4 rounded-[20px] border space-y-3.5">
                         
                         <!-- List of Cart Items -->
                         @if(count($cartItems) > 0)
-                            <div class="space-y-2 max-h-48 overflow-y-auto scrollbar-none pr-1">
+                            <div class="space-y-2.5 max-h-48 overflow-y-auto scrollbar-none pr-1">
                                 @foreach($cartItems as $item)
-                                    <div class="flex items-center justify-between gap-2 text-[12px] pb-2 border-b border-neutral-500/5">
+                                    <div class="flex items-center justify-between gap-2 text-[11px] pb-2 border-b border-neutral-500/5">
                                         <div class="truncate flex-1">
-                                            <span :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="font-medium block truncate">{{ $item['product']->name }}</span>
-                                            <span class="text-[11px] text-neutral-500 font-mono block">{{ $item['quantity'] }}x &bull; {{ $item['size'] }}</span>
+                                            <span :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="font-sans font-normal block truncate uppercase text-[10px] tracking-wider">{{ $item['product']->name }}</span>
+                                            <span class="text-[9px] text-neutral-500 font-mono block mt-0.5">{{ $item['quantity'] }}x &bull; {{ ucfirst($item['size']) }}</span>
                                         </div>
                                         <div class="text-right shrink-0">
-                                            <span class="font-mono text-neutral-400 block">{{ number_format($item['subtotal']) }} KSH</span>
+                                            <span class="font-mono text-neutral-400 block text-[10px]">{{ number_format($item['subtotal']) }} KSH</span>
                                             <!-- Mini adjust controls -->
                                             <div class="flex items-center justify-end space-x-2 mt-1">
-                                                <button wire:click="removeFromCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="hover:text-amber-500 font-mono text-[11px] cursor-pointer select-none font-bold">-</button>
-                                                <button wire:click="addToCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="hover:text-amber-500 font-mono text-[11px] cursor-pointer select-none font-bold">+</button>
+                                                <button wire:click="removeFromCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="hover:text-amber-500 font-mono text-[10px] cursor-pointer select-none font-bold">-</button>
+                                                <button wire:click="addToCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="hover:text-amber-500 font-mono text-[10px] cursor-pointer select-none font-bold">+</button>
                                             </div>
                                         </div>
                                     </div>
@@ -1016,30 +1101,35 @@
                                 <svg class="w-6 h-6 text-neutral-500 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                 </svg>
-                                <span class="text-[10px] text-neutral-500 font-mono tracking-widest uppercase">Empty</span>
+                                <span class="text-[9px] text-neutral-500 font-mono tracking-widest uppercase">Workspace Empty</span>
                             </div>
                         @endif
 
                         <div class="pt-2 border-t border-neutral-500/10 space-y-1.5">
-                            <div class="flex justify-between items-center text-sm">
+                            <div class="flex justify-between items-center text-xs">
                                 <span class="text-neutral-500">Curations:</span>
                                 <span class="font-mono font-semibold">{{ $cartCount }}</span>
                             </div>
-                            <div class="flex justify-between items-center text-sm">
+                            <div class="flex justify-between items-center text-xs">
                                 <span class="text-neutral-500">Subtotal:</span>
-                                <span class="font-mono font-bold text-amber-500">{{ number_format($cartTotal) }} KSH</span>
+                                <span class="font-mono font-bold"
+                                      :class="{
+                                          'text-[#C5A880]': theme === 'onyx',
+                                          'text-[#B59A7A]': theme === 'champagne',
+                                          'text-[#B76E79]': theme === 'rose'
+                                      }">{{ number_format($cartTotal) }} KSH</span>
                             </div>
                         </div>
-                        <button @click="drawerOpen = true" :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full mt-2 py-2 rounded-xl text-[11px] font-mono uppercase tracking-wider font-semibold transition-all cursor-pointer text-center block shadow-sm">
-                            Open Drawer
+                        <button @click="drawerOpen = true" :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full mt-2 py-2.5 rounded-xl text-[10px] font-sans font-light uppercase tracking-widest font-semibold transition-all cursor-pointer text-center block shadow-sm">
+                            Open Workspace
                         </button>
                     </div>
                 </div>
 
                 <!-- Concierge Info -->
                 <div class="border-t border-neutral-500/10 pt-4 space-y-2">
-                    <span class="text-[11px] font-mono uppercase tracking-widest text-neutral-500 block"> Concierge Dispatch</span>
-                    <p class="text-[12px] text-neutral-500 leading-relaxed font-light">
+                    <span class="text-[10px] font-sans uppercase tracking-[0.16em] text-neutral-500 block"> Concierge Dispatch</span>
+                    <p class="text-[11px] text-neutral-500 leading-relaxed font-light font-sans">
                         Operating: Mon - Sat 07:00 - 20:00. Call <span class="font-mono text-neutral-400 font-semibold">+254 712 345 678</span> for custom events.
                     </p>
                 </div>
@@ -1419,9 +1509,25 @@
                         <span class="text-neutral-500 tracking-wider">Estimated Subtotal</span>
                         <span :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" class="text-base font-mono font-semibold">{{ number_format($cartTotal) }} KSH</span>
                     </div>
-                    <button @click="checkoutMode = true" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-4 cursor-pointer rounded-full btn-curate">
-                        Proceed to Logistics Spec
-                    </button>
+                    @auth
+                        <button @click="checkoutMode = true" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-4 cursor-pointer rounded-full btn-curate">
+                            Proceed to Logistics Spec
+                        </button>
+                    @else
+                        <!-- Guest authentication request block -->
+                        <div class="border border-dashed border-[#C5A880]/30 rounded-2xl p-4.5 bg-[#C5A880]/5 text-center space-y-3.5">
+                            <span class="text-[10px] font-sans uppercase tracking-[0.2em] text-[#C5A880] block font-semibold">✦ Authentication Required ✦</span>
+                            <p class="text-neutral-400 font-light text-[11.5px] leading-relaxed font-sans">Please sign in or create an account to configure logistics details and checkout.</p>
+                            <div class="grid grid-cols-2 gap-3 pt-1.5">
+                                <button type="button" wire:click="prepareGuestCheckoutRedirect('/login')" class="bg-[#C5A880] text-black font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] hover:bg-[#B59A7A] transition-all cursor-pointer shadow-md">
+                                    Sign In
+                                </button>
+                                <button type="button" wire:click="prepareGuestCheckoutRedirect('/register')" class="border border-neutral-800 text-neutral-450 hover:text-white hover:border-neutral-600 font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] transition-all cursor-pointer">
+                                    Register
+                                </button>
+                            </div>
+                        </div>
+                    @endauth
                 </div>
             @endif
         </div>
@@ -1845,10 +1951,10 @@
                 path.setAttribute("d", pathD);
                 path.setAttribute("stroke", "var(--brand-accent)");
                 path.setAttribute("stroke-dasharray", Math.random() > 0.85 ? "2,2" : "none");
-                path.setAttribute("stroke-width", Math.random() * 0.4 + 0.4);
-                path.setAttribute("stroke-opacity", Math.random() * 0.15 + 0.1);
+                path.setAttribute("stroke-width", Math.random() * 0.8 + 0.8);
+                path.setAttribute("stroke-opacity", Math.random() * 0.35 + 0.35);
                 path.setAttribute("fill", "var(--brand-accent)");
-                path.setAttribute("fill-opacity", Math.random() * 0.04 + 0.012);
+                path.setAttribute("fill-opacity", Math.random() * 0.08 + 0.06);
 
                 group.style.position = "absolute";
                 group.style.transformOrigin = "center";
@@ -1865,8 +1971,8 @@
                     vy: 0,
                     angle: Math.random() * 360,
                     rotationSpeed: (Math.random() * 0.15 + 0.05) * (Math.random() > 0.5 ? 1 : -1),
-                    scale: Math.random() * 0.55 + 0.35,
-                    opacity: Math.random() * 0.25 + 0.15,
+                    scale: Math.random() * 0.6 + 0.65,
+                    opacity: Math.random() * 0.3 + 0.5,
                     swaySpeed: Math.random() * 0.005 + 0.002,
                     swayAmount: Math.random() * 0.4 + 0.1,
                     phase: Math.random() * 100,
