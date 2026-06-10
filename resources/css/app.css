@@ -463,3 +463,83 @@ html { scroll-behavior: smooth; }
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   OFFERS CONTINUOUS MARQUEE SCROLLER
+   ═══════════════════════════════════════════════════════════ */
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 60s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HEADER BRAND TITLE HOVER GLOW
+   ═══════════════════════════════════════════════════════════ */
+.brand-title-atelier, .brand-title-main {
+  transition: text-shadow 0.4s ease, transform 0.4s ease, color 0.4s ease;
+}
+
+/* Onyx (Gold Glow) */
+.onyx .group\/brand:hover .brand-title-atelier {
+  text-shadow: 0 0 8px rgba(197, 168, 128, 0.6);
+}
+.onyx .group\/brand:hover .brand-title-main {
+  text-shadow: 0 0 12px rgba(197, 168, 128, 0.6);
+}
+
+/* Champagne (Taupe Glow) */
+.champagne .group\/brand:hover .brand-title-atelier {
+  text-shadow: 0 0 8px rgba(181, 154, 122, 0.5);
+}
+.champagne .group\/brand:hover .brand-title-main {
+  text-shadow: 0 0 12px rgba(181, 154, 122, 0.5);
+}
+
+/* Rose (Pink Glow) */
+.rose .group\/brand:hover .brand-title-atelier {
+  text-shadow: 0 0 8px rgba(244, 114, 182, 0.5);
+}
+.rose .group\/brand:hover .brand-title-main {
+  text-shadow: 0 0 12px rgba(244, 114, 182, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UX CARD & SCROLL ANIMATIONS
+   ═══════════════════════════════════════════════════════════ */
+
+@keyframes pop-flow {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-pop-flow {
+  animation: pop-flow 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes end-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-end-bounce {
+  animation: end-bounce 2.2s ease-in-out infinite;
+}

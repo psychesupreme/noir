@@ -58,6 +58,15 @@ class Product extends Model
     }
 
     /**
+     * Get the orders associated with this product.
+     */
+    public function orders(): BelongsToMany
+    {
+        return $this->belongsToMany(Order::class)->withPivot('quantity', 'price_at_sale')->withTimestamps();
+    }
+
+
+    /**
      * Get branch-specific stock levels for this product.
      */
     public function branchStocks(): HasMany
@@ -150,10 +159,89 @@ class Product extends Model
     }
 
     /**
+     * Generate automatic SKU based on branch region and category.
+     */
+    public static function generateSkuForProduct(Product $product): string
+    {
+        $branchId = $product->adjustment_branch_id ?: (
+            \App\Models\Branch::where('is_active', true)->value('id') ?: \App\Models\Branch::value('id')
+        );
+
+        $branch = \App\Models\Branch::find($branchId);
+        $branchCode = 'NRB'; // default fallback
+
+        if ($branch) {
+            $source = $branch->location_city ?: $branch->name;
+            $lowerSource = strtolower($source);
+            if (str_contains($lowerSource, 'nairobi')) {
+                $branchCode = 'NRB';
+            } elseif (str_contains($lowerSource, 'kiambu')) {
+                $branchCode = 'KMB';
+            } else {
+                // Dynamic consonant extraction for new hubs/regions
+                $clean = preg_replace('/[^a-zA-Z]/', '', $source);
+                $chars = str_split(strtoupper($clean));
+                $consonants = [];
+                $vowels = ['A','E','I','O','U'];
+                foreach ($chars as $c) {
+                    if (!in_array($c, $vowels) && !in_array($c, $consonants)) {
+                        $consonants[] = $c;
+                    }
+                }
+                if (count($consonants) < 3) {
+                    foreach ($chars as $c) {
+                        if (!in_array($c, $vowels) && count($consonants) < 3) {
+                            $consonants[] = $c;
+                        }
+                    }
+                }
+                $branchCode = count($consonants) >= 3 
+                    ? implode('', array_slice($consonants, 0, 3)) 
+                    : str_pad(implode('', $consonants), 3, 'X');
+            }
+        }
+
+        $categoryLetter = match (strtolower($product->category ?: 'stems')) {
+            'stems' => 'S',
+            'bouquet', 'bouquets' => 'B',
+            'bundle' => 'U',
+            'giftings', 'gifting', 'hampers' => 'G',
+            'home_decor', 'decor' => 'D',
+            'specializtion', 'specialization', 'specializations' => 'P',
+            'retail' => 'R',
+            'wholesale' => 'W',
+            default => 'U',
+        };
+
+        $prefix = $branchCode . '-' . $categoryLetter . '-';
+        
+        // Find the next sequence number
+        $lastProduct = static::where('sku', 'like', $prefix . '%')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastProduct) {
+            $parts = explode('-', $lastProduct->sku);
+            $lastNum = (int) end($parts);
+            $nextNum = $lastNum + 1;
+        } else {
+            $nextNum = 1;
+        }
+
+        return $prefix . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
      * Booted method to handle eloquent model events.
      */
     protected static function booted(): void
     {
+        static::creating(function ($product) {
+            if (empty($product->sku)) {
+                $product->sku = static::generateSkuForProduct($product);
+            }
+        });
+
         static::updating(function ($product) {
             if ($product->isDirty('stock')) {
                 $original = (int) $product->getOriginal('stock');

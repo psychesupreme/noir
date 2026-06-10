@@ -9,18 +9,22 @@ class BranchSeeder extends Seeder
 {
     public function run(): void
     {
-        Branch::create([
-            'name' => 'Nairobi Central Atelier',
-            'code' => 'NB-NBO',
-            'location_city' => 'Nairobi',
-            'is_active' => true,
-        ]);
+        Branch::updateOrCreate(
+            ['code' => 'NB-NBO'],
+            [
+                'name' => 'Nairobi Central Atelier',
+                'location_city' => 'Nairobi',
+                'is_active' => true,
+            ]
+        );
 
-        Branch::create([
-            'name' => 'Kiambu Ridge Hub',
-            'code' => 'NB-KBU',
-            'location_city' => 'Kiambu',
-            'is_active' => true,
-        ]);
+        Branch::updateOrCreate(
+            ['code' => 'NB-KBU'],
+            [
+                'name' => 'Kiambu Ridge Hub',
+                'location_city' => 'Kiambu',
+                'is_active' => true,
+            ]
+        );
     }
 }

@@ -40,9 +40,11 @@
                     class="bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-neutral-400 focus:outline-none focus:border-neutral-600 cursor-pointer"
                 >
                     <option value="all">All Categories</option>
-                    <option value="retail">Retail</option>
-                    <option value="wholesale">Wholesale</option>
-                    <option value="gifting">Gifting</option>
+                    <option value="stems">Stems</option>
+                    <option value="bundle">Bundle</option>
+                    <option value="bouquet">Bouquet</option>
+                    <option value="giftings">Giftings</option>
+                    <option value="specializtion">Specializtion</option>
                 </select>
 
                 {{-- Stock Trail --}}
@@ -126,13 +128,16 @@
                             <td class="p-5">
                                 @php
                                     $catStyles = match($product->category) {
-                                        'wholesale' => 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-                                        'gifting' => 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+                                        'stems' => 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                                        'bouquet', 'bouquets' => 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                                        'giftings', 'hampers' => 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+                                        'bundle', 'home_decor' => 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                                        'specializtion', 'specialization', 'specializations' => 'bg-purple-500/10 text-purple-400 border-purple-500/20',
                                         default => 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20',
                                     };
                                 @endphp
                                 <span class="inline-block {{ $catStyles }} border px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider">
-                                    {{ $product->category ?? 'retail' }}
+                                    {{ $product->category ?? 'uncategorized' }}
                                 </span>
                             </td>
 
@@ -368,21 +373,24 @@
                                 class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 transition-colors font-mono"
                                 placeholder="NB-ROS-001"
                             >
+                            <span class="text-[9px] text-neutral-600 mt-1 block">(Leave empty to generate automatically)</span>
                             @error('sku') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
-                    {{-- Row: Category + Unit Type --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {{-- Row: Category + Unit Type + Branch --}}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Category *</label>
                             <select
                                 wire:model="category"
                                 class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 cursor-pointer"
                             >
-                                <option value="retail">Retail</option>
-                                <option value="wholesale">Wholesale</option>
-                                <option value="gifting">Gifting</option>
+                                <option value="stems">Stems</option>
+                                <option value="bundle">Bundle</option>
+                                <option value="bouquet">Bouquet</option>
+                                <option value="giftings">Giftings</option>
+                                <option value="specializtion">Specializtion</option>
                             </select>
                             @error('category') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>
@@ -398,6 +406,23 @@
                                 <option value="hamper">Hamper</option>
                             </select>
                             @error('unit_type') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            @if (!$isEditing)
+                                <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Fulfilling Branch *</label>
+                                <select
+                                    wire:model="selectedBranchId"
+                                    class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 cursor-pointer"
+                                >
+                                    @foreach($branches as $b)
+                                        <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('selectedBranchId') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
+                            @else
+                                <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Fulfilling Branch</label>
+                                <div class="text-xs text-neutral-550 py-2.5 font-mono">Managed per hub</div>
+                            @endif
                         </div>
                     </div>
 

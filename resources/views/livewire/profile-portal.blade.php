@@ -49,7 +49,7 @@
     >
         <!-- Gold Accent Bottom Glow Line -->
         <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-[#C5A880]/30 to-transparent"></div>
-        <div class="max-w-7xl w-full mx-auto px-6 flex items-center justify-between gap-8">
+        <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-8">
             <a href="/" class="shrink-0 flex items-baseline space-x-2 select-none cursor-pointer">
                 <span class="text-[11px] font-mono tracking-[0.4em] text-[#C5A880] uppercase">Atelier</span>
                 <span :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-base font-semibold uppercase tracking-[0.35em] transition-colors font-outfit">NOIR & BLOOM</span>
@@ -80,7 +80,7 @@
         </div>
     </header>
 
-    <main class="max-w-7xl w-full mx-auto px-6 pt-32 flex-1 flex flex-col lg:flex-row gap-8 z-10 relative">
+    <main class="max-w-8xl w-full mx-auto px-6 pt-32 flex-1 flex flex-col lg:flex-row gap-8 z-10 relative">
         
         <!-- Left Sidebar Navigation -->
         <aside 

@@ -330,7 +330,7 @@
     >
         <!-- Gold Accent Bottom Glow Line -->
         <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-[#C5A880]/30 to-transparent"></div>
-        <div class="max-w-7xl w-full mx-auto px-6 flex items-center justify-between gap-8">
+        <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-8">
             <a href="/" class="shrink-0 flex items-baseline space-x-2 animate-nav-item select-none cursor-pointer" style="animation-delay: 100ms;">
                 <span class="text-[11px] font-mono tracking-[0.4em] text-[#C5A880] uppercase">Atelier</span>
                 <span :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-base font-semibold uppercase tracking-[0.35em] transition-colors font-outfit">NOIR & BLOOM</span>
@@ -604,25 +604,25 @@
         </div>
     </header>
     <!-- Interactive Advertisements Carousel (5 Luxury Slides with auto-grading overlays, hover indicators, and Roman numerals) -->
-    <div class="w-full px-4 pt-32 pb-6 shrink-0">
+    <div class="w-full px-0 pt-28 pb-4 shrink-0">
         <section x-data="{ 
-                     activeSlide: 0, 
-                     slidesCount: 5, 
-                     timer: null,
-                     init() {
-                         this.startTimer();
-                     },
-                     startTimer() {
-                         this.timer = setInterval(() => {
-                             this.activeSlide = (this.activeSlide + 1) % this.slidesCount;
+                      activeSlide: 0, 
+                      slidesCount: 5, 
+                      timer: null,
+                      init() {
+                          this.startTimer();
+                      },
+                      startTimer() {
+                          this.timer = setInterval(() => {
+                              this.activeSlide = (this.activeSlide + 1) % this.slidesCount;
                          }, 5000); // Accelerated transition timing
-                     },
-                     resetTimer() {
-                         clearInterval(this.timer);
-                         this.startTimer();
-                     }
-                 }" 
-                 class="w-full relative overflow-hidden rounded-none border border-neutral-500/10 h-[calc(100vh-180px)] min-h-[580px] flex items-center shadow-2xl group theme-section"
+                      },
+                      resetTimer() {
+                          clearInterval(this.timer);
+                          this.startTimer();
+                      }
+                  }" 
+                 class="w-full relative overflow-hidden rounded-none border-y border-neutral-500/10 h-[calc(100vh-240px)] min-h-[480px] flex items-center shadow-2xl group theme-section"
         >
             <!-- Slide 1: Naivasha Volcanic Roses -->
             <div x-show="activeSlide === 0" 
@@ -834,7 +834,7 @@
                         Elite weekly orchid rotations, white lily suspensions, and tailored lobby installations designed for high-end workspaces and luxury private residences.
                     </p>
                     <div class="pt-4">
-                        <button @click="$wire.selectCategory('specializations'); document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'})" 
+                        <button @click="$wire.selectCategory('specializtion'); document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'})" 
                                 class="bg-[#C5A880] text-black px-6 py-3 rounded-full text-[11px] font-mono uppercase tracking-[0.2em] font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#B59A7A] cursor-pointer">
                             Reserve Installation
                         </button>
@@ -939,7 +939,64 @@
         </section>
     </div>
 
-    <main class="max-w-7xl w-full mx-auto px-6 pt-0 flex-1 flex flex-col">
+    @php
+        $offerProducts = \App\Models\Product::where('category', '!=', 'specializtion')
+            ->where('category', '!=', 'specialization')
+            ->where('category', '!=', 'specializations')
+            ->where('stock', '>', 0)
+            ->limit(5)
+            ->get()
+            ->map(function($product) {
+                $product->backdrop_url = $product->image_url ?: match($product->category) {
+                    'stems'   => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
+                    'giftings' => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
+                    default   => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
+                };
+                $product->stock_standard = $product->stock;
+                $product->stock_deluxe = (int) floor($product->stock * 0.7);
+                $product->stock_grand = (int) floor($product->stock * 0.4);
+                return $product;
+            });
+    @endphp
+
+    @if($offerProducts->count() > 0)
+        <div class="w-full pb-2 pt-0 shrink-0 mt-0 z-10 relative">
+            <div class="relative w-full overflow-hidden py-2 border-y backdrop-blur-sm transition-colors duration-500"
+                 :class="theme === 'champagne' ? 'bg-white/30 border-neutral-200/50' : 'bg-neutral-950/20 border-neutral-900/60'">
+                <div class="flex whitespace-nowrap space-x-4 w-max animate-marquee">
+                    @for($i = 0; $i < 4; $i++)
+                        @foreach($offerProducts as $product)
+                            @php
+                                $originalPrice = (int) round($product->price * 1.18);
+                                $discountPercent = 15;
+                            @endphp
+                            <div :class="theme === 'champagne' ? 'bg-white/80 border-neutral-200/50 text-neutral-900' : 'bg-[#0F0F12]/80 border-neutral-900/60 text-white'"
+                                 class="inline-flex items-center space-x-3 p-2 rounded-xl border w-[250px] transition-all duration-300 hover:border-[#C5A880] cursor-pointer theme-section"
+                                 @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard }}, stock_deluxe: {{ $product->stock_deluxe }}, stock_grand: {{ $product->stock_grand }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                            >
+                                <div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-950/5 relative">
+                                    <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                    <div class="absolute top-0.5 left-0.5 bg-red-500 text-white text-[6px] font-bold px-1 py-0.5 rounded-sm">
+                                        -{{ $discountPercent }}%
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0 text-left">
+                                    <span class="text-[8px] uppercase tracking-widest text-[#C5A880] font-outfit block font-bold">{{ str_replace('_', ' ', $product->category) }}</span>
+                                    <h4 class="font-serif italic text-[11px] tracking-wide truncate mt-0.5">{{ $product->name }}</h4>
+                                    <div class="flex items-center space-x-2 mt-0.5 font-mono text-[8px]">
+                                        <span class="text-neutral-500 line-through">{{ number_format($originalPrice) }} KSH</span>
+                                        <span class="text-amber-500 font-bold">{{ number_format($product->price) }} KSH</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endfor
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <main class="max-w-8xl w-full mx-auto px-6 pt-0 flex-1 flex flex-col">
         <h1 class="sr-only">Noir &amp; Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier</h1>
 
 
@@ -985,12 +1042,12 @@
                                 class="w-full flex items-center space-x-2 px-2 py-1 rounded-r-md text-[10px] uppercase tracking-[0.12em] transition-all cursor-pointer text-left">
                             <span>Fresh Stems</span>
                         </button>
-                        <button @click="active = 'bouquets'; $wire.selectCategory('bouquets')" 
+                        <button @click="active = 'bouquet'; $wire.selectCategory('bouquet')" 
                                 :class="{
-                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'bouquets' && theme === 'onyx',
-                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'bouquets' && theme === 'champagne',
-                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'bouquets' && theme === 'rose',
-                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'bouquets'
+                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'bouquet' && theme === 'onyx',
+                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'bouquet' && theme === 'champagne',
+                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'bouquet' && theme === 'rose',
+                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'bouquet'
                                 }"
                                 class="w-full flex items-center space-x-2 px-2 py-1 rounded-r-md text-[10px] uppercase tracking-[0.12em] transition-all cursor-pointer text-left">
                             <span>Bespoke Bouquets</span>
@@ -1000,22 +1057,22 @@
                     <!-- Department: Luxury Gifting -->
                     <div class="space-y-0.5 pt-1.5 border-t border-neutral-500/10">
                         <span class="text-[9px] font-serif text-neutral-500 uppercase tracking-widest block font-bold px-1.5 mb-1 italic">✦ Luxury Gifting</span>
-                        <button @click="active = 'hampers'; $wire.selectCategory('hampers')" 
+                        <button @click="active = 'giftings'; $wire.selectCategory('giftings')" 
                                 :class="{
-                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'hampers' && theme === 'onyx',
-                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'hampers' && theme === 'champagne',
-                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'hampers' && theme === 'rose',
-                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'hampers'
+                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'giftings' && theme === 'onyx',
+                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'giftings' && theme === 'champagne',
+                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'giftings' && theme === 'rose',
+                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'giftings'
                                 }"
                                 class="w-full flex items-center space-x-2 px-2 py-1 rounded-r-md text-[10px] uppercase tracking-[0.12em] transition-all cursor-pointer text-left">
                             <span>Gifting Hampers</span>
                         </button>
-                        <button @click="active = 'home_decor'; $wire.selectCategory('home_decor')" 
+                        <button @click="active = 'bundle'; $wire.selectCategory('bundle')" 
                                 :class="{
-                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'home_decor' && theme === 'onyx',
-                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'home_decor' && theme === 'champagne',
-                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'home_decor' && theme === 'rose',
-                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'home_decor'
+                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'bundle' && theme === 'onyx',
+                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'bundle' && theme === 'champagne',
+                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'bundle' && theme === 'rose',
+                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'bundle'
                                 }"
                                 class="w-full flex items-center space-x-2 px-2 py-1 rounded-r-md text-[10px] uppercase tracking-[0.12em] transition-all cursor-pointer text-left">
                             <span>Home & Vases</span>
@@ -1025,12 +1082,12 @@
                     <!-- Department: Specialized Consultations -->
                     <div class="space-y-0.5 pt-1.5 border-t border-neutral-500/10">
                         <span class="text-[9px] font-serif text-neutral-500 uppercase tracking-widest block font-bold px-1.5 mb-1 italic">✦ Specializations</span>
-                        <button @click="active = 'specializations'; $wire.selectCategory('specializations')" 
+                        <button @click="active = 'specializtion'; $wire.selectCategory('specializtion')" 
                                 :class="{
-                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'specializations' && theme === 'onyx',
-                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'specializations' && theme === 'champagne',
-                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'specializations' && theme === 'rose',
-                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'specializations'
+                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'specializtion' && theme === 'onyx',
+                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'specializtion' && theme === 'champagne',
+                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'specializtion' && theme === 'rose',
+                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'specializtion'
                                 }"
                                 class="w-full flex items-center space-x-2 px-2 py-1 rounded-r-md text-[10px] uppercase tracking-[0.12em] transition-all cursor-pointer text-left">
                             <span>Custom Services</span>
@@ -1109,104 +1166,142 @@
                     <div class="flex space-x-2.5 min-w-max px-2 font-mono text-[11px] uppercase tracking-wider">
                         <button @click="active = 'all'; $wire.selectCategory('all')" :class="active === 'all' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">All</button>
                         <button @click="active = 'stems'; $wire.selectCategory('stems')" :class="active === 'stems' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Stems</button>
-                        <button @click="active = 'bouquets'; $wire.selectCategory('bouquets')" :class="active === 'bouquets' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Bouquets</button>
-                        <button @click="active = 'hampers'; $wire.selectCategory('hampers')" :class="active === 'hampers' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Hampers</button>
-                        <button @click="active = 'home_decor'; $wire.selectCategory('home_decor')" :class="active === 'home_decor' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Decor</button>
-                        <button @click="active = 'specializations'; $wire.selectCategory('specializations')" :class="active === 'specializations' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Specializations</button>
+                        <button @click="active = 'bouquet'; $wire.selectCategory('bouquet')" :class="active === 'bouquet' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Bouquet</button>
+                        <button @click="active = 'giftings'; $wire.selectCategory('giftings')" :class="active === 'giftings' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Giftings</button>
+                        <button @click="active = 'bundle'; $wire.selectCategory('bundle')" :class="active === 'bundle' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Bundle</button>
+                        <button @click="active = 'specializtion'; $wire.selectCategory('specializtion')" :class="active === 'specializtion' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Specializtion</button>
                     </div>
                 </div>
-
-                <!-- Reduced size smart search input replacing Curation Moods -->
-                <div class="w-full max-w-md text-left pb-2">
-                    <div class="relative group" x-data="{ focused: false }">
-                        <input 
-                            type="text" 
-                            wire:model.live.debounce.200ms="search"
-                            @focus="focused = true"
-                            @blur="focused = false"
-                            placeholder="Search bouquets, stems, custom gifts..."
-                            :class="{
-                                'bg-neutral-900/40 border-neutral-800/80 text-white placeholder-neutral-500 hover:border-[#C5A880]/50 hover:shadow-[0_0_15px_rgba(197,168,128,0.1)]': theme === 'onyx',
-                                'bg-white border-neutral-250 text-neutral-900 placeholder-neutral-400 hover:border-[#B59A7A]/50 hover:shadow-[0_0_15px_rgba(181,154,122,0.1)]': theme === 'champagne',
-                                'bg-[#1C0A10]/40 border-[#2D121F] text-pink-100 placeholder-pink-300/40 hover:border-[#B76E79]/50 hover:shadow-[0_0_15px_rgba(183,110,121,0.1)]': theme === 'rose',
-                                
-                                'shadow-[0_0_20px_rgba(197,168,128,0.25)] !border-[#C5A880]': focused && theme === 'onyx',
-                                'shadow-[0_0_20px_rgba(181,154,122,0.25)] !border-[#B59A7A]': focused && theme === 'champagne',
-                                'shadow-[0_0_20px_rgba(183,110,121,0.25)] !border-[#B76E79]': focused && theme === 'rose'
-                            }"
-                            class="w-full border rounded-full pl-11 pr-5 py-2 text-xs font-light font-sans focus:outline-none transition-all duration-300 shadow-sm"
-                            style="transition-property: all; font-size: 13px;"
-                        >
-                        <!-- Search Icon -->
-                        <div class="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none transition-colors duration-300"
-                             :class="{
-                                 'text-[#C5A880]': theme === 'onyx',
-                                 'text-[#B59A7A]': theme === 'champagne',
-                                 'text-[#B76E79]': theme === 'rose'
-                             }">
-                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                 <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
-                             </svg>
+                <!-- Search bar & Filters container -->
+                <div class="flex flex-col md:flex-row md:items-center justify-end gap-4 pb-2 border-b border-neutral-500/5">
+                    <!-- Minimize size search bar -->
+                    <div class="w-full max-w-xs text-left">
+                        <div class="relative group" x-data="{ focused: false }">
+                            <input 
+                                type="text" 
+                                wire:model.live.debounce.200ms="search"
+                                @focus="focused = true"
+                                @blur="focused = false"
+                                placeholder="Search curation..."
+                                :class="{
+                                    'bg-neutral-900/40 border-neutral-850/60 text-white placeholder-neutral-550 hover:border-[#C5A880]/50 hover:shadow-[0_0_12px_rgba(197,168,128,0.08)]': theme === 'onyx',
+                                    'bg-white border-neutral-250 text-neutral-900 placeholder-neutral-450 hover:border-[#B59A7A]/50 hover:shadow-[0_0_12px_rgba(181,154,122,0.08)]': theme === 'champagne',
+                                    'bg-[#1C0A10]/40 border-[#2D121F] text-pink-100 placeholder-pink-300/40 hover:border-[#B76E79]/50 hover:shadow-[0_0_12px_rgba(183,110,121,0.08)]': theme === 'rose',
+                                    
+                                    'shadow-[0_0_15px_rgba(197,168,128,0.2)] !border-[#C5A880]': focused && theme === 'onyx',
+                                    'shadow-[0_0_15px_rgba(181,154,122,0.2)] !border-[#B59A7A]': focused && theme === 'champagne',
+                                    'shadow-[0_0_15px_rgba(183,110,121,0.2)] !border-[#B76E79]': focused && theme === 'rose'
+                                }"
+                                class="w-full border rounded-full pl-9 pr-4 py-1.5 text-xs font-light font-sans focus:outline-none transition-all duration-300 shadow-sm"
+                                style="transition-property: all; font-size: 12px;"
+                            >
+                            <!-- Search Icon -->
+                            <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none transition-colors duration-300"
+                                 :class="{
+                                     'text-[#C5A880]': theme === 'onyx',
+                                     'text-[#B59A7A]': theme === 'champagne',
+                                     'text-[#B76E79]': theme === 'rose'
+                                 }">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+                                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
+                                 </svg>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Restored Curation Mood filter buttons -->
+                    <div class="flex flex-wrap gap-2 text-[10px] font-mono uppercase tracking-wider items-center">
+                        <button wire:click="filterByOccasion(null)" 
+                                :class="theme === 'champagne' ? 
+                                    ( '{{ is_null($selectedOccasion) }}' ? 'bg-[#B59A7A] text-white font-medium' : 'text-neutral-500 border border-neutral-250 hover:bg-neutral-50' ) : 
+                                    ( '{{ is_null($selectedOccasion) }}' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-800/80 hover:text-neutral-300' )"
+                                class="px-3 py-1 rounded-full cursor-pointer transition-all">All Curation Moods</button>
+                        @foreach($occasions as $occasion)
+                            <button wire:click="filterByOccasion('{{ $occasion->slug }}')" 
+                                    :class="theme === 'champagne' ? 
+                                        ( '{{ $selectedOccasion === $occasion->slug }}' ? 'bg-[#B59A7A] text-white font-medium' : 'text-neutral-500 border border-neutral-250 hover:bg-neutral-50' ) : 
+                                        ( '{{ $selectedOccasion === $occasion->slug }}' ? 'font-bold text-white' : 'text-neutral-500 border border-neutral-800/80 hover:text-neutral-300' )"
+                                    class="px-3 py-1 rounded-full cursor-pointer transition-all hover:scale-102"
+                                    style="{{ $selectedOccasion === $occasion->slug ? 'background-color: '.$occasion->accent_color.'; border-color: '.$occasion->accent_color.';' : '' }}">
+                                {{ $occasion->name }}
+                            </button>
+                        @endforeach
                     </div>
                 </div>
 
                 <!-- Showroom Grid (Cathedral Arched product cards & Landscape custom rectangular cards) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid-flow-dense gap-6 animate-hero-fade" wire:loading.class="opacity-40" wire:target="search, selectedCategory, filterByOccasion">
                     @forelse($products as $product)
-                        @if($product->category === 'specializations')
-                            <!-- Rectangular Landscape Layout for specialized custom services -->
+                        @if($product->category === 'specializtion' || $product->category === 'specialization' || $product->category === 'specializations')
+                            <!-- Rectangular Landscape Layout for specialized custom services (half height of standard card) -->
                             <div x-data="{ selectedSize: 'standard', basePrice: {{ $product->price }}, numberFormat(val) { return new Intl.NumberFormat().format(val); } }" 
                                  :class="theme === 'champagne' ? 'border-neutral-200 bg-white/70 shadow-sm text-neutral-900' : 'border-neutral-900/60 bg-[#0C0C0E]/50 text-white'"
-                                 class="col-span-1 sm:col-span-2 flex flex-col md:flex-row p-4 rounded-[32px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group text-left backdrop-blur-md product-card theme-section"
+                                 class="col-span-1 flex flex-row p-3 rounded-[24px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group text-left backdrop-blur-md product-card theme-section self-start min-h-[170px]"
                             >
-                                <!-- Left side: Image Frame -->
-                                <div class="w-full md:w-[40%] aspect-[4/3] md:aspect-auto rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 min-h-[220px]">
+                                <!-- Left side: Squared Image Frame -->
+                                <div class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center">
                                     <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
                                          class="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-all duration-700 z-0">
                                     
-                                    <div class="absolute bottom-3 left-3 z-10">
-                                        <span class="bg-[#C5A880] text-black px-2.5 py-1 rounded-full text-[10px] font-outfit font-bold tracking-wider uppercase shadow-md">
-                                            {{ $product->grade ?? 'Specialization' }}
+                                    <div class="absolute bottom-2 left-2 z-10">
+                                        <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded-full text-[8px] font-outfit font-bold tracking-wider uppercase shadow-md">
+                                            {{ $product->grade ?? 'Service' }}
                                         </span>
                                     </div>
                                 </div>
                                 <!-- Right side: Details -->
-                                <div class="flex-1 px-4 py-2 flex flex-col justify-between space-y-4">
-                                    <div class="space-y-2">
-                                        <span class="text-[11px] uppercase tracking-[0.3em] text-[#C5A880] font-outfit block font-bold">Atelier Specialization</span>
-                                        <h3 :class="theme === 'champagne' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-2xl font-serif italic tracking-wider leading-snug">
+                                <div class="flex-1 pl-3 flex flex-col justify-between overflow-hidden">
+                                    <div class="space-y-1 overflow-hidden">
+                                        <span class="text-[9px] uppercase tracking-[0.2em] text-[#C5A880] font-outfit block font-bold truncate">Specialization</span>
+                                        <h3 :class="theme === 'champagne' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-sm font-serif italic tracking-wide leading-tight truncate">
                                             {{ $product->name }}
                                         </h3>
-                                        <p class="text-neutral-500 font-light text-sm leading-relaxed">
+                                        <p class="text-neutral-550 font-light text-[11px] leading-snug line-clamp-2">
                                             {{ $product->description }}
                                         </p>
-                                        <!-- Social Sharing Direct Links for SMM -->
-                                        <div class="flex items-center space-x-3 text-[10px] font-outfit uppercase tracking-wider text-neutral-400 mt-2">
-                                            <span class="text-neutral-500 text-[9px] uppercase tracking-widest font-bold">Share:</span>
-                                            <a href="https://api.whatsapp.com/send?text=Check%20out%20this%20exclusive%20{{ urlencode($product->name) }}%20service%20at%20Noir%20%26%20Bloom:%20{{ urlencode(url('/')) }}" 
-                                               target="_blank" rel="noopener" class="hover:text-emerald-500 transition-colors font-bold" title="Share via WhatsApp">WA</a>
-                                            <a href="https://twitter.com/intent/tweet?text=Consulting%20with%20@NoirAndBloom%20for%20{{ urlencode($product->name) }}:&url={{ urlencode(url('/')) }}" 
-                                               target="_blank" rel="noopener" class="hover:text-white transition-colors font-bold" title="Share on X">X</a>
-                                            <a href="https://pinterest.com/pin/create/button/?url={{ urlencode(url('/')) }}&media={{ urlencode($product->backdrop_url) }}&description=Bespoke%20Floral%20Service%20-%20{{ urlencode($product->name) }}" 
-                                               target="_blank" rel="noopener" class="hover:text-rose-500 transition-colors font-bold" title="Pin to Pinterest">PIN</a>
-                                        </div>
                                     </div>
 
-                                    <div class="flex items-center justify-between pt-4 border-t border-neutral-500/10">
-                                        <div>
-                                            <span class="text-[10px] font-outfit uppercase tracking-[0.2em] text-neutral-400 block">Service Base Fee</span>
-                                            <span class="font-outfit text-lg font-bold text-amber-500">
-                                                {{ number_format($product->price) }} KSH
-                                            </span>
+                                    <div class="space-y-2 mt-1">
+                                        <!-- Social Sharing Direct Links for SMM (Instagram, Facebook, X SVGs) -->
+                                        <div class="flex items-center space-x-2.5 text-[10px] font-outfit uppercase text-neutral-400">
+                                            <span class="text-neutral-500 text-[8px] uppercase tracking-widest font-bold">Share:</span>
+                                            <!-- Instagram Icon -->
+                                            <a href="https://instagram.com" target="_blank" rel="noopener" class="hover:text-pink-500 transition-colors" title="Instagram">
+                                                <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                                </svg>
+                                            </a>
+                                            <!-- Facebook Icon -->
+                                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url('/')) }}" target="_blank" rel="noopener" class="hover:text-blue-500 transition-colors" title="Facebook">
+                                                <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                                                </svg>
+                                            </a>
+                                            <!-- X Icon -->
+                                            <a href="https://twitter.com/intent/tweet?text=Consulting+with+@NoirAndBloom+for+{{ urlencode($product->name) }}:&url={{ urlencode(url('/')) }}" target="_blank" rel="noopener" class="hover:text-white transition-colors" title="Share on X">
+                                                <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                                </svg>
+                                            </a>
                                         </div>
 
-                                        <a href="/profile-portal"
-                                           :class="theme === 'champagne' ? 'bg-black text-white hover:bg-[#B59A7A] hover:text-black' : 'bg-white text-black hover:bg-[#C5A880] hover:text-black'"
-                                           class="px-5 py-2.5 rounded-full text-[11px] font-outfit uppercase font-bold tracking-wider transition-all duration-300 shadow-md flex items-center space-x-1"
-                                        >
-                                            <span>Request Curation</span>
-                                        </a>
+                                        <div class="flex items-center justify-between border-t border-neutral-500/10 pt-2">
+                                            <div>
+                                                <span class="text-[8px] font-outfit uppercase tracking-[0.15em] text-neutral-400 block">Base Fee</span>
+                                                <span class="font-outfit text-xs font-bold text-amber-500">
+                                                    {{ number_format($product->price) }} KSH
+                                                </span>
+                                            </div>
+
+                                            <a href="/profile-portal"
+                                               :class="theme === 'champagne' ? 'bg-black text-white hover:bg-[#B59A7A] hover:text-black' : 'bg-white text-black hover:bg-[#C5A880] hover:text-black'"
+                                               class="px-3 py-1.5 rounded-full text-[9px] font-outfit uppercase font-bold tracking-wider transition-all duration-300 shadow-md"
+                                            >
+                                                Request
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1292,17 +1387,26 @@
                                             <div class="flex items-center justify-between border-t border-neutral-500/10 pt-2.5 text-[10px] font-outfit text-neutral-400 uppercase tracking-widest">
                                                 <span>Share:</span>
                                                 <div class="flex items-center space-x-3">
+                                                    <!-- WhatsApp Icon -->
                                                     <a href="https://api.whatsapp.com/send?text=Check%20out%20this%20stunning%20{{ urlencode($product->name) }}%20arrangement%20at%20Noir%20%26%20Bloom:%20{{ urlencode(url('/')) }}" 
-                                                       target="_blank" rel="noopener" class="hover:text-emerald-500 transition-colors font-bold" title="Share via WhatsApp">
-                                                        WA
+                                                       target="_blank" rel="noopener" class="hover:text-emerald-500 transition-colors" title="Share via WhatsApp">
+                                                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                                            <path d="M17.472 14.382c-.022-.08-.117-.146-.217-.196-.1-.05-1.002-.494-1.157-.552-.155-.058-.268-.088-.38.08-.112.167-.432.552-.53.662-.097.11-.197.125-.297.075-.1-.05-.422-.156-.803-.496-.297-.265-.497-.592-.555-.693-.058-.1-.006-.153.044-.203.045-.045.1-.117.15-.175.05-.058.067-.1.1-.167.033-.066.017-.125-.008-.175-.025-.05-.268-.646-.367-.883-.097-.235-.195-.203-.268-.203-.07 0-.15 0-.23 0-.08 0-.21.03-.32.15-.11.12-.42.41-.42 1.01s.44 1.18.5 1.26c.06.08.86 1.31 2.08 1.84.29.12.51.2.69.26.3.09.57.08.78.05.24-.03.73-.3 1.01-.58.28-.28.28-.58.26-.66zm-5.46-8.7c-4.148 0-7.53 3.38-7.53 7.53 0 1.32.345 2.613 1.003 3.753L4.5 20.5l3.65-.957c1.097.6 2.33.914 3.593.914 4.148 0 7.53-3.38 7.53-7.53 0-4.15-3.382-7.53-7.53-7.53zm0 13.82c-1.13 0-2.242-.3-3.213-.88l-.23-.136-2.39.626.637-2.33-.15-.24c-.64-.993-.978-2.15-.978-3.33 0-3.418 2.78-6.2 6.2-6.2s6.2 2.782 6.2 6.2-2.78 6.2-6.2 6.2z"/>
+                                                        </svg>
                                                     </a>
+                                                    <!-- X Icon -->
                                                     <a href="https://twitter.com/intent/tweet?text=Loving%20the%20premium%20{{ urlencode($product->name) }}%20curation%20from%20@NoirAndBloom.%20Check%20it%20out:&url={{ urlencode(url('/')) }}" 
-                                                       target="_blank" rel="noopener" class="hover:text-white transition-colors font-bold" title="Share on X">
-                                                        X
+                                                       target="_blank" rel="noopener" class="hover:text-white transition-colors" title="Share on X">
+                                                        <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                                                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                                        </svg>
                                                     </a>
+                                                    <!-- Pinterest Icon -->
                                                     <a href="https://pinterest.com/pin/create/button/?url={{ urlencode(url('/')) }}&media={{ urlencode($product->backdrop_url) }}&description=Noir%20%26%20Bloom%20-%20{{ urlencode($product->name) }}" 
-                                                       target="_blank" rel="noopener" class="hover:text-rose-500 transition-colors font-bold" title="Pin to Pinterest">
-                                                        PIN
+                                                       target="_blank" rel="noopener" class="hover:text-rose-500 transition-colors" title="Pin to Pinterest">
+                                                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                                            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.947-.199-2.399.041-3.429.218-.927 1.408-5.965 1.408-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.204 0 1.03.397 2.133.893 2.734.1.121.114.227.085.345-.093.389-.3.122-.345-.067-.5-.208-1.579-.854-1.579-2.858 0-3.791 2.756-7.276 7.95-7.276 4.174 0 7.417 2.974 7.417 6.953 0 4.148-2.613 7.486-6.241 7.486-1.218 0-2.363-.633-2.756-1.379l-.752 2.863c-.272 1.04-.997 2.346-1.488 3.149 1.096.337 2.257.519 3.46.519 6.621 0 11.988-5.367 11.988-11.987C24.004 5.367 18.638 0 12.017 0z"/>
+                                                        </svg>
                                                     </a>
                                                 </div>
                                             </div>
@@ -1365,7 +1469,7 @@
         }"
         class="border-t mt-32 py-16 px-6 transition-colors duration-500 z-10 relative theme-section"
     >
-        <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-left">
+        <div class="max-w-8xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-left">
             <!-- Col 1: Brand & Coordinates -->
             <div class="space-y-4">
                 <div class="flex items-baseline space-x-2">
@@ -1432,7 +1536,7 @@
             </div>
         </div>
 
-        <div :class="theme === 'champagne' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-7xl w-full mx-auto border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
+        <div :class="theme === 'champagne' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-8xl w-full mx-auto border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
             <p>&copy; {{ date('Y') }} Noir &amp; Bloom Ltd. Registered Tax Entity.</p>
             <div class="flex space-x-6">
                 <a href="#" class="hover:text-neutral-400">Terms of Curation</a>

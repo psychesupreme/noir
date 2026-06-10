@@ -144,7 +144,7 @@
     >
         <!-- Gold Accent Bottom Glow Line -->
         <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-[#C5A880]/30 to-transparent"></div>
-        <div class="max-w-7xl w-full mx-auto px-6 flex items-center justify-between gap-8">
+        <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-8">
             <a href="/" class="shrink-0 flex items-baseline space-x-2 select-none cursor-pointer">
                 <span class="text-[11px] font-mono tracking-[0.4em] text-[#C5A880] uppercase">Atelier</span>
                 <span :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-base font-semibold uppercase tracking-[0.35em] transition-colors font-outfit">NOIR & BLOOM</span>
@@ -175,7 +175,7 @@
         </div>
     </header>
 
-    <main class="max-w-7xl w-full mx-auto px-6 pt-32 flex-1 flex flex-col z-10 relative">
+    <main class="max-w-8xl w-full mx-auto px-6 pt-32 flex-1 flex flex-col z-10 relative">
         <div class="space-y-4 mb-12">
             <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-[#C5A880] block">Noir & Bloom Atelier</span>
             <h1 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-4xl sm:text-5xl font-outfit font-semibold uppercase tracking-wider leading-tight">
@@ -191,50 +191,68 @@
             <h3 class="text-[14px] font-mono uppercase tracking-[0.25em] text-neutral-400 font-bold border-b border-neutral-500/10 pb-2">
                 &bull; Bespoke Specialized Services
             </h3>
-            <div class="grid grid-cols-1 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($services as $srv)
                     <div 
                         :class="theme === 'champagne' ? 'border-neutral-200 bg-white/70 shadow-sm text-neutral-900' : 'border-neutral-900/60 bg-[#0C0C0E]/50 text-white'"
-                        class="flex flex-col md:flex-row rounded-3xl border overflow-hidden backdrop-blur-md transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group"
+                        class="col-span-1 flex flex-row p-3 rounded-[24px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group text-left backdrop-blur-md theme-section self-start min-h-[170px]"
                     >
-                        <!-- Left image -->
-                        <div class="w-full md:w-1/3 aspect-[4/3] md:aspect-auto relative overflow-hidden bg-neutral-900/10">
-                            <img src="{{ $srv->image_url }}" alt="{{ $srv->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105">
-                            <div class="absolute top-4 left-4">
-                                <span class="bg-[#C5A880] text-black px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase">
-                                    {{ $srv->grade ?? 'Specialization' }}
+                        <!-- Left side: Squared Image Frame -->
+                        <div class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center">
+                            <img src="{{ $srv->image_url }}" alt="{{ $srv->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 z-0">
+                            <div class="absolute bottom-2 left-2 z-10">
+                                <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded-full text-[8px] font-mono font-bold tracking-wider uppercase shadow-md">
+                                    {{ $srv->grade ?? 'Service' }}
                                 </span>
                             </div>
                         </div>
                         <!-- Right details -->
-                        <div class="p-6 md:p-8 flex-1 flex flex-col justify-between space-y-6">
-                            <div class="space-y-3">
-                                <h4 class="text-xl font-outfit font-semibold uppercase tracking-wider">{{ $srv->name }}</h4>
-                                <p class="text-neutral-500 font-light text-sm leading-relaxed">{{ $srv->description }}</p>
-                                
-                                <!-- Social Sharing Direct Links for SMM -->
-                                <div class="flex items-center space-x-3 text-[10px] font-mono uppercase tracking-wider text-neutral-450 mt-2">
-                                    <span class="text-neutral-500 text-[9px] uppercase tracking-widest font-bold">Share:</span>
-                                    <a href="https://api.whatsapp.com/send?text=Check%20out%20this%20exclusive%20{{ urlencode($srv->name) }}%20service%20at%20Noir%20%26%20Bloom:%20{{ urlencode(url('/services-gifts')) }}" 
-                                       target="_blank" rel="noopener" class="hover:text-emerald-500 transition-colors font-bold" title="Share via WhatsApp">WA</a>
-                                    <a href="https://twitter.com/intent/tweet?text=Bespoke%20{{ urlencode($srv->name) }}%20service%20from%20@NoirAndBloom:&url={{ urlencode(url('/services-gifts')) }}" 
-                                       target="_blank" rel="noopener" class="hover:text-white transition-colors font-bold" title="Share on X">X</a>
-                                    <a href="https://pinterest.com/pin/create/button/?url={{ urlencode(url('/services-gifts')) }}&media={{ urlencode($srv->image_url) }}&description=Bespoke%20Floral%20Service%20-%20{{ urlencode($srv->name) }}" 
-                                       target="_blank" rel="noopener" class="hover:text-rose-500 transition-colors font-bold" title="Pin to Pinterest">PIN</a>
-                                </div>
+                        <div class="flex-1 pl-3 flex flex-col justify-between overflow-hidden">
+                            <div class="space-y-1 overflow-hidden">
+                                <span class="text-[9px] uppercase tracking-[0.2em] text-[#C5A880] font-mono block font-bold truncate">Specialization</span>
+                                <h4 class="text-sm font-serif italic tracking-wide leading-tight truncate text-current">{{ $srv->name }}</h4>
+                                <p class="text-neutral-500 font-light text-[11px] leading-snug line-clamp-2">{{ $srv->description }}</p>
                             </div>
-                            <div class="flex items-center justify-between border-t border-neutral-500/10 pt-4">
-                                <div>
-                                    <span class="text-[10px] font-mono uppercase text-neutral-400 tracking-wider block">Service Base Investment</span>
-                                    <span class="text-xl font-mono font-bold text-amber-500">{{ number_format($srv->price) }} KSH</span>
+
+                            <div class="space-y-2 mt-1">
+                                <!-- Social Sharing Direct Links for SMM (Instagram, Facebook, X SVGs) -->
+                                <div class="flex items-center space-x-2.5 text-[10px] font-mono uppercase text-neutral-400">
+                                    <span class="text-neutral-500 text-[8px] uppercase tracking-widest font-bold font-sans">Share:</span>
+                                    <!-- Instagram Icon -->
+                                    <a href="https://instagram.com" target="_blank" rel="noopener" class="hover:text-pink-500 transition-colors" title="Instagram">
+                                        <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                        </svg>
+                                    </a>
+                                    <!-- Facebook Icon -->
+                                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url('/services-gifts')) }}" target="_blank" rel="noopener" class="hover:text-blue-500 transition-colors" title="Facebook">
+                                        <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                                        </svg>
+                                    </a>
+                                    <!-- X Icon -->
+                                    <a href="https://twitter.com/intent/tweet?text=Bespoke+{{ urlencode($srv->name) }}+service+from+@NoirAndBloom:&url={{ urlencode(url('/services-gifts')) }}" target="_blank" rel="noopener" class="hover:text-white transition-colors" title="Share on X">
+                                        <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                        </svg>
+                                    </a>
                                 </div>
-                                <a 
-                                    href="/profile-portal"
-                                    :class="theme === 'champagne' ? 'bg-black text-white hover:bg-[#B59A7A] hover:text-black' : 'bg-white text-black hover:bg-[#C5A880] hover:text-black'"
-                                    class="px-6 py-3 rounded-full text-[11px] font-mono uppercase font-bold tracking-wider transition-all duration-300 shadow-md cursor-pointer font-sans"
-                                >
-                                    Request Consultation
-                                </a>
+
+                                <div class="flex items-center justify-between border-t border-neutral-500/10 pt-2">
+                                    <div>
+                                        <span class="text-[8px] font-mono uppercase tracking-[0.15em] text-neutral-400 block">Base Fee</span>
+                                        <span class="font-mono text-xs font-bold text-amber-500">{{ number_format($srv->price) }} KSH</span>
+                                    </div>
+                                    <a 
+                                        href="/profile-portal"
+                                        :class="theme === 'champagne' ? 'bg-black text-white hover:bg-[#B59A7A] hover:text-black' : 'bg-white text-black hover:bg-[#C5A880] hover:text-black'"
+                                        class="px-3 py-1.5 rounded-full text-[9px] font-mono uppercase font-bold tracking-wider transition-all duration-300 shadow-md"
+                                    >
+                                        Request
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -301,7 +319,7 @@
         }"
         class="border-t py-16 px-6 transition-colors duration-500 z-10 relative"
     >
-        <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-left">
+        <div class="max-w-8xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-left">
             <div class="space-y-4">
                 <div class="flex items-baseline space-x-2">
                     <span class="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
@@ -331,7 +349,7 @@
                 <p class="text-xs font-light">Join the circle for seasonal launches and custom service upgrades.</p>
             </div>
         </div>
-        <div class="max-w-7xl w-full mx-auto border-t mt-12 pt-8 text-center text-[12px] font-mono uppercase tracking-wider">
+        <div class="max-w-8xl w-full mx-auto border-t mt-12 pt-8 text-center text-[12px] font-mono uppercase tracking-wider">
             <p>&copy; {{ date('Y') }} Noir &amp; Bloom Ltd. Registered Tax Entity.</p>
         </div>
     </footer>

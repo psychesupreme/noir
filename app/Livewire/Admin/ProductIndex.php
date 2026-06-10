@@ -40,12 +40,13 @@ class ProductIndex extends Component
     public int $price = 0;
     public int $cost_price = 0;
     public int $stock = 0;
-    public string $category = 'retail';
+    public string $category = 'stems';
     public string $unit_type = 'arrangement';
     public ?string $grade = null;
     public ?string $image_url = null;
     public $image_file = null;
     public array $selectedOccasions = [];
+    public ?int $selectedBranchId = null;
 
     // Delete confirmation
     public bool $showDeleteModal = false;
@@ -67,11 +68,12 @@ class ProductIndex extends Component
             'price' => 'required|integer|min:1',
             'cost_price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
-            'category' => 'nullable|in:retail,wholesale,gifting,uncategorized',
+            'category' => 'nullable|in:stems,bundle,bouquet,giftings,specializtion,specialization,bouquets,hampers,home_decor,specializations,retail,wholesale,gifting,uncategorized',
             'unit_type' => 'required|in:arrangement,stem,bundle,hamper',
             'grade' => 'nullable|string|max:20',
             'image_url' => 'nullable|string|max:500',
             'image_file' => 'nullable|image|max:2048',
+            'selectedBranchId' => 'nullable|exists:branches,id',
         ];
     }
 
@@ -98,6 +100,7 @@ class ProductIndex extends Component
     public function openCreateModal(): void
     {
         $this->resetForm();
+        $this->selectedBranchId = Branch::where('is_active', true)->first()?->id ?: Branch::first()?->id;
         $this->isEditing = false;
         $this->showModal = true;
     }
@@ -132,11 +135,18 @@ class ProductIndex extends Component
 
         unset($validated['image_file']);
 
+        $selectedBranch = $validated['selectedBranchId'] ?? null;
+        unset($validated['selectedBranchId']);
+
         if ($this->isEditing && $this->editingProductId) {
             $product = Product::findOrFail($this->editingProductId);
             $product->update($validated);
         } else {
-            $product = Product::create($validated);
+            $product = new Product($validated);
+            if ($selectedBranch) {
+                $product->adjustment_branch_id = $selectedBranch;
+            }
+            $product->save();
         }
 
         $product->occasions()->sync($this->selectedOccasions);
@@ -193,12 +203,12 @@ class ProductIndex extends Component
         $this->reset([
             'editingProductId', 'name', 'sku', 'description',
             'price', 'cost_price', 'stock', 'category', 'unit_type', 'grade',
-            'image_url', 'image_file', 'selectedOccasions', 'isEditing'
+            'image_url', 'image_file', 'selectedOccasions', 'isEditing', 'selectedBranchId'
         ]);
         $this->price = 0;
         $this->cost_price = 0;
         $this->stock = 0;
-        $this->category = 'retail';
+        $this->category = 'stems';
         $this->unit_type = 'arrangement';
     }
 

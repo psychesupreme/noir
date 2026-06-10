@@ -9,9 +9,8 @@ class ServicesGifts extends Component
 {
     public function render()
     {
-        // Retrieve specializations and gift accessories
-        $services = Product::where('category', 'specializations')->get();
-        $gifts = Product::whereIn('category', ['hampers', 'home_decor'])->get();
+        $services = Product::whereIn('category', ['specializtion', 'specialization', 'specializations'])->get();
+        $gifts = Product::whereIn('category', ['giftings', 'bundle', 'hampers', 'home_decor'])->get();
 
         return view('livewire.services-gifts', [
             'services' => $services,

@@ -25,6 +25,10 @@ class Storefront extends Component
     #[Url(as: 'tier', history: true)]
     public string $selectedCategory = 'all'; 
 
+    #[Url(as: 'sort', history: true)]
+    public string $sortBy = 'latest';
+
+
     public array $cart = [];
 
     // Form inputs pre-filled from our active user session
@@ -162,12 +166,25 @@ class Storefront extends Component
     public function filterByOccasion(?string $slug = null): void
     {
         $this->selectedOccasion = $slug;
+        $this->perPage = 6;
     }
 
     public function selectCategory(string $category): void
     {
         $this->selectedCategory = $category;
+        $this->perPage = 6;
     }
+
+    public function updatedSearch(): void
+    {
+        $this->perPage = 6;
+    }
+
+    public function updatedSortBy(): void
+    {
+        $this->perPage = 6;
+    }
+
 
     public function addToCuration(int $productId, string $size = 'standard'): void
     {
@@ -544,81 +561,85 @@ class Storefront extends Component
     {
         $occasions = \Illuminate\Support\Facades\Cache::remember('occasions_all', 3600, fn() => Occasion::all());
         
-        $isBaseCatalog = ($this->selectedCategory === 'all' && empty($this->search) && !$this->selectedOccasion);
+        $query = Product::with('occasions');
 
-        if ($isBaseCatalog) {
-            $showroomProducts = \Illuminate\Support\Facades\Cache::remember('storefront_products_base_' . $this->perPage, 300, function () {
-                return Product::with('occasions')->latest()->take($this->perPage)->get()->map(function($product) {
-                    $product->backdrop_url = $product->image_url ?: match($product->category) {
-                        'stems'           => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
-                        'hampers'         => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
-                        'specializations' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=600',
-                        default           => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
-                    };
-                    $product->stock_standard = $product->stock;
-                    $product->stock_deluxe = (int) floor($product->stock * 0.7);
-                    $product->stock_grand = (int) floor($product->stock * 0.4);
-                    return $product;
-                });
+        if ($this->selectedCategory !== 'all') {
+            $query->where('category', $this->selectedCategory);
+        }
+
+        if (!empty($this->search)) {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('description', 'like', '%' . $this->search . '%');
             });
+        }
+
+        if ($this->selectedOccasion) {
+            $query->whereHas('occasions', function ($q) {
+                $q->where('slug', $this->selectedOccasion);
+            });
+        }
+
+        if ($this->sortBy === 'price_asc') {
+            $query->orderBy('price', 'asc');
+        } elseif ($this->sortBy === 'price_desc') {
+            $query->orderBy('price', 'desc');
+        } elseif ($this->sortBy === 'popularity') {
+            $query->withCount('orders')->orderBy('orders_count', 'desc');
         } else {
-            $productsQuery = Product::with('occasions')->latest();
+            $query->latest();
+        }
 
-            if ($this->selectedCategory !== 'all') {
-                $productsQuery->where('category', $this->selectedCategory);
-            }
-
-            if (!empty($this->search)) {
-                $productsQuery->where(function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('description', 'like', '%' . $this->search . '%');
-                });
-            }
-
-            if ($this->selectedOccasion) {
-                $productsQuery->whereHas('occasions', function ($query) {
-                    $query->where('slug', $this->selectedOccasion);
-                });
-            }
-
-            $showroomProducts = $productsQuery->take($this->perPage)->get()->map(function($product) {
+        $products = $query->take($this->perPage)->get()->map(function($product) {
+            if ($product->category === 'specializtion' || $product->category === 'specialization' || $product->category === 'specializations') {
+                $product->backdrop_url = $product->image_url ?: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=600';
+            } else {
                 $product->backdrop_url = $product->image_url ?: match($product->category) {
-                    'stems'           => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
-                    'hampers'         => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
-                    'specializations' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=600',
-                    default           => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
+                    'stems'   => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
+                    'giftings', 'hampers' => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
+                    default   => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
                 };
-                $product->stock_standard = $product->stock;
-                $product->stock_deluxe = (int) floor($product->stock * 0.7);
-                $product->stock_grand = (int) floor($product->stock * 0.4);
-                return $product;
+            }
+            $product->stock_standard = $product->stock;
+            $product->stock_deluxe = (int) floor($product->stock * 0.7);
+            $product->stock_grand = (int) floor($product->stock * 0.4);
+            return $product;
+        });
+
+        // Reorder such that service product cards come in the second row (on All Category view)
+        if ($this->selectedCategory === 'all' && empty($this->search) && !$this->selectedOccasion) {
+            $regular = $products->filter(fn($p) => $p->category !== 'specializtion' && $p->category !== 'specialization' && $p->category !== 'specializations');
+            $services = $products->filter(fn($p) => $p->category === 'specializtion' || $p->category === 'specialization' || $p->category === 'specializations');
+            
+            $ordered = collect();
+            // Row 1: First 3 regular products
+            $ordered = $ordered->concat($regular->take(3));
+            $remainingRegular = $regular->skip(3);
+            
+            // Row 2: All services
+            $ordered = $ordered->concat($services);
+            
+            // Remaining rows: The rest of standard products
+            $ordered = $ordered->concat($remainingRegular);
+            
+            $products = $ordered;
+        }
+        $totalCountQuery = Product::query();
+        if ($this->selectedCategory !== 'all') {
+            $totalCountQuery->where('category', $this->selectedCategory);
+        }
+        if (!empty($this->search)) {
+            $totalCountQuery->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('description', 'like', '%' . $this->search . '%');
             });
         }
-        
-        $totalMatchingProducts = 0;
-        if ($isBaseCatalog) {
-            $totalMatchingProducts = \Illuminate\Support\Facades\Cache::remember('storefront_products_base_count', 3600, fn() => Product::count());
-        } else {
-            $productsQueryCount = Product::query();
-
-            if ($this->selectedCategory !== 'all') {
-                $productsQueryCount->where('category', $this->selectedCategory);
-            }
-
-            if (!empty($this->search)) {
-                $productsQueryCount->where(function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('description', 'like', '%' . $this->search . '%');
-                });
-            }
-
-            if ($this->selectedOccasion) {
-                $productsQueryCount->whereHas('occasions', function ($query) {
-                    $query->where('slug', $this->selectedOccasion);
-                });
-            }
-            $totalMatchingProducts = $productsQueryCount->count();
+        if ($this->selectedOccasion) {
+            $totalCountQuery->whereHas('occasions', function ($q) {
+                $q->where('slug', $this->selectedOccasion);
+            });
         }
+        $totalCount = $totalCountQuery->count();
 
         $userOrders = collect();
         if (auth()->check()) {
@@ -631,15 +652,28 @@ class Storefront extends Component
         $cartItems = $this->compileCartItems();
         $cartTotal = array_sum(array_column($cartItems, 'subtotal'));
 
+        $suggestionQuery = Product::where('stock', '>', 0);
+        if (!empty(trim($this->search))) {
+            $suggestionQuery->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('description', 'like', '%' . $this->search . '%');
+            });
+        }
+        $suggestions = $suggestionQuery->withCount('orders')
+            ->orderBy('orders_count', 'desc')
+            ->limit(5)
+            ->get();
+
         return view('livewire.storefront', [
-            'occasions'    => $occasions,
-            'products'     => $showroomProducts,
-            'cartItems'    => $cartItems,
-            'cartTotal'    => $cartTotal,
-            'cartCount'    => array_sum($this->cart),
-            'activeColor'  => $this->selectedOccasion ? $occasions->firstWhere('slug', $this->selectedOccasion)?->accent_color : '#E5E5E5',
-            'userOrders'   => $userOrders,
-            'hasMore'      => $showroomProducts->count() < $totalMatchingProducts,
+            'occasions'       => $occasions,
+            'products'        => $products,
+            'suggestions'     => $suggestions,
+            'cartItems'       => $cartItems,
+            'cartTotal'       => $cartTotal,
+            'cartCount'       => array_sum($this->cart),
+            'activeColor'     => $this->selectedOccasion ? $occasions->firstWhere('slug', $this->selectedOccasion)?->accent_color : '#E5E5E5',
+            'userOrders'      => $userOrders,
+            'hasMore'         => $products->count() < $totalCount,
         ])->layout('components.layouts.app');
     }
 
