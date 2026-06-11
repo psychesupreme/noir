@@ -316,7 +316,8 @@
 
 
     <!-- Interactive SVG ambient floral background overlay -->
-    <svg id="flower-ambient-svg" class="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden" style="perspective: 800px; transform-style: preserve-3d;"></svg>
+
+    <svg id="flower-ambient-svg" wire:ignore x-data="storefrontAmbient" class="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden" style="perspective: 800px; transform-style: preserve-3d;"></svg>
 
     <!-- Fine Linen Organic Grid Overlay -->
     <div class="absolute inset-0 pointer-events-none fine-linen z-0 opacity-80"></div>
@@ -339,6 +340,10 @@
             <div class="flex-1 hidden md:block"></div>
 
             <div class="flex items-center space-x-6 text-[12px] font-mono uppercase tracking-widest text-neutral-400">
+                <!-- Navigation links -->
+                <a href="{{ route('curate') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer" style="animation-delay: 150ms;">3D Curation</a>
+                <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer" style="animation-delay: 200ms;">Services</a>
+
                 <!-- Theme Switcher Pill (3 options, desktop only) -->
                 <div class="hidden lg:flex items-center space-x-1 border border-neutral-500/10 rounded-full bg-neutral-500/5 p-1 animate-nav-item select-none relative" style="animation-delay: 300ms;">
                     <button @click="changeTheme('onyx')" 
@@ -2008,172 +2013,5 @@
         </div>
     </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const svg = document.getElementById('flower-ambient-svg');
-        if (svg) {
-            let width = window.innerWidth;
-            let height = window.innerHeight;
 
-            const handleResize = () => {
-                width = window.innerWidth;
-                height = window.innerHeight;
-            };
-            window.addEventListener('resize', handleResize);
-
-            // Centered SVG path coordinates representing luxury floral elements
-            const petalPaths = [
-                // Rose Petal shape
-                "M 0 -15 C 10 -25, 20 -10, 10 5 C 0 20, -15 10, 0 -15",
-                // Orchid/Lily Petal shape
-                "M 0 -25 C 10 -15, 5 15, 0 25 C -5 15, -10 -15, 0 -25",
-                // Wild Flower shape
-                "M 0 -10 C 5 -15, 15 -15, 10 -5 C 15 0, 15 10, 5 5 C 0 15, -10 10, -5 0 C -10 -5, -5 -15, 0 -10 Z",
-                // Stem Leaf shape
-                "M 0 15 C 2 -5, 10 -15, 8 -28 C 0 -18, -4 -5, 0 15 M 4 0 C 9 -5, 12 -11, 12 -11 M -2 -5 C -7 -9, -9 -14, -9 -14"
-            ];
-
-            const particles = [];
-            // Optimal particle count based on screen real-estate
-            const particleCount = Math.min(45, Math.max(16, Math.floor((width * height) / 55000)));
-
-            // Create particles
-            for (let i = 0; i < particleCount; i++) {
-                const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-
-                const pathD = petalPaths[Math.floor(Math.random() * petalPaths.length)];
-                path.setAttribute("d", pathD);
-                path.setAttribute("stroke", "var(--brand-accent)");
-                path.setAttribute("stroke-dasharray", Math.random() > 0.85 ? "2,2" : "none");
-                path.setAttribute("stroke-width", Math.random() * 0.8 + 0.8);
-                path.setAttribute("stroke-opacity", Math.random() * 0.35 + 0.35);
-                path.setAttribute("fill", "var(--brand-accent)");
-                path.setAttribute("fill-opacity", Math.random() * 0.08 + 0.06);
-
-                group.style.position = "absolute";
-                group.style.transformOrigin = "center";
-                group.style.transformBox = "fill-box";
-                group.appendChild(path);
-                svg.appendChild(group);
-
-                particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    baseVx: Math.random() * 0.24 - 0.12, // Slow horizontal drift
-                    baseVy: -(Math.random() * 0.28 + 0.12), // Upward drift by default
-                    vx: 0,
-                    vy: 0,
-                    angle: Math.random() * 360,
-                    rotationSpeed: (Math.random() * 0.15 + 0.05) * (Math.random() > 0.5 ? 1 : -1),
-                    scale: Math.random() * 0.6 + 0.65,
-                    opacity: Math.random() * 0.3 + 0.5,
-                    swaySpeed: Math.random() * 0.005 + 0.002,
-                    swayAmount: Math.random() * 0.4 + 0.1,
-                    phase: Math.random() * 100,
-                    element: group
-                });
-            }
-
-            // Mouse interaction setup
-            const mouse = { x: -2000, y: -2000, active: false };
-            window.addEventListener('mousemove', (e) => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
-                mouse.active = true;
-            });
-            window.addEventListener('mouseleave', () => {
-                mouse.active = false;
-            });
-
-            // Scroll velocity tracking setup
-            let lastScrollY = window.scrollY;
-            let scrollVelocity = 0;
-            let scrollTimeout = null;
-
-            window.addEventListener('scroll', () => {
-                const currentScrollY = window.scrollY;
-                const delta = currentScrollY - lastScrollY;
-                scrollVelocity = delta;
-                lastScrollY = currentScrollY;
-
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    scrollVelocity = 0;
-                }, 100);
-            }, { passive: true });
-
-            let frameCount = 0;
-            const animate = () => {
-                frameCount++;
-                scrollVelocity *= 0.94; // Decelerate scroll wind velocity
-                if (Math.abs(scrollVelocity) < 0.05) scrollVelocity = 0;
-
-                particles.forEach((p) => {
-                    // Constant slow floating drift
-                    const sway = Math.sin(p.phase + frameCount * p.swaySpeed) * p.swayAmount;
-                    p.vx = p.baseVx + sway;
-                    p.vy = p.baseVy;
-
-                    // Scroll drag force: scrolling down (delta > 0) drifts petals UP.
-                    // Scrolling up (delta < 0) drifts petals DOWN.
-                    const scrollEffectY = -scrollVelocity * 0.18;
-                    const scrollEffectX = scrollVelocity * 0.04 * Math.sin(p.phase + frameCount * 0.015);
-
-                    // Cursor displacement force (gentle repulsion)
-                    let pushX = 0;
-                    let pushY = 0;
-                    if (mouse.active) {
-                        const dx = p.x - mouse.x;
-                        const dy = p.y - mouse.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 180) {
-                            const force = (180 - dist) / 180;
-                            const pushAngle = Math.atan2(dy, dx);
-                            pushX = Math.cos(pushAngle) * force * 1.8;
-                            pushY = Math.sin(pushAngle) * force * 1.8;
-                        }
-                    }
-
-                    // Total updates
-                    p.x += p.vx + scrollEffectX + pushX;
-                    p.y += p.vy + scrollEffectY + pushY;
-                    p.angle += p.rotationSpeed + (scrollVelocity * 0.08);
-
-                    // Dynamic 3D tilt mimicking organic falling
-                    const rotateX = Math.sin(p.phase + frameCount * p.swaySpeed * 1.4) * 35;
-                    const rotateY = Math.cos(p.phase * 0.8 + frameCount * p.swaySpeed * 1.1) * 35;
-
-                    // Adjust tilt under scroll drag
-                    const windTiltX = Math.max(-75, Math.min(75, rotateX + (scrollVelocity * 0.5)));
-                    const windTiltY = Math.max(-75, Math.min(75, rotateY + (scrollVelocity * 0.15)));
-
-                    // Wrap-around screen margins
-                    const margin = 60;
-                    if (p.x < -margin) {
-                        p.x = width + margin;
-                    } else if (p.x > width + margin) {
-                        p.x = -margin;
-                    }
-
-                    if (p.y < -margin) {
-                        p.y = height + margin;
-                        p.x = Math.random() * width;
-                    } else if (p.y > height + margin) {
-                        p.y = -margin;
-                        p.x = Math.random() * width;
-                    }
-
-                    // Apply visual transforms via GPU accelerated CSS properties with 3D tilt
-                    p.element.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) rotateX(${windTiltX}deg) rotateY(${windTiltY}deg) rotateZ(${p.angle}deg) scale(${p.scale})`;
-                    p.element.style.opacity = p.opacity;
-                });
-
-                requestAnimationFrame(animate);
-            };
-
-            animate();
-        }
-    });
-</script>
 </div>

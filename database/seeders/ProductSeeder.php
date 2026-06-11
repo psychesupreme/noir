@@ -177,5 +177,114 @@ class ProductSeeder extends Seeder
             'grade' => 'Subscription',
             'image_url' => 'https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&q=80&w=600',
         ]);
+
+        // ── 6. Curation Addons & Giftings ───────────────────
+        Product::create([
+            'name' => 'Luxury Kraft Wrap',
+            'sku' => 'NB-DEC-LKW-01',
+            'description' => 'Artisanal brown kraft wrapping paper with natural raffia tie.',
+            'price' => 500,
+            'stock' => 200,
+            'category' => 'bundle',
+            'unit_type' => 'wrap',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Luxury Linen Wrap',
+            'sku' => 'NB-DEC-LLW-02',
+            'description' => 'Woven luxury white linen wrapping with gold brand silk ribbon.',
+            'price' => 1200,
+            'stock' => 150,
+            'category' => 'bundle',
+            'unit_type' => 'wrap',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Noir Obsidian Gift Box',
+            'sku' => 'NB-DEC-NOG-03',
+            'description' => 'Matte black premium presentation box with gold foil lettering.',
+            'price' => 2500,
+            'stock' => 80,
+            'category' => 'bundle',
+            'unit_type' => 'wrap',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Premium South African Merlot',
+            'sku' => 'NB-HMP-PSM-01',
+            'description' => 'Rich, full-bodied red wine with dark fruit aromas and oak notes.',
+            'price' => 4500,
+            'stock' => 50,
+            'category' => 'giftings',
+            'unit_type' => 'bottle',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Moët & Chandon Imperial Brut',
+            'sku' => 'NB-HMP-MCI-02',
+            'description' => 'Distinguished French Champagne characterized by bright fruitiness and elegant maturity.',
+            'price' => 12500,
+            'stock' => 30,
+            'category' => 'giftings',
+            'unit_type' => 'bottle',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1594487524733-efe60e1d033e?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Chamdor Non-Alcoholic Sparkling Wine',
+            'sku' => 'NB-HMP-CNS-03',
+            'description' => 'Sweet, carbonated non-alcoholic sparkling grape juice.',
+            'price' => 3000,
+            'stock' => 100,
+            'category' => 'giftings',
+            'unit_type' => 'bottle',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Artisanal Belgian Truffles Box',
+            'sku' => 'NB-HMP-ABT-04',
+            'description' => 'A curated selection of 16 hand-crafted luxury Belgian chocolate truffles.',
+            'price' => 2800,
+            'stock' => 120,
+            'category' => 'giftings',
+            'unit_type' => 'box',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1548907040-4d42b52125bf?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Atelier Rosewood & Amber Mist',
+            'sku' => 'NB-DEC-ARA-04',
+            'description' => 'Signature fragrance mist to spray over flower arrangements for a lasting woodsy aroma.',
+            'price' => 1500,
+            'stock' => 90,
+            'category' => 'bundle',
+            'unit_type' => 'bottle',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Limuru Lavender Fields Mist',
+            'sku' => 'NB-DEC-LLF-05',
+            'description' => 'Soothing, fresh lavender fragrance mist derived from Limuru fields.',
+            'price' => 1200,
+            'stock' => 110,
+            'category' => 'bundle',
+            'unit_type' => 'bottle',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=80&w=600',
+        ]);
     }
 }

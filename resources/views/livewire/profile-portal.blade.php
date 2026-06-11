@@ -33,7 +33,8 @@
     class="min-h-screen font-sans antialiased relative text-left flex flex-col justify-between transition-colors duration-500 overflow-hidden"
 >
     <!-- 3D Flower Ambient Animation Canvas -->
-    <canvas id="flower-ambient-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <canvas id="flower-ambient-canvas" wire:ignore x-data="canvasAmbient" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
     <!-- Fine Grain Noise Overlay -->
     <div class="absolute inset-0 pointer-events-none storefront-grain z-0 opacity-80"></div>
@@ -56,6 +57,10 @@
             </a>
             
             <div class="flex items-center space-x-6 text-[12px] font-mono uppercase tracking-widest text-neutral-400">
+                <!-- Navigation links -->
+                <a href="{{ route('curate') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 select-none cursor-pointer">3D Curation</a>
+                <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 select-none cursor-pointer">Services</a>
+
                 <!-- Theme Switcher Pill -->
                 <div class="hidden lg:flex items-center space-x-1 border border-neutral-500/10 rounded-full bg-neutral-500/5 p-1 select-none">
                     <button @click="theme = 'onyx'" :class="theme === 'onyx' ? 'bg-[#C5A880] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-neutral-200'" class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
@@ -489,182 +494,5 @@
         </div>
     </main>
 
-    <!-- Script for background canvas animation (Reynolds Flocking Boids) -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const canvas = document.getElementById('flower-ambient-canvas');
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                let width = canvas.width = window.innerWidth;
-                let height = canvas.height = window.innerHeight;
 
-                window.addEventListener('resize', () => {
-                    width = canvas.width = window.innerWidth;
-                    height = canvas.height = window.innerHeight;
-                });
-
-                const particleCount = 60;
-                const particles = [];
-                const mouse = { x: -1000, y: -1000, active: false };
-
-                window.addEventListener('mousemove', (e) => {
-                    mouse.x = e.clientX;
-                    mouse.y = e.clientY;
-                    mouse.active = true;
-                });
-
-                window.addEventListener('mouseleave', () => {
-                    mouse.active = false;
-                });
-
-                const getPetalColors = () => {
-                    const activeTheme = localStorage.getItem('nb_theme') || 'onyx';
-                    if (activeTheme === 'rose') {
-                        return ['#EC4899', '#F472B6', '#F43F5E', '#C58B9F', '#E5C1CD'];
-                    } else if (activeTheme === 'champagne') {
-                        return ['#B59A7A', '#D4AF37', '#E5C1CD', '#FFFFFF', '#D48EA1'];
-                    } else {
-                        return ['#C5A880', '#A78BFA', '#8B5CF6', '#4B5563', '#B76E79'];
-                    }
-                };
-
-                for (let i = 0; i < particleCount; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = Math.random() * 0.8 + 0.3;
-                    particles.push({
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        vx: Math.cos(angle) * speed,
-                        vy: Math.sin(angle) * speed,
-                        r: Math.random() * 8 + 4,
-                        d: Math.random() * particleCount,
-                        angle: Math.random() * 360,
-                        rotationSpeed: Math.random() * 0.8 - 0.4,
-                        type: Math.random() > 0.4 ? 'petal' : 'flower'
-                    });
-                }
-
-                function drawFlower(x, y, radius, petals, color, angle) {
-                    ctx.save();
-                    ctx.translate(x, y);
-                    ctx.rotate(angle * Math.PI / 180);
-                    ctx.fillStyle = color;
-                    ctx.beginPath();
-                    for (let i = 0; i < petals; i++) {
-                        ctx.rotate(Math.PI * 2 / petals);
-                        ctx.ellipse(0, -radius, radius * 0.5, radius * 0.9, 0, 0, Math.PI * 2);
-                    }
-                    ctx.fill();
-                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, radius * 0.25, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-                }
-
-                function drawPetal(x, y, radius, color, angle) {
-                    ctx.save();
-                    ctx.translate(x, y);
-                    ctx.rotate(angle * Math.PI / 180);
-                    ctx.fillStyle = color;
-                    ctx.beginPath();
-                    ctx.moveTo(0, 0);
-                    ctx.quadraticCurveTo(-radius * 0.8, -radius * 1.2, 0, -radius * 2);
-                    ctx.quadraticCurveTo(radius * 0.8, -radius * 1.2, 0, 0);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.restore();
-                }
-
-                function animate() {
-                    ctx.clearRect(0, 0, width, height);
-                    const colors = getPetalColors();
-
-                    particles.forEach((p, idx) => {
-                        p.color = colors[idx % colors.length] + '55';
-
-                        if (p.type === 'flower') {
-                            drawFlower(p.x, p.y, p.r, 5, p.color, p.angle);
-                        } else {
-                            drawPetal(p.x, p.y, p.r, p.color, p.angle);
-                        }
-
-                        // Basic Reynolds Flocking
-                        let flockVx = 0; let flockVy = 0;
-                        let flockX = 0; let flockY = 0;
-                        let avoidX = 0; let avoidY = 0;
-                        let neighbors = 0; let closeNeighbors = 0;
-
-                        const visualRange = 80;
-                        const minDistance = 25;
-
-                        particles.forEach(other => {
-                            if (other === p) return;
-                            let dx = other.x - p.x;
-                            let dy = other.y - p.y;
-                            let dist = Math.sqrt(dx*dx + dy*dy);
-                            if (dist < visualRange) {
-                                flockX += other.x; flockY += other.y;
-                                flockVx += other.vx; flockVy += other.vy;
-                                neighbors++;
-                                if (dist < minDistance) {
-                                    avoidX -= dx; avoidY -= dy;
-                                    closeNeighbors++;
-                                }
-                            }
-                        });
-
-                        let ax = 0; let ay = 0;
-                        if (neighbors > 0) {
-                            ax += (flockX / neighbors - p.x) * 0.003;
-                            ay += (flockY / neighbors - p.y) * 0.003;
-                            ax += (flockVx / neighbors - p.vx) * 0.02;
-                            ay += (flockVy / neighbors - p.vy) * 0.02;
-                        }
-                        if (closeNeighbors > 0) {
-                            ax += avoidX * 0.04;
-                            ay += avoidY * 0.04;
-                        }
-
-                        if (mouse.active) {
-                            let mDx = p.x - mouse.x;
-                            let mDy = p.y - mouse.y;
-                            let mDist = Math.sqrt(mDx*mDx + mDy*mDy);
-                            if (mDist < 180) {
-                                let force = (180 - mDist) / 180;
-                                let angle = Math.atan2(mDy, mDx);
-                                ax += Math.cos(angle) * force * 1.2;
-                                ay += Math.sin(angle) * force * 1.2;
-                            }
-                        }
-
-                        p.vx += ax; p.vy += ay;
-                        let speed = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
-                        const minS = 0.4; const maxS = 1.8;
-                        if (speed > maxS) {
-                            p.vx = (p.vx/speed)*maxS; p.vy = (p.vy/speed)*maxS;
-                        } else if (speed < minS) {
-                            if (speed === 0) {
-                                p.vx = Math.random()*minS; p.vy = Math.random()*minS;
-                            } else {
-                                p.vx = (p.vx/speed)*minS; p.vy = (p.vy/speed)*minS;
-                            }
-                        }
-
-                        p.x += p.vx; p.y += p.vy;
-                        p.angle = Math.atan2(p.vy, p.vx) * (180 / Math.PI) + 90;
-
-                        const margin = p.r * 2 + 10;
-                        if (p.x < -margin) p.x = width + margin;
-                        else if (p.x > width + margin) p.x = -margin;
-                        if (p.y < -margin) p.y = height + margin;
-                        else if (p.y > height + margin) p.y = -margin;
-                    });
-
-                    requestAnimationFrame(animate);
-                }
-                animate();
-            }
-        });
-    </script>
 </div>
