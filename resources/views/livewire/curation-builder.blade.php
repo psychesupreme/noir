@@ -11,6 +11,7 @@
         selectedGiftId: @entangle('selectedGiftId'),
         selectedFragranceId: @entangle('selectedFragranceId'),
         orbitActive: true,
+        vasesList: {{ json_encode($availableVases) }},
         toggleOrbit() {
             this.orbitActive = !this.orbitActive;
             this.$dispatch('toggle-orbit', this.orbitActive);
@@ -91,9 +92,8 @@
                 'bg-[#1A080E]/90 border-[#3D1222]': theme === 'rose'
             }"
             class="w-full lg:w-96 rounded-3xl border p-5 flex flex-col justify-between backdrop-blur-md overflow-hidden shrink-0"
-        >
-            <!-- Category Tabs (Expanded to Stems, Vases, Wraps, Addons) -->
-            <div class="grid grid-cols-4 border-b border-neutral-800/40 pb-3 mb-4 shrink-0 text-[10px] font-bold uppercase tracking-wider">
+                  <!-- Category Tabs (Expanded to Stems, Vases, Wraps, Addons, Studio) -->
+            <div class="grid grid-cols-5 border-b border-neutral-800/40 pb-3 mb-4 shrink-0 text-[9px] font-bold uppercase tracking-wider gap-0.5">
                 <button 
                     @click="activeCategory = 'stems'" 
                     :class="activeCategory === 'stems' ? 'border-[#C5A880] text-[#C5A880]' : 'border-transparent text-neutral-400 hover:text-neutral-200'"
@@ -122,106 +122,121 @@
                 >
                     Addons
                 </button>
+                <button 
+                    @click="activeCategory = 'studio'" 
+                    :class="activeCategory === 'studio' ? 'border-[#C5A880] text-[#C5A880]' : 'border-transparent text-neutral-400 hover:text-neutral-200'"
+                    class="text-center py-2 border-b-2 transition-all cursor-pointer"
+                >
+                    Studio
+                </button>
             </div>
 
             <!-- Scrollable Catalog list -->
             <div class="flex-1 overflow-y-auto space-y-4 pr-1 scrollbar-thin">
                 
-                <!-- Stems List -->
-                <div x-show="activeCategory === 'stems'" class="space-y-4">
+                <!-- Stems Grid -->
+                <div x-show="activeCategory === 'stems'" class="grid grid-cols-2 gap-3">
                     @foreach($availableStems as $stem)
                         <div 
-                            :class="theme === 'champagne' ? 'bg-neutral-50/50 hover:bg-neutral-100/60' : 'bg-black/20 hover:bg-black/40'" 
-                            class="flex items-center gap-3.5 p-3 rounded-2xl border border-neutral-800/30 transition-all group"
+                            :class="(selectedStems[{{ $stem->id }}] ?? 0) > 0 
+                                ? 'border-[#C5A880] shadow-[0_0_12px_rgba(197,168,128,0.15)] bg-[#C5A880]/5' 
+                                : (theme === 'champagne' ? 'bg-neutral-50/50 hover:bg-neutral-100/60 border-neutral-200' : 'bg-black/20 hover:bg-black/40 border-neutral-800/30')"
+                            class="flex flex-col rounded-2xl border p-2.5 transition-all group justify-between relative"
                         >
-                            <img src="{{ $stem->image_url }}" alt="{{ $stem->name }}" class="w-14 h-14 object-cover rounded-xl shadow-md shrink-0">
+                            <div class="relative w-full aspect-square overflow-hidden rounded-xl mb-2 shrink-0">
+                                <img src="{{ $stem->image_url }}" alt="{{ $stem->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                @if($stem->stock < 10)
+                                    <span class="absolute top-1 left-1 px-1.5 py-0.5 bg-red-950/80 text-red-400 border border-red-900/30 rounded text-[7px] font-mono uppercase tracking-wider">Low Stock</span>
+                                @endif
+                            </div>
                             
-                            <div class="flex-1 min-w-0">
-                                <h4 class="text-xs font-semibold truncate group-hover:text-[#C5A880] transition-colors">{{ $stem->name }}</h4>
-                                <p class="text-[10px] text-neutral-500 font-mono mt-0.5">{{ number_format($stem->price) }} KSH</p>
-                                <p class="text-[9px] text-neutral-400 italic mt-0.5 truncate">{{ $stem->grade }} &bull; {{ $stem->description }}</p>
-                            </div>
+                            <div class="flex-1 min-w-0 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="text-[11px] font-semibold truncate group-hover:text-[#C5A880] transition-colors" title="{{ $stem->name }}">{{ $stem->name }}</h4>
+                                    <p class="text-[9px] text-neutral-550 font-mono mt-0.5">{{ number_format($stem->price) }} KSH</p>
+                                </div>
 
-                            <!-- Quantity Selector -->
-                            <div class="flex items-center space-x-2 shrink-0">
-                                <button 
-                                    wire:click="removeStem({{ $stem->id }})" 
-                                    class="w-6 h-6 rounded-full flex items-center justify-center border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 font-mono text-xs cursor-pointer select-none"
-                                >
-                                    -
-                                </button>
-                                <span class="text-xs font-mono w-5 text-center">{{ $selectedStems[$stem->id] ?? 0 }}</span>
-                                <button 
-                                    wire:click="addStem({{ $stem->id }})" 
-                                    class="w-6 h-6 rounded-full flex items-center justify-center border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 font-mono text-xs cursor-pointer select-none"
-                                >
-                                    +
-                                </button>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                <!-- Vases List -->
-                <div x-show="activeCategory === 'vases'" class="space-y-4">
-                    @foreach($availableVases as $vase)
-                        <div 
-                            @click="$wire.selectVase({{ $vase->id }})"
-                            :class="{
-                                'border-[#C5A880] bg-[#C5A880]/5': selectedVaseId == {{ $vase->id }},
-                                'border-neutral-800/30': selectedVaseId != {{ $vase->id }},
-                                'bg-neutral-50/50': theme === 'champagne' && selectedVaseId != {{ $vase->id }},
-                                'bg-black/20': theme !== 'champagne' && selectedVaseId != {{ $vase->id }}
-                            }"
-                            class="flex items-center gap-3.5 p-3 rounded-2xl border hover:border-[#C5A880]/70 transition-all cursor-pointer group"
-                        >
-                            <img src="{{ $vase->image_url }}" alt="{{ $vase->name }}" class="w-14 h-14 object-cover rounded-xl shadow-md shrink-0">
-                            
-                            <div class="flex-1 min-w-0">
-                                <h4 class="text-xs font-semibold truncate group-hover:text-[#C5A880] transition-colors">{{ $vase->name }}</h4>
-                                <p class="text-[10px] text-neutral-500 font-mono mt-0.5">{{ number_format($vase->price) }} KSH</p>
-                                <p class="text-[9px] text-neutral-400 italic mt-0.5 truncate">{{ $vase->description }}</p>
-                            </div>
-
-                            <!-- Selection Indicator -->
-                            <div class="shrink-0 pr-2">
-                                <div :class="selectedVaseId == {{ $vase->id }} ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-4 h-4 rounded-full flex items-center justify-center">
-                                    <template x-if="selectedVaseId == {{ $vase->id }}">
-                                        <svg class="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </template>
+                                <!-- Quantity Selector -->
+                                <div class="flex items-center justify-between mt-3 bg-black/30 rounded-lg p-1">
+                                    <button 
+                                        wire:click="removeStem({{ $stem->id }})" 
+                                        class="w-5 h-5 rounded-md flex items-center justify-center border border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-900 font-mono text-[10px] cursor-pointer select-none"
+                                    >
+                                        -
+                                    </button>
+                                    <span class="text-[10px] font-mono w-4 text-center text-neutral-200">{{ $selectedStems[$stem->id] ?? 0 }}</span>
+                                    <button 
+                                        wire:click="addStem({{ $stem->id }})" 
+                                        class="w-5 h-5 rounded-md flex items-center justify-center border border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-900 font-mono text-[10px] cursor-pointer select-none"
+                                    >
+                                        +
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
 
-                <!-- Wrappings List -->
-                <div x-show="activeCategory === 'wraps'" class="space-y-4">
+                <!-- Vases Grid -->
+                <div x-show="activeCategory === 'vases'" class="grid grid-cols-2 gap-3">
+                    @foreach($availableVases as $vase)
+                        <div 
+                            @click="$wire.selectVase({{ $vase->id }})"
+                            :class="selectedVaseId == {{ $vase->id }} 
+                                ? 'border-[#C5A880] shadow-[0_0_12px_rgba(197,168,128,0.2)] bg-[#C5A880]/5' 
+                                : (theme === 'champagne' ? 'bg-neutral-50/50 hover:bg-neutral-100/60 border-neutral-200' : 'bg-black/20 hover:bg-black/40 border-neutral-800/30')"
+                            class="flex flex-col rounded-2xl border p-2.5 transition-all cursor-pointer group justify-between"
+                        >
+                            <div class="relative w-full aspect-square overflow-hidden rounded-xl mb-2 shrink-0">
+                                <img src="{{ $vase->image_url }}" alt="{{ $vase->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            </div>
+                            
+                            <div class="flex-1 min-w-0 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="text-[11px] font-semibold truncate group-hover:text-[#C5A880] transition-colors" title="{{ $vase->name }}">{{ $vase->name }}</h4>
+                                    <p class="text-[9px] text-neutral-550 font-mono mt-0.5">{{ number_format($vase->price) }} KSH</p>
+                                </div>
+
+                                <div class="flex justify-between items-center mt-2.5">
+                                    <span class="text-[8px] text-neutral-500 font-mono uppercase">Vase Base</span>
+                                    <div :class="selectedVaseId == {{ $vase->id }} ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                                        <template x-if="selectedVaseId == {{ $vase->id }}">
+                                            <svg class="w-2 h-2 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Wrappings Grid -->
+                <div x-show="activeCategory === 'wraps'" class="grid grid-cols-2 gap-3">
                     <!-- Option for No Wrap -->
                     <div 
                         @click="$wire.selectWrapping(null)"
-                        :class="{
-                            'border-[#C5A880] bg-[#C5A880]/5': selectedWrappingId === null,
-                            'border-neutral-800/30': selectedWrappingId !== null,
-                            'bg-neutral-50/50': theme === 'champagne' && selectedWrappingId !== null,
-                            'bg-black/20': theme !== 'champagne' && selectedWrappingId !== null
-                        }"
-                        class="flex items-center gap-3.5 p-3 rounded-2xl border hover:border-[#C5A880]/70 transition-all cursor-pointer group"
+                        :class="selectedWrappingId === null 
+                            ? 'border-[#C5A880] shadow-[0_0_12px_rgba(197,168,128,0.2)] bg-[#C5A880]/5' 
+                            : (theme === 'champagne' ? 'bg-neutral-50/50 hover:bg-neutral-100/60 border-neutral-200' : 'bg-black/20 hover:bg-black/40 border-neutral-800/30')"
+                        class="flex flex-col rounded-2xl border p-2.5 transition-all cursor-pointer group justify-between"
                     >
-                        <div class="w-14 h-14 bg-neutral-500/10 rounded-xl flex items-center justify-center text-[10px] font-mono text-neutral-400 shrink-0">None</div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="text-xs font-semibold truncate group-hover:text-[#C5A880] transition-colors">No Wrapping</h4>
-                            <p class="text-[9px] text-neutral-500 mt-0.5">Keep the arrangement bare in its presentation vase.</p>
-                        </div>
-                        <div class="shrink-0 pr-2">
-                            <div :class="selectedWrappingId === null ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-4 h-4 rounded-full flex items-center justify-center">
-                                <template x-if="selectedWrappingId === null">
-                                    <svg class="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </template>
+                        <div class="w-full aspect-square bg-neutral-500/5 rounded-xl flex items-center justify-center text-[10px] font-mono text-neutral-500 mb-2 shrink-0">None</div>
+                        <div class="flex-1 min-w-0 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-[11px] font-semibold truncate group-hover:text-[#C5A880] transition-colors">No Wrap</h4>
+                                <p class="text-[9px] text-neutral-500 mt-0.5">Bare presentation</p>
+                            </div>
+                            <div class="flex justify-between items-center mt-2.5">
+                                <span class="text-[8px] text-neutral-500 font-mono uppercase">Free</span>
+                                <div :class="selectedWrappingId === null ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                                    <template x-if="selectedWrappingId === null">
+                                        <svg class="w-2 h-2 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -229,123 +244,297 @@
                     @foreach($availableWrappings as $wrap)
                         <div 
                             @click="$wire.selectWrapping({{ $wrap->id }})"
-                            :class="{
-                                'border-[#C5A880] bg-[#C5A880]/5': selectedWrappingId == {{ $wrap->id }},
-                                'border-neutral-800/30': selectedWrappingId != {{ $wrap->id }},
-                                'bg-neutral-50/50': theme === 'champagne' && selectedWrappingId != {{ $wrap->id }},
-                                'bg-black/20': theme !== 'champagne' && selectedWrappingId != {{ $wrap->id }}
-                            }"
-                            class="flex items-center gap-3.5 p-3 rounded-2xl border hover:border-[#C5A880]/70 transition-all cursor-pointer group"
+                            :class="selectedWrappingId == {{ $wrap->id }} 
+                                ? 'border-[#C5A880] shadow-[0_0_12px_rgba(197,168,128,0.2)] bg-[#C5A880]/5' 
+                                : (theme === 'champagne' ? 'bg-neutral-50/50 hover:bg-neutral-100/60 border-neutral-200' : 'bg-black/20 hover:bg-black/40 border-neutral-800/30')"
+                            class="flex flex-col rounded-2xl border p-2.5 transition-all cursor-pointer group justify-between"
                         >
-                            <img src="{{ $wrap->image_url }}" alt="{{ $wrap->name }}" class="w-14 h-14 object-cover rounded-xl shadow-md shrink-0">
-                            <div class="flex-1 min-w-0">
-                                <h4 class="text-xs font-semibold truncate group-hover:text-[#C5A880] transition-colors">{{ $wrap->name }}</h4>
-                                <p class="text-[10px] text-neutral-500 font-mono mt-0.5">{{ number_format($wrap->price) }} KSH</p>
-                                <p class="text-[9px] text-neutral-400 italic mt-0.5 truncate">{{ $wrap->description }}</p>
+                            <div class="relative w-full aspect-square overflow-hidden rounded-xl mb-2 shrink-0">
+                                <img src="{{ $wrap->image_url }}" alt="{{ $wrap->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             </div>
-                            <div class="shrink-0 pr-2">
-                                <div :class="selectedWrappingId == {{ $wrap->id }} ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-4 h-4 rounded-full flex items-center justify-center">
-                                    <template x-if="selectedWrappingId == {{ $wrap->id }}">
-                                        <svg class="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </template>
+                            
+                            <div class="flex-1 min-w-0 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="text-[11px] font-semibold truncate group-hover:text-[#C5A880] transition-colors" title="{{ $wrap->name }}">{{ $wrap->name }}</h4>
+                                    <p class="text-[9px] text-neutral-550 font-mono mt-0.5">{{ number_format($wrap->price) }} KSH</p>
+                                </div>
+
+                                <div class="flex justify-between items-center mt-2.5">
+                                    <span class="text-[8px] text-neutral-500 font-mono uppercase">Wrapping</span>
+                                    <div :class="selectedWrappingId == {{ $wrap->id }} ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                                        <template x-if="selectedWrappingId == {{ $wrap->id }}">
+                                            <svg class="w-2 h-2 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
 
-                <!-- Addons List (Wine, Gifts, Fragrances) -->
+                <!-- Addons Grid (Wine, Gifts, Fragrances) -->
                 <div x-show="activeCategory === 'addons'" class="space-y-6">
                     
                     <!-- Wine Sub-Section -->
                     <div class="space-y-3">
                         <h4 class="text-[10px] uppercase tracking-widest font-mono text-[#C5A880] font-bold">1. Wines & Champagne</h4>
                         
-                        <!-- None Option -->
-                        <div 
-                            @click="$wire.selectWine(null)"
-                            :class="selectedWineId === null ? 'border-[#C5A880] bg-[#C5A880]/5' : 'border-neutral-800/30'"
-                            class="flex items-center justify-between p-2.5 rounded-xl border text-xs cursor-pointer hover:border-[#C5A880]/70 transition-all"
-                        >
-                            <span class="font-medium text-neutral-300">No Premium Wine</span>
-                            <span class="font-mono text-neutral-500">Free</span>
-                        </div>
-
-                        @foreach($availableWines as $wine)
+                        <div class="grid grid-cols-2 gap-3">
+                            <!-- None Option -->
                             <div 
-                                @click="$wire.selectWine({{ $wine->id }})"
-                                :class="selectedWineId == {{ $wine->id }} ? 'border-[#C5A880] bg-[#C5A880]/5' : 'border-neutral-800/30'"
-                                class="flex items-center justify-between p-2.5 rounded-xl border text-xs cursor-pointer hover:border-[#C5A880]/70 transition-all gap-2"
+                                @click="$wire.selectWine(null)"
+                                :class="selectedWineId === null 
+                                    ? 'border-[#C5A880] shadow-[0_0_12px_rgba(197,168,128,0.2)] bg-[#C5A880]/5' 
+                                    : (theme === 'champagne' ? 'bg-neutral-50/50 hover:bg-neutral-100/60 border-neutral-200' : 'bg-black/20 hover:bg-black/40 border-neutral-800/30')"
+                                class="flex flex-col rounded-2xl border p-2.5 transition-all cursor-pointer group justify-between"
                             >
-                                <div class="truncate">
-                                    <p class="font-semibold truncate text-neutral-200">{{ $wine->name }}</p>
-                                    <p class="text-[9px] text-neutral-500 truncate">{{ $wine->description }}</p>
+                                <div class="w-full aspect-video bg-neutral-500/5 rounded-xl flex items-center justify-center text-[10px] font-mono text-neutral-500 mb-2 shrink-0">None</div>
+                                <div class="flex-1 min-w-0 flex flex-col justify-between">
+                                    <div>
+                                        <h4 class="text-[11px] font-semibold truncate group-hover:text-[#C5A880] transition-colors">No Wine</h4>
+                                        <p class="text-[9px] text-neutral-500 mt-0.5">Bare bouquet</p>
+                                    </div>
+                                    <div class="flex justify-between items-center mt-2.5">
+                                        <span class="text-[8px] text-neutral-500 font-mono uppercase">Free</span>
+                                        <div :class="selectedWineId === null ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                                            <template x-if="selectedWineId === null">
+                                                <svg class="w-2 h-2 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span class="font-mono text-[#C5A880] shrink-0">{{ number_format($wine->price) }} KSH</span>
                             </div>
-                        @endforeach
+
+                            @foreach($availableWines as $wine)
+                                <div 
+                                    @click="$wire.selectWine({{ $wine->id }})"
+                                    :class="selectedWineId == {{ $wine->id }} 
+                                        ? 'border-[#C5A880] shadow-[0_0_12px_rgba(197,168,128,0.2)] bg-[#C5A880]/5' 
+                                        : (theme === 'champagne' ? 'bg-neutral-50/50 hover:bg-neutral-100/60 border-neutral-200' : 'bg-black/20 hover:bg-black/40 border-neutral-800/30')"
+                                    class="flex flex-col rounded-2xl border p-2.5 transition-all cursor-pointer group justify-between"
+                                >
+                                    <div class="w-full aspect-video overflow-hidden rounded-xl mb-2 shrink-0">
+                                        <img src="{{ $wine->image_url }}" alt="{{ $wine->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                    </div>
+                                    
+                                    <div class="flex-1 min-w-0 flex flex-col justify-between">
+                                        <div>
+                                            <h4 class="text-[11px] font-semibold truncate group-hover:text-[#C5A880] transition-colors" title="{{ $wine->name }}">{{ $wine->name }}</h4>
+                                            <p class="text-[9px] text-neutral-550 font-mono mt-0.5">{{ number_format($wine->price) }} KSH</p>
+                                        </div>
+
+                                        <div class="flex justify-between items-center mt-2.5">
+                                            <span class="text-[8px] text-neutral-500 font-mono uppercase">Wine</span>
+                                            <div :class="selectedWineId == {{ $wine->id }} ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                                                <template x-if="selectedWineId == {{ $wine->id }}">
+                                                    <svg class="w-2 h-2 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
 
                     <!-- Gifts Sub-Section -->
                     <div class="space-y-3">
                         <h4 class="text-[10px] uppercase tracking-widest font-mono text-[#C5A880] font-bold">2. Luxury Gifts</h4>
                         
-                        <!-- None Option -->
-                        <div 
-                            @click="$wire.selectGift(null)"
-                            :class="selectedGiftId === null ? 'border-[#C5A880] bg-[#C5A880]/5' : 'border-neutral-800/30'"
-                            class="flex items-center justify-between p-2.5 rounded-xl border text-xs cursor-pointer hover:border-[#C5A880]/70 transition-all"
-                        >
-                            <span class="font-medium text-neutral-300">No Gift Addon</span>
-                            <span class="font-mono text-neutral-500">Free</span>
-                        </div>
-
-                        @foreach($availableGifts as $gift)
+                        <div class="grid grid-cols-2 gap-3">
+                            <!-- None Option -->
                             <div 
-                                @click="$wire.selectGift({{ $gift->id }})"
-                                :class="selectedGiftId == {{ $gift->id }} ? 'border-[#C5A880] bg-[#C5A880]/5' : 'border-neutral-800/30'"
-                                class="flex items-center justify-between p-2.5 rounded-xl border text-xs cursor-pointer hover:border-[#C5A880]/70 transition-all gap-2"
+                                @click="$wire.selectGift(null)"
+                                :class="selectedGiftId === null 
+                                    ? 'border-[#C5A880] shadow-[0_0_12px_rgba(197,168,128,0.2)] bg-[#C5A880]/5' 
+                                    : (theme === 'champagne' ? 'bg-neutral-50/50 hover:bg-neutral-100/60 border-neutral-200' : 'bg-black/20 hover:bg-black/40 border-neutral-800/30')"
+                                class="flex flex-col rounded-2xl border p-2.5 transition-all cursor-pointer group justify-between"
                             >
-                                <div class="truncate">
-                                    <p class="font-semibold truncate text-neutral-200">{{ $gift->name }}</p>
-                                    <p class="text-[9px] text-neutral-500 truncate">{{ $gift->description }}</p>
+                                <div class="w-full aspect-video bg-neutral-500/5 rounded-xl flex items-center justify-center text-[10px] font-mono text-neutral-500 mb-2 shrink-0">None</div>
+                                <div class="flex-1 min-w-0 flex flex-col justify-between">
+                                    <div>
+                                        <h4 class="text-[11px] font-semibold truncate group-hover:text-[#C5A880] transition-colors">No Gift</h4>
+                                        <p class="text-[9px] text-neutral-500 mt-0.5">Bare bouquet</p>
+                                    </div>
+                                    <div class="flex justify-between items-center mt-2.5">
+                                        <span class="text-[8px] text-neutral-500 font-mono uppercase">Free</span>
+                                        <div :class="selectedGiftId === null ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                                            <template x-if="selectedGiftId === null">
+                                                <svg class="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span class="font-mono text-[#C5A880] shrink-0">{{ number_format($gift->price) }} KSH</span>
                             </div>
-                        @endforeach
+
+                            @foreach($availableGifts as $gift)
+                                <div 
+                                    @click="$wire.selectGift({{ $gift->id }})"
+                                    :class="selectedGiftId == {{ $gift->id }} 
+                                        ? 'border-[#C5A880] shadow-[0_0_12px_rgba(197,168,128,0.2)] bg-[#C5A880]/5' 
+                                        : (theme === 'champagne' ? 'bg-neutral-50/50 hover:bg-neutral-100/60 border-neutral-200' : 'bg-black/20 hover:bg-black/40 border-neutral-800/30')"
+                                    class="flex flex-col rounded-2xl border p-2.5 transition-all cursor-pointer group justify-between"
+                                >
+                                    <div class="w-full aspect-video overflow-hidden rounded-xl mb-2 shrink-0">
+                                        <img src="{{ $gift->image_url }}" alt="{{ $gift->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                    </div>
+                                    
+                                    <div class="flex-1 min-w-0 flex flex-col justify-between">
+                                        <div>
+                                            <h4 class="text-[11px] font-semibold truncate group-hover:text-[#C5A880] transition-colors" title="{{ $gift->name }}">{{ $gift->name }}</h4>
+                                            <p class="text-[9px] text-neutral-550 font-mono mt-0.5">{{ number_format($gift->price) }} KSH</p>
+                                        </div>
+
+                                        <div class="flex justify-between items-center mt-2.5">
+                                            <span class="text-[8px] text-neutral-500 font-mono uppercase">Gift</span>
+                                            <div :class="selectedGiftId == {{ $gift->id }} ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                                                <template x-if="selectedGiftId == {{ $gift->id }}">
+                                                    <svg class="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
 
                     <!-- Fragrances Sub-Section -->
                     <div class="space-y-3">
                         <h4 class="text-[10px] uppercase tracking-widest font-mono text-[#C5A880] font-bold">3. Atelier Floral Mists</h4>
                         
-                        <!-- None Option -->
-                        <div 
-                            @click="$wire.selectFragrance(null)"
-                            :class="selectedFragranceId === null ? 'border-[#C5A880] bg-[#C5A880]/5' : 'border-neutral-800/30'"
-                            class="flex items-center justify-between p-2.5 rounded-xl border text-xs cursor-pointer hover:border-[#C5A880]/70 transition-all"
-                        >
-                            <span class="font-medium text-neutral-300">No Fragrance Mist</span>
-                            <span class="font-mono text-neutral-500">Free</span>
-                        </div>
-
-                        @foreach($availableFragrances as $frag)
+                        <div class="grid grid-cols-2 gap-3">
+                            <!-- None Option -->
                             <div 
-                                @click="$wire.selectFragrance({{ $frag->id }})"
-                                :class="selectedFragranceId == {{ $frag->id }} ? 'border-[#C5A880] bg-[#C5A880]/5' : 'border-neutral-800/30'"
-                                class="flex items-center justify-between p-2.5 rounded-xl border text-xs cursor-pointer hover:border-[#C5A880]/70 transition-all gap-2"
+                                @click="$wire.selectFragrance(null)"
+                                :class="selectedFragranceId === null 
+                                    ? 'border-[#C5A880] shadow-[0_0_12px_rgba(197,168,128,0.2)] bg-[#C5A880]/5' 
+                                    : (theme === 'champagne' ? 'bg-neutral-50/50 hover:bg-neutral-100/60 border-neutral-200' : 'bg-black/20 hover:bg-black/40 border-neutral-800/30')"
+                                class="flex flex-col rounded-2xl border p-2.5 transition-all cursor-pointer group justify-between"
                             >
-                                <div class="truncate">
-                                    <p class="font-semibold truncate text-neutral-200">{{ $frag->name }}</p>
-                                    <p class="text-[9px] text-neutral-500 truncate">{{ $frag->description }}</p>
+                                <div class="w-full aspect-video bg-neutral-500/5 rounded-xl flex items-center justify-center text-[10px] font-mono text-neutral-500 mb-2 shrink-0">None</div>
+                                <div class="flex-1 min-w-0 flex flex-col justify-between">
+                                    <div>
+                                        <h4 class="text-[11px] font-semibold truncate group-hover:text-[#C5A880] transition-colors">No Mist</h4>
+                                        <p class="text-[9px] text-neutral-550 mt-0.5">Bare bouquet</p>
+                                    </div>
+                                    <div class="flex justify-between items-center mt-2.5">
+                                        <span class="text-[8px] text-neutral-500 font-mono uppercase">Free</span>
+                                        <div :class="selectedFragranceId === null ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                                            <template x-if="selectedFragranceId === null">
+                                                <svg class="w-2 h-2 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span class="font-mono text-[#C5A880] shrink-0">{{ number_format($frag->price) }} KSH</span>
                             </div>
-                        @endforeach
+
+                            @foreach($availableFragrances as $frag)
+                                <div 
+                                    @click="$wire.selectFragrance({{ $frag->id }})"
+                                    :class="selectedFragranceId == {{ $frag->id }} 
+                                        ? 'border-[#C5A880] shadow-[0_0_12px_rgba(197,168,128,0.2)] bg-[#C5A880]/5' 
+                                        : (theme === 'champagne' ? 'bg-neutral-50/50 hover:bg-neutral-100/60 border-neutral-200' : 'bg-black/20 hover:bg-black/40 border-neutral-800/30')"
+                                    class="flex flex-col rounded-2xl border p-2.5 transition-all cursor-pointer group justify-between"
+                                >
+                                    <div class="w-full aspect-video overflow-hidden rounded-xl mb-2 shrink-0">
+                                        <img src="{{ $frag->image_url }}" alt="{{ $frag->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                    </div>
+                                    
+                                    <div class="flex-1 min-w-0 flex flex-col justify-between">
+                                        <div>
+                                            <h4 class="text-[11px] font-semibold truncate group-hover:text-[#C5A880] transition-colors" title="{{ $frag->name }}">{{ $frag->name }}</h4>
+                                            <p class="text-[9px] text-neutral-550 font-mono mt-0.5">{{ number_format($frag->price) }} KSH</p>
+                                        </div>
+
+                                        <div class="flex justify-between items-center mt-2.5">
+                                            <span class="text-[8px] text-neutral-500 font-mono uppercase">Mist</span>
+                                            <div :class="selectedFragranceId == {{ $frag->id }} ? 'bg-[#C5A880]' : 'border border-neutral-700'" class="w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                                                <template x-if="selectedFragranceId == {{ $frag->id }}">
+                                                    <svg class="w-2 h-2 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
 
+                </div>
+
+                <!-- Studio/Atmosphere Tab content -->
+                <div x-show="activeCategory === 'studio'" class="space-y-5">
+                    <div class="space-y-2.5">
+                        <label class="text-[10px] uppercase tracking-widest font-mono text-neutral-400 block font-bold">Studio Lighting Themes</label>
+                        <div class="grid grid-cols-1 gap-2">
+                            <button 
+                                @click="theme = 'onyx'"
+                                :class="theme === 'onyx' ? 'border-[#C5A880] bg-[#C5A880]/10 text-white font-semibold' : 'border-neutral-800/30 text-neutral-400 hover:text-neutral-200 bg-black/10'" 
+                                class="flex items-center justify-between p-3.5 rounded-2xl border text-xs cursor-pointer transition-all"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]"></span>
+                                    Onyx Dark Room
+                                </span>
+                                <span class="text-[9px] font-mono uppercase text-neutral-500">Amber Glow</span>
+                            </button>
+                            <button 
+                                @click="theme = 'champagne'"
+                                :class="theme === 'champagne' ? 'border-[#C5A880] bg-[#C5A880]/10 text-neutral-900 font-semibold' : 'border-neutral-800/30 text-neutral-400 hover:text-neutral-200 bg-black/10'" 
+                                class="flex items-center justify-between p-3.5 rounded-2xl border text-xs cursor-pointer transition-all"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-100 shadow-[0_0_8px_rgba(254,249,195,0.5)]"></span>
+                                    Champagne Atelier
+                                </span>
+                                <span class="text-[9px] font-mono uppercase text-neutral-500">Bright Luxury</span>
+                            </button>
+                            <button 
+                                @click="theme = 'rose'"
+                                :class="theme === 'rose' ? 'border-[#C5A880] bg-[#C5A880]/10 text-white font-semibold' : 'border-neutral-800/30 text-neutral-400 hover:text-neutral-200 bg-black/10'" 
+                                class="flex items-center justify-between p-3.5 rounded-2xl border text-xs cursor-pointer transition-all"
+                            >
+                                <span class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-pink-400 shadow-[0_0_8px_rgba(244,114,182,0.5)]"></span>
+                                    Blushing Rose Salon
+                                </span>
+                                <span class="text-[9px] font-mono uppercase text-neutral-500">Rose Glow</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2.5 pt-4 border-t border-neutral-800/40">
+                        <label class="text-[10px] uppercase tracking-widest font-mono text-neutral-400 block font-bold">Cinematic Viewpoints</label>
+                        <div class="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                            <button @click="$dispatch('camera-preset', 'front')" class="p-3 rounded-2xl border border-neutral-800/30 bg-black/15 text-neutral-350 hover:text-white hover:border-[#C5A880]/70 hover:bg-neutral-800/30 transition text-left cursor-pointer select-none">
+                                🎬 Front View
+                            </button>
+                            <button @click="$dispatch('camera-preset', 'birds_eye')" class="p-3 rounded-2xl border border-neutral-800/30 bg-black/15 text-neutral-350 hover:text-white hover:border-[#C5A880]/70 hover:bg-neutral-800/30 transition text-left cursor-pointer select-none">
+                                👁️ Bird's Eye
+                            </button>
+                            <button @click="$dispatch('camera-preset', 'macro')" class="p-3 rounded-2xl border border-neutral-800/30 bg-black/15 text-neutral-350 hover:text-white hover:border-[#C5A880]/70 hover:bg-neutral-800/30 transition text-left cursor-pointer select-none">
+                                🔍 Macro Zoom
+                            </button>
+                            <button @click="$dispatch('camera-preset', 'reset')" class="p-3 rounded-2xl border border-neutral-800/30 bg-black/15 text-neutral-350 hover:text-white hover:border-[#C5A880]/70 hover:bg-neutral-800/30 transition text-left cursor-pointer select-none">
+                                🔄 Reset Cam
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -372,6 +561,7 @@
             <script>
                 window.threeCurationScene = function() {
                     return {
+                        // Three.js Core Components
                         scene: null,
                         camera: null,
                         renderer: null,
@@ -389,12 +579,28 @@
                         giftMesh: null,
                         fragranceMesh: null,
 
+                        // Pedestal Under-glow components
+                        glowRing: null,
+                        glowMat: null,
+
+                        // Animation loop handle
+                        animationFrameId: null,
+
+                        // Camera Presets Smooth Transition states
+                        cameraTargetPos: new THREE.Vector3(0, 7, 13),
+                        cameraTargetLookAt: new THREE.Vector3(0, 3, 0),
+                        isTransitioningCamera: false,
+
                         vaseStyles: {
                             1: { color: '#8C6239', roughness: 0.85, metalness: 0.1, opacity: 1.0, transmission: 0.0 }, // Clay
                             2: { color: '#E2F0D9', roughness: 0.1, metalness: 0.1, opacity: 0.65, transmission: 0.9, transparent: true }, // Glass
                             default: { color: '#111115', roughness: 0.15, metalness: 0.9, opacity: 1.0, transmission: 0.0 }
                         },
 
+                        /**
+                         * Initialize Three.js viewport, table pedestal, lights, controls, and render loops.
+                         * Attaches event listeners and registers proper garbage collection handlers on destruction.
+                         */
                         initScene() {
                             if (typeof THREE === 'undefined') {
                                 setTimeout(() => this.initScene(), 150);
@@ -404,29 +610,34 @@
                             const canvas = document.getElementById('curation-3d-canvas');
                             const container = canvas.parentElement;
 
+                            // 1. Scene setup
                             this.scene = new THREE.Scene();
                             
+                            // 2. Camera setup with starting coordinates
                             this.camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-                            this.camera.position.set(0, 7, 13);
+                            this.camera.position.copy(this.cameraTargetPos);
 
+                            // 3. WebGL Renderer configuration with high-fidelity soft shadows
                             this.renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
                             this.renderer.setSize(container.clientWidth, container.clientHeight);
                             this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                             this.renderer.shadowMap.enabled = true;
                             this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
+                            // 4. OrbitControls with elastic dampening & custom angle limits
                             this.controls = new OrbitControls(this.camera, this.renderer.domElement);
                             this.controls.enableDamping = true;
                             this.controls.dampingFactor = 0.05;
                             this.controls.maxPolarAngle = Math.PI / 2 - 0.05;
-                            this.controls.minDistance = 5;
+                            this.controls.minDistance = 4;
                             this.controls.maxDistance = 25;
-                            this.controls.target.set(0, 3, 0);
+                            this.controls.target.copy(this.cameraTargetLookAt);
 
-                            // Enable auto-rotate by default for premium rotation preview
+                            // Auto-rotate by default for premium rotation preview
                             this.controls.autoRotate = this.$parent.orbitActive;
                             this.controls.autoRotateSpeed = 1.2;
 
+                            // 5. Lighting: Ambient, Directional (with shadows), and Point lighting
                             this.ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
                             this.scene.add(this.ambientLight);
 
@@ -441,26 +652,51 @@
                             this.pointLight.position.set(0, 5, 2);
                             this.scene.add(this.pointLight);
 
-                            const tableGeo = new THREE.CylinderGeometry(6, 6, 0.2, 64);
-                            const tableMat = new THREE.MeshStandardMaterial({
-                                color: 0x121214,
-                                roughness: 0.15,
-                                metalness: 0.8,
+                            // 6. Pedestal Base (Lower deck)
+                            const baseGeo = new THREE.CylinderGeometry(5.2, 5.2, 0.4, 64);
+                            const baseMat = new THREE.MeshStandardMaterial({
+                                color: 0x070709,
+                                roughness: 0.3,
+                                metalness: 0.9,
                             });
-                            this.tableMesh = new THREE.Mesh(tableGeo, tableMat);
-                            this.tableMesh.position.y = -0.1;
+                            const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+                            baseMesh.position.y = -0.3;
+                            baseMesh.receiveShadow = true;
+                            this.scene.add(baseMesh);
+
+                            // Table Pedestal Top Shelf (Upper deck)
+                            const topGeo = new THREE.CylinderGeometry(4.8, 4.8, 0.3, 64);
+                            const topMat = new THREE.MeshStandardMaterial({
+                                color: 0x18181c,
+                                roughness: 0.08,
+                                metalness: 0.85,
+                            });
+                            this.tableMesh = new THREE.Mesh(topGeo, topMat);
+                            this.tableMesh.position.y = 0.05;
                             this.tableMesh.receiveShadow = true;
                             this.scene.add(this.tableMesh);
+
+                            // Emissive Neon Under-glow Ring
+                            const glowGeo = new THREE.TorusGeometry(4.9, 0.06, 8, 64);
+                            this.glowMat = new THREE.MeshBasicMaterial({
+                                color: 0xEAB308, // Default Onyx glow color
+                            });
+                            this.glowRing = new THREE.Mesh(glowGeo, this.glowMat);
+                            this.glowRing.position.y = -0.1;
+                            this.glowRing.rotation.x = Math.PI / 2;
+                            this.scene.add(this.glowRing);
 
                             this.flowersGroup = new THREE.Group();
                             this.scene.add(this.flowersGroup);
 
+                            // Helper function to extract ID values from entangles safely
                             const getDetailId = (detail) => {
                                 if (Array.isArray(detail)) return detail[0];
                                 if (detail && typeof detail === 'object' && 'id' in detail) return detail.id;
                                 return detail;
                             };
 
+                            // Initialize viewport geometry and materials
                             this.buildVase();
                             this.updateArrangement();
                             this.updateWrapping();
@@ -469,63 +705,106 @@
                             this.updateFragrance();
                             this.applyTheme(this.$parent.theme);
 
+                            // --- WINDOW EVENT HANDLERS ---
                             const handleResize = () => {
+                                if (!container || !this.camera || !this.renderer) return;
                                 this.camera.aspect = container.clientWidth / container.clientHeight;
                                 this.camera.updateProjectionMatrix();
                                 this.renderer.setSize(container.clientWidth, container.clientHeight);
                             };
                             window.addEventListener('resize', handleResize);
 
-                            window.addEventListener('vase-changed', (e) => {
+                            const handleVaseChanged = (e) => {
                                 const id = getDetailId(e.detail);
                                 if (id !== undefined) this.$parent.selectedVaseId = id;
                                 this.buildVase();
-                            });
+                            };
+                            window.addEventListener('vase-changed', handleVaseChanged);
 
                             const triggerUpdate = () => {
                                 setTimeout(() => this.updateArrangement(), 50);
                             };
-                            window.addEventListener('stem-added', triggerUpdate);
-                            window.addEventListener('stem-removed', triggerUpdate);
-                            window.addEventListener('size-changed', triggerUpdate);
+                            const handleStemAdded = triggerUpdate;
+                            const handleStemRemoved = triggerUpdate;
+                            const handleSizeChanged = triggerUpdate;
                             
-                            window.addEventListener('theme-changed', (e) => {
+                            window.addEventListener('stem-added', handleStemAdded);
+                            window.addEventListener('stem-removed', handleStemRemoved);
+                            window.addEventListener('size-changed', handleSizeChanged);
+                            
+                            const handleThemeChanged = (e) => {
                                 const themeVal = getDetailId(e.detail);
                                 if (themeVal !== undefined) this.$parent.theme = themeVal;
                                 this.applyTheme(themeVal);
-                            });
+                            };
+                            window.addEventListener('theme-changed', handleThemeChanged);
 
-                            window.addEventListener('wrapping-changed', (e) => {
+                            const handleWrappingChanged = (e) => {
                                 const id = getDetailId(e.detail);
                                 if (id !== undefined) this.$parent.selectedWrappingId = id;
                                 this.updateWrapping();
-                            });
+                            };
+                            window.addEventListener('wrapping-changed', handleWrappingChanged);
 
-                            window.addEventListener('wine-changed', (e) => {
+                            const handleWineChanged = (e) => {
                                 const id = getDetailId(e.detail);
                                 if (id !== undefined) this.$parent.selectedWineId = id;
                                 this.updateWine();
-                            });
+                            };
+                            window.addEventListener('wine-changed', handleWineChanged);
 
-                            window.addEventListener('gift-changed', (e) => {
+                            const handleGiftChanged = (e) => {
                                 const id = getDetailId(e.detail);
                                 if (id !== undefined) this.$parent.selectedGiftId = id;
                                 this.updateGift();
-                            });
+                            };
+                            window.addEventListener('gift-changed', handleGiftChanged);
 
-                            window.addEventListener('fragrance-changed', (e) => {
+                            const handleFragranceChanged = (e) => {
                                 const id = getDetailId(e.detail);
                                 if (id !== undefined) this.$parent.selectedFragranceId = id;
                                 this.updateFragrance();
-                            });
+                            };
+                            window.addEventListener('fragrance-changed', handleFragranceChanged);
 
-                            window.addEventListener('toggle-orbit', (e) => {
+                            const handleToggleOrbit = (e) => {
                                 this.controls.autoRotate = !!getDetailId(e.detail);
-                            });
+                            };
+                            window.addEventListener('toggle-orbit', handleToggleOrbit);
 
+                            // Cinematic Camera Presets events listener
+                            const handleCameraPreset = (e) => {
+                                const preset = getDetailId(e.detail);
+                                this.isTransitioningCamera = true;
+                                if (preset === 'front') {
+                                    this.cameraTargetPos.set(0, 5, 13);
+                                    this.cameraTargetLookAt.set(0, 3, 0);
+                                } else if (preset === 'birds_eye') {
+                                    this.cameraTargetPos.set(0, 12, 0.1);
+                                    this.cameraTargetLookAt.set(0, 4.5, 0);
+                                } else if (preset === 'macro') {
+                                    this.cameraTargetPos.set(0, 4.2, 3.8);
+                                    this.cameraTargetLookAt.set(0, 4.2, 0);
+                                } else if (preset === 'reset') {
+                                    this.cameraTargetPos.set(0, 7, 13);
+                                    this.cameraTargetLookAt.set(0, 3, 0);
+                                }
+                            };
+                            window.addEventListener('camera-preset', handleCameraPreset);
+
+                            // --- ANIMATION LOOP ---
                             let frameCount = 0;
                             const animate = () => {
                                 frameCount++;
+                                
+                                // Interpolate camera coordinates smoothly for high-end cinematic sweeps
+                                if (this.isTransitioningCamera) {
+                                    this.camera.position.lerp(this.cameraTargetPos, 0.06);
+                                    this.controls.target.lerp(this.cameraTargetLookAt, 0.06);
+                                    if (this.camera.position.distanceTo(this.cameraTargetPos) < 0.01) {
+                                        this.isTransitioningCamera = false;
+                                    }
+                                }
                                 
                                 // Organic growing Bezier-tubes and rose spin-blooms
                                 if (this.flowersGroup) {
@@ -585,43 +864,173 @@
 
                                 this.controls.update();
                                 this.renderer.render(this.scene, this.camera);
-                                requestAnimationFrame(animate);
+                                this.animationFrameId = requestAnimationFrame(animate);
                             };
                             animate();
+
+                            // --- ALPINE CLEANUP HANDLER (PREVENTS WebGL CONTEXT LEAKS) ---
+                            this.$cleanup(() => {
+                                if (this.animationFrameId) {
+                                    cancelAnimationFrame(this.animationFrameId);
+                                }
+
+                                // Remove window event listeners
+                                window.removeEventListener('resize', handleResize);
+                                window.removeEventListener('vase-changed', handleVaseChanged);
+                                window.removeEventListener('stem-added', handleStemAdded);
+                                window.removeEventListener('stem-removed', handleStemRemoved);
+                                window.removeEventListener('size-changed', handleSizeChanged);
+                                window.removeEventListener('theme-changed', handleThemeChanged);
+                                window.removeEventListener('wrapping-changed', handleWrappingChanged);
+                                window.removeEventListener('wine-changed', handleWineChanged);
+                                window.removeEventListener('gift-changed', handleGiftChanged);
+                                window.removeEventListener('fragrance-changed', handleFragranceChanged);
+                                window.removeEventListener('toggle-orbit', handleToggleOrbit);
+                                window.removeEventListener('camera-preset', handleCameraPreset);
+
+                                // Dispose controls and renderer
+                                if (this.controls) this.controls.dispose();
+                                if (this.renderer) this.renderer.dispose();
+
+                                // Traverse scene and dispose of geometries, materials, and textures
+                                if (this.scene) {
+                                    this.scene.traverse((obj) => {
+                                        if (obj.geometry) obj.geometry.dispose();
+                                        if (obj.material) {
+                                            if (Array.isArray(obj.material)) {
+                                                obj.material.forEach((mat) => mat.dispose());
+                                            } else {
+                                                obj.material.dispose();
+                                            }
+                                        }
+                                    });
+                                }
+                                console.log('Three.js scene WebGL resources and Alpine scope events successfully garbage-collected.');
+                            });
                         },
 
                         buildVase() {
+                            // Properly traverse and dispose of existing WebGL entities to prevent leaks
                             if (this.vaseMesh) {
+                                this.vaseMesh.traverse((child) => {
+                                    if (child.geometry) child.geometry.dispose();
+                                    if (child.material) {
+                                        if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+                                        else child.material.dispose();
+                                    }
+                                });
                                 this.scene.remove(this.vaseMesh);
+                                this.vaseMesh = null;
                             }
 
+                            // Dynamic 3D Lathe Geometry & Material configuration based on database SKU mapping
+                            const vasesList = @json($availableVases);
+                            const selectedVase = vasesList.find(v => v.id == this.$parent.selectedVaseId);
+                            const sku = selectedVase ? selectedVase.sku : '';
+
+                            const vaseGroup = new THREE.Group();
                             const points = [];
-                            const vaseStyle = this.vaseStyles[this.$parent.selectedVaseId] || this.vaseStyles.default;
+                            let vaseMat = null;
 
-                            points.push(new THREE.Vector2(0, 0));
-                            points.push(new THREE.Vector2(1.2, 0));
-                            points.push(new THREE.Vector2(1.3, 0.4));
-                            points.push(new THREE.Vector2(1.1, 1.2));
-                            points.push(new THREE.Vector2(0.7, 2.0));
-                            points.push(new THREE.Vector2(0.8, 2.8));
-                            points.push(new THREE.Vector2(1.0, 3.0));
+                            if (sku === 'NB-DEC-CGW-02') { // Crystal Glass Watamu Vase (Hourglass profile + Clear Glass material)
+                                points.push(new THREE.Vector2(0, 0));
+                                points.push(new THREE.Vector2(1.0, 0));
+                                points.push(new THREE.Vector2(1.4, 0.6));
+                                points.push(new THREE.Vector2(0.7, 1.6));
+                                points.push(new THREE.Vector2(0.6, 2.2));
+                                points.push(new THREE.Vector2(0.9, 2.8));
+                                points.push(new THREE.Vector2(1.1, 3.2));
 
-                            const vaseGeo = new THREE.LatheGeometry(points, 32);
-                            const vaseMat = new THREE.MeshPhysicalMaterial({
-                                color: new THREE.Color(vaseStyle.color),
-                                roughness: vaseStyle.roughness,
-                                metalness: vaseStyle.metalness,
-                                transmission: vaseStyle.transmission || 0,
-                                opacity: vaseStyle.opacity,
-                                transparent: vaseStyle.transparent || false,
-                                side: THREE.DoubleSide,
-                                clearcoat: 1.0,
-                                clearcoatRoughness: 0.1
-                            });
+                                vaseMat = new THREE.MeshPhysicalMaterial({
+                                    color: new THREE.Color('#D4EBF2'),
+                                    roughness: 0.05,
+                                    metalness: 0.1,
+                                    transmission: 0.9,
+                                    opacity: 1.0,
+                                    transparent: true,
+                                    ior: 1.5,
+                                    thickness: 0.15,
+                                    side: THREE.DoubleSide,
+                                    clearcoat: 1.0,
+                                    clearcoatRoughness: 0.05
+                                });
+                            } else if (sku === 'NB-DEC-OOA-03') { // Obsidian Onyx Alabaster Vase (Stout profile + polished black gold material + physical gold top rim)
+                                points.push(new THREE.Vector2(0, 0));
+                                points.push(new THREE.Vector2(1.3, 0));
+                                points.push(new THREE.Vector2(1.3, 2.8));
+                                points.push(new THREE.Vector2(1.1, 2.9));
+                                points.push(new THREE.Vector2(1.1, 3.0));
 
-                            this.vaseMesh = new THREE.Mesh(vaseGeo, vaseMat);
-                            this.vaseMesh.castShadow = true;
-                            this.vaseMesh.receiveShadow = true;
+                                vaseMat = new THREE.MeshPhysicalMaterial({
+                                    color: new THREE.Color('#111115'),
+                                    roughness: 0.15,
+                                    metalness: 0.8,
+                                    side: THREE.DoubleSide,
+                                    clearcoat: 1.0,
+                                    clearcoatRoughness: 0.1
+                                });
+
+                                // Add Golden Top Rim for Obsidian Onyx to make it feel extremely luxury
+                                const rimGeo = new THREE.TorusGeometry(1.1, 0.07, 16, 64);
+                                const rimMat = new THREE.MeshStandardMaterial({
+                                    color: 0xD4AF37,
+                                    roughness: 0.18,
+                                    metalness: 0.95
+                                });
+                                const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+                                rimMesh.position.y = 3.0;
+                                rimMesh.rotation.x = Math.PI / 2;
+                                rimMesh.castShadow = true;
+                                rimMesh.receiveShadow = true;
+                                vaseGroup.add(rimMesh);
+                            } else if (sku === 'NB-DEC-FGL-04') { // Frosted Glacier Lily Vase (Fluted profile + Frosted Glass material)
+                                points.push(new THREE.Vector2(0, 0));
+                                points.push(new THREE.Vector2(0.8, 0));
+                                points.push(new THREE.Vector2(0.9, 0.5));
+                                points.push(new THREE.Vector2(0.8, 1.2));
+                                points.push(new THREE.Vector2(1.2, 2.2));
+                                points.push(new THREE.Vector2(1.7, 3.0));
+                                points.push(new THREE.Vector2(1.8, 3.1));
+
+                                vaseMat = new THREE.MeshPhysicalMaterial({
+                                    color: new THREE.Color('#E0F2FE'),
+                                    roughness: 0.35,
+                                    metalness: 0.05,
+                                    transmission: 0.8,
+                                    opacity: 0.9,
+                                    transparent: true,
+                                    ior: 1.2,
+                                    thickness: 0.2,
+                                    side: THREE.DoubleSide,
+                                    clearcoat: 0.2,
+                                    clearcoatRoughness: 0.4
+                                });
+                            } else { // NB-DEC-MRV-01 Matte Clay Rift Valley Vase ( Artisan classic clay silhouette + Matte Volcanic soils color)
+                                points.push(new THREE.Vector2(0, 0));
+                                points.push(new THREE.Vector2(1.2, 0));
+                                points.push(new THREE.Vector2(1.3, 0.4));
+                                points.push(new THREE.Vector2(1.1, 1.2));
+                                points.push(new THREE.Vector2(0.7, 2.0));
+                                points.push(new THREE.Vector2(0.8, 2.8));
+                                points.push(new THREE.Vector2(1.0, 3.0));
+
+                                vaseMat = new THREE.MeshPhysicalMaterial({
+                                    color: new THREE.Color('#8C6239'),
+                                    roughness: 0.85,
+                                    metalness: 0.1,
+                                    side: THREE.DoubleSide,
+                                    clearcoat: 0.0,
+                                    clearcoatRoughness: 0.1
+                                });
+                            }
+
+                            const vaseGeo = new THREE.LatheGeometry(points, 64);
+                            const baseBody = new THREE.Mesh(vaseGeo, vaseMat);
+                            baseBody.castShadow = true;
+                            baseBody.receiveShadow = true;
+                            vaseGroup.add(baseBody);
+
+                            this.vaseMesh = vaseGroup;
                             this.scene.add(this.vaseMesh);
                         },
 
@@ -735,10 +1144,11 @@
 
                             if (!this.$parent.selectedWrappingId) return;
 
-                            // 14 = Kraft Paper, 15 = Linen, 16 = Obsidian Box
-                            const id = parseInt(this.$parent.selectedWrappingId);
+                            const wrappingsList = @json($availableWrappings);
+                            const selectedWrapping = wrappingsList.find(w => w.id == this.$parent.selectedWrappingId);
+                            const sku = selectedWrapping ? selectedWrapping.sku : '';
                             
-                            if (id === 14) { // Kraft paper wrap
+                            if (sku === 'NB-DEC-LKW-01') { // Kraft paper wrap
                                 const wrapGeo = new THREE.CylinderGeometry(1.6, 1.2, 3.4, 32, 1, true);
                                 const wrapMat = new THREE.MeshStandardMaterial({
                                     color: 0xC6A678,
@@ -751,7 +1161,7 @@
                                 this.wrappingMesh.castShadow = true;
                                 this.wrappingMesh.receiveShadow = true;
                                 this.scene.add(this.wrappingMesh);
-                            } else if (id === 15) { // Linen wrap
+                            } else if (sku === 'NB-DEC-LLW-02') { // Linen wrap
                                 const wrapGeo = new THREE.CylinderGeometry(1.65, 1.2, 3.4, 32, 1, true);
                                 const wrapMat = new THREE.MeshStandardMaterial({
                                     color: 0xEAE5D9,
@@ -764,7 +1174,7 @@
                                 this.wrappingMesh.castShadow = true;
                                 this.wrappingMesh.receiveShadow = true;
                                 this.scene.add(this.wrappingMesh);
-                            } else if (id === 16) { // Obsidian Gift Box
+                            } else if (sku === 'NB-DEC-NOG-03') { // Obsidian Gift Box
                                 const boxGeo = new THREE.BoxGeometry(3.2, 2.2, 3.2);
                                 const boxMat = new THREE.MeshPhysicalMaterial({
                                     color: 0x111115,
@@ -1058,6 +1468,17 @@
                         applyTheme(themeName) {
                             if (!this.scene) return;
 
+                            // Dynamic shifting of the neon under-glow color ring matching active theme settings
+                            if (this.glowMat) {
+                                if (themeName === 'rose') {
+                                    this.glowMat.color.setHex(0xF472B6); // Blushing pink
+                                } else if (themeName === 'champagne') {
+                                    this.glowMat.color.setHex(0xD4AF37); // Champagne gold
+                                } else {
+                                    this.glowMat.color.setHex(0xEAB308); // Onyx amber
+                                }
+                            }
+
                             if (themeName === 'rose') {
                                 this.renderer.setClearColor(0x15060A, 1.0);
                                 this.ambientLight.color.setHex(0x3E1E2C);
@@ -1141,6 +1562,43 @@
             <!-- 3D Canvas element -->
             <div wire:ignore class="absolute inset-0 z-0 w-full h-full" x-data="threeCurationScene()" x-init="initScene()">
                 <canvas id="curation-3d-canvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+
+                <!-- Floating Overlays (Inside wire:ignore so Livewire never breaks them) -->
+                <!-- Top-Left Curation Stats Sheet -->
+                <div class="absolute top-4 left-4 z-20 w-56 bg-black/60 backdrop-blur-md border border-neutral-800/40 p-3.5 rounded-2xl pointer-events-auto space-y-2 text-neutral-300">
+                    <div class="flex items-center justify-between border-b border-neutral-800/40 pb-1.5">
+                        <span class="text-[9px] font-mono tracking-widest uppercase text-[#C5A880] font-semibold">Atelier Status</span>
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                            eTIMS Compliant
+                        </span>
+                    </div>
+                    <div class="space-y-1.5 text-[10px] font-mono">
+                        <div class="flex justify-between">
+                            <span class="text-neutral-500">Base Vase:</span>
+                            <span class="text-neutral-200 truncate max-w-[120px]" x-text="((vasesList.find(v => v.id == selectedVaseId) || {name: 'None'}).name).replace(' Vase', '')"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-neutral-500">Base Price:</span>
+                            <span class="text-neutral-200" x-text="Number((vasesList.find(v => v.id == selectedVaseId) || {price: 0}).price).toLocaleString() + ' KSH'"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-neutral-500">Floral Stems:</span>
+                            <span class="text-[#C5A880] font-semibold" x-text="Math.ceil(Object.values(selectedStems).reduce((a, b) => a + (parseInt(b) || 0), 0) * (size === 'deluxe' ? 1.5 : (size === 'grand' ? 2.2 : 1.0))) + ' Stems'"></span>
+                        </div>
+                        <div class="flex justify-between pt-1 border-t border-neutral-800/20">
+                            <span class="text-neutral-500">Desk Total:</span>
+                            <span class="text-white font-semibold" x-text="Number(subtotal).toLocaleString() + ' KSH'"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top-Right Camera Presets Toolbar -->
+                <div class="absolute top-4 right-4 z-20 flex space-x-1 bg-black/60 backdrop-blur-md p-1 border border-neutral-800/40 rounded-xl pointer-events-auto">
+                    <button @click="$dispatch('camera-preset', 'front')" class="px-2.5 py-1.5 rounded-lg text-[9px] font-mono tracking-wider uppercase text-neutral-300 hover:text-white hover:bg-neutral-800 transition cursor-pointer select-none">Front</button>
+                    <button @click="$dispatch('camera-preset', 'birds_eye')" class="px-2.5 py-1.5 rounded-lg text-[9px] font-mono tracking-wider uppercase text-neutral-300 hover:text-white hover:bg-neutral-800 transition cursor-pointer select-none">Bird's Eye</button>
+                    <button @click="$dispatch('camera-preset', 'macro')" class="px-2.5 py-1.5 rounded-lg text-[9px] font-mono tracking-wider uppercase text-neutral-300 hover:text-white hover:bg-neutral-800 transition cursor-pointer select-none">Macro</button>
+                    <button @click="$dispatch('camera-preset', 'reset')" class="px-2.5 py-1.5 rounded-lg text-[9px] font-mono tracking-wider uppercase text-neutral-300 hover:text-white hover:bg-neutral-800 transition cursor-pointer select-none">Reset</button>
+                </div>
             </div>
 
             <!-- Scene Overlays & HUD -->

@@ -26,6 +26,8 @@ class CurationBuilder extends Component
     public $selectedGiftId = null;
     public $selectedFragranceId = null;
 
+    public $subtotal = 0;
+
     public function mount()
     {
         $this->availableStems = Product::where('category', 'stems')->get();
@@ -139,6 +141,11 @@ class CurationBuilder extends Component
         return $id;
     }
 
+    /**
+     * Add the constructed curation bundle and optional accessories to the user's session cart.
+     * Validates that all selected IDs correspond to valid products in their expected categories
+     * to prevent parameter tampering/injection.
+     */
     public function addToCart()
     {
         $cart = session()->get('noir_bloom_cart', []);
@@ -149,16 +156,68 @@ class CurationBuilder extends Component
         $giftId = $this->sanitizeId($this->selectedGiftId);
         $fragranceId = $this->sanitizeId($this->selectedFragranceId);
 
-        // Add vase
+        // --- BACKEND INPUT VALIDATION ---
+        // Verify that the vase exists in the seeded vases collection
+        if ($vaseId) {
+            $vase = $this->availableVases->firstWhere('id', $vaseId);
+            if (!$vase) {
+                session()->flash('error', 'Selected vase is invalid or discontinued.');
+                return;
+            }
+        }
+
+        // Verify that the wrapping paper exists in the wrappings collection
+        if ($wrappingId) {
+            $wrapping = $this->availableWrappings->firstWhere('id', $wrappingId);
+            if (!$wrapping) {
+                session()->flash('error', 'Selected wrapping option is invalid.');
+                return;
+            }
+        }
+
+        // Verify that the wine exists in the wines collection
+        if ($wineId) {
+            $wine = $this->availableWines->firstWhere('id', $wineId);
+            if (!$wine) {
+                session()->flash('error', 'Selected wine or beverage is invalid.');
+                return;
+            }
+        }
+
+        // Verify that the gift item exists in the gifts collection
+        if ($giftId) {
+            $gift = $this->availableGifts->firstWhere('id', $giftId);
+            if (!$gift) {
+                session()->flash('error', 'Selected gift accessory is invalid.');
+                return;
+            }
+        }
+
+        // Verify that the fragrance exists in the fragrances collection
+        if ($fragranceId) {
+            $fragrance = $this->availableFragrances->firstWhere('id', $fragranceId);
+            if (!$fragrance) {
+                session()->flash('error', 'Selected floral fragrance is invalid.');
+                return;
+            }
+        }
+
+        // Add Base Vase to the cart array
         if ($vaseId) {
             $key = $vaseId . '-standard';
             $cart[$key] = ($cart[$key] ?? 0) + 1;
         }
 
-        // Add stems
+        // Add Stems with size category validation
         $hasItems = false;
         foreach ($this->selectedStems as $stemId => $qty) {
             if ($qty > 0) {
+                // Ensure the stem product ID actually matches a valid stem variety
+                $stem = $this->availableStems->firstWhere('id', $stemId);
+                if (!$stem) {
+                    session()->flash('error', 'One or more selected stem varieties are invalid.');
+                    return;
+                }
                 $key = $stemId . '-' . $this->size;
                 $cart[$key] = ($cart[$key] ?? 0) + $qty;
                 $hasItems = true;
@@ -170,30 +229,31 @@ class CurationBuilder extends Component
             return;
         }
 
-        // Add Wrapping Addon
+        // Add Wrapping Addon to the cart array
         if ($wrappingId) {
             $key = $wrappingId . '-standard';
             $cart[$key] = ($cart[$key] ?? 0) + 1;
         }
 
-        // Add Wine Addon
+        // Add Wine Addon to the cart array
         if ($wineId) {
             $key = $wineId . '-standard';
             $cart[$key] = ($cart[$key] ?? 0) + 1;
         }
 
-        // Add Gift Addon
+        // Add Gift Addon to the cart array
         if ($giftId) {
             $key = $giftId . '-standard';
             $cart[$key] = ($cart[$key] ?? 0) + 1;
         }
 
-        // Add Fragrance Addon
+        // Add Fragrance Addon to the cart array
         if ($fragranceId) {
             $key = $fragranceId . '-standard';
             $cart[$key] = ($cart[$key] ?? 0) + 1;
         }
 
+        // Persist back to session cart registries
         session()->put('noir_bloom_cart', $cart);
         session()->put('open_curation_drawer_after_login', true);
 
@@ -201,7 +261,10 @@ class CurationBuilder extends Component
         return redirect()->route('storefront');
     }
 
-    public function getSubtotalProperty()
+    /**
+     * Compute subtotal using in-memory loaded collections to avoid N+1 database queries.
+     */
+    public function calculateSubtotal()
     {
         $total = 0;
         
@@ -211,15 +274,15 @@ class CurationBuilder extends Component
         $giftId = $this->sanitizeId($this->selectedGiftId);
         $fragranceId = $this->sanitizeId($this->selectedFragranceId);
 
-        // Base Vase
-        if ($vaseId) {
-            $vase = Product::find($vaseId);
+        // 1. Calculate Base Vase price
+        if ($vaseId && $this->availableVases) {
+            $vase = $this->availableVases->firstWhere('id', $vaseId);
             if ($vase) {
                 $total += $vase->price;
             }
         }
 
-        // Stems with size multiplier
+        // 2. Calculate Stems price with size multiplier
         $multiplier = match($this->size) {
             'deluxe' => 1.5,
             'grand' => 2.2,
@@ -227,39 +290,41 @@ class CurationBuilder extends Component
         };
 
         foreach ($this->selectedStems as $stemId => $qty) {
-            $product = Product::find($stemId);
-            if ($product && $qty > 0) {
-                $total += (int) round($product->price * $multiplier) * $qty;
+            if ($qty > 0 && $this->availableStems) {
+                $product = $this->availableStems->firstWhere('id', $stemId);
+                if ($product) {
+                    $total += (int) round($product->price * $multiplier) * $qty;
+                }
             }
         }
 
-        // Addon Wrapping
-        if ($wrappingId) {
-            $wrapping = Product::find($wrappingId);
+        // 3. Addon Wrapping price
+        if ($wrappingId && $this->availableWrappings) {
+            $wrapping = $this->availableWrappings->firstWhere('id', $wrappingId);
             if ($wrapping) {
                 $total += $wrapping->price;
             }
         }
 
-        // Addon Wine
-        if ($wineId) {
-            $wine = Product::find($wineId);
+        // 4. Addon Wine price
+        if ($wineId && $this->availableWines) {
+            $wine = $this->availableWines->firstWhere('id', $wineId);
             if ($wine) {
                 $total += $wine->price;
             }
         }
 
-        // Addon Gift
-        if ($giftId) {
-            $gift = Product::find($giftId);
+        // 5. Addon Gift price
+        if ($giftId && $this->availableGifts) {
+            $gift = $this->availableGifts->firstWhere('id', $giftId);
             if ($gift) {
                 $total += $gift->price;
             }
         }
 
-        // Addon Fragrance
-        if ($fragranceId) {
-            $fragrance = Product::find($fragranceId);
+        // 6. Addon Fragrance price
+        if ($fragranceId && $this->availableFragrances) {
+            $fragrance = $this->availableFragrances->firstWhere('id', $fragranceId);
             if ($fragrance) {
                 $total += $fragrance->price;
             }
@@ -267,6 +332,7 @@ class CurationBuilder extends Component
 
         return $total;
     }
+
 
     protected function getFlowerColor($name)
     {
@@ -300,6 +366,7 @@ class CurationBuilder extends Component
 
     public function render()
     {
+        $this->subtotal = $this->calculateSubtotal();
         return view('livewire.curation-builder', [
             'subtotal' => $this->subtotal
         ])->layout('components.layouts.app');

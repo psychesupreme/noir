@@ -91,6 +91,14 @@
         /* Initialize preloader lift */
         setTimeout(() => { loading = false; }, 1600);
 
+        /* Auto-open curation cart drawer if redirect query parameter is present */
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('open_cart') === 'true') {
+            drawerOpen = true;
+            checkoutMode = false;
+        }
+
+
         $watch('theme', val => { 
             localStorage.setItem('nb_theme', val); 
             document.documentElement.className = val; 

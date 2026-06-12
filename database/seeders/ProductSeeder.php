@@ -39,7 +39,7 @@ class ProductSeeder extends Seeder
             'category' => 'stems',
             'unit_type' => 'stem',
             'grade' => 'Grade A',
-            'image_url' => 'https://images.unsplash.com/photo-1550950158-d0d960dff51b?auto=format&fit=crop&q=80&w=600',
+            'image_url' => 'https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&q=80&w=600',
         ]);
 
         Product::create([
@@ -127,6 +127,42 @@ class ProductSeeder extends Seeder
             'unit_type' => 'bundle',
             'grade' => null,
             'image_url' => 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Crystal Glass Watamu Vase',
+            'sku' => 'NB-DEC-CGW-02',
+            'description' => 'Earthy yet high-end hand-blown clear glass vase. Exposes elegant stem lines underwater.',
+            'price' => 5500,
+            'stock' => 25,
+            'category' => 'bundle',
+            'unit_type' => 'bundle',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Obsidian Onyx Alabaster Vase',
+            'sku' => 'NB-DEC-OOA-03',
+            'description' => 'Ultra-premium polished black-stone vase with rich gold veins and polished metallic rim.',
+            'price' => 7800,
+            'stock' => 15,
+            'category' => 'bundle',
+            'unit_type' => 'bundle',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1508610048659-a06b669e3321?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Frosted Glacier Lily Vase',
+            'sku' => 'NB-DEC-FGL-04',
+            'description' => 'A fluted, semi-translucent frosted glass vase styled like a blooming white glacier lily.',
+            'price' => 6200,
+            'stock' => 20,
+            'category' => 'bundle',
+            'unit_type' => 'bundle',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=600',
         ]);
 
         Product::create([
@@ -236,7 +272,7 @@ class ProductSeeder extends Seeder
             'category' => 'giftings',
             'unit_type' => 'bottle',
             'grade' => null,
-            'image_url' => 'https://images.unsplash.com/photo-1594487524733-efe60e1d033e?auto=format&fit=crop&q=80&w=600',
+            'image_url' => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600',
         ]);
 
         Product::create([
@@ -260,7 +296,7 @@ class ProductSeeder extends Seeder
             'category' => 'giftings',
             'unit_type' => 'box',
             'grade' => null,
-            'image_url' => 'https://images.unsplash.com/photo-1548907040-4d42b52125bf?auto=format&fit=crop&q=80&w=600',
+            'image_url' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600',
         ]);
 
         Product::create([

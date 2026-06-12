@@ -416,6 +416,15 @@ html { scroll-behavior: smooth; }
   overflow: hidden;
 }
 
+.fine-linen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='currentColor' stroke-width='0.5' stroke-opacity='0.15'%3E%3Cpath d='M0 10h80M0 20h80M0 30h80M0 40h80M0 50h80M0 60h80M0 70h80M10 0v80M20 0v80M30 0v80M40 0v80M50 0v80M60 0v80M70 0v80'/%3E%3Cpath d='M0 5h80M0 15h80M0 25h80M0 35h80M0 45h80M0 55h80M0 65h80M0 75h80M5 0v80M15 0v80M25 0v80M35 0v80M45 0v80M55 0v80M65 0v80M75 0v80' stroke-width='0.25' stroke-opacity='0.08'/%3E%3C/g%3E%3C/svg%3E");
+}
+
 .btn-curate {
   position: relative;
   overflow: hidden;

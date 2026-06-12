@@ -159,10 +159,15 @@ class ProfilePortal extends Component
             }
         }
 
+        // Count total items currently stored in the session-based shopping cart
+        $cartCount = array_sum(session()->get('noir_bloom_cart', []));
+
         return view('livewire.profile-portal', [
             'userOrders' => $userOrders,
             'assignedRuns' => $assignedRuns,
             'user' => $user,
+            'cartCount' => $cartCount,
         ])->layout('components.layouts.app');
     }
+
 }

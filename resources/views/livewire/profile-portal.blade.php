@@ -4,7 +4,12 @@
 
 <div 
     x-data="{ 
-        theme: localStorage.getItem('nb_theme') || 'onyx'
+        theme: localStorage.getItem('nb_theme') || 'onyx',
+        hoverTheme: null,
+        changeTheme(targetTheme) {
+            if (this.theme === targetTheme) return;
+            this.theme = targetTheme;
+        }
     }" 
     x-init="
         $watch('theme', val => { 
@@ -39,48 +44,266 @@
     <!-- Fine Grain Noise Overlay -->
     <div class="absolute inset-0 pointer-events-none storefront-grain z-0 opacity-80"></div>
     
-    <!-- Cohesive Header -->
+    <!-- Luxury Cohesive Header -->
     <header 
         :class="{
             'bg-[#050507]/75 border-neutral-950/20 shadow-2xl': theme === 'onyx',
             'bg-white/75 border-neutral-200/50 shadow-sm': theme === 'champagne',
             'bg-[#15060A]/75 border-[#2D0D19]/30 shadow-2xl': theme === 'rose'
         }"
-        class="fixed top-4 inset-x-4 h-16 backdrop-blur-md border rounded-full z-50 transition-all duration-500 flex items-center shadow-lg hover:shadow-xl group"
+        class="fixed top-4 inset-x-4 h-16 backdrop-blur-md border rounded-full z-50 transition-all duration-500 flex items-center shadow-lg hover:shadow-xl group theme-section"
     >
         <!-- Gold Accent Bottom Glow Line -->
         <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-[#C5A880]/30 to-transparent"></div>
         <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-8">
-            <a href="/" class="shrink-0 flex items-baseline space-x-2 select-none cursor-pointer">
+            <a href="/" class="shrink-0 flex items-baseline space-x-2 animate-nav-item select-none cursor-pointer" style="animation-delay: 100ms;">
                 <span class="text-[11px] font-mono tracking-[0.4em] text-[#C5A880] uppercase">Atelier</span>
                 <span :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-base font-semibold uppercase tracking-[0.35em] transition-colors font-outfit">NOIR & BLOOM</span>
             </a>
-            
+            <!-- Spacing column to balance layout -->
+            <div class="flex-1 hidden md:block"></div>
+
             <div class="flex items-center space-x-6 text-[12px] font-mono uppercase tracking-widest text-neutral-400">
                 <!-- Navigation links -->
-                <a href="{{ route('curate') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 select-none cursor-pointer">3D Curation</a>
-                <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 select-none cursor-pointer">Services</a>
+                <a href="{{ route('curate') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer" style="animation-delay: 150ms;">3D Curation</a>
+                <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer" style="animation-delay: 200ms;">Services</a>
 
-                <!-- Theme Switcher Pill -->
-                <div class="hidden lg:flex items-center space-x-1 border border-neutral-500/10 rounded-full bg-neutral-500/5 p-1 select-none">
-                    <button @click="theme = 'onyx'" :class="theme === 'onyx' ? 'bg-[#C5A880] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-neutral-200'" class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
+                <!-- Theme Switcher Pill (3 options, desktop only) -->
+                <div class="hidden lg:flex items-center space-x-1 border border-neutral-500/10 rounded-full bg-neutral-500/5 p-1 animate-nav-item select-none relative" style="animation-delay: 300ms;">
+                    <button @click="changeTheme('onyx')" 
+                            @mouseenter="hoverTheme = 'onyx'" 
+                            @mouseleave="hoverTheme = null" 
+                            :class="theme === 'onyx' ? 'bg-[#C5A880] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-[#C5A880] hover:bg-[#C5A880]/10'" 
+                            class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
+                        <span class="w-1 h-1 rounded-full bg-current"></span>
                         <span>Onyx</span>
                     </button>
-                    <button @click="theme = 'champagne'" :class="theme === 'champagne' ? 'bg-[#B59A7A] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-neutral-200'" class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
+                    <button @click="changeTheme('champagne')" 
+                            @mouseenter="hoverTheme = 'champagne'" 
+                            @mouseleave="hoverTheme = null" 
+                            :class="theme === 'champagne' ? 'bg-[#B59A7A] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-[#B59A7A] hover:bg-[#B59A7A]/10'" 
+                            class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
+                        <span class="w-1 h-1 rounded-full bg-current"></span>
                         <span>Champagne</span>
                     </button>
-                    <button @click="theme = 'rose'" :class="theme === 'rose' ? 'bg-[#B76E79] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-neutral-200'" class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
+                    <button @click="changeTheme('rose')" 
+                            @mouseenter="hoverTheme = 'rose'" 
+                            @mouseleave="hoverTheme = null" 
+                            :class="theme === 'rose' ? 'bg-[#B76E79] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-[#B76E79] hover:bg-[#B76E79]/10'" 
+                            class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
+                        <span class="w-1 h-1 rounded-full bg-current"></span>
                         <span>Rose</span>
                     </button>
+
+                    <!-- Theme Hover Preview Popover Card -->
+                    <div x-show="hoverTheme !== null"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 translate-y-3 scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-3 scale-95"
+                         :class="theme === 'champagne' ? 'bg-white border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#0F0F12]/95 border-neutral-800 text-white shadow-2xl'"
+                         class="absolute top-full left-1/2 -translate-x-1/2 mt-3.5 w-64 rounded-2xl border p-4 text-left z-50 text-xs backdrop-blur-md space-y-3"
+                         style="display: none;"
+                    >
+                        <!-- Onyx Preview Content -->
+                        <div x-show="hoverTheme === 'onyx'" class="space-y-2">
+                            <span class="font-bold text-[#C5A880] tracking-wider uppercase text-[10px] block">Onyx Theme</span>
+                            <p class="text-neutral-450 text-[11px] leading-relaxed font-light">Midnight Obsidian & Deep Velvet. A high-contrast dark aesthetic built for dramatic evening luxury.</p>
+                            <div class="flex items-center space-x-1 pt-1">
+                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#050507]" title="Background"></span>
+                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#C5A880]" title="Accent"></span>
+                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#F4F4F5]" title="Text"></span>
+                            </div>
+                        </div>
+
+                        <!-- Champagne Preview Content -->
+                        <div x-show="hoverTheme === 'champagne'" class="space-y-2">
+                            <span class="font-bold text-[#B59A7A] tracking-wider uppercase text-[10px] block">Champagne Theme</span>
+                            <p class="text-neutral-500 text-[11px] leading-relaxed font-light">Warm Alabaster & Gilded Gold. A soft, light mode reflecting sunlit mornings in the flower atelier.</p>
+                            <div class="flex items-center space-x-1 pt-1">
+                                <span class="w-4 h-4 rounded-full border border-neutral-200 bg-[#FAF7F0]" title="Background"></span>
+                                <span class="w-4 h-4 rounded-full border border-neutral-200 bg-[#B59A7A]" title="Accent"></span>
+                                <span class="w-4 h-4 rounded-full border border-neutral-200 bg-[#1C1917]" title="Text"></span>
+                            </div>
+                        </div>
+
+                        <!-- Rose Preview Content -->
+                        <div x-show="hoverTheme === 'rose'" class="space-y-2">
+                            <span class="font-bold text-[#B76E79] tracking-wider uppercase text-[10px] block">Rose Theme</span>
+                            <p class="text-neutral-450 text-[11px] leading-relaxed font-light">Blushing Burgundy & Rose Quartz. A rich, romantic dark mode inspired by fresh Kenyan spray roses.</p>
+                            <div class="flex items-center space-x-1 pt-1">
+                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#15060A]" title="Background"></span>
+                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#B76E79]" title="Accent"></span>
+                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#FCE7EC]" title="Text"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Return to Shop -->
-                <a href="/" class="hover:text-neutral-300 transition-colors flex items-center space-x-1.5 text-xs font-mono font-medium tracking-wider">
+                <!-- Collapsed mobile theme switcher -->
+                <button @click="changeTheme(theme === 'onyx' ? 'champagne' : (theme === 'champagne' ? 'rose' : 'onyx'))" 
+                        class="lg:hidden hover:text-neutral-200 transition-colors cursor-pointer select-none relative w-8 h-8 flex items-center justify-center border border-neutral-500/10 rounded-full bg-neutral-500/5 animate-nav-item"
+                        style="animation-delay: 300ms;"
+                        title="Cycle Theme"
+                >
                     <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="12" cy="12" r="5" />
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.77l1.42-1.42M18.36 5.64l1.42-1.42" />
                     </svg>
-                    <span>Back to Shop</span>
+                </button>
+
+                <!-- Modern SVG shopping bag cart button redirecting to storefront open cart -->
+                <a href="/?open_cart=true" 
+                        class="hover:text-neutral-300 transition-colors cursor-pointer select-none relative w-8 h-8 flex items-center justify-center border border-neutral-500/10 rounded-full bg-neutral-500/5 animate-nav-item animate-pulse" 
+                        style="animation-delay: 400ms;"
+                        title="View Curation Drawer"
+                >
+                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    @if($cartCount > 0)
+                        <span class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#C5A880] text-black text-[10px] font-bold font-sans tracking-none shadow-[0_0_8px_rgba(197,168,128,0.5)]">
+                            {{ $cartCount }}
+                        </span>
+                    @endif
                 </a>
+
+                <!-- Profile Portal Dropdown Card Popover -->
+                <div x-data="{ profileMenuOpen: false }" class="relative inline-block text-left animate-nav-item" style="animation-delay: 500ms;">
+                    @auth
+                        <!-- Initials-based Monogram Avatar Button -->
+                        <button @click="profileMenuOpen = !profileMenuOpen" 
+                                class="hover:border-[#C5A880]/60 border border-neutral-500/20 transition-all cursor-pointer select-none w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-tr from-neutral-900 via-neutral-950 to-neutral-900 shadow-md border-[#C5A880]"
+                                title="Profile Portal Options"
+                        >
+                            <span class="text-[10px] font-mono font-bold tracking-wider text-[#C5A880] uppercase">
+                                {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
+                            </span>
+                        </button>
+                    @else
+                        <!-- Log In / Sign In Button for Guests -->
+                        <button @click="profileMenuOpen = !profileMenuOpen" 
+                                :class="{
+                                    'border-[#C5A880]/30 hover:border-[#C5A880] hover:shadow-[0_0_15px_rgba(197,168,128,0.25)]': theme === 'onyx',
+                                    'border-[#B59A7A]/30 hover:border-[#B59A7A] hover:shadow-[0_0_15px_rgba(181,154,122,0.25)]': theme === 'champagne',
+                                    'border-[#B76E79]/30 hover:border-[#B76E79] hover:shadow-[0_0_15px_rgba(183,110,121,0.25)]': theme === 'rose'
+                                }"
+                                class="transition-all duration-300 hover:scale-[1.03] cursor-pointer select-none px-4 h-8 flex items-center justify-center space-x-1.5 border rounded-full bg-neutral-500/5 text-[11px] font-sans font-light tracking-widest uppercase"
+                                title="Log In or Sign In"
+                        >
+                            <svg class="w-3.5 h-3.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3M15 12" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span class="hidden sm:inline">Sign In</span>
+                        </button>
+                    @endauth
+
+                    <!-- Popover Dropdown Card -->
+                    <div 
+                        x-show="profileMenuOpen" 
+                        @click.away="profileMenuOpen = false" 
+                        x-transition:enter="transition cubic-bezier(0.16, 1, 0.3, 1) duration-350"
+                        x-transition:enter-start="opacity-0 scale-95 -translate-y-3"
+                        x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                        x-transition:leave="transition cubic-bezier(0.16, 1, 0.3, 1) duration-250"
+                        x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                        x-transition:leave-end="opacity-0 scale-95 -translate-y-3"
+                        :class="theme === 'champagne' ? 'bg-white border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#0F0F12]/95 border-neutral-900 text-white shadow-2xl'"
+                        class="absolute right-0 mt-3.5 w-80 rounded-3xl border p-5 text-left z-50 text-xs backdrop-blur-md space-y-4"
+                        style="display: none;"
+                    >
+                        @auth
+                            <div class="flex items-center space-x-3 pb-3 border-b border-neutral-500/10">
+                                <div class="w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-tr from-neutral-955 via-neutral-900 to-neutral-955 border-2 border-[#C5A880]/30 shadow-md">
+                                    <span class="text-sm font-mono font-bold tracking-wider text-[#C5A880]">
+                                        {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
+                                    </span>
+                                </div>
+                                <div class="truncate">
+                                    <span class="font-semibold block text-sm tracking-wide" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" x-text="'{{ auth()->user()->name }}'"></span>
+                                    <span class="text-[10px] text-neutral-450 block font-mono tracking-tight" x-text="'{{ auth()->user()->email }}'"></span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2.5 font-sans py-1">
+                                <div class="flex items-center space-x-2 text-[11px] text-neutral-450">
+                                    <svg class="w-3.5 h-3.5 text-[#C5A880]/80 stroke-current fill-none shrink-0" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 7.92z" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span class="font-mono">{{ auth()->user()->phone_number ?: 'Not Provided' }}</span>
+                                </div>
+
+                                <div class="flex items-start space-x-2 text-[11px] text-neutral-450">
+                                    <svg class="w-3.5 h-3.5 text-[#C5A880]/80 stroke-current fill-none shrink-0 mt-0.5" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <circle cx="12" cy="10" r="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <div class="leading-relaxed truncate">
+                                        <span class="font-bold text-[9px] uppercase tracking-wider text-[#C5A880]/80 block">Main Address</span>
+                                        <span class="block truncate" title="{{ auth()->user()->default_delivery_address }}">{{ auth()->user()->default_delivery_address ?: 'No Address Set' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border-t border-neutral-500/10 pt-3 space-y-2 font-mono text-[11px]">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-neutral-500">Tier:</span>
+                                    <span class="text-[#C5A880] font-bold text-[10px] tracking-widest uppercase" x-text="'{{ auth()->user()->loyalty_tier }}'"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-neutral-500">Loyalty Points:</span>
+                                    <span class="text-neutral-400 font-bold" x-text="'{{ number_format(auth()->user()->loyalty_points) }} PTS'"></span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2 pt-2">
+                                <a href="/profile-portal" class="block w-full text-center bg-[#C5A880] text-black font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] hover:bg-[#B59A7A] transition-all">
+                                    [ View Profile Dashboard ]
+                                </a>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full text-center text-neutral-500 hover:text-rose-500 font-mono text-[9px] uppercase tracking-wider pt-1.5 block cursor-pointer bg-transparent border-none">
+                                        [ Sign Out of Atelier ]
+                                    </button>
+                                </form>
+                            </div>
+                        @else
+                            <div class="text-center py-2.5 space-y-4">
+                                <span class="font-serif text-xl italic block transition-colors duration-500"
+                                      :class="{
+                                          'text-[#C5A880]': theme === 'onyx',
+                                          'text-[#B59A7A]': theme === 'champagne',
+                                          'text-[#B76E79]': theme === 'rose'
+                                      }">Atelier Loyalty Circle</span>
+                                <p class="text-neutral-400 font-light text-[11px] leading-relaxed">Sign in to track orders, manage profiles, and earn rewards.</p>
+                                <div class="flex flex-col gap-2.5 pt-1">
+                                    <a href="/login" 
+                                       :class="{
+                                           'bg-[#C5A880] text-black hover:bg-[#B59A7A]': theme === 'onyx',
+                                           'bg-[#B59A7A] text-white hover:bg-[#FAF7F0] hover:text-black border border-[#B59A7A]': theme === 'champagne',
+                                           'bg-[#B76E79] text-white hover:bg-[#15060A] border border-[#B76E79]': theme === 'rose'
+                                       }"
+                                       class="font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] transition-all duration-300 hover:scale-[1.02] text-center block shadow-md"
+                                    >
+                                        Sign In
+                                    </a>
+                                    <a href="/register" 
+                                       :class="{
+                                           'border-neutral-800 text-neutral-400 hover:text-[#C5A880] hover:border-[#C5A880]': theme === 'onyx',
+                                           'border-neutral-200 text-neutral-600 hover:text-[#B59A7A] hover:border-[#B59A7A]': theme === 'champagne',
+                                           'border-[#2D121F] text-pink-300/60 hover:text-[#B76E79] hover:border-[#B76E79]': theme === 'rose'
+                                       }"
+                                       class="border font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] transition-all duration-300 hover:scale-[1.02] text-center block"
+                                    >
+                                        Create Account
+                                    </a>
+                                </div>
+                            </div>
+                        @endauth
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -495,4 +718,89 @@
     </main>
 
 
+    <!-- Fully-Featured Luxury Atelier Footer -->
+    <footer 
+        :class="{
+            'border-neutral-900 bg-[#070709] text-neutral-400': theme === 'onyx',
+            'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'champagne',
+            'border-[#2D0D19]/40 bg-[#1D0C13] text-neutral-300': theme === 'rose'
+        }"
+        class="border-t mt-32 py-16 px-6 transition-colors duration-500 z-10 relative theme-section"
+    >
+        <div class="max-w-8xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-left">
+            <!-- Col 1: Brand Coordinates -->
+            <div class="space-y-4">
+                <div class="flex items-baseline space-x-2">
+                    <span class="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
+                    <h4 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">NOIR & BLOOM</h4>
+                </div>
+                <p class="text-xs font-light leading-relaxed max-w-xs">
+                    Premium floral curation, bespoke gifting suites, and high-end events concierge. Sourcing directly from Rift Valley growers.
+                </p>
+                <div class="space-y-1 text-[12px] font-mono text-neutral-500">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+                        <span>Nairobi: 1.2921° S, 36.8219° E</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
+                        <span>Kiambu: 1.1478° S, 36.8524° E</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Col 2: Showroom Catalog Links -->
+            <div class="space-y-4">
+                <h5 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Showroom</h5>
+                <ul class="space-y-2 text-xs font-light">
+                    <li><a href="/?collection=retail" class="hover:underline">Bespoke Retail Arrays</a></li>
+                    <li><a href="/?collection=wholesale" class="hover:underline">Wholesale Graded Stems</a></li>
+                    <li><a href="/?collection=giftings" class="hover:underline">Luxury Giftings</a></li>
+                    <li><a href="/profile-portal" class="hover:underline">Atelier Loyalty Circle</a></li>
+                </ul>
+            </div>
+
+            <!-- Col 3: Hours & Support -->
+            <div class="space-y-4">
+                <h5 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">Concierge Dispatch</h5>
+                <ul class="space-y-2 text-xs font-light">
+                    <li><span class="block text-neutral-500">Operating Hours</span> Mon &mdash; Sat: 07:00 &mdash; 20:00</li>
+                    <li>Sunday: 09:00 &mdash; 17:00</li>
+                    <li class="pt-2"><span class="block text-neutral-500 font-mono text-[11px] uppercase tracking-wider">Hotline Direct</span> +254 (0) 712 345 678</li>
+                    <li>concierge@noirbloom.co.ke</li>
+                </ul>
+            </div>
+
+            <!-- Col 4: Newsletter -->
+            <div class="space-y-4">
+                <h5 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Atelier Bulletin</h5>
+                <p class="text-xs font-light leading-relaxed">
+                    Subscribe for seasonal curation updates, wholesale catalog changes, and exclusive releases.
+                </p>
+                <div class="flex items-center space-x-2 pt-1">
+                    <input 
+                        type="email" 
+                        placeholder="you@company.co.ke" 
+                        :class="theme === 'champagne' ? 'bg-white border-neutral-300 text-black placeholder-neutral-400 focus:border-neutral-500' : 'bg-neutral-900/60 border-neutral-800 text-white placeholder-neutral-700 focus:border-neutral-700'"
+                        class="flex-1 text-xs px-3.5 py-2.5 border rounded-xl focus:outline-none transition-all"
+                    >
+                    <button 
+                        :class="theme === 'champagne' ? 'bg-neutral-950 text-white hover:bg-black' : 'bg-white text-black hover:bg-neutral-200'"
+                        class="px-4 py-2.5 text-[11px] font-mono uppercase tracking-wider font-semibold rounded-full transition-all"
+                    >
+                        Join
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div :class="theme === 'champagne' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-8xl w-full mx-auto border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
+            <p>&copy; {{ date('Y') }} Noir &amp; Bloom Ltd. Registered Tax Entity.</p>
+            <div class="flex space-x-6">
+                <a href="#" class="hover:text-neutral-400">Terms of Curation</a>
+                <a href="#" class="hover:text-neutral-400">Logistics Policy</a>
+                <a href="#" class="hover:text-neutral-400">eTIMS Verification</a>
+            </div>
+        </div>
+    </footer>
 </div>
