@@ -1,0 +1,32 @@
+app = "noir-bloom-erp"
+primary_region = "ams"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  APP_ENV = "production"
+  APP_DEBUG = "false"
+  RUN_MIGRATIONS = "true"
+  LOG_CHANNEL = "stderr"
+
+[[services]]
+  http_service = true
+  internal_port = 80
+  force_https = true
+  auto_start_machines = true
+  auto_stop_machines = true
+  min_machines_running = 1
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 250
+    soft_limit = 200

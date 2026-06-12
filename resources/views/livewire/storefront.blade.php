@@ -349,7 +349,6 @@
 
             <div class="flex items-center space-x-6 text-[12px] font-mono uppercase tracking-widest text-neutral-400">
                 <!-- Navigation links -->
-                <a href="{{ route('curate') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer" style="animation-delay: 150ms;">3D Curation</a>
                 <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer" style="animation-delay: 200ms;">Services</a>
 
                 <!-- Theme Switcher Pill (3 options, desktop only) -->
@@ -620,7 +619,7 @@
     <div class="w-full px-0 pt-28 pb-4 shrink-0">
         <section x-data="{ 
                       activeSlide: 0, 
-                      slidesCount: 5, 
+                      slidesCount: {{ count($slides) }}, 
                       timer: null,
                       init() {
                           this.startTimer();
@@ -628,7 +627,7 @@
                       startTimer() {
                           this.timer = setInterval(() => {
                               this.activeSlide = (this.activeSlide + 1) % this.slidesCount;
-                         }, 5000); // Accelerated transition timing
+                          }, 5000); // Accelerated transition timing
                       },
                       resetTimer() {
                           clearInterval(this.timer);
@@ -637,8 +636,9 @@
                   }" 
                  class="w-full relative overflow-hidden rounded-none border-y border-neutral-500/10 h-[calc(100vh-240px)] min-h-[480px] flex items-center shadow-2xl group theme-section"
         >
-            <!-- Slide 1: Naivasha Volcanic Roses -->
-            <div x-show="activeSlide === 0" 
+            @foreach ($slides as $index => $slide)
+            <!-- Slide {{ $index + 1 }}: {{ $slide['title'] }} -->
+            <div x-show="activeSlide === {{ $index }}" 
                  x-transition:enter="transition duration-1000 ease-out"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100"
@@ -646,268 +646,54 @@
                  x-transition:leave-start="opacity-100"
                  x-transition:leave-end="opacity-0"
                  class="absolute inset-0 flex flex-col justify-center px-8 md:px-16 py-12 text-left"
+                 @if($index !== 0) style="display: none;" @endif
             >
                 <!-- Background Image with dynamic filtering -->
                 <div class="absolute inset-0 bg-cover bg-center select-none"
                      :class="{
-                         'filter brightness-75 contrast-125 saturate-[0.8]': theme === 'onyx',
-                         'filter brightness-90 sepia-[0.15] saturate-[0.95]': theme === 'champagne',
-                         'filter brightness-75 contrast-110 saturate-[0.85]': theme === 'rose'
+                          'filter brightness-75 contrast-125 saturate-[0.8]': theme === 'onyx',
+                          'filter brightness-90 sepia-[0.15] saturate-[0.95]': theme === 'champagne',
+                          'filter brightness-75 contrast-110 saturate-[0.85]': theme === 'rose'
                      }"
-                     style="background-image: url('https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?auto=format&fit=crop&q=80&w=1200');">
+                     style="background-image: url('{{ $slide['bg_image'] }}');">
                 </div>
                 <!-- Linear Theme Blending Overlay -->
                 <div class="absolute inset-0 pointer-events-none mix-blend-multiply"
                      :class="{
-                         'bg-gradient-to-r from-[#050507]/95 via-[#050507]/50 to-transparent': theme === 'onyx',
-                         'bg-gradient-to-r from-[#FAF7F0]/95 via-[#FAF7F0]/60 to-transparent': theme === 'champagne',
-                         'bg-gradient-to-r from-[#15060A]/95 via-[#15060A]/60 to-transparent': theme === 'rose'
+                          'bg-gradient-to-r from-[#050507]/95 via-[#050507]/50 to-transparent': theme === 'onyx',
+                          'bg-gradient-to-r from-[#FAF7F0]/95 via-[#FAF7F0]/60 to-transparent': theme === 'champagne',
+                          'bg-gradient-to-r from-[#15060A]/95 via-[#15060A]/60 to-transparent': theme === 'rose'
                      }">
                 </div>
                 <!-- Secondary Color Burn Blending -->
                 <div class="absolute inset-0 pointer-events-none mix-blend-color-burn opacity-60"
                      :class="{
-                         'bg-[#0C1E1A]/10': theme === 'onyx',
-                         'bg-[#C5A880]/15': theme === 'champagne',
-                         'bg-[#B76E79]/20': theme === 'rose'
+                          'bg-[#0C1E1A]/10': theme === 'onyx',
+                          'bg-[#C5A880]/15': theme === 'champagne',
+                          'bg-[#B76E79]/20': theme === 'rose'
                      }">
                 </div>
 
                 <div class="max-w-xl space-y-4 z-10 animate-hero-rise">
-                    <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-[#C5A880] block">Pure Rift Valley Luxury</span>
+                    <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-[#C5A880] block">{{ $slide['badge'] }}</span>
                     <h2 class="text-3xl sm:text-4xl md:text-5xl font-outfit font-semibold uppercase tracking-wider leading-none"
                         :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'">
-                        Naivasha Volcanic Roses
+                        {{ $slide['title'] }}
                     </h2>
                     <div class="h-[1px] w-16 bg-[#C5A880]/40"></div>
                     <p class="text-sm sm:text-base font-light leading-relaxed"
                        :class="theme === 'champagne' ? 'text-neutral-700' : 'text-neutral-300'">
-                        Grown in nutrient-dense volcanic soils of Lake Naivasha. Our premium Grade-A Naomi roses feature dense, velvet petals and elongated structural stems.
+                        {{ $slide['description'] }}
                     </p>
                     <div class="pt-4">
-                        <button @click="$wire.selectCategory('stems'); document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'})" 
+                        <button @click="if ('{{ $slide['cta_link'] }}'.startsWith('/') || '{{ $slide['cta_link'] }}'.startsWith('http')) { window.location.href = '{{ $slide['cta_link'] }}'; } else { $wire.selectCategory('{{ $slide['cta_link'] }}'); document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'}); }"
                                 class="bg-[#C5A880] text-black px-6 py-3 rounded-full text-[11px] font-mono uppercase tracking-[0.2em] font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#B59A7A] cursor-pointer">
-                            Order Stems Catalog
+                            {{ $slide['cta_text'] }}
                         </button>
                     </div>
                 </div>
             </div>
-
-            <!-- Slide 2: Limuru Berry & Bloom Hampers -->
-            <div x-show="activeSlide === 1" 
-                 x-transition:enter="transition duration-1000 ease-out"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 x-transition:leave="transition duration-500 ease-in"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="absolute inset-0 flex flex-col justify-center px-8 md:px-16 py-12 text-left"
-                 style="display: none;"
-            >
-                <div class="absolute inset-0 bg-cover bg-center select-none"
-                     :class="{
-                         'filter brightness-75 contrast-125 saturate-[0.8]': theme === 'onyx',
-                         'filter brightness-90 sepia-[0.15] saturate-[0.95]': theme === 'champagne',
-                         'filter brightness-75 contrast-110 saturate-[0.85]': theme === 'rose'
-                     }"
-                     style="background-image: url('https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=1200');">
-                </div>
-                <div class="absolute inset-0 pointer-events-none mix-blend-multiply"
-                     :class="{
-                         'bg-gradient-to-r from-[#050507]/95 via-[#050507]/50 to-transparent': theme === 'onyx',
-                         'bg-gradient-to-r from-[#FAF7F0]/95 via-[#FAF7F0]/60 to-transparent': theme === 'champagne',
-                         'bg-gradient-to-r from-[#15060A]/95 via-[#15060A]/60 to-transparent': theme === 'rose'
-                     }">
-                </div>
-                <div class="absolute inset-0 pointer-events-none mix-blend-color-burn opacity-60"
-                     :class="{
-                         'bg-[#0C1E1A]/10': theme === 'onyx',
-                         'bg-[#C5A880]/15': theme === 'champagne',
-                         'bg-[#B76E79]/20': theme === 'rose'
-                     }">
-                </div>
-
-                <div class="max-w-xl space-y-4 z-10">
-                    <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-[#C5A880] block">Highland Curation Trunks</span>
-                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-outfit font-semibold uppercase tracking-wider leading-none"
-                        :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'">
-                        Limuru Berry & Bloom
-                    </h2>
-                    <div class="h-[1px] w-16 bg-[#C5A880]/40"></div>
-                    <p class="text-sm sm:text-base font-light leading-relaxed"
-                       :class="theme === 'champagne' ? 'text-neutral-700' : 'text-neutral-300'">
-                        An elite combination of hand-tied fresh bouquets, artisanal organic berry infusions, and premium purple tea leaves sourced directly from misty Limuru growers.
-                    </p>
-                    <div class="pt-4">
-                        <button @click="$wire.selectCategory('hampers'); document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'})" 
-                                class="bg-[#C5A880] text-black px-6 py-3 rounded-full text-[11px] font-mono uppercase tracking-[0.2em] font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#B59A7A] cursor-pointer">
-                            Acquire Curation Trunk
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Slide 3: Great Rift Valley Sunset Proteas -->
-            <div x-show="activeSlide === 2" 
-                 x-transition:enter="transition duration-1000 ease-out"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 x-transition:leave="transition duration-500 ease-in"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="absolute inset-0 flex flex-col justify-center px-8 md:px-16 py-12 text-left"
-                 style="display: none;"
-            >
-                <div class="absolute inset-0 bg-cover bg-center select-none"
-                     :class="{
-                         'filter brightness-75 contrast-125 saturate-[0.8]': theme === 'onyx',
-                         'filter brightness-90 sepia-[0.15] saturate-[0.95]': theme === 'champagne',
-                         'filter brightness-75 contrast-110 saturate-[0.85]': theme === 'rose'
-                     }"
-                     style="background-image: url('https://images.unsplash.com/photo-1508610048659-a06b669e3321?auto=format&fit=crop&q=80&w=1200');">
-                </div>
-                <div class="absolute inset-0 pointer-events-none mix-blend-multiply"
-                     :class="{
-                         'bg-gradient-to-r from-[#050507]/95 via-[#050507]/50 to-transparent': theme === 'onyx',
-                         'bg-gradient-to-r from-[#FAF7F0]/95 via-[#FAF7F0]/60 to-transparent': theme === 'champagne',
-                         'bg-gradient-to-r from-[#15060A]/95 via-[#15060A]/60 to-transparent': theme === 'rose'
-                     }">
-                </div>
-                <div class="absolute inset-0 pointer-events-none mix-blend-color-burn opacity-60"
-                     :class="{
-                         'bg-[#0C1E1A]/10': theme === 'onyx',
-                         'bg-[#C5A880]/15': theme === 'champagne',
-                         'bg-[#B76E79]/20': theme === 'rose'
-                     }">
-                </div>
-
-                <div class="max-w-xl space-y-4 z-10">
-                    <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-[#C5A880] block">Savannah Botanical Spray</span>
-                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-outfit font-semibold uppercase tracking-wider leading-none"
-                        :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'">
-                        Rift Valley Sunset
-                    </h2>
-                    <div class="h-[1px] w-16 bg-[#C5A880]/40"></div>
-                    <p class="text-sm sm:text-base font-light leading-relaxed"
-                       :class="theme === 'champagne' ? 'text-neutral-700' : 'text-neutral-300'">
-                        Vibrant proteas, golden craspedias, and wild eucalyptus sprays, designed to embody the majestic warmth of the Great Rift Valley's golden hour.
-                    </p>
-                    <div class="pt-4">
-                        <button @click="$wire.selectCategory('bouquets'); document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'})" 
-                                class="bg-[#C5A880] text-black px-6 py-3 rounded-full text-[11px] font-mono uppercase tracking-[0.2em] font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#B59A7A] cursor-pointer">
-                            Acquire Arrangement
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Slide 4: Mt. Kenya Alabaster Installations -->
-            <div x-show="activeSlide === 3" 
-                 x-transition:enter="transition duration-1000 ease-out"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 x-transition:leave="transition duration-500 ease-in"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="absolute inset-0 flex flex-col justify-center px-8 md:px-16 py-12 text-left"
-                 style="display: none;"
-            >
-                <div class="absolute inset-0 bg-cover bg-center select-none"
-                     :class="{
-                         'filter brightness-75 contrast-125 saturate-[0.8]': theme === 'onyx',
-                         'filter brightness-90 sepia-[0.15] saturate-[0.95]': theme === 'champagne',
-                         'filter brightness-75 contrast-110 saturate-[0.85]': theme === 'rose'
-                     }"
-                     style="background-image: url('https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&q=80&w=1200');">
-                </div>
-                <div class="absolute inset-0 pointer-events-none mix-blend-multiply"
-                     :class="{
-                         'bg-gradient-to-r from-[#050507]/95 via-[#050507]/50 to-transparent': theme === 'onyx',
-                         'bg-gradient-to-r from-[#FAF7F0]/95 via-[#FAF7F0]/60 to-transparent': theme === 'champagne',
-                         'bg-gradient-to-r from-[#15060A]/95 via-[#15060A]/60 to-transparent': theme === 'rose'
-                     }">
-                </div>
-                <div class="absolute inset-0 pointer-events-none mix-blend-color-burn opacity-60"
-                     :class="{
-                         'bg-[#0C1E1A]/10': theme === 'onyx',
-                         'bg-[#C5A880]/15': theme === 'champagne',
-                         'bg-[#B76E79]/20': theme === 'rose'
-                     }">
-                </div>
-
-                <div class="max-w-xl space-y-4 z-10">
-                    <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-[#C5A880] block">Corporate & Home Styling</span>
-                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-outfit font-semibold uppercase tracking-wider leading-none"
-                        :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'">
-                        Mt. Kenya Alabaster
-                    </h2>
-                    <div class="h-[1px] w-16 bg-[#C5A880]/40"></div>
-                    <p class="text-sm sm:text-base font-light leading-relaxed"
-                       :class="theme === 'champagne' ? 'text-neutral-700' : 'text-neutral-300'">
-                        Elite weekly orchid rotations, white lily suspensions, and tailored lobby installations designed for high-end workspaces and luxury private residences.
-                    </p>
-                    <div class="pt-4">
-                        <button @click="$wire.selectCategory('specializtion'); document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'})" 
-                                class="bg-[#C5A880] text-black px-6 py-3 rounded-full text-[11px] font-mono uppercase tracking-[0.2em] font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#B59A7A] cursor-pointer">
-                            Reserve Installation
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Slide 5: Watamu Coral Botanicals -->
-            <div x-show="activeSlide === 4" 
-                 x-transition:enter="transition duration-1000 ease-out"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 x-transition:leave="transition duration-500 ease-in"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="absolute inset-0 flex flex-col justify-center px-8 md:px-16 py-12 text-left"
-                 style="display: none;"
-            >
-                <div class="absolute inset-0 bg-cover bg-center select-none"
-                     :class="{
-                         'filter brightness-75 contrast-125 saturate-[0.8]': theme === 'onyx',
-                         'filter brightness-90 sepia-[0.15] saturate-[0.95]': theme === 'champagne',
-                         'filter brightness-75 contrast-110 saturate-[0.85]': theme === 'rose'
-                     }"
-                     style="background-image: url('https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=1200');">
-                </div>
-                <div class="absolute inset-0 pointer-events-none mix-blend-multiply"
-                     :class="{
-                         'bg-gradient-to-r from-[#050507]/95 via-[#050507]/50 to-transparent': theme === 'onyx',
-                         'bg-gradient-to-r from-[#FAF7F0]/95 via-[#FAF7F0]/60 to-transparent': theme === 'champagne',
-                         'bg-gradient-to-r from-[#15060A]/95 via-[#15060A]/60 to-transparent': theme === 'rose'
-                     }">
-                </div>
-                <div class="absolute inset-0 pointer-events-none mix-blend-color-burn opacity-60"
-                     :class="{
-                         'bg-[#0C1E1A]/10': theme === 'onyx',
-                         'bg-[#C5A880]/15': theme === 'champagne',
-                         'bg-[#B76E79]/20': theme === 'rose'
-                     }">
-                </div>
-
-                <div class="max-w-xl space-y-4 z-10">
-                    <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-[#C5A880] block">Sun-Kissed Coastal Flora</span>
-                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-outfit font-semibold uppercase tracking-wider leading-none"
-                        :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'">
-                        Watamu Coral Hibiscus
-                    </h2>
-                    <div class="h-[1px] w-16 bg-[#C5A880]/40"></div>
-                    <p class="text-sm sm:text-base font-light leading-relaxed"
-                       :class="theme === 'champagne' ? 'text-neutral-700' : 'text-neutral-300'">
-                        Fresh coastal hibiscus, exotic bird-of-paradise blooms, and palm fan accents, bringing the warm tropical breeze of the Kenyan coast into your home.
-                    </p>
-                    <div class="pt-4">
-                        <button @click="$wire.selectCategory('home_decor'); document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'})" 
-                                class="bg-[#C5A880] text-black px-6 py-3 rounded-full text-[11px] font-mono uppercase tracking-[0.2em] font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#B59A7A] cursor-pointer">
-                            Order Coastal Botanicals
-                        </button>
-                    </div>
-                </div>
-            </div>
+            @endforeach
 
             <!-- Edge Navigation Chevrons (Hover activated) -->
             <button 
@@ -935,7 +721,7 @@
             <!-- Roman Numeral slide indicators with moving progress line bar -->
             <div class="absolute bottom-8 right-8 md:right-16 flex flex-col items-end space-y-2.5 z-20 font-mono select-none">
                 <div class="flex items-center space-x-6 text-sm tracking-widest">
-                    <template x-for="(numeral, index) in ['I', 'II', 'III', 'IV', 'V']" :key="index">
+                    <template x-for="(numeral, index) in ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'].slice(0, slidesCount)" :key="index">
                         <button @click="activeSlide = index; resetTimer();"
                                 :class="activeSlide === index ? (theme === 'champagne' ? 'text-black font-bold' : 'text-white font-bold') : 'text-neutral-500 hover:text-neutral-300'"
                                 class="transition-all duration-300 cursor-pointer text-xs font-semibold px-1 focus:outline-none"
@@ -946,7 +732,7 @@
                 <!-- Elegant slide progress line bar container -->
                 <div class="w-40 h-[2px] rounded-full relative overflow-hidden bg-neutral-500/10">
                     <div class="absolute left-0 top-0 h-full rounded-full transition-all duration-500 ease-out bg-[#C5A880]"
-                         :style="{ width: '20%', left: (activeSlide * 20) + '%' }"></div>
+                         :style="{ width: (100 / slidesCount) + '%', left: (activeSlide * (100 / slidesCount)) + '%' }"></div>
                 </div>
             </div>
         </section>
@@ -1091,21 +877,6 @@
                             <span>Home & Vases</span>
                         </button>
                     </div>
-
-                    <!-- Department: Specialized Consultations -->
-                    <div class="space-y-0.5 pt-1.5 border-t border-neutral-500/10">
-                        <span class="text-[9px] font-serif text-neutral-500 uppercase tracking-widest block font-bold px-1.5 mb-1 italic">✦ Specializations</span>
-                        <button @click="active = 'specializtion'; $wire.selectCategory('specializtion')" 
-                                :class="{
-                                    'text-[#C5A880] bg-[#C5A880]/5 border-l-2 border-[#C5A880] font-medium': active === 'specializtion' && theme === 'onyx',
-                                    'text-[#B59A7A] bg-[#B59A7A]/5 border-l-2 border-[#B59A7A] font-medium': active === 'specializtion' && theme === 'champagne',
-                                    'text-[#B76E79] bg-[#B76E79]/5 border-l-2 border-[#B76E79] font-medium': active === 'specializtion' && theme === 'rose',
-                                    'text-neutral-450 hover:text-current hover:bg-neutral-500/5 hover:border-l-2 hover:border-neutral-500/20 border-l-2 border-transparent': active !== 'specializtion'
-                                }"
-                                class="w-full flex items-center space-x-2 px-2 py-1 rounded-r-md text-[10px] uppercase tracking-[0.12em] transition-all cursor-pointer text-left">
-                            <span>Custom Services</span>
-                        </button>
-                    </div>
                 </div>
 
                 <!-- Expanded Workspace Config mini preview listing actual items -->
@@ -1182,7 +953,6 @@
                         <button @click="active = 'bouquet'; $wire.selectCategory('bouquet')" :class="active === 'bouquet' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Bouquet</button>
                         <button @click="active = 'giftings'; $wire.selectCategory('giftings')" :class="active === 'giftings' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Giftings</button>
                         <button @click="active = 'bundle'; $wire.selectCategory('bundle')" :class="active === 'bundle' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Bundle</button>
-                        <button @click="active = 'specializtion'; $wire.selectCategory('specializtion')" :class="active === 'specializtion' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Specializtion</button>
                     </div>
                 </div>
                 <!-- Search bar & Filters container -->

@@ -44,7 +44,7 @@
                     <option value="bundle">Bundle</option>
                     <option value="bouquet">Bouquet</option>
                     <option value="giftings">Giftings</option>
-                    <option value="specializtion">Specializtion</option>
+                    <option value="specialization">Specialization</option>
                 </select>
 
                 {{-- Stock Trail --}}
@@ -390,7 +390,7 @@
                                 <option value="bundle">Bundle</option>
                                 <option value="bouquet">Bouquet</option>
                                 <option value="giftings">Giftings</option>
-                                <option value="specializtion">Specializtion</option>
+                                <option value="specialization">Specialization</option>
                             </select>
                             @error('category') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>

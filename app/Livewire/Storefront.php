@@ -30,6 +30,7 @@ class Storefront extends Component
 
 
     public array $cart = [];
+    public array $slides = [];
 
     // Form inputs pre-filled from our active user session
     public string $full_name = '';
@@ -559,12 +560,21 @@ class Storefront extends Component
 
     public function render()
     {
+        $this->slides = \App\Services\HeroSettingsService::getSlides();
+
         $occasions = \Illuminate\Support\Facades\Cache::remember('occasions_all', 3600, fn() => Occasion::all());
         
-        $query = Product::with('occasions');
+        $query = Product::with('occasions')
+            ->whereNotIn('category', ['specializtion', 'specialization', 'specializations']);
 
         if ($this->selectedCategory !== 'all') {
-            $query->where('category', $this->selectedCategory);
+            $cats = match (strtolower($this->selectedCategory)) {
+                'bouquet', 'bouquets' => ['bouquet', 'bouquets'],
+                'giftings', 'gifting', 'hampers' => ['giftings', 'gifting', 'hampers'],
+                'specializtion', 'specialization', 'specializations' => ['specializtion', 'specialization', 'specializations'],
+                default => [$this->selectedCategory],
+            };
+            $query->whereIn('category', $cats);
         }
 
         if (!empty($this->search)) {
@@ -606,27 +616,16 @@ class Storefront extends Component
             return $product;
         });
 
-        // Reorder such that service product cards come in the second row (on All Category view)
-        if ($this->selectedCategory === 'all' && empty($this->search) && !$this->selectedOccasion) {
-            $regular = $products->filter(fn($p) => $p->category !== 'specializtion' && $p->category !== 'specialization' && $p->category !== 'specializations');
-            $services = $products->filter(fn($p) => $p->category === 'specializtion' || $p->category === 'specialization' || $p->category === 'specializations');
-            
-            $ordered = collect();
-            // Row 1: First 3 regular products
-            $ordered = $ordered->concat($regular->take(3));
-            $remainingRegular = $regular->skip(3);
-            
-            // Row 2: All services
-            $ordered = $ordered->concat($services);
-            
-            // Remaining rows: The rest of standard products
-            $ordered = $ordered->concat($remainingRegular);
-            
-            $products = $ordered;
-        }
-        $totalCountQuery = Product::query();
+        $totalCountQuery = Product::query()
+            ->whereNotIn('category', ['specializtion', 'specialization', 'specializations']);
         if ($this->selectedCategory !== 'all') {
-            $totalCountQuery->where('category', $this->selectedCategory);
+            $cats = match (strtolower($this->selectedCategory)) {
+                'bouquet', 'bouquets' => ['bouquet', 'bouquets'],
+                'giftings', 'gifting', 'hampers' => ['giftings', 'gifting', 'hampers'],
+                'specializtion', 'specialization', 'specializations' => ['specializtion', 'specialization', 'specializations'],
+                default => [$this->selectedCategory],
+            };
+            $totalCountQuery->whereIn('category', $cats);
         }
         if (!empty($this->search)) {
             $totalCountQuery->where(function ($q) {

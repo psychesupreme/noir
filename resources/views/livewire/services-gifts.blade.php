@@ -159,7 +159,6 @@
 
             <div class="flex items-center space-x-6 text-[12px] font-mono uppercase tracking-widest text-neutral-400">
                 <!-- Navigation links -->
-                <a href="{{ route('curate') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer" style="animation-delay: 150ms;">3D Curation</a>
                 <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer text-[#C5A880] font-semibold" style="animation-delay: 200ms;">Services</a>
 
                 <!-- Theme Switcher Pill (3 options, desktop only) -->

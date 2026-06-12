@@ -43,15 +43,63 @@ class ProductSeeder extends Seeder
         ]);
 
         Product::create([
-            'name' => 'Watamu Coral Hibiscus Stems',
-            'sku' => 'NB-STM-WCH-03',
-            'description' => 'Vibrant coral hibiscus stems harvested from the warm coastal gardens of Watamu. Brings a tropical breeze to any vase. Sold per stem.',
+            'name' => 'Eldoret Golden Sunflowers',
+            'sku' => 'NB-STM-EGS-03',
+            'description' => 'Bright, radiant golden sunflowers harvested from the rich agricultural highlands of Eldoret. Adds warmth and sunlit charm to any room. Sold per stem.',
             'price' => 350,
             'stock' => 200,
             'category' => 'stems',
             'unit_type' => 'stem',
             'grade' => 'Grade A',
-            'image_url' => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
+            'image_url' => 'https://images.unsplash.com/photo-1597848212624-a19eb35e2651?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Nakuru Pink Carnations',
+            'sku' => 'NB-STM-NPC-04',
+            'description' => 'Elegant ruffle-petalled pink carnations sourced from professional growers around Lake Nakuru. Known for their long vase life. Sold per stem.',
+            'price' => 250,
+            'stock' => 400,
+            'category' => 'stems',
+            'unit_type' => 'stem',
+            'grade' => 'Grade A',
+            'image_url' => 'https://images.unsplash.com/photo-1572915243851-bc29084df948?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Nairobi Blue Hydrangeas',
+            'sku' => 'NB-STM-NBH-05',
+            'description' => 'Large, globe-like blue hydrangeas grown in shaded valley plots of Nairobi. Ideal for creating instant focus and structural volume. Sold per stem.',
+            'price' => 500,
+            'stock' => 150,
+            'category' => 'stems',
+            'unit_type' => 'stem',
+            'grade' => 'Grade A',
+            'image_url' => 'https://images.unsplash.com/photo-1507504038482-7621ab2886f1?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Tsavo Purple Orchids',
+            'sku' => 'NB-STM-TPO-06',
+            'description' => 'Exotic and rare purple orchids sourced from temperature-controlled conservatories near Tsavo. Represents absolute luxury. Sold per stem.',
+            'price' => 600,
+            'stock' => 100,
+            'category' => 'stems',
+            'unit_type' => 'stem',
+            'grade' => 'Grade A',
+            'image_url' => 'https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Nyeri Sunset Orange Gerberas',
+            'sku' => 'NB-STM-NSG-07',
+            'description' => 'Cheerful and vibrant orange gerbera daisies cultivated under the sunny skies of Nyeri. Striking daisy-like shape. Sold per stem.',
+            'price' => 280,
+            'stock' => 350,
+            'category' => 'stems',
+            'unit_type' => 'stem',
+            'grade' => 'Grade A',
+            'image_url' => 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=600',
         ]);
 
         // ── 2. Bespoke Bouquets Category ───────────────────
@@ -184,7 +232,7 @@ class ProductSeeder extends Seeder
             'description' => 'A 1-on-1 design consultation session at our Nairobi showroom or online. We plan, budget, and select varieties for your custom floral requirements.',
             'price' => 5000,
             'stock' => 100, // Consultation slots
-            'category' => 'specializtion',
+            'category' => 'specialization',
             'unit_type' => 'arrangement',
             'grade' => 'Consultation',
             'image_url' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=600',
@@ -196,7 +244,7 @@ class ProductSeeder extends Seeder
             'description' => 'Bespoke event planning, venue walkthroughs, and custom flower installations (arches, centerpieces, suspensions) led by our expert team.',
             'price' => 95000,
             'stock' => 5,
-            'category' => 'specializtion',
+            'category' => 'specialization',
             'unit_type' => 'arrangement',
             'grade' => 'Event Styling',
             'image_url' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&q=80&w=600',
@@ -208,7 +256,7 @@ class ProductSeeder extends Seeder
             'description' => 'Tailored weekly rotation of corporate workspace flower arrangements, entry lobby structures, and meeting desk bowls matching brand guidelines.',
             'price' => 45000,
             'stock' => 10,
-            'category' => 'specializtion',
+            'category' => 'specialization',
             'unit_type' => 'arrangement',
             'grade' => 'Subscription',
             'image_url' => 'https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&q=80&w=600',
@@ -216,8 +264,8 @@ class ProductSeeder extends Seeder
 
         // ── 6. Curation Addons & Giftings ───────────────────
         Product::create([
-            'name' => 'Luxury Kraft Wrap',
-            'sku' => 'NB-DEC-LKW-01',
+            'name' => 'Kraft Paper Wrapping',
+            'sku' => 'NB-DEC-KPW-01',
             'description' => 'Artisanal brown kraft wrapping paper with natural raffia tie.',
             'price' => 500,
             'stock' => 200,
@@ -228,10 +276,10 @@ class ProductSeeder extends Seeder
         ]);
 
         Product::create([
-            'name' => 'Luxury Linen Wrap',
-            'sku' => 'NB-DEC-LLW-02',
-            'description' => 'Woven luxury white linen wrapping with gold brand silk ribbon.',
-            'price' => 1200,
+            'name' => 'Satin Ribbon Accent',
+            'sku' => 'NB-DEC-SRA-02',
+            'description' => 'Luxury double-faced satin ribbon tied in a classic atelier bow.',
+            'price' => 800,
             'stock' => 150,
             'category' => 'bundle',
             'unit_type' => 'wrap',
@@ -240,15 +288,27 @@ class ProductSeeder extends Seeder
         ]);
 
         Product::create([
-            'name' => 'Noir Obsidian Gift Box',
-            'sku' => 'NB-DEC-NOG-03',
-            'description' => 'Matte black premium presentation box with gold foil lettering.',
-            'price' => 2500,
-            'stock' => 80,
+            'name' => 'French Mesh Wrapping',
+            'sku' => 'NB-DEC-FMW-03',
+            'description' => 'Textured black mesh wrapping adding volume and theatrical depth.',
+            'price' => 1000,
+            'stock' => 100,
             'category' => 'bundle',
             'unit_type' => 'wrap',
             'grade' => null,
             'image_url' => 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=600',
+        ]);
+
+        Product::create([
+            'name' => 'Organic Burlap Wrapping',
+            'sku' => 'NB-DEC-OBW-04',
+            'description' => 'Rustic natural jute burlap wrap for an organic, textured appearance.',
+            'price' => 600,
+            'stock' => 120,
+            'category' => 'bundle',
+            'unit_type' => 'wrap',
+            'grade' => null,
+            'image_url' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600',
         ]);
 
         Product::create([

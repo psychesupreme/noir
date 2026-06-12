@@ -34,22 +34,28 @@
     </div>
 
     {{-- Tabs Navigation Row --}}
-    <div class="flex border-b border-neutral-900 mb-10 text-xs uppercase tracking-widest font-mono">
+    <div class="flex border-b border-neutral-900 mb-10 text-xs uppercase tracking-widest font-mono overflow-x-auto scrollbar-none">
         <button 
             wire:click="$set('activeTab', 'general')"
-            class="px-6 py-3 border-b-2 transition-all duration-300 {{ $activeTab === 'general' ? 'border-amber-500 text-white' : 'border-transparent text-neutral-500 hover:text-neutral-300' }}"
+            class="px-6 py-3 border-b-2 transition-all duration-300 whitespace-nowrap {{ $activeTab === 'general' ? 'border-amber-500 text-white' : 'border-transparent text-neutral-500 hover:text-neutral-300' }}"
         >
             General Defaults
         </button>
         <button 
             wire:click="$set('activeTab', 'credentials')"
-            class="px-6 py-3 border-b-2 transition-all duration-300 {{ $activeTab === 'credentials' ? 'border-amber-500 text-white' : 'border-transparent text-neutral-500 hover:text-neutral-300' }}"
+            class="px-6 py-3 border-b-2 transition-all duration-300 whitespace-nowrap {{ $activeTab === 'credentials' ? 'border-amber-500 text-white' : 'border-transparent text-neutral-500 hover:text-neutral-300' }}"
         >
             Integration APIs
         </button>
         <button 
+            wire:click="$set('activeTab', 'hero')"
+            class="px-6 py-3 border-b-2 transition-all duration-300 whitespace-nowrap {{ $activeTab === 'hero' ? 'border-amber-500 text-white' : 'border-transparent text-neutral-500 hover:text-neutral-300' }}"
+        >
+            Landing Hero
+        </button>
+        <button 
             wire:click="$set('activeTab', 'users')"
-            class="px-6 py-3 border-b-2 transition-all duration-300 {{ $activeTab === 'users' ? 'border-amber-500 text-white' : 'border-transparent text-neutral-500 hover:text-neutral-300' }}"
+            class="px-6 py-3 border-b-2 transition-all duration-300 whitespace-nowrap {{ $activeTab === 'users' ? 'border-amber-500 text-white' : 'border-transparent text-neutral-500 hover:text-neutral-300' }}"
         >
             Access & Roles
         </button>
@@ -164,6 +170,148 @@
                             Save Credentials
                         </button>
                     </div>
+                </form>
+            </div>
+        @endif
+
+        {{-- Tab 4: Landing Page Hero Settings --}}
+        @if ($activeTab === 'hero')
+            <div class="bg-[#0F0F12] border border-neutral-900 rounded p-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-xs font-mono uppercase tracking-[0.2em] text-white">Landing Page Hero Slides</h3>
+                        <p class="text-[10px] text-neutral-550 font-light mt-0.5">Customize the landing page slideshow hero text, images, and links.</p>
+                    </div>
+                    <button 
+                        type="button"
+                        wire:click="addSlide"
+                        class="bg-amber-500 hover:bg-amber-600 text-black text-[10px] font-mono uppercase tracking-widest px-4 py-2 rounded transition-colors"
+                    >
+                        + Add Slide
+                    </button>
+                </div>
+
+                <form wire:submit.prevent="saveHeroSettings" class="space-y-8">
+                    @foreach ($slides as $index => $slide)
+                        <div class="border border-neutral-850 p-6 rounded bg-[#0A0A0A]/40 relative space-y-4">
+                            {{-- Slide Controls Header --}}
+                            <div class="flex justify-between items-center border-b border-neutral-900 pb-3 mb-2">
+                                <span class="text-xs font-mono text-[#C5A880]">Slide #{{ $index + 1 }}</span>
+                                <div class="flex items-center space-x-2 text-[10px] font-mono">
+                                    <button 
+                                        type="button" 
+                                        wire:click="moveSlideUp({{ $index }})" 
+                                        class="text-neutral-500 hover:text-white disabled:opacity-30"
+                                        {{ $index === 0 ? 'disabled' : '' }}
+                                    >
+                                        ▲ Up
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        wire:click="moveSlideDown({{ $index }})" 
+                                        class="text-neutral-500 hover:text-white disabled:opacity-30"
+                                        {{ $index === count($slides) - 1 ? 'disabled' : '' }}
+                                    >
+                                        ▼ Down
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        wire:click="deleteSlide({{ $index }})" 
+                                        class="text-rose-500 hover:text-rose-400 font-bold ml-2"
+                                    >
+                                        [ Delete ]
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[9px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">Badge Text</label>
+                                    <input 
+                                        wire:model="slides.{{ $index }}.badge" 
+                                        type="text" 
+                                        class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                                    >
+                                    @error('slides.' . $index . '.badge') <span class="text-[9px] text-rose-500 font-mono mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="text-[9px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">Slide Title</label>
+                                    <input 
+                                        wire:model="slides.{{ $index }}.title" 
+                                        type="text" 
+                                        class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                                    >
+                                    @error('slides.' . $index . '.title') <span class="text-[9px] text-rose-500 font-mono mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-[9px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">Description Copy</label>
+                                <textarea 
+                                    wire:model="slides.{{ $index }}.description" 
+                                    rows="2"
+                                    class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                                ></textarea>
+                                @error('slides.' . $index . '.description') <span class="text-[9px] text-rose-500 font-mono mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label class="text-[9px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">Background Image URL</label>
+                                <input 
+                                    wire:model="slides.{{ $index }}.bg_image" 
+                                    type="text" 
+                                    class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                                >
+                                @error('slides.' . $index . '.bg_image') <span class="text-[9px] text-rose-500 font-mono mt-1 block">{{ $message }}</span> @enderror
+                                
+                                @if (isset($slide['bg_image']) && filter_var($slide['bg_image'], FILTER_VALIDATE_URL))
+                                    <div class="mt-2 flex items-center space-x-2">
+                                        <span class="text-[9px] font-mono text-neutral-600 uppercase">Preview:</span>
+                                        <img src="{{ $slide['bg_image'] }}" class="h-12 w-24 object-cover rounded border border-neutral-800" onerror="this.style.display='none'">
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-[9px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">CTA Button Text</label>
+                                    <input 
+                                        wire:model="slides.{{ $index }}.cta_text" 
+                                        type="text" 
+                                        class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                                    >
+                                    @error('slides.' . $index . '.cta_text') <span class="text-[9px] text-rose-500 font-mono mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="text-[9px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-1">CTA Action Link (Category Select)</label>
+                                    <input 
+                                        wire:model="slides.{{ $index }}.cta_link" 
+                                        type="text" 
+                                        placeholder="e.g. stems, bouquets, hampers, giftings, specialization..."
+                                        class="w-full bg-[#0A0A0A] border border-neutral-800 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neutral-600 font-mono"
+                                    >
+                                    @error('slides.' . $index . '.cta_link') <span class="text-[9px] text-rose-500 font-mono mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    @if(count($slides) === 0)
+                        <div class="text-center py-8 text-neutral-600 font-mono text-xs border border-dashed border-neutral-800 rounded">
+                            No slides configured. Click "+ Add Slide" to create one.
+                        </div>
+                    @endif
+
+                    @if(count($slides) > 0)
+                        <div class="pt-4 flex justify-end">
+                            <button 
+                                type="submit" 
+                                class="bg-white text-black text-xs font-mono uppercase tracking-widest px-6 py-2.5 rounded hover:bg-neutral-200 transition-colors"
+                            >
+                                Save Hero Configuration
+                            </button>
+                        </div>
+                    @endif
                 </form>
             </div>
         @endif

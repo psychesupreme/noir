@@ -27,6 +27,9 @@ class SettingsIndex extends Component
     // Users search
     public string $userSearch = '';
 
+    // Hero settings
+    public array $slides = [];
+
     protected $queryString = [
         'activeTab' => ['except' => 'general']
     ];
@@ -40,6 +43,8 @@ class SettingsIndex extends Component
         $this->mpesaKey = config('services.mpesa.key', '');
         $this->mpesaSecret = config('services.mpesa.secret', '');
         $this->mpesaPasskey = config('services.mpesa.passkey', '');
+
+        $this->slides = \App\Services\HeroSettingsService::getSlides();
     }
 
     public function updatingUserSearch(): void
@@ -87,6 +92,57 @@ class SettingsIndex extends Component
         ]);
 
         session()->flash('message', "User {$user->name}'s role updated to {$roleCase->label()} successfully.");
+    }
+
+    public function saveHeroSettings(): void
+    {
+        $this->validate([
+            'slides.*.badge' => 'required|string|max:100',
+            'slides.*.title' => 'required|string|max:100',
+            'slides.*.description' => 'required|string|max:500',
+            'slides.*.bg_image' => 'required|url|max:500',
+            'slides.*.cta_text' => 'required|string|max:50',
+            'slides.*.cta_link' => 'required|string|max:100',
+        ]);
+
+        \App\Services\HeroSettingsService::saveSlides($this->slides);
+        session()->flash('message', 'Landing page hero settings configurations persisted successfully.');
+    }
+
+    public function addSlide(): void
+    {
+        $this->slides[] = [
+            'badge' => 'New Badge Text',
+            'title' => 'New Slide Title',
+            'description' => 'Slide description copy goes here.',
+            'bg_image' => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=1200',
+            'cta_text' => 'Learn More',
+            'cta_link' => 'stems',
+        ];
+    }
+
+    public function deleteSlide(int $index): void
+    {
+        unset($this->slides[$index]);
+        $this->slides = array_values($this->slides);
+    }
+
+    public function moveSlideUp(int $index): void
+    {
+        if ($index > 0) {
+            $temp = $this->slides[$index - 1];
+            $this->slides[$index - 1] = $this->slides[$index];
+            $this->slides[$index] = $temp;
+        }
+    }
+
+    public function moveSlideDown(int $index): void
+    {
+        if ($index < count($this->slides) - 1) {
+            $temp = $this->slides[$index + 1];
+            $this->slides[$index + 1] = $this->slides[$index];
+            $this->slides[$index] = $temp;
+        }
     }
 
     public function render()

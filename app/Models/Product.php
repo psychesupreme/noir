@@ -190,7 +190,7 @@ class Product extends Model
                 }
                 if (count($consonants) < 3) {
                     foreach ($chars as $c) {
-                        if (!in_array($c, $vowels) && count($consonants) < 3) {
+                        if (in_array($c, $vowels) && !in_array($c, $consonants) && count($consonants) < 3) {
                             $consonants[] = $c;
                         }
                     }
