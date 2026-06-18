@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1A0D10" />
+      <stop offset="100%" stop-color="#090507" />
+    </radialGradient>
+    <radialGradient id="roseGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F43F5E" />
+      <stop offset="70%" stop-color="#E11D48" />
+      <stop offset="100%" stop-color="#9F1239" />
+    </radialGradient>
+  </defs>
+  <rect width="100" height="100" rx="20" fill="url(#bgGrad)" stroke="#E11D48" stroke-width="0.5" stroke-opacity="0.3" />
+  <g transform="translate(50, 48)">
+    <!-- Stem & Leaves -->
+    <path d="M 0,0 C 5,20 -5,35 0,45" fill="none" stroke="#1B4332" stroke-width="3" stroke-linecap="round" />
+    <path d="M 3,15 C 10,13 18,17 15,22 C 10,25 5,20 3,15" fill="#2D6A4F" />
+    <path d="M -3,22 C -10,20 -18,24 -15,29 C -10,32 -5,27 -3,22" fill="#2D6A4F" />
+    <!-- Rose Blooms -->
+    <circle cx="0" cy="0" r="20" fill="url(#roseGrad)" filter="drop-shadow(0px 4px 6px rgba(0,0,0,0.5))" />
+    <path d="M -12,-5 C -8,-15 8,-15 12,-5 C 5,-2 -5,-2 -12,-5 Z" fill="#FDA4AF" opacity="0.8" />
+    <path d="M -8,5 C -12,0 -8,-8 0,-8 C 8,-8 12,0 8,5 C 4,2 -4,2 -8,5 Z" fill="#F43F5E" />
+    <circle cx="0" cy="-2" r="5" fill="#9F1239" />
+  </g>
+</svg>

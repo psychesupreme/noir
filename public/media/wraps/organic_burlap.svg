@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <rect width="100" height="100" rx="20" fill="#0C0D0E" stroke="#8A7E66" stroke-width="0.5" stroke-opacity="0.2" />
+  <g transform="translate(50, 50)">
+    <!-- Organic burlap folds -->
+    <path d="M -24,24 L -6,-36 L 20,-36 L -8,24 Z" fill="#6E5D47" opacity="0.8" />
+    <path d="M 24,24 L 6,-36 L -20,-36 L 8,24 Z" fill="#8A775C" stroke="#5C4D3C" stroke-width="0.8" stroke-dasharray="3,3" />
+    <line x1="-12" y1="12" x2="12" y2="12" stroke="#4A3B2C" stroke-width="2" />
+    <circle cx="0" cy="12" r="2.5" fill="#4A3B2C" />
+  </g>
+</svg>

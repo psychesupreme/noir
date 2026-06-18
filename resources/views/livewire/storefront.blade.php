@@ -63,9 +63,13 @@
     x-data="{ 
         drawerOpen: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
         checkoutMode: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
-        theme: localStorage.getItem('nb_theme') || 'onyx', 
+        theme: 'champagne', 
         accountPanelOpen: false, 
         chatOpen: false,
+        quickViewOpen: false,
+        quickViewProduct: null,
+        quickViewSize: 'standard',
+        numberFormat(val) { return new Intl.NumberFormat().format(val); },
         
         /* Preloader & transition states */
         loading: true,
@@ -320,6 +324,14 @@
             pointer-events: none;
             z-index: 1;
         }
+
+        @keyframes card-fade-in {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-card-fade-in {
+            animation: card-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
     </style>
 
 
@@ -330,125 +342,55 @@
     <!-- Fine Linen Organic Grid Overlay -->
     <div class="absolute inset-0 pointer-events-none fine-linen z-0 opacity-80"></div>
     <header 
-        :class="{
-            'bg-[#050507]/75 border-neutral-950/20 shadow-2xl': theme === 'onyx',
-            'bg-white/75 border-neutral-200/50 shadow-sm': theme === 'champagne',
-            'bg-[#15060A]/75 border-[#2D0D19]/30 shadow-2xl': theme === 'rose'
-        }"
-        class="fixed top-4 inset-x-4 h-16 backdrop-blur-md border rounded-full z-50 transition-all duration-500 flex items-center shadow-lg hover:shadow-xl group theme-section"
+        class="fixed top-4 inset-x-4 h-16 bg-white/90 border border-neutral-200/80 rounded-full z-50 transition-all duration-500 flex items-center shadow-md hover:shadow-lg group"
     >
-        <!-- Gold Accent Bottom Glow Line -->
-        <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-[#C5A880]/30 to-transparent"></div>
-        <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-8">
-            <a href="/" class="shrink-0 flex items-baseline space-x-2 animate-nav-item select-none cursor-pointer" style="animation-delay: 100ms;">
-                <span class="text-[11px] font-mono tracking-[0.4em] text-[#C5A880] uppercase">Atelier</span>
-                <span :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-base font-semibold uppercase tracking-[0.35em] transition-colors font-outfit">NOIR & BLOOM</span>
+        {{-- FNP Green Bottom Glow Line --}}
+        <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-emerald-600/30 to-transparent"></div>
+        <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-6">
+            <a href="/" class="shrink-0 flex items-center space-x-2 select-none cursor-pointer group-hover:scale-102 transition-transform duration-300">
+                <div class="w-8.5 h-8.5 rounded-full bg-emerald-800 flex items-center justify-center text-white font-serif italic text-sm font-semibold shadow-md shrink-0">N</div>
+                <div class="flex flex-col text-left leading-none">
+                    <span class="text-[9px] font-mono tracking-[0.3em] text-emerald-700 uppercase font-bold">Atelier</span>
+                    <span class="text-xs sm:text-sm md:text-base font-extrabold uppercase tracking-[0.15em] text-neutral-900 font-outfit mt-0.5">Noir & Bloom</span>
+                </div>
             </a>
-            <!-- Spacing column to balance layout -->
-            <div class="flex-1 hidden md:block"></div>
-
-            <div class="flex items-center space-x-6 text-[12px] font-mono uppercase tracking-widest text-neutral-400">
-                <!-- Navigation links -->
-                <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer" style="animation-delay: 200ms;">Services</a>
-
-                <!-- Theme Switcher Pill (3 options, desktop only) -->
-                <div class="hidden lg:flex items-center space-x-1 border border-neutral-500/10 rounded-full bg-neutral-500/5 p-1 animate-nav-item select-none relative" style="animation-delay: 300ms;">
-                    <button @click="changeTheme('onyx')" 
-                            @mouseenter="hoverTheme = 'onyx'" 
-                            @mouseleave="hoverTheme = null" 
-                            :class="theme === 'onyx' ? 'bg-[#C5A880] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-[#C5A880] hover:bg-[#C5A880]/10'" 
-                            class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
-                        <span class="w-1 h-1 rounded-full bg-current"></span>
-                        <span>Onyx</span>
-                    </button>
-                    <button @click="changeTheme('champagne')" 
-                            @mouseenter="hoverTheme = 'champagne'" 
-                            @mouseleave="hoverTheme = null" 
-                            :class="theme === 'champagne' ? 'bg-[#B59A7A] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-[#B59A7A] hover:bg-[#B59A7A]/10'" 
-                            class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
-                        <span class="w-1 h-1 rounded-full bg-current"></span>
-                        <span>Champagne</span>
-                    </button>
-                    <button @click="changeTheme('rose')" 
-                            @mouseenter="hoverTheme = 'rose'" 
-                            @mouseleave="hoverTheme = null" 
-                            :class="theme === 'rose' ? 'bg-[#B76E79] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-[#B76E79] hover:bg-[#B76E79]/10'" 
-                            class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
-                        <span class="w-1 h-1 rounded-full bg-current"></span>
-                        <span>Rose</span>
-                    </button>
-
-                    <!-- Theme Hover Preview Popover Card -->
-                    <div x-show="hoverTheme !== null"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 translate-y-3 scale-95"
-                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                         x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                         x-transition:leave-end="opacity-0 translate-y-3 scale-95"
-                         :class="theme === 'champagne' ? 'bg-white border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#0F0F12]/95 border-neutral-800 text-white shadow-2xl'"
-                         class="absolute top-full left-1/2 -translate-x-1/2 mt-3.5 w-64 rounded-2xl border p-4 text-left z-50 text-xs backdrop-blur-md space-y-3"
-                         style="display: none;"
+            
+            {{-- Prominent Header Search Bar (FNP-style) --}}
+            <div class="flex-1 max-w-lg mx-auto hidden md:block">
+                <div class="relative group" x-data="{ focused: false }">
+                    <input 
+                        type="text" 
+                        wire:model.live.debounce.200ms="search"
+                        @focus="focused = true"
+                        @blur="focused = false"
+                        placeholder="Search fresh flowers, luxury hampers, cakes, combinations..."
+                        class="w-full bg-neutral-50 border border-neutral-200 text-neutral-800 placeholder-neutral-400 hover:border-emerald-600 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-600/10 rounded-full pl-10 pr-4 py-2 text-xs font-light font-sans focus:outline-none transition-all duration-300 shadow-sm"
                     >
-                        <!-- Onyx Preview Content -->
-                        <div x-show="hoverTheme === 'onyx'" class="space-y-2">
-                            <span class="font-bold text-[#C5A880] tracking-wider uppercase text-[10px] block">Onyx Theme</span>
-                            <p class="text-neutral-450 text-[11px] leading-relaxed font-light">Midnight Obsidian & Deep Velvet. A high-contrast dark aesthetic built for dramatic evening luxury.</p>
-                            <!-- Mini Color Palette Swatches -->
-                            <div class="flex items-center space-x-1 pt-1">
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#050507]" title="Background"></span>
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#C5A880]" title="Accent"></span>
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#F4F4F5]" title="Text"></span>
-                            </div>
-                        </div>
-
-                        <!-- Champagne Preview Content -->
-                        <div x-show="hoverTheme === 'champagne'" class="space-y-2">
-                            <span class="font-bold text-[#B59A7A] tracking-wider uppercase text-[10px] block">Champagne Theme</span>
-                            <p class="text-neutral-500 text-[11px] leading-relaxed font-light">Warm Alabaster & Gilded Gold. A soft, light mode reflecting sunlit mornings in the flower atelier.</p>
-                            <div class="flex items-center space-x-1 pt-1">
-                                <span class="w-4 h-4 rounded-full border border-neutral-200 bg-[#FAF7F0]" title="Background"></span>
-                                <span class="w-4 h-4 rounded-full border border-neutral-200 bg-[#B59A7A]" title="Accent"></span>
-                                <span class="w-4 h-4 rounded-full border border-neutral-200 bg-[#1C1917]" title="Text"></span>
-                            </div>
-                        </div>
-
-                        <!-- Rose Preview Content -->
-                        <div x-show="hoverTheme === 'rose'" class="space-y-2">
-                            <span class="font-bold text-[#B76E79] tracking-wider uppercase text-[10px] block">Rose Theme</span>
-                            <p class="text-neutral-450 text-[11px] leading-relaxed font-light">Blushing Burgundy & Rose Quartz. A rich, romantic dark mode inspired by fresh Kenyan spray roses.</p>
-                            <div class="flex items-center space-x-1 pt-1">
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#15060A]" title="Background"></span>
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#B76E79]" title="Accent"></span>
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#FCE7EC]" title="Text"></span>
-                            </div>
-                        </div>
+                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-neutral-400 group-focus-within:text-emerald-700 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
+                        </svg>
                     </div>
                 </div>
+            </div>
 
-                <!-- Collapsed mobile theme switcher (curtain transition aware) -->
-                <button @click="changeTheme(theme === 'onyx' ? 'champagne' : (theme === 'champagne' ? 'rose' : 'onyx'))" 
-                        class="lg:hidden hover:text-neutral-200 transition-colors cursor-pointer select-none relative w-8 h-8 flex items-center justify-center border border-neutral-500/10 rounded-full bg-neutral-500/5 animate-nav-item"
-                        style="animation-delay: 300ms;"
-                        title="Cycle Theme"
-                >
-                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                        <circle cx="12" cy="12" r="5" />
-                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.77l1.42-1.42M18.36 5.64l1.42-1.42" />
-                    </svg>
-                </button>
+            <div class="flex items-center space-x-4 text-[12px] font-mono uppercase tracking-widest text-neutral-600">
+                <a href="{{ route('services-gifts') }}" class="hidden lg:inline-block hover:text-emerald-800 transition-colors duration-300 select-none cursor-pointer">Services</a>
+                <a href="{{ route('curate') }}" 
+                   class="hidden md:inline-block px-4 py-1.5 rounded-full border border-emerald-600/30 hover:border-emerald-600 hover:bg-emerald-600/5 text-emerald-800 font-medium transition-all duration-300 select-none cursor-pointer">
+                   Curation Studio
+                </a>
 
-                <!-- Modern SVG shopping bag cart button with absolute badge -->
+                {{-- Shopping Bag button --}}
                 <button @click="drawerOpen = true; checkoutMode = false;" 
-                        class="hover:text-neutral-300 transition-colors cursor-pointer select-none relative w-8 h-8 flex items-center justify-center border border-neutral-500/10 rounded-full bg-neutral-500/5 animate-nav-item" 
-                        style="animation-delay: 400ms;"
+                        class="hover:text-emerald-700 transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-full bg-neutral-50 shadow-sm" 
                         title="View Curation Drawer"
                 >
-                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                    <svg class="w-4 h-4 stroke-current fill-none text-neutral-700" viewBox="0 0 24 24" stroke-width="2">
                         <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     @if($cartCount > 0)
-                        <span class="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#C5A880] text-black text-[10px] font-bold font-sans tracking-none shadow-[0_0_8px_rgba(197,168,128,0.5)]">
+                        <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-emerald-600 text-white text-[9px] font-bold font-sans shadow-md">
                             {{ $cartCount }}
                         </span>
                     @endif
@@ -459,22 +401,17 @@
                     @auth
                         <!-- Initials-based Monogram Avatar Button (Shown when logged in) -->
                         <button @click="profileMenuOpen = !profileMenuOpen" 
-                                class="hover:border-[#C5A880]/60 border border-neutral-500/20 transition-all cursor-pointer select-none w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-tr from-neutral-900 via-neutral-950 to-neutral-900 shadow-md"
+                                class="hover:border-emerald-600 border border-neutral-200 transition-all cursor-pointer select-none w-8 h-8 flex items-center justify-center rounded-full bg-neutral-100 shadow-sm"
                                 title="Profile Portal Options"
                         >
-                            <span class="text-[10px] font-mono font-bold tracking-wider text-[#C5A880] uppercase">
+                            <span class="text-[10px] font-mono font-bold tracking-wider text-emerald-800 uppercase">
                                 {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
                             </span>
                         </button>
                     @else
-                        <!-- Log In / Sign In Button for Guests with dynamic theme-aware borders & smooth shadow glows -->
+                        <!-- Log In / Sign In Button for Guests -->
                         <button @click="profileMenuOpen = !profileMenuOpen" 
-                                :class="{
-                                    'border-[#C5A880]/30 hover:border-[#C5A880] hover:shadow-[0_0_15px_rgba(197,168,128,0.25)]': theme === 'onyx',
-                                    'border-[#B59A7A]/30 hover:border-[#B59A7A] hover:shadow-[0_0_15px_rgba(181,154,122,0.25)]': theme === 'champagne',
-                                    'border-[#B76E79]/30 hover:border-[#B76E79] hover:shadow-[0_0_15px_rgba(183,110,121,0.25)]': theme === 'rose'
-                                }"
-                                class="transition-all duration-300 hover:scale-[1.03] cursor-pointer select-none px-4 h-8 flex items-center justify-center space-x-1.5 border rounded-full bg-neutral-500/5 text-[11px] font-sans font-light tracking-widest uppercase"
+                                class="transition-all duration-300 hover:scale-[1.03] cursor-pointer select-none px-4 h-8 flex items-center justify-center space-x-1.5 border border-neutral-200 rounded-full bg-neutral-50 text-[11px] font-sans font-light tracking-widest uppercase text-neutral-700 hover:text-emerald-800 hover:border-emerald-600"
                                 title="Log In or Sign In"
                         >
                             <svg class="w-3.5 h-3.5 stroke-current fill-none transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 24 24" stroke-width="1.5">
@@ -795,8 +732,108 @@
         </div>
     @endif
 
-    <main class="max-w-8xl w-full mx-auto px-6 pt-0 flex-1 flex flex-col">
         <h1 class="sr-only">Noir &amp; Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier</h1>
+
+        <!-- FNP-Style Circular Category Navigation Menu -->
+        <div class="w-full py-8">
+            <div class="flex items-center justify-center gap-6 md:gap-12 overflow-x-auto scrollbar-none py-2 px-4">
+                <!-- Category: Flowers -->
+                <button wire:click="selectCategory('bouquet')" class="flex flex-col items-center gap-2 group shrink-0 focus:outline-none cursor-pointer">
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-neutral-250 group-hover:border-emerald-600 group-hover:scale-105 transition-all duration-300 shadow-sm relative">
+                        <img src="https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=200" alt="Flowers" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-xs md:text-sm font-medium text-neutral-700 group-hover:text-emerald-800 transition-colors">Flowers</span>
+                </button>
+                
+                <!-- Category: Cakes & Sweets -->
+                <button wire:click="selectCategory('giftings')" class="flex flex-col items-center gap-2 group shrink-0 focus:outline-none cursor-pointer">
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-neutral-250 group-hover:border-emerald-600 group-hover:scale-105 transition-all duration-300 shadow-sm relative">
+                        <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=200" alt="Cakes & Sweets" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-xs md:text-sm font-medium text-neutral-700 group-hover:text-emerald-800 transition-colors">Cakes & Sweets</span>
+                </button>
+                
+                <!-- Category: Plants & Vases -->
+                <button wire:click="selectCategory('bundle')" class="flex flex-col items-center gap-2 group shrink-0 focus:outline-none cursor-pointer">
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-neutral-250 group-hover:border-emerald-600 group-hover:scale-105 transition-all duration-300 shadow-sm relative">
+                        <img src="https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80&w=200" alt="Plants & Vases" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-xs md:text-sm font-medium text-neutral-700 group-hover:text-emerald-800 transition-colors">Plants & Vases</span>
+                </button>
+                
+                <!-- Category: Combos -->
+                <button wire:click="selectCategory('giftings')" class="flex flex-col items-center gap-2 group shrink-0 focus:outline-none cursor-pointer">
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-neutral-250 group-hover:border-emerald-600 group-hover:scale-105 transition-all duration-300 shadow-sm relative">
+                        <img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=200" alt="Combos" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-xs md:text-sm font-medium text-neutral-700 group-hover:text-emerald-800 transition-colors">Combos</span>
+                </button>
+                
+                <!-- Category: Hampers -->
+                <button wire:click="selectCategory('giftings')" class="flex flex-col items-center gap-2 group shrink-0 focus:outline-none cursor-pointer">
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-neutral-250 group-hover:border-emerald-600 group-hover:scale-105 transition-all duration-300 shadow-sm relative">
+                        <img src="https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&q=80&w=200" alt="Hampers" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-xs md:text-sm font-medium text-neutral-700 group-hover:text-emerald-800 transition-colors">Hampers</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- FNP-Style Global Location & Date Checker Bar -->
+        <div class="w-full bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 md:p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm text-left">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25a7.5 7.5 0 1 1 15 0Z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-neutral-800">Select Delivery Details</h3>
+                    <p class="text-xs text-neutral-500 font-light">Confirm destination city and date to view available collections and slots.</p>
+                </div>
+            </div>
+            
+            <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <!-- Delivery City -->
+                <div class="flex-1 min-w-[160px]">
+                    <select wire:model.live="deliveryCity" class="w-full bg-white border border-neutral-200 rounded-lg px-3 py-2 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/20 font-sans cursor-pointer">
+                        <option value="">-- Select City --</option>
+                        <option value="Nairobi">Nairobi</option>
+                        <option value="Kiambu">Kiambu</option>
+                        <option value="Mombasa">Mombasa</option>
+                        <option value="Kisumu">Kisumu</option>
+                        <option value="Nakuru">Nakuru</option>
+                    </select>
+                </div>
+                
+                <!-- Delivery Date -->
+                <div class="flex-1 min-w-[160px]">
+                    <input type="date" wire:model.live="deliveryDate" min="{{ date('Y-m-d') }}" class="w-full bg-white border border-neutral-200 rounded-lg px-3 py-2 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/20 font-sans">
+                </div>
+                
+                <!-- Delivery Slot -->
+                <div class="flex-1 min-w-[160px]">
+                    <select wire:model.live="deliverySlot" class="w-full bg-white border border-neutral-200 rounded-lg px-3 py-2 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/20 font-sans cursor-pointer">
+                        <option value="standard">Standard (Free)</option>
+                        <option value="midnight">Midnight (1,500 KSH)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Delivery Status Message -->
+            <div class="shrink-0 text-xs">
+                @if($deliveryDetailsValid)
+                    <span class="text-emerald-700 font-medium flex items-center gap-1.5 bg-emerald-100/50 px-3 py-1.5 rounded-lg border border-emerald-200">
+                        ✓ Delivering to <span class="font-bold">{{ $deliveryCity }}</span> on <span class="font-bold">{{ \Carbon\Carbon::parse($deliveryDate)->format('d M Y') }}</span> ({{ ucfirst($deliverySlot) }})
+                    </span>
+                @else
+                    <span class="text-amber-700 font-medium flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 animate-pulse">
+                        ⚠ Enter details to check availability
+                    </span>
+                @endif
+            </div>
+        </div>
 
 
         <!-- Double Column Layout: Left Sticky Sidebar, Right Catalog showroom -->
@@ -1013,13 +1050,84 @@
                 </div>
 
                 <!-- Showroom Grid (Cathedral Arched product cards & Landscape custom rectangular cards) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid-flow-dense gap-6 animate-hero-fade" wire:loading.class="opacity-40" wire:target="search, selectedCategory, filterByOccasion">
-                    @forelse($products as $product)
+                @php
+                    $groupedProducts = $products->groupBy(function($item) {
+                        return match($item->category) {
+                            'bouquet', 'bouquets' => 'bouquets',
+                            'giftings', 'gifting', 'hampers' => 'giftings',
+                            'bundle', 'wraps' => 'bundles',
+                            'stems' => 'stems',
+                            default => 'other',
+                        };
+                    });
+
+                    $isBrowsingAll = ($selectedCategory === 'all' && empty($search) && !$selectedOccasion);
+                    
+                    if ($isBrowsingAll) {
+                        $sectionsToRender = [
+                            [
+                                'title' => 'Best Seller Flowers & Bouquets',
+                                'subtitle' => 'Handcrafted luxury arrangements cut fresh and styled by our master florists.',
+                                'category_key' => 'bouquet',
+                                'items' => $groupedProducts->get('bouquets', collect())
+                            ],
+                            [
+                                'title' => 'Luxury Hampers & Giftings',
+                                'subtitle' => 'Premium cakes, Belgian truffles, fine wines, and custom jewelry sets.',
+                                'category_key' => 'giftings',
+                                'items' => $groupedProducts->get('giftings', collect())
+                            ],
+                            [
+                                'title' => 'Fresh Plants & Design Accents',
+                                'subtitle' => 'Living interior plants, designer vases, and fragrant ambient sprays.',
+                                'category_key' => 'bundle',
+                                'items' => $groupedProducts->get('bundles', collect())
+                            ],
+                            [
+                                'title' => 'Fresh Cut Stems Catalog',
+                                'subtitle' => 'Individual Grade-A stem varieties sourced directly from Rift Valley growers.',
+                                'category_key' => 'stems',
+                                'items' => $groupedProducts->get('stems', collect())
+                            ]
+                        ];
+                    } else {
+                        $sectionsToRender = [
+                            [
+                                'title' => 'Showroom Collections',
+                                'subtitle' => 'Explore our curated collection of luxury arrangements and premium gifts.',
+                                'category_key' => $selectedCategory,
+                                'items' => $products
+                            ]
+                        ];
+                    }
+                @endphp
+
+                <div class="w-full space-y-16 animate-hero-fade" wire:loading.class="opacity-40" wire:target="search, selectedCategory, filterByOccasion">
+                    @foreach($sectionsToRender as $section)
+                        @if($section['items']->count() > 0)
+                            <div class="space-y-6">
+                                <!-- Section Header Ribbon -->
+                                <div class="border-b border-neutral-200/60 pb-3 flex flex-col md:flex-row md:items-baseline justify-between gap-2 text-left">
+                                    <div>
+                                        <h3 class="text-xl sm:text-2xl font-serif italic text-neutral-800 font-semibold">{{ $section['title'] }}</h3>
+                                        <p class="text-xs text-neutral-500 font-light mt-0.5">{{ $section['subtitle'] }}</p>
+                                    </div>
+                                    @if($isBrowsingAll)
+                                        <button wire:click="selectCategory('{{ $section['category_key'] }}')"
+                                                class="text-[10px] font-bold text-emerald-800 hover:text-emerald-950 font-outfit uppercase tracking-widest shrink-0 cursor-pointer transition-colors">
+                                            View All &rarr;
+                                        </button>
+                                    @endif
+                                </div>
+
+                                <!-- Section Grid -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid-flow-dense gap-6">
+                                    @foreach($section['items'] as $product)
                         @if($product->category === 'specializtion' || $product->category === 'specialization' || $product->category === 'specializations')
                             <!-- Rectangular Landscape Layout for specialized custom services (half height of standard card) -->
                             <div x-data="{ selectedSize: 'standard', basePrice: {{ $product->price }}, numberFormat(val) { return new Intl.NumberFormat().format(val); } }" 
                                  :class="theme === 'champagne' ? 'border-neutral-200 bg-white/70 shadow-sm text-neutral-900' : 'border-neutral-900/60 bg-[#0C0C0E]/50 text-white'"
-                                 class="col-span-1 flex flex-row p-3 rounded-[24px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group text-left backdrop-blur-md product-card theme-section self-start min-h-[170px]"
+                                 class="col-span-1 flex flex-row p-3 rounded-[24px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group text-left backdrop-blur-md product-card theme-section self-start min-h-[170px] animate-card-fade-in"
                             >
                                 <!-- Left side: Squared Image Frame -->
                                 <div class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center">
@@ -1046,7 +1154,7 @@
 
                                     <div class="space-y-2 mt-1">
                                         <!-- Social Sharing Direct Links for SMM (Instagram, Facebook, X SVGs) -->
-                                        <div class="flex items-center space-x-2.5 text-[10px] font-outfit uppercase text-neutral-400">
+                                        <div :class="theme === 'champagne' ? 'text-neutral-600' : 'text-neutral-400'" class="flex items-center space-x-2.5 text-[10px] font-outfit uppercase">
                                             <span class="text-neutral-500 text-[8px] uppercase tracking-widest font-bold">Share:</span>
                                             <!-- Instagram Icon -->
                                             <a href="https://instagram.com" target="_blank" rel="noopener" class="hover:text-pink-500 transition-colors" title="Instagram">
@@ -1063,7 +1171,7 @@
                                                 </svg>
                                             </a>
                                             <!-- X Icon -->
-                                            <a href="https://twitter.com/intent/tweet?text=Consulting+with+@NoirAndBloom+for+{{ urlencode($product->name) }}:&url={{ urlencode(url('/')) }}" target="_blank" rel="noopener" class="hover:text-white transition-colors" title="Share on X">
+                                            <a href="https://twitter.com/intent/tweet?text=Consulting+with+@NoirAndBloom+for+{{ urlencode($product->name) }}:&url={{ urlencode(url('/')) }}" target="_blank" rel="noopener" :class="theme === 'champagne' ? 'hover:text-black' : 'hover:text-white'" class="transition-colors" title="Share on X">
                                                 <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
                                                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                                                 </svg>
@@ -1078,12 +1186,13 @@
                                                 </span>
                                             </div>
 
-                                            <a href="/profile-portal"
+                                            <button type="button"
+                                               @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard }}, stock_deluxe: {{ $product->stock_deluxe }}, stock_grand: {{ $product->stock_grand }} }; quickViewSize = 'standard'; quickViewOpen = true;"
                                                :class="theme === 'champagne' ? 'bg-black text-white hover:bg-[#B59A7A] hover:text-black' : 'bg-white text-black hover:bg-[#C5A880] hover:text-black'"
-                                               class="px-3 py-1.5 rounded-full text-[9px] font-outfit uppercase font-bold tracking-wider transition-all duration-300 shadow-md"
+                                               class="px-3 py-1.5 rounded-full text-[9px] font-outfit uppercase font-bold tracking-wider transition-all duration-300 shadow-md cursor-pointer"
                                             >
                                                 Request
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1092,7 +1201,7 @@
                             <!-- Standard Cathedral Arch Layout -->
                             <div x-data="{ selectedSize: 'standard', basePrice: {{ $product->price }}, numberFormat(val) { return new Intl.NumberFormat().format(val); } }" 
                                  :class="theme === 'champagne' ? 'border-neutral-200 bg-white/70 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/50'"
-                                 class="flex flex-col p-3 rounded-t-[200px] rounded-b-[32px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5 group text-left backdrop-blur-md product-card theme-section"
+                                 class="flex flex-col p-3 rounded-t-[200px] rounded-b-[32px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5 group text-left backdrop-blur-md product-card theme-section animate-card-fade-in"
                             >
                                 <!-- Product Image Frame -->
                                 <div class="p-1 border border-neutral-500/10 rounded-t-[190px] rounded-b-[28px] overflow-hidden relative">
@@ -1159,15 +1268,14 @@
 
                                             <button 
                                                 type="button"
-                                                :disabled="(selectedSize === 'standard' && {{ $product->stock_standard }} <= 0) || (selectedSize === 'deluxe' && {{ $product->stock_deluxe }} <= 0) || (selectedSize === 'grand' && {{ $product->stock_grand }} <= 0)"
-                                                @click="$wire.addToCuration({{ $product->id }}, selectedSize); drawerOpen = true; checkoutMode = false;"
-                                                class="w-full text-[12px] font-semibold tracking-[0.2em] uppercase py-2.5 rounded-full flex items-center justify-center font-outfit btn-curate"
+                                                @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard }}, stock_deluxe: {{ $product->stock_deluxe }}, stock_grand: {{ $product->stock_grand }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                                                class="w-full text-[12px] font-semibold tracking-[0.2em] uppercase py-2.5 rounded-full flex items-center justify-center font-outfit bg-emerald-800 text-white hover:bg-emerald-900 transition-colors shadow-sm cursor-pointer"
                                             >
-                                                <span x-text="(selectedSize === 'standard' && {{ $product->stock_standard }} <= 0) || (selectedSize === 'deluxe' && {{ $product->stock_deluxe }} <= 0) || (selectedSize === 'grand' && {{ $product->stock_grand }} <= 0) ? 'Out of Stock' : 'Curate Selection'"></span>
+                                                <span>Select Details</span>
                                             </button>
 
                                             <!-- Social Sharing Direct Links for SMM -->
-                                            <div class="flex items-center justify-between border-t border-neutral-500/10 pt-2.5 text-[10px] font-outfit text-neutral-400 uppercase tracking-widest">
+                                            <div :class="theme === 'champagne' ? 'text-neutral-600' : 'text-neutral-400'" class="flex items-center justify-between border-t border-neutral-500/10 pt-2.5 text-[10px] font-outfit uppercase tracking-widest">
                                                 <span>Share:</span>
                                                 <div class="flex items-center space-x-3">
                                                     <!-- WhatsApp Icon -->
@@ -1179,7 +1287,7 @@
                                                     </a>
                                                     <!-- X Icon -->
                                                     <a href="https://twitter.com/intent/tweet?text=Loving%20the%20premium%20{{ urlencode($product->name) }}%20curation%20from%20@NoirAndBloom.%20Check%20it%20out:&url={{ urlencode(url('/')) }}" 
-                                                       target="_blank" rel="noopener" class="hover:text-white transition-colors" title="Share on X">
+                                                       target="_blank" rel="noopener" :class="theme === 'champagne' ? 'hover:text-black' : 'hover:text-white'" class="transition-colors" title="Share on X">
                                                         <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
                                                             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                                                         </svg>
@@ -1198,11 +1306,17 @@
                                 </div>
                             </div>
                         @endif
-                    @empty
-                        <div class="col-span-full py-20 text-center border border-dashed border-neutral-800 rounded-2xl">
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+
+                    @if($products->isEmpty())
+                        <div class="col-span-full py-20 text-center border border-dashed border-neutral-250 rounded-2xl">
                             <p class="text-xs font-light text-neutral-500 font-mono">No computational logs found matching this showroom segment filter query.</p>
                         </div>
-                    @endforelse
+                    @endif
                 </div>
 
                 <!-- Manual Scroll Loader Button & Curation End Marker -->
@@ -1791,5 +1905,134 @@
         </div>
     </div>
 
+
+    <!-- Product Detail Modal (FNP-style) -->
+    <div x-show="quickViewOpen" @click="quickViewOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+    
+    <div
+        x-show="quickViewOpen"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-32px)] sm:w-[640px] max-h-[90vh] z-50 bg-white border border-neutral-200 text-neutral-900 shadow-2xl flex flex-col justify-between text-left rounded-[28px] overflow-hidden font-sans"
+        style="display: none;"
+    >
+        <div class="p-5 border-b border-neutral-100 flex items-center justify-between shrink-0">
+            <div>
+                <span class="text-[9px] uppercase tracking-widest text-emerald-800 font-bold block" x-text="quickViewProduct ? quickViewProduct.category.replace('_', ' ') : ''"></span>
+                <h3 class="text-lg font-serif italic text-neutral-800" x-text="quickViewProduct ? quickViewProduct.name : ''"></h3>
+            </div>
+            <button @click="quickViewOpen = false" class="text-neutral-450 hover:text-neutral-800 cursor-pointer select-none transition-colors" title="Close Details">
+                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1 flex flex-col md:flex-row gap-6">
+            <!-- Image column -->
+            <div class="w-full md:w-1/2 shrink-0">
+                <div class="w-full h-48 md:h-64 rounded-2xl overflow-hidden bg-neutral-100 relative">
+                    <img :src="quickViewProduct ? quickViewProduct.image : ''" :alt="quickViewProduct ? quickViewProduct.name : ''" class="w-full h-full object-cover">
+                </div>
+                <p class="text-xs text-neutral-500 font-light mt-3 leading-relaxed" x-text="quickViewProduct ? quickViewProduct.description : ''"></p>
+            </div>
+            <!-- Config column -->
+            <div class="flex-1 flex flex-col gap-4">
+                <!-- Size Selector -->
+                <div>
+                    <span class="text-xs font-bold text-neutral-700 block mb-2">Select Sizing & Volume</span>
+                    <div class="flex flex-wrap gap-2">
+                        <!-- Standard -->
+                        <button type="button" @click="quickViewSize = 'standard'"
+                            :class="quickViewSize === 'standard' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
+                            class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
+                            :disabled="quickViewProduct && quickViewProduct.stock_standard <= 0"
+                        >
+                            <span class="block">Standard</span>
+                            <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price) + ' KSH' : ''"></span>
+                            <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_standard <= 0">Out of Stock</span>
+                        </button>
+                        <!-- Deluxe -->
+                        <button type="button" @click="quickViewSize = 'deluxe'"
+                            :class="quickViewSize === 'deluxe' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
+                            class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
+                            :disabled="quickViewProduct && quickViewProduct.stock_deluxe <= 0"
+                        >
+                            <span class="block">Deluxe</span>
+                            <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 1.5)) + ' KSH' : ''"></span>
+                            <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_deluxe <= 0">Out of Stock</span>
+                        </button>
+                        <!-- Grand -->
+                        <button type="button" @click="quickViewSize = 'grand'"
+                            :class="quickViewSize === 'grand' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
+                            class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
+                            :disabled="quickViewProduct && quickViewProduct.stock_grand <= 0"
+                        >
+                            <span class="block">Grand</span>
+                            <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 2.2)) + ' KSH' : ''"></span>
+                            <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_grand <= 0">Out of Stock</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Location & Date Picker -->
+                <div class="bg-neutral-50 rounded-xl p-3 border border-neutral-100 flex flex-col gap-2.5">
+                    <span class="text-xs font-bold text-neutral-700 block">Fulfillment Details</span>
+                    
+                    <!-- Delivery City -->
+                    <div>
+                        <label class="text-[10px] text-neutral-500 uppercase font-semibold block mb-1">City</label>
+                        <select wire:model.live="deliveryCity" class="w-full bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 font-sans cursor-pointer">
+                            <option value="">-- Select City --</option>
+                            <option value="Nairobi">Nairobi</option>
+                            <option value="Kiambu">Kiambu</option>
+                            <option value="Mombasa">Mombasa</option>
+                            <option value="Kisumu">Kisumu</option>
+                            <option value="Nakuru">Nakuru</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Delivery Date -->
+                    <div>
+                        <label class="text-[10px] text-neutral-500 uppercase font-semibold block mb-1">Delivery Date</label>
+                        <input type="date" wire:model.live="deliveryDate" min="{{ date('Y-m-d') }}" class="w-full bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 font-sans">
+                    </div>
+                    
+                    <!-- Delivery Slot -->
+                    <div>
+                        <label class="text-[10px] text-neutral-500 uppercase font-semibold block mb-1">Delivery Time Slot</label>
+                        <select wire:model.live="deliverySlot" class="w-full bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 font-sans cursor-pointer">
+                            <option value="standard">Standard (Free)</option>
+                            <option value="midnight">Midnight (1,500 KSH)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Validation Warning -->
+                <div x-show="!$wire.deliveryCity || !$wire.deliveryDate" class="text-xs text-amber-700 font-medium bg-amber-50 border border-amber-200/60 rounded-lg px-3 py-2 flex items-start gap-1.5 animate-pulse">
+                    <span>⚠</span>
+                    <span>Please enter delivery city and date above to enable adding this item to your curation.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-5 border-t border-neutral-100 bg-neutral-50 shrink-0 flex items-center justify-between">
+            <div>
+                <span class="text-[10px] text-neutral-500 uppercase tracking-wider block">Price</span>
+                <span class="text-base font-bold text-neutral-850 font-mono">
+                    <span x-text="quickViewProduct ? numberFormat(quickViewSize === 'standard' ? quickViewProduct.price : (quickViewSize === 'deluxe' ? Math.round(quickViewProduct.price * 1.5) : Math.round(quickViewProduct.price * 2.2))) : ''"></span> KSH
+                </span>
+            </div>
+            
+            <button
+                type="button"
+                :disabled="!$wire.deliveryCity || !$wire.deliveryDate || (quickViewProduct && (quickViewSize === 'standard' && quickViewProduct.stock_standard <= 0) || (quickViewProduct && (quickViewSize === 'deluxe' && quickViewProduct.stock_deluxe <= 0) || (quickViewProduct && (quickViewSize === 'grand' && quickViewProduct.stock_grand <= 0))))"
+                @click="$wire.addToCuration(quickViewProduct.id, quickViewSize); quickViewOpen = false; drawerOpen = true; checkoutMode = false;"
+                class="px-6 py-2.5 bg-emerald-800 hover:bg-emerald-950 text-white rounded-xl text-xs uppercase tracking-wider font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+                Add to Curation
+            </button>
+        </div>
+    </div>
 
 </div>

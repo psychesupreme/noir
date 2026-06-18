@@ -94,6 +94,8 @@ class AccountsReceivableAndAnalyticsTest extends TestCase
             ->set('region', 'Nairobi')
             ->set('delivery_address', 'Corporate Suites Plaza')
             ->set('delivery_type', 'standard')
+            ->set('deliveryCity', 'Nairobi')
+            ->set('deliveryDate', now()->addDay()->format('Y-m-d'))
             ->call('submitCurationRequest');
 
         $component->assertHasNoErrors();
@@ -145,6 +147,8 @@ class AccountsReceivableAndAnalyticsTest extends TestCase
             ->set('region', 'Nairobi')
             ->set('delivery_address', 'Corporate Suites Plaza')
             ->set('delivery_type', 'standard')
+            ->set('deliveryCity', 'Nairobi')
+            ->set('deliveryDate', now()->addDay()->format('Y-m-d'))
             ->call('submitCurationRequest');
 
         $component->assertHasErrors(['paymentMethod']);

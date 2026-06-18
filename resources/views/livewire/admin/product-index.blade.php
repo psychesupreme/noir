@@ -526,25 +526,7 @@
                         @error('description') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
-                    {{-- Occasions Multi-Select --}}
-                    @if ($occasions->count())
-                        <div>
-                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-3">Occasions</label>
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                @foreach ($occasions as $occasion)
-                                    <label class="flex items-center space-x-2 cursor-pointer group">
-                                        <input
-                                            type="checkbox"
-                                            value="{{ $occasion->id }}"
-                                            wire:model="selectedOccasions"
-                                            class="rounded-sm border-neutral-700 bg-[#0A0A0A] text-amber-500 focus:ring-amber-500/30 focus:ring-offset-0 cursor-pointer"
-                                        >
-                                        <span class="text-xs text-neutral-500 group-hover:text-neutral-300 transition-colors">{{ $occasion->name }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
+
 
                     {{-- Action Buttons --}}
                     <div class="flex items-center justify-end space-x-3 pt-4 border-t border-neutral-900">

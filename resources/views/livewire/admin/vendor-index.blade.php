@@ -28,141 +28,312 @@
         </div>
     </div>
 
-    {{-- Filters & Search --}}
-    <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
-        {{-- Search --}}
-        <div class="md:col-span-3 relative group">
-            <input 
-                wire:model.live.debounce.300ms="search" 
-                type="text" 
-                placeholder="Search vendors by name, contact, email or phone..."
-                class="w-full bg-[#0F0F12] border border-neutral-900 rounded-sm pl-10 pr-4 py-2.5 text-xs text-neutral-300 placeholder-neutral-600 focus:outline-none focus:border-neutral-700 focus:ring-1 focus:ring-amber-500/20 transition-all duration-300 font-mono"
+    @if($viewingVendorId && $viewingVendor)
+        {{-- Detailed Supplier Profile View --}}
+        <div class="mb-8 flex items-center justify-between">
+            <button 
+                wire:click="closeView" 
+                class="bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-white text-xs font-mono uppercase tracking-wider px-4 py-2 rounded-sm border border-neutral-800 transition-all cursor-pointer"
             >
-            <div class="absolute left-3 top-3 flex items-center justify-center pointer-events-none">
-                <svg class="w-4 h-4 text-neutral-600 transition-all duration-300 group-focus-within:text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                </svg>
+                ← Back to Vendor List
+            </button>
+            <button 
+                wire:click="edit({{ $viewingVendor->id }})"
+                class="bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold uppercase tracking-wider px-5 py-2 rounded-sm transition-all duration-300"
+            >
+                Edit Profile
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {{-- Left Column: Who & Where --}}
+            <div class="space-y-6 text-left">
+                {{-- Who: Vendor Details --}}
+                <div class="bg-[#0F0F12] border border-neutral-900 rounded-sm p-6 space-y-4">
+                    <div class="border-b border-neutral-900 pb-3">
+                        <h2 class="text-lg font-semibold text-white">{{ $viewingVendor->name }}</h2>
+                        <span class="text-xs text-neutral-500 font-mono block mt-0.5">Supplier Profile</span>
+                    </div>
+
+                    <div class="space-y-4 text-xs font-mono">
+                        <div>
+                            <span class="text-[9px] uppercase tracking-wider text-neutral-500 block mb-1">Contact Representative</span>
+                            <span class="text-neutral-200 text-sm font-sans font-medium">{{ $viewingVendor->contact_person }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] uppercase tracking-wider text-neutral-500 block mb-1">Email Address</span>
+                            <span class="text-neutral-200 block truncate">{{ $viewingVendor->email ?: 'Not Configured' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] uppercase tracking-wider text-neutral-500 block mb-1">Phone Contact</span>
+                            <span class="text-neutral-200 block">{{ $viewingVendor->phone ?: 'Not Configured' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] uppercase tracking-wider text-neutral-500 block mb-1">Payment Terms</span>
+                            <span class="inline-block text-[10px] uppercase font-mono px-2 py-0.5 mt-1 rounded bg-neutral-950 border border-neutral-800 text-neutral-400">
+                                {{ $viewingVendor->payment_terms }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] uppercase tracking-wider text-neutral-500 block mb-1">Reliability Status</span>
+                            <div class="flex text-amber-500 mt-1">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    @if ($i <= $viewingVendor->reliability_rating)
+                                        <span>★</span>
+                                    @else
+                                        <span class="text-neutral-800">★</span>
+                                    @endif
+                                @endfor
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-[9px] uppercase tracking-wider text-neutral-500 block mb-1">Status</span>
+                            @if ($viewingVendor->is_active)
+                                <span class="text-emerald-500 text-xs uppercase tracking-wider block mt-1">● Active</span>
+                            @else
+                                <span class="text-neutral-500 text-xs uppercase tracking-wider block mt-1">● Inactive</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Where: Address --}}
+                <div class="bg-[#0F0F12] border border-neutral-900 rounded-sm p-6 space-y-3">
+                    <span class="text-[10px] uppercase tracking-wider text-neutral-500 block font-mono border-b border-neutral-900 pb-2">Fulfillment Location (Where)</span>
+                    <p class="text-xs text-neutral-300 leading-relaxed font-mono">
+                        {{ $viewingVendor->address ?: 'No physical address configured for this supplier.' }}
+                    </p>
+                </div>
+            </div>
+
+            {{-- Right Column: What & Pricing + History --}}
+            <div class="lg:col-span-2 space-y-8 text-left">
+                {{-- What & Pricing --}}
+                <div class="bg-[#0F0F12] border border-neutral-900 rounded-sm overflow-hidden">
+                    <div class="p-6 border-b border-neutral-900 bg-[#0A0A0A]/50">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-white">Supplied Catalog & Pricing (What & Pricing)</h3>
+                        <p class="text-[11px] text-neutral-500 font-light mt-1">List of items historically ordered from this vendor and their peak cost price.</p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-neutral-900 text-neutral-500 text-[10px] uppercase tracking-[0.2em] bg-[#0A0A0A]/30">
+                                    <th class="p-4 font-medium">Product / Variety</th>
+                                    <th class="p-4 font-medium">SKU</th>
+                                    <th class="p-4 font-medium">Max Cost Price</th>
+                                    <th class="p-4 font-medium">Last Purchased</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-900/60 text-xs font-mono">
+                                @forelse($vendorProducts as $item)
+                                    @if($item->product)
+                                        <tr class="hover:bg-neutral-950/40 transition-colors">
+                                            <td class="p-4 text-white font-sans font-normal">{{ $item->product->name }}</td>
+                                            <td class="p-4 text-neutral-400">{{ $item->product->sku }}</td>
+                                            <td class="p-4 text-amber-500 font-semibold">{{ number_format($item->max_price) }} KSH</td>
+                                            <td class="p-4 text-neutral-500">{{ \Carbon\Carbon::parse($item->last_ordered)->format('d M Y') }}</td>
+                                        </tr>
+                                    @endif
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="p-8 text-center text-neutral-500 font-light font-mono">
+                                            No purchase items logged for this supplier yet.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- History --}}
+                <div class="bg-[#0F0F12] border border-neutral-900 rounded-sm overflow-hidden">
+                    <div class="p-6 border-b border-neutral-900 bg-[#0A0A0A]/50">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-white">Purchase Order History (History)</h3>
+                        <p class="text-[11px] text-neutral-500 font-light mt-1">Historical track records of procurement orders and fulfillment statuses.</p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-neutral-900 text-neutral-500 text-[10px] uppercase tracking-[0.2em] bg-[#0A0A0A]/30">
+                                    <th class="p-4 font-medium">PO Code</th>
+                                    <th class="p-4 font-medium">Branch</th>
+                                    <th class="p-4 font-medium">Total Cost</th>
+                                    <th class="p-4 font-medium">Order Date</th>
+                                    <th class="p-4 font-medium">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-900/60 text-xs font-mono">
+                                @forelse($vendorHistory as $po)
+                                    <tr class="hover:bg-neutral-950/40 transition-colors">
+                                        <td class="p-4 text-white font-medium">
+                                            <a href="{{ route('admin.purchase-orders', ['po_id' => $po->id]) }}" class="text-amber-500 hover:underline">
+                                                #PO-{{ str_pad($po->id, 4, '0', STR_PAD_LEFT) }}
+                                            </a>
+                                        </td>
+                                        <td class="p-4 text-neutral-400 font-sans font-light">{{ $po->branch->name ?? 'N/A' }}</td>
+                                        <td class="p-4 text-neutral-200">{{ number_format($po->total_cost) }} KSH</td>
+                                        <td class="p-4 text-neutral-400">{{ $po->created_at->format('d M Y') }}</td>
+                                        <td class="p-4">
+                                            <span class="inline-block text-[9px] uppercase px-2 py-0.5 rounded font-bold 
+                                                @if($po->status === 'received') bg-emerald-950 text-emerald-400 border border-emerald-900
+                                                @elseif($po->status === 'cancelled') bg-rose-955 text-rose-400 border border-rose-900
+                                                @elseif($po->status === 'draft') bg-neutral-900 text-neutral-400 border border-neutral-800
+                                                @else bg-amber-955 text-amber-400 border border-amber-900 @endif">
+                                                {{ $po->status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="p-8 text-center text-neutral-500 font-light font-mono">
+                                            No purchase orders placed with this supplier yet.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @else
+        {{-- Filters & Search --}}
+        <div class="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+            {{-- Search --}}
+            <div class="md:col-span-3 relative group">
+                <input 
+                    wire:model.live.debounce.300ms="search" 
+                    type="text" 
+                    placeholder="Search vendors by name, contact, email or phone..."
+                    class="w-full bg-[#0F0F12] border border-neutral-900 rounded-sm pl-10 pr-4 py-2.5 text-xs text-neutral-300 placeholder-neutral-600 focus:outline-none focus:border-neutral-700 focus:ring-1 focus:ring-amber-500/20 transition-all duration-300 font-mono"
+                >
+                <div class="absolute left-3 top-3 flex items-center justify-center pointer-events-none">
+                    <svg class="w-4 h-4 text-neutral-600 transition-all duration-300 group-focus-within:text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                </div>
+            </div>
+
+            {{-- Status Filter --}}
+            <div>
+                <select 
+                    wire:model.live="activeFilter"
+                    class="w-full bg-[#0F0F12] border border-neutral-900 rounded-sm px-4 py-2.5 text-xs text-neutral-400 focus:outline-none focus:border-neutral-700 font-mono cursor-pointer"
+                >
+                    <option value="all">All Vendors</option>
+                    <option value="active">Active Only</option>
+                    <option value="inactive">Inactive Only</option>
+                </select>
             </div>
         </div>
 
-        {{-- Status Filter --}}
-        <div>
-            <select 
-                wire:model.live="activeFilter"
-                class="w-full bg-[#0F0F12] border border-neutral-900 rounded-sm px-4 py-2.5 text-xs text-neutral-400 focus:outline-none focus:border-neutral-700 font-mono cursor-pointer"
-            >
-                <option value="all">All Vendors</option>
-                <option value="active">Active Only</option>
-                <option value="inactive">Inactive Only</option>
-            </select>
-        </div>
-    </div>
-
-    {{-- Vendors Directory --}}
-    <div class="bg-[#0F0F12] border border-neutral-900 rounded-sm overflow-hidden shadow-2xl">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="border-b border-neutral-900 text-neutral-500 text-[10px] uppercase tracking-[0.2em] bg-[#0A0A0A]/50">
-                        <th class="p-6 font-medium">Vendor Details</th>
-                        <th class="p-6 font-medium">Primary Contact</th>
-                        <th class="p-6 font-medium">Contact Details</th>
-                        <th class="p-6 font-medium">Payment Terms</th>
-                        <th class="p-6 font-medium">Reliability</th>
-                        <th class="p-6 font-medium">Purchase Orders</th>
-                        <th class="p-6 font-medium">Status</th>
-                        <th class="p-6 font-medium text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-neutral-900/60 text-sm font-light">
-                    @forelse ($vendors as $vendor)
-                        <tr class="hover:bg-neutral-950/40 transition-colors">
-                            {{-- Vendor Details --}}
-                            <td class="p-6">
-                                <span class="text-white font-normal block">{{ $vendor->name }}</span>
-                                <span class="text-neutral-500 text-xs block truncate max-w-[200px]" title="{{ $vendor->address }}">{{ $vendor->address ?: 'No Address Stated' }}</span>
-                            </td>
-
-                            {{-- Contact Person --}}
-                            <td class="p-6">
-                                <span class="text-neutral-200 block">{{ $vendor->contact_person }}</span>
-                            </td>
-
-                            {{-- Contact Details --}}
-                            <td class="p-6 font-mono text-xs">
-                                <span class="text-neutral-400 block">{{ $vendor->email ?: '-' }}</span>
-                                <span class="text-neutral-500 block mt-0.5">{{ $vendor->phone ?: '-' }}</span>
-                            </td>
-
-                            {{-- Payment Terms --}}
-                            <td class="p-6">
-                                <span class="inline-block text-[10px] tracking-wider uppercase font-mono px-2.5 py-1 rounded-sm bg-neutral-900 text-neutral-400 border border-neutral-800">
-                                    {{ $vendor->payment_terms }}
-                                </span>
-                            </td>
-
-                            {{-- Reliability --}}
-                            <td class="p-6">
-                                <div class="flex text-amber-500" title="{{ $vendor->reliability_rating }} of 5 rating">
-                                    @for ($i = 1; $i <= 5; $i++)
-                                        @if ($i <= $vendor->reliability_rating)
-                                            <span class="text-xs">★</span>
-                                        @else
-                                            <span class="text-xs text-neutral-800">★</span>
-                                        @endif
-                                    @endfor
-                                </div>
-                            </td>
-
-                            {{-- Purchase Orders --}}
-                            <td class="p-6 font-mono text-neutral-400">
-                                {{ $vendor->purchaseOrders()->count() }} POs
-                            </td>
-
-                            {{-- Status --}}
-                            <td class="p-6">
-                                @if ($vendor->is_active)
-                                    <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500" title="Active"></span>
-                                    <span class="text-xs font-mono text-emerald-500 uppercase tracking-wider ml-1.5">Active</span>
-                                @else
-                                    <span class="inline-flex h-2 w-2 rounded-full bg-neutral-800" title="Inactive"></span>
-                                    <span class="text-xs font-mono text-neutral-500 uppercase tracking-wider ml-1.5">Inactive</span>
-                                @endif
-                            </td>
-
-                            {{-- Actions --}}
-                            <td class="p-6 text-right space-x-2">
-                                <button 
-                                    wire:click="edit({{ $vendor->id }})"
-                                    class="text-xs text-neutral-400 hover:text-amber-500 transition-colors uppercase tracking-wider font-mono border border-neutral-800 hover:border-amber-500 px-2 py-1 rounded"
-                                >
-                                    Edit
-                                </button>
-                                <button 
-                                    wire:click="delete({{ $vendor->id }})"
-                                    onclick="confirm('Are you sure you want to delete this vendor?') || event.stopImmediatePropagation()"
-                                    class="text-xs text-neutral-600 hover:text-rose-500 transition-colors uppercase tracking-wider font-mono border border-neutral-800 hover:border-rose-500 px-2 py-1 rounded"
-                                >
-                                    Delete
-                                </button>
-                            </td>
+        {{-- Vendors Directory Table --}}
+        <div class="bg-[#0F0F12] border border-neutral-900 rounded-sm overflow-hidden shadow-2xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-neutral-900 text-neutral-500 text-[10px] uppercase tracking-[0.2em] bg-[#0A0A0A]/50">
+                            <th class="p-6 font-medium">Vendor Details</th>
+                            <th class="p-6 font-medium">Primary Contact</th>
+                            <th class="p-6 font-medium">Contact Details</th>
+                            <th class="p-6 font-medium">Payment Terms</th>
+                            <th class="p-6 font-medium">Reliability</th>
+                            <th class="p-6 font-medium">Purchase Orders</th>
+                            <th class="p-6 font-medium">Status</th>
+                            <th class="p-6 font-medium text-right">Actions</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="p-12 text-center text-neutral-500 font-light font-mono">
-                                No suppliers registered in the database directory.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-900/60 text-sm font-light">
+                        @forelse ($vendors as $vendor)
+                            <tr class="hover:bg-neutral-950/40 transition-colors">
+                                {{-- Vendor Details --}}
+                                <td class="p-6">
+                                    <a href="#" wire:click.prevent="viewVendor({{ $vendor->id }})" class="text-amber-500 hover:underline font-normal block">{{ $vendor->name }}</a>
+                                    <span class="text-neutral-500 text-xs block truncate max-w-[200px]" title="{{ $vendor->address }}">{{ $vendor->address ?: 'No Address Stated' }}</span>
+                                </td>
 
-    {{-- Pagination --}}
-    <div class="mt-6 font-mono text-xs">
-        {{ $vendors->links() }}
-    </div>
+                                {{-- Contact Person --}}
+                                <td class="p-6">
+                                    <span class="text-neutral-200 block">{{ $vendor->contact_person }}</span>
+                                </td>
+
+                                {{-- Contact Details --}}
+                                <td class="p-6 font-mono text-xs">
+                                    <span class="text-neutral-400 block">{{ $vendor->email ?: '-' }}</span>
+                                    <span class="text-neutral-500 block mt-0.5">{{ $vendor->phone ?: '-' }}</span>
+                                </td>
+
+                                {{-- Payment Terms --}}
+                                <td class="p-6">
+                                    <span class="inline-block text-[10px] tracking-wider uppercase font-mono px-2.5 py-1 rounded-sm bg-neutral-900 text-neutral-400 border border-neutral-800">
+                                        {{ $vendor->payment_terms }}
+                                    </span>
+                                </td>
+
+                                {{-- Reliability --}}
+                                <td class="p-6">
+                                    <div class="flex text-amber-500" title="{{ $vendor->reliability_rating }} of 5 rating">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            @if ($i <= $vendor->reliability_rating)
+                                                <span class="text-xs">★</span>
+                                            @else
+                                                <span class="text-xs text-neutral-800">★</span>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                </td>
+
+                                {{-- Purchase Orders --}}
+                                <td class="p-6 font-mono text-neutral-400">
+                                    {{ $vendor->purchaseOrders()->count() }} POs
+                                </td>
+
+                                {{-- Status --}}
+                                <td class="p-6">
+                                    @if ($vendor->is_active)
+                                        <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500" title="Active"></span>
+                                        <span class="text-xs font-mono text-emerald-500 uppercase tracking-wider ml-1.5">Active</span>
+                                    @else
+                                        <span class="inline-flex h-2 w-2 rounded-full bg-neutral-800" title="Inactive"></span>
+                                        <span class="text-xs font-mono text-neutral-500 uppercase tracking-wider ml-1.5">Inactive</span>
+                                    @endif
+                                </td>
+
+                                {{-- Actions --}}
+                                <td class="p-6 text-right space-x-2">
+                                    <button 
+                                        wire:click="edit({{ $vendor->id }})"
+                                        class="text-xs text-neutral-400 hover:text-amber-500 transition-colors uppercase tracking-wider font-mono border border-neutral-800 hover:border-amber-500 px-2 py-1 rounded cursor-pointer"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button 
+                                        wire:click="delete({{ $vendor->id }})"
+                                        onclick="confirm('Are you sure you want to delete this vendor?') || event.stopImmediatePropagation()"
+                                        class="text-xs text-neutral-600 hover:text-rose-500 transition-colors uppercase tracking-wider font-mono border border-neutral-800 hover:border-rose-500 px-2 py-1 rounded cursor-pointer"
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="p-12 text-center text-neutral-500 font-light font-mono">
+                                    No suppliers registered in the database directory.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Pagination --}}
+        <div class="mt-6 font-mono text-xs">
+            {{ $vendors->links() }}
+        </div>
+    @endif
 
     {{-- Create/Edit Modal --}}
     @if($showModal)

@@ -15,6 +15,28 @@ class PurchaseOrderIndex extends Component
 {
     use WithPagination;
 
+    public ?int $viewingPoId = null;
+
+    public function mount(): void
+    {
+        if (request()->query('action') === 'create') {
+            $this->create();
+        }
+        if (request()->query('po_id')) {
+            $this->viewPO((int)request()->query('po_id'));
+        }
+    }
+
+    public function viewPO(int $id): void
+    {
+        $this->viewingPoId = $id;
+    }
+
+    public function closeView(): void
+    {
+        $this->viewingPoId = null;
+    }
+
     public string $search = '';
     public string $statusFilter = 'all';
     public string $vendorFilter = 'all';
@@ -257,6 +279,7 @@ class PurchaseOrderIndex extends Component
             'vendors' => Vendor::active()->get(),
             'branches' => Branch::all(),
             'products' => Product::orderBy('name')->get(),
+            'viewingPo' => $this->viewingPoId ? PurchaseOrder::with(['vendor', 'branch', 'items.product'])->find($this->viewingPoId) : null,
         ])->layout('components.layouts.admin', ['title' => 'Purchase Orders']);
     }
 }

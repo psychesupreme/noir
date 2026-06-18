@@ -45,7 +45,6 @@ class ProductIndex extends Component
     public ?string $grade = null;
     public ?string $image_url = null;
     public $image_file = null;
-    public array $selectedOccasions = [];
     public ?int $selectedBranchId = null;
 
     // Delete confirmation
@@ -68,7 +67,7 @@ class ProductIndex extends Component
             'price' => 'required|integer|min:1',
             'cost_price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
-            'category' => 'nullable|in:stems,bundle,bouquet,giftings,specializtion,specialization,bouquets,hampers,home_decor,specializations,retail,wholesale,gifting,uncategorized',
+            'category' => 'required|in:stems,bundle,bouquet,giftings,specialization',
             'unit_type' => 'required|in:arrangement,stem,bundle,hamper',
             'grade' => 'nullable|string|max:20',
             'image_url' => 'nullable|string|max:500',
@@ -107,7 +106,7 @@ class ProductIndex extends Component
 
     public function openEditModal(int $productId): void
     {
-        $product = Product::with('occasions')->findOrFail($productId);
+        $product = Product::findOrFail($productId);
         $this->editingProductId = $product->id;
         $this->name = $product->name;
         $this->sku = $product->sku ?? '';
@@ -119,7 +118,6 @@ class ProductIndex extends Component
         $this->unit_type = $product->unit_type ?? 'arrangement';
         $this->grade = $product->grade;
         $this->image_url = $product->image_url;
-        $this->selectedOccasions = $product->occasions->pluck('id')->toArray();
         $this->isEditing = true;
         $this->showModal = true;
     }
@@ -148,8 +146,6 @@ class ProductIndex extends Component
             }
             $product->save();
         }
-
-        $product->occasions()->sync($this->selectedOccasions);
 
         $this->showModal = false;
         $this->resetForm();
@@ -203,7 +199,7 @@ class ProductIndex extends Component
         $this->reset([
             'editingProductId', 'name', 'sku', 'description',
             'price', 'cost_price', 'stock', 'category', 'unit_type', 'grade',
-            'image_url', 'image_file', 'selectedOccasions', 'isEditing', 'selectedBranchId'
+            'image_url', 'image_file', 'isEditing', 'selectedBranchId'
         ]);
         $this->price = 0;
         $this->cost_price = 0;
@@ -224,7 +220,7 @@ class ProductIndex extends Component
 
     public function render()
     {
-        $query = Product::with(['occasions', 'branchStocks.branch']);
+        $query = Product::with(['branchStocks.branch']);
 
         if ($this->categoryFilter !== 'all') {
             $query->where('category', $this->categoryFilter);

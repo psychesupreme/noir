@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 // ── Public Storefront ────────────────────────────────────────────────────
 Route::get('/', Storefront::class)->name('storefront');
 Route::get('/services-gifts', \App\Livewire\ServicesGifts::class)->name('services-gifts');
+Route::get('/curate', \App\Livewire\CurationBuilder::class)->name('curate');
 Route::get('/profile-portal', \App\Livewire\ProfilePortal::class)->middleware('auth')->name('profile-portal');
 Route::get('/receipt/{order}/download', [\App\Http\Controllers\ReceiptController::class, 'download'])
     ->name('receipt.download');

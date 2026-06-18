@@ -59,6 +59,15 @@
                         radial-gradient(ellipse at 80% 20%, rgba(183, 110, 121, 0.04) 0%, transparent 50%),
                         linear-gradient(180deg, #15060A 0%, #2D0D19 50%, #15060A 100%);
         }
+        .ambient-glow-onyx {
+            background: radial-gradient(circle, rgba(197, 168, 128, 0.05) 0%, rgba(139, 92, 246, 0.01) 50%, transparent 100%);
+        }
+        .ambient-glow-champagne {
+            background: radial-gradient(circle, rgba(181, 154, 122, 0.1) 0%, rgba(212, 175, 55, 0.01) 60%, transparent 100%);
+        }
+        .ambient-glow-rose {
+            background: radial-gradient(circle, rgba(244, 114, 182, 0.06) 0%, rgba(183, 110, 121, 0.01) 50%, transparent 100%);
+        }
     </style>
 </head>
 <body x-data="{ theme: localStorage.getItem('nb_theme') || 'onyx' }" class="bg-bg-base text-text-primary antialiased font-sans transition-colors duration-500 selection:bg-rose-950 selection:text-rose-200 min-h-screen">
@@ -75,10 +84,38 @@
             class="hidden lg:flex lg:w-[45%] xl:w-[42%] relative overflow-hidden grain transition-colors duration-500"
         >
 
+            {{-- Background Image with dynamic filtering --}}
+            <div class="absolute inset-0 bg-cover bg-center select-none z-0"
+                 :class="{
+                     'filter brightness-[0.45] contrast-[1.15] saturate-[0.8]': theme === 'onyx',
+                     'filter brightness-[0.95] sepia-[0.1] saturate-[0.8]': theme === 'champagne',
+                     'filter brightness-[0.45] contrast-[1.1] saturate-[0.7] font-semibold': theme === 'rose'
+                 }"
+                 style="background-image: url('{{ asset('media/auth_flower_bg.png') }}');">
+            </div>
+
+            <!-- Linear Theme Blending Overlay -->
+            <div class="absolute inset-0 pointer-events-none mix-blend-multiply z-0"
+                 :class="{
+                     'bg-gradient-to-b from-[#050507]/90 via-[#050507]/40 to-[#050507]/90': theme === 'onyx',
+                     'bg-gradient-to-b from-[#FAF7F0]/90 via-[#FAF7F0]/60 to-[#FAF7F0]/90': theme === 'champagne',
+                     'bg-gradient-to-b from-[#15060A]/90 via-[#15060A]/50 to-[#15060A]/90': theme === 'rose'
+                 }">
+            </div>
+
+            <!-- Secondary Color Burn Blending -->
+            <div class="absolute inset-0 pointer-events-none mix-blend-color-burn opacity-60 z-0"
+                 :class="{
+                     'bg-[#0C1E1A]/10': theme === 'onyx',
+                     'bg-[#C5A880]/15': theme === 'champagne',
+                     'bg-[#B76E79]/20': theme === 'rose'
+                 }">
+            </div>
+
             {{-- Decorative border line --}}
             <div 
                 :class="theme === 'champagne' ? 'via-[#E8E2D5]/40' : 'via-neutral-800/50'"
-                class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent to-transparent"
+                class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent to-transparent z-10"
             ></div>
 
             {{-- Content --}}
@@ -148,10 +185,29 @@
         </div>
 
         {{-- Right Form Panel --}}
-        <div class="flex-1 flex flex-col min-h-screen">
+        <div 
+            :class="{
+                'bg-[#050507]': theme === 'onyx',
+                'bg-[#FAF7F0]': theme === 'champagne',
+                'bg-[#15060A]': theme === 'rose'
+            }"
+            class="flex-1 flex flex-col min-h-screen relative z-10 transition-colors duration-500 overflow-hidden"
+        >
+
+            {{-- Ambient Glow blob inside the form side --}}
+            <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+                <div 
+                    :class="{
+                        'ambient-glow-onyx': theme === 'onyx',
+                        'ambient-glow-champagne': theme === 'champagne',
+                        'ambient-glow-rose': theme === 'rose'
+                    }"
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-90 transition-all duration-500"
+                ></div>
+            </div>
 
             {{-- Mobile brand header — visible only on small screens --}}
-            <div class="lg:hidden px-6 pt-10 pb-6 text-center space-y-2">
+            <div class="lg:hidden px-6 pt-10 pb-6 text-center space-y-2 z-10">
                 <span class="text-[8px] font-mono tracking-[0.4em] text-[#D4AF37]/50 uppercase block">Atelier</span>
                 <h1 
                     :class="theme === 'champagne' ? 'text-[#1C1917]' : 'text-white/90'"
@@ -161,7 +217,7 @@
             </div>
 
             {{-- Centered form slot --}}
-            <div class="flex-1 flex items-center justify-center px-6 py-8 lg:py-12">
+            <div class="flex-1 flex items-center justify-center px-6 py-8 lg:py-12 z-10">
                 <div class="w-full max-w-[420px]">
                     {{ $slot }}
                 </div>

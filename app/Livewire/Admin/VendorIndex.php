@@ -10,8 +10,18 @@ class VendorIndex extends Component
 {
     use WithPagination;
 
+    public function mount(): void
+    {
+        if (request()->query('action') === 'create') {
+            $this->create();
+        }
+    }
+
     public string $search = '';
     public string $activeFilter = 'all';
+    
+    // View state
+    public ?int $viewingVendorId = null;
 
     // Form attributes
     public ?Vendor $editingVendor = null;
@@ -26,6 +36,16 @@ class VendorIndex extends Component
 
     public bool $showModal = false;
     public bool $isEditMode = false;
+
+    public function viewVendor(int $id): void
+    {
+        $this->viewingVendorId = $id;
+    }
+
+    public function closeView(): void
+    {
+        $this->viewingVendorId = null;
+    }
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -125,8 +145,31 @@ class VendorIndex extends Component
             $query->search($this->search);
         }
 
+        $viewingVendor = null;
+        $vendorHistory = collect();
+        $vendorProducts = collect();
+
+        if ($this->viewingVendorId) {
+            $viewingVendor = Vendor::findOrFail($this->viewingVendorId);
+            $vendorHistory = \App\Models\PurchaseOrder::where('vendor_id', $this->viewingVendorId)
+                ->with('branch')
+                ->latest()
+                ->get();
+            
+            $vendorProducts = \App\Models\PurchaseOrderItem::whereHas('purchaseOrder', function($q) {
+                    $q->where('vendor_id', $this->viewingVendorId);
+                })
+                ->with('product')
+                ->select('product_id', \DB::raw('MAX(unit_cost) as max_price'), \DB::raw('MAX(created_at) as last_ordered'))
+                ->groupBy('product_id')
+                ->get();
+        }
+
         return view('livewire.admin.vendor-index', [
             'vendors' => $query->latest()->paginate(10),
+            'viewingVendor' => $viewingVendor,
+            'vendorHistory' => $vendorHistory,
+            'vendorProducts' => $vendorProducts,
         ])->layout('components.layouts.admin', ['title' => 'Suppliers & Vendors']);
     }
 }

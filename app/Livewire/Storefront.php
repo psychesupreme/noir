@@ -32,6 +32,12 @@ class Storefront extends Component
     public array $cart = [];
     public array $slides = [];
 
+    // FNP Delivery details
+    public string $deliveryCity = '';
+    public string $deliveryDate = '';
+    public string $deliverySlot = 'standard';
+    public bool $deliveryDetailsValid = false;
+
     // Form inputs pre-filled from our active user session
     public string $full_name = '';
     public string $company_name = '';
@@ -126,6 +132,11 @@ class Storefront extends Component
 
     public function mount(): void
     {
+        $this->deliveryCity = session()->get('nb_delivery_city', '');
+        $this->deliveryDate = session()->get('nb_delivery_date', '');
+        $this->deliverySlot = session()->get('nb_delivery_slot', 'standard');
+        $this->validateDeliveryDetails();
+
         $rawCart = session()->get('noir_bloom_cart', []);
         $this->cart = [];
         foreach ($rawCart as $key => $qty) {
@@ -153,6 +164,33 @@ class Storefront extends Component
             $this->autoOpenDrawer = true;
             session()->forget('open_curation_drawer_after_login');
         }
+    }
+
+    public function validateDeliveryDetails(): void
+    {
+        if (!empty($this->deliveryCity) && !empty($this->deliveryDate)) {
+            $this->deliveryDetailsValid = true;
+            session()->put('nb_delivery_city', $this->deliveryCity);
+            session()->put('nb_delivery_date', $this->deliveryDate);
+            session()->put('nb_delivery_slot', $this->deliverySlot);
+        } else {
+            $this->deliveryDetailsValid = false;
+        }
+    }
+
+    public function updatedDeliveryCity(): void
+    {
+        $this->validateDeliveryDetails();
+    }
+
+    public function updatedDeliveryDate(): void
+    {
+        $this->validateDeliveryDetails();
+    }
+
+    public function updatedDeliverySlot(): void
+    {
+        $this->validateDeliveryDetails();
     }
 
     public function updatedDeliveryType(): void
@@ -191,6 +229,11 @@ class Storefront extends Component
     {
         $this->orderSubmitted = false;
         $this->mpesaErrorMessage = null;
+
+        if (empty($this->deliveryCity) || empty($this->deliveryDate)) {
+            session()->flash('error', 'Please select a delivery city and date before adding items to curation.');
+            return;
+        }
 
         $product = Product::find($productId);
         if (!$product) return;
@@ -318,6 +361,13 @@ class Storefront extends Component
         }
         \Illuminate\Support\Facades\RateLimiter::hit($ipKey, 60);
 
+        if (empty($this->deliveryCity) || empty($this->deliveryDate)) {
+            $this->addError('deliveryCity', 'Please select a delivery city.');
+            $this->addError('deliveryDate', 'Please select a delivery date.');
+            session()->flash('error', 'Please select a delivery city and date.');
+            return;
+        }
+
         $this->validate([
             'full_name'        => 'required|string|min:3',
             'email'            => 'required|email',
@@ -403,6 +453,22 @@ class Storefront extends Component
 
             $targetBranch = Branch::where('location_city', $this->region)->where('is_active', true)->first();
 
+            $customizations = session()->get('noir_bloom_customizations', []);
+            $customMsg = $customizations['card_message'] ?? null;
+            $ribbonColor = $customizations['ribbon_color'] ?? null;
+            $glitter = $customizations['glitter'] ?? 'No';
+
+            $specialInstructions = 'Delivery Package: ' . strtoupper($this->delivery_type);
+            if ($customMsg) {
+                $specialInstructions .= ' | Handwritten Note: ' . $customMsg;
+            }
+            if ($ribbonColor && $ribbonColor !== 'None') {
+                $specialInstructions .= ' | Ribbon Accent: ' . $ribbonColor;
+            }
+            if ($glitter === 'Yes') {
+                $specialInstructions .= ' | Glitter Accent: Yes';
+            }
+
             $order = Order::create([
                 'client_id'            => $client->id,
                 'branch_id'            => $targetBranch?->id ?? null,
@@ -412,7 +478,7 @@ class Storefront extends Component
                 'total_amount'         => $grandTotal,
                 'service_fee_amount'   => $this->service_fee,
                 'status'               => 'pending',
-                'special_instructions' => 'Delivery Package: ' . strtoupper($this->delivery_type),
+                'special_instructions' => $specialInstructions,
             ]);
 
             foreach ($itemsToAttach as $item) {
@@ -450,6 +516,7 @@ class Storefront extends Component
             $this->mpesaReceiptNumber = null;
             $this->cart = [];
             session()->forget('noir_bloom_cart');
+            session()->forget('noir_bloom_customizations');
         }
     }
 
@@ -529,6 +596,7 @@ class Storefront extends Component
             $this->mpesaReceiptNumber = $payment->mpesa_receipt_number;
             $this->cart = [];
             session()->forget('noir_bloom_cart');
+            session()->forget('noir_bloom_customizations');
         } elseif ($payment->status === 'failed') {
             $this->paymentStatus = 'failed';
             $this->mpesaErrorMessage = $payment->result_description ?: 'STK Push rejected or expired.';
@@ -551,6 +619,7 @@ class Storefront extends Component
     {
         $this->cart = [];
         session()->forget('noir_bloom_cart');
+        session()->forget('noir_bloom_customizations');
         $this->reset([
             'is_gift', 'recipient_name', 'recipient_phone', 'delivery_type', 'service_fee', 
             'orderSubmitted', 'trackedOrderId', 'mpesaErrorMessage',
@@ -600,7 +669,11 @@ class Storefront extends Component
             $query->latest();
         }
 
-        $products = $query->take($this->perPage)->get()->map(function($product) {
+        $limit = ($this->selectedCategory === 'all' && empty($this->search) && !$this->selectedOccasion)
+            ? max(18, $this->perPage)
+            : $this->perPage;
+
+        $products = $query->take($limit)->get()->map(function($product) {
             if ($product->category === 'specializtion' || $product->category === 'specialization' || $product->category === 'specializations') {
                 $product->backdrop_url = $product->image_url ?: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=600';
             } else {

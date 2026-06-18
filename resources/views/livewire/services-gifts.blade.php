@@ -150,16 +150,24 @@
         <!-- Gold Accent Bottom Glow Line -->
         <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-[#C5A880]/30 to-transparent"></div>
         <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-8">
-            <a href="/" class="shrink-0 flex items-baseline space-x-2 animate-nav-item select-none cursor-pointer" style="animation-delay: 100ms;">
-                <span class="text-[11px] font-mono tracking-[0.4em] text-[#C5A880] uppercase">Atelier</span>
-                <span :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-base font-semibold uppercase tracking-[0.35em] transition-colors font-outfit">NOIR & BLOOM</span>
+            <a href="/" class="shrink-0 flex items-center space-x-2 select-none cursor-pointer group-hover:scale-102 transition-transform duration-300">
+                <div class="w-8.5 h-8.5 rounded-full bg-emerald-800 flex items-center justify-center text-white font-serif italic text-sm font-semibold shadow-md shrink-0">N</div>
+                <div class="flex flex-col text-left leading-none">
+                    <span class="text-[9px] font-mono tracking-[0.3em] text-emerald-700 uppercase font-bold">Atelier</span>
+                    <span :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" class="text-xs sm:text-sm md:text-base font-extrabold uppercase tracking-[0.15em] font-outfit mt-0.5">Noir & Bloom</span>
+                </div>
             </a>
             <!-- Spacing column to balance layout -->
             <div class="flex-1 hidden md:block"></div>
 
             <div class="flex items-center space-x-6 text-[12px] font-mono uppercase tracking-widest text-neutral-400">
                 <!-- Navigation links -->
-                <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer text-[#C5A880] font-semibold" style="animation-delay: 200ms;">Services</a>
+                <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer {{ request()->routeIs('services-gifts') ? 'text-[#C5A880] font-semibold' : '' }}" style="animation-delay: 200ms;">Services</a>
+                <a href="{{ route('curate') }}" 
+                   class="hidden md:inline-block px-4 py-1.5 rounded-full border transition-all duration-300 animate-nav-item select-none cursor-pointer {{ request()->routeIs('curate') ? 'border-[#C5A880] bg-[#C5A880]/10 text-[#C5A880] font-semibold' : 'border-[#C5A880]/30 hover:border-[#C5A880] hover:bg-[#C5A880]/5 text-[#C5A880]' }}"
+                   style="animation-delay: 250ms;">
+                   Curate Your Arrangement
+                </a>
 
                 <!-- Theme Switcher Pill (3 options, desktop only) -->
                 <div class="hidden lg:flex items-center space-x-1 border border-neutral-500/10 rounded-full bg-neutral-500/5 p-1 animate-nav-item select-none relative" style="animation-delay: 300ms;">
@@ -442,7 +450,7 @@
 
                             <div class="space-y-2 mt-1">
                                 <!-- Social Sharing Direct Links for SMM (Instagram, Facebook, X SVGs) -->
-                                <div class="flex items-center space-x-2.5 text-[10px] font-mono uppercase text-neutral-400">
+                                <div :class="theme === 'champagne' ? 'text-neutral-600' : 'text-neutral-400'" class="flex items-center space-x-2.5 text-[10px] font-mono uppercase">
                                     <span class="text-neutral-500 text-[8px] uppercase tracking-widest font-bold font-sans">Share:</span>
                                     <!-- Instagram Icon -->
                                     <a href="https://instagram.com" target="_blank" rel="noopener" class="hover:text-pink-500 transition-colors" title="Instagram">
@@ -459,7 +467,7 @@
                                         </svg>
                                     </a>
                                     <!-- X Icon -->
-                                    <a href="https://twitter.com/intent/tweet?text=Bespoke+{{ urlencode($srv->name) }}+service+from+@NoirAndBloom:&url={{ urlencode(url('/services-gifts')) }}" target="_blank" rel="noopener" class="hover:text-white transition-colors" title="Share on X">
+                                    <a href="https://twitter.com/intent/tweet?text=Bespoke+{{ urlencode($srv->name) }}+service+from+@NoirAndBloom:&url={{ urlencode(url('/services-gifts')) }}" target="_blank" rel="noopener" :class="theme === 'champagne' ? 'hover:text-black' : 'hover:text-white'" class="transition-colors" title="Share on X">
                                         <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
                                             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                                         </svg>
@@ -511,12 +519,12 @@
                                 <p class="text-neutral-500 font-light text-xs line-clamp-2">{{ $gift->description }}</p>
                                 
                                 <!-- Social Sharing Direct Links for SMM -->
-                                <div class="flex items-center space-x-2 text-[9px] font-mono uppercase tracking-wider text-neutral-450 pt-1">
+                                <div :class="theme === 'champagne' ? 'text-neutral-600' : 'text-neutral-400'" class="flex items-center space-x-2 text-[9px] font-mono uppercase tracking-wider pt-1">
                                     <span class="text-neutral-500 font-bold">Share:</span>
                                     <a href="https://api.whatsapp.com/send?text=Check%20out%20the%20exclusive%20{{ urlencode($gift->name) }}%20gift%20accent%20at%20Noir%20%26%20Bloom:%20{{ urlencode(url('/services-gifts')) }}" 
                                        target="_blank" rel="noopener" class="hover:text-emerald-500 transition-colors font-bold" title="Share via WhatsApp">WA</a>
                                     <a href="https://twitter.com/intent/tweet?text=Premium%20{{ urlencode($gift->name) }}%20gift%20at%20@NoirAndBloom:&url={{ urlencode(url('/services-gifts')) }}" 
-                                       target="_blank" rel="noopener" class="hover:text-white transition-colors font-bold" title="Share on X">X</a>
+                                       target="_blank" rel="noopener" :class="theme === 'champagne' ? 'hover:text-black' : 'hover:text-white'" class="transition-colors font-bold" title="Share on X">X</a>
                                 </div>
                             </div>
                             <div class="mt-4 flex items-center justify-between border-t border-neutral-500/10 pt-3">

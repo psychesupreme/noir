@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" width="100%" height="100%">
+    <defs>
+        <!-- Glass Gradient -->
+        <linearGradient id="glass-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#1e293b" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#0f172a" stop-opacity="0.95"/>
+        </linearGradient>
+        <!-- Shadows -->
+        <filter id="car-shadow" x="-5%" y="-5%" width="110%" height="115%">
+            <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#000000" flood-opacity="0.5"/>
+        </filter>
+    </defs>
+
+    <!-- Floor Shadow -->
+    <ellipse cx="400" cy="265" rx="360" ry="15" fill="#000000" opacity="0.6" />
+
+    <!-- CAR PROFILE GROUP -->
+    <g filter="url(#car-shadow)">
+        <!-- Shadow Underlay -->
+        <path d="M 120 230 C 120 230, 150 240, 200 240 C 250 240, 600 240, 680 230 C 700 225, 715 210, 710 190 C 700 150, 650 135, 590 125 C 530 115, 340 110, 260 125 C 190 138, 140 160, 120 190 C 110 205, 110 220, 120 230 Z" fill="#09090b" opacity="0.4"/>
+
+        <!-- Car Body Path (Targeted for dynamic fill changes) -->
+        <path id="car-body" d="M 120 215 C 115 195, 125 175, 160 155 C 200 132, 260 120, 310 115 C 370 108, 490 108, 560 118 C 620 126, 670 140, 700 160 C 715 170, 725 185, 720 200 C 715 215, 705 220, 690 222 C 685 222, 680 215, 680 210 C 680 190, 640 180, 620 180 C 590 180, 560 200, 560 215 C 560 225, 570 228, 580 228 C 590 228, 600 226, 610 226 H 640 L 675 224 C 685 224, 690 228, 690 232 C 680 240, 640 242, 600 242 H 240 C 200 242, 160 240, 150 232 C 150 228, 155 224, 165 224 H 190 C 200 226, 210 228, 220 228 C 230 228, 240 225, 240 215 C 240 200, 210 180, 180 180 C 160 180, 120 190, 120 210 C 120 215, 118 222, 120 215 Z" fill="#4b5563" style="transition: fill 0.6s cubic-bezier(0.4, 0, 0.2, 1);" />
+
+        <!-- Cabin / Window Area (Glass) -->
+        <path d="M 280 128 C 320 121, 460 121, 520 128 C 555 132, 590 142, 615 158 H 255 C 265 145, 272 135, 280 128 Z" fill="url(#glass-grad)" stroke="#111827" stroke-width="2"/>
+        <!-- B-Pillar Divider -->
+        <line x1="420" y1="123" x2="420" y2="158" stroke="#09090b" stroke-width="6"/>
+
+        <!-- Front Headlight (Sleek LED strip) -->
+        <path d="M 690 168 C 695 168, 708 174, 712 178 C 710 180, 700 180, 690 174 Z" fill="#ffffff" opacity="0.9" />
+        <path d="M 685 170 C 695 170, 712 176, 715 180" stroke="#60a5fa" stroke-width="2" fill="none" filter="drop-shadow(0px 0px 3px #3b82f6)"/>
+
+        <!-- Rear Taillight (Red wrap-around) -->
+        <path d="M 124 185 C 120 185, 118 192, 122 196 C 126 194, 128 190, 128 186 Z" fill="#ef4444" />
+        <path d="M 124 185 C 128 185, 134 187, 138 190" stroke="#f87171" stroke-width="2" fill="none" filter="drop-shadow(0px 0px 2px #ef4444)"/>
+
+        <!-- Chrome Trim / Details -->
+        <path d="M 230 164 Q 430 164, 630 164" stroke="#d1d5db" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <path d="M 148 200 H 155" stroke="#111827" stroke-width="3" fill="none"/>
+        <path d="M 685 204 H 695" stroke="#111827" stroke-width="3" fill="none"/>
+
+        <!-- Wheel Cutouts (Empty space inside body for wheel swaps) -->
+        <circle cx="180" cy="215" r="46" fill="#09090b" />
+        <circle cx="580" cy="215" r="46" fill="#09090b" />
+    </g>
+</svg>

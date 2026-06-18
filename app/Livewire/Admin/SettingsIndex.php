@@ -100,7 +100,7 @@ class SettingsIndex extends Component
             'slides.*.badge' => 'required|string|max:100',
             'slides.*.title' => 'required|string|max:100',
             'slides.*.description' => 'required|string|max:500',
-            'slides.*.bg_image' => 'required|url|max:500',
+            'slides.*.bg_image' => 'required|string|max:500',
             'slides.*.cta_text' => 'required|string|max:50',
             'slides.*.cta_link' => 'required|string|max:100',
         ]);

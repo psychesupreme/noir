@@ -15,23 +15,7 @@
    THEME VARIABLES — 3 Luxury Themes
    ═══════════════════════════════════════════════════════════ */
 
-:root, .onyx {
-  --bg-base: #050507;
-  --bg-card: #0A0A0E;
-  --border-base: #18181C;
-  --text-primary: #F4F4F5;
-  --text-secondary: #9CA3AF;
-  --brand-accent: #C5A880;
-  --brand-accent-rgb: 197, 168, 128;
-  --blob-1: rgba(197, 168, 128, 0.06);
-  --blob-2: rgba(88, 28, 135, 0.04);
-  --card-bg: rgba(12, 12, 14, 0.45);
-  --card-border: rgba(255, 255, 255, 0.04);
-  --card-hover-border: rgba(255, 255, 255, 0.1);
-  --card-hover-shadow: 0 20px 60px -15px rgba(197, 168, 128, 0.08);
-}
-
-.champagne {
+:root, .champagne {
   --bg-base: #FAF7F0;
   --bg-card: #FFFFFF;
   --border-base: #E8E2D5;
@@ -45,6 +29,22 @@
   --card-border: rgba(0, 0, 0, 0.06);
   --card-hover-border: rgba(0, 0, 0, 0.12);
   --card-hover-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.08);
+}
+
+.onyx {
+  --bg-base: #050507;
+  --bg-card: #0A0A0E;
+  --border-base: #18181C;
+  --text-primary: #F4F4F5;
+  --text-secondary: #9CA3AF;
+  --brand-accent: #C5A880;
+  --brand-accent-rgb: 197, 168, 128;
+  --blob-1: rgba(197, 168, 128, 0.06);
+  --blob-2: rgba(88, 28, 135, 0.04);
+  --card-bg: rgba(12, 12, 14, 0.45);
+  --card-border: rgba(255, 255, 255, 0.04);
+  --card-hover-border: rgba(255, 255, 255, 0.1);
+  --card-hover-shadow: 0 20px 60px -15px rgba(197, 168, 128, 0.08);
 }
 
 .rose {

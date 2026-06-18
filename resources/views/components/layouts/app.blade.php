@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="champagne">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +38,7 @@
     <script type="application/ld+json">
     {
       "@@context": "https://schema.org",
-      "@graph": [
+      "@@graph": [
         {
           "@type": "Organization",
           "@id": "{{ url('/') }}/#organization",
@@ -83,7 +83,7 @@
     <!-- Persistent Theme Bootstrap -->
     <script>
         (function() {
-            const theme = localStorage.getItem('nb_theme') || 'onyx';
+            const theme = localStorage.getItem('nb_theme') || 'champagne';
             document.documentElement.className = theme;
             document.documentElement.setAttribute('data-theme', theme);
         })();

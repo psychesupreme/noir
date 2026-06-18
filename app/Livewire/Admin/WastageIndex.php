@@ -12,6 +12,25 @@ class WastageIndex extends Component
 {
     use WithPagination;
 
+    public function mount(): void
+    {
+        if (request()->query('action') === 'create') {
+            $this->openLogModal();
+        }
+    }
+
+    public ?int $viewingWastageId = null;
+
+    public function viewWastage(int $id): void
+    {
+        $this->viewingWastageId = $id;
+    }
+
+    public function closeView(): void
+    {
+        $this->viewingWastageId = null;
+    }
+
     public string $search = '';
     public string $branchFilter = 'all';
     public string $reasonFilter = 'all';
@@ -139,6 +158,7 @@ class WastageIndex extends Component
             'totalWastageValue' => $totalWastageValue,
             'topWastedProduct' => $topWasted ? $topWasted->product?->name . " ({$topWasted->total_qty} units)" : 'None',
             'breakdown' => $breakdown,
+            'viewingWastage' => $this->viewingWastageId ? WastageLog::with(['product', 'branch', 'user'])->find($this->viewingWastageId) : null,
         ])->layout('components.layouts.admin', ['title' => 'Wastage & Perishables Log']);
     }
 }
