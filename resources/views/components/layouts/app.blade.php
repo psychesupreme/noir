@@ -8,31 +8,31 @@
     @hasSection('meta')
         @yield('meta')
     @else
-        <meta name="description" content="Noir & Bloom is a premium luxury floral curation atelier, bespoke gifting suite, and elite event design concierge. Sourcing Grade-A stems directly from volcanic Rift Valley growers.">
+        <meta name="description" content="Atelier Noir & Bloom is a premium luxury floral curation atelier, bespoke gifting suite, and elite event design concierge. Sourcing Grade-A stems directly from volcanic Rift Valley growers.">
         <meta name="keywords" content="luxury flowers Nairobi, bespoke gifting Kenya, premium florist Kiambu, Rift Valley stems, corporate flower subscriptions, eTIMS compliance flowers, M-Pesa florist">
-        <meta name="author" content="Noir & Bloom Atelier">
+        <meta name="author" content="Atelier Noir & Bloom">
         <meta name="robots" content="index, follow">
         <link rel="canonical" href="{{ url()->current() }}">
 
         <!-- Open Graph (Facebook / Pinterest / LinkedIn) -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">
-        <meta property="og:title" content="{{ $title ?? 'Noir & Bloom | Premium Floral & Gifting Atelier' }}">
+        <meta property="og:title" content="{{ $title ?? 'Atelier Noir & Bloom | Premium Floral & Gifting' }}">
         <meta property="og:description" content="Premium luxury floral curation atelier, bespoke gifting suite, and elite event design concierge. Sourcing Grade-A stems directly from Rift Valley growers.">
         <meta property="og:image" content="{{ asset('media/og-image-default.jpg') }}">
-        <meta property="og:site_name" content="Noir & Bloom">
+        <meta property="og:site_name" content="Atelier Noir & Bloom">
         <meta property="og:locale" content="en_KE">
 
         <!-- Twitter / X Card -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:url" content="{{ url()->current() }}">
-        <meta name="twitter:title" content="{{ $title ?? 'Noir & Bloom | Premium Floral & Gifting Atelier' }}">
+        <meta name="twitter:title" content="{{ $title ?? 'Atelier Noir & Bloom | Premium Floral & Gifting' }}">
         <meta name="twitter:description" content="Premium luxury floral curation atelier, bespoke gifting suite, and elite event design concierge. Sourcing Grade-A stems directly from Rift Valley growers.">
         <meta name="twitter:image" content="{{ asset('media/og-image-default.jpg') }}">
         <meta name="twitter:site" content="@NoirAndBloom">
     @endif
 
-    <title>{{ $title ?? 'Noir & Bloom | Premium Floral & Gifting Atelier' }}</title>
+    <title>{{ $title ?? 'Atelier Noir & Bloom | Premium Floral & Gifting' }}</title>
 
     <!-- Google Search Engine Structured Data Schema (JSON-LD) -->
     <script type="application/ld+json">
@@ -42,7 +42,7 @@
         {
           "@type": "Organization",
           "@id": "{{ url('/') }}/#organization",
-          "name": "Noir & Bloom",
+          "name": "Atelier Noir & Bloom",
           "url": "{{ url('/') }}",
           "logo": "{{ asset('media/logo.png') }}",
           "sameAs": [
@@ -62,7 +62,7 @@
           "@type": "WebSite",
           "@id": "{{ url('/') }}/#website",
           "url": "{{ url('/') }}",
-          "name": "Noir & Bloom",
+          "name": "Atelier Noir & Bloom",
           "description": "Premium Floral Curation & Bespoke Gifting Atelier",
           "publisher": {
             "@id": "{{ url('/') }}/#organization"
@@ -83,7 +83,8 @@
     <!-- Persistent Theme Bootstrap -->
     <script>
         (function() {
-            const theme = localStorage.getItem('nb_theme') || 'champagne';
+            const storedTheme = localStorage.getItem('nb_theme');
+            const theme = (storedTheme === 'onyx' || storedTheme === 'champagne') ? storedTheme : 'champagne';
             document.documentElement.className = theme;
             document.documentElement.setAttribute('data-theme', theme);
         })();

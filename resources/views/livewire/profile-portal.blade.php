@@ -4,7 +4,7 @@
 
 <div 
     x-data="{ 
-        theme: localStorage.getItem('nb_theme') || 'onyx',
+        theme: (localStorage.getItem('nb_theme') === 'onyx' || localStorage.getItem('nb_theme') === 'champagne') ? localStorage.getItem('nb_theme') : 'onyx',
         hoverTheme: null,
         changeTheme(targetTheme) {
             if (this.theme === targetTheme) return;
@@ -17,23 +17,20 @@
             document.documentElement.className = val; 
             document.documentElement.setAttribute('data-theme', val);
             const bgColors = {
-                'onyx': '#050507',
-                'champagne': '#FAF7F0',
-                'rose': '#15060A'
+                'onyx': '#0B0B0D',
+                'champagne': '#FAF7F0'
             };
             const textColors = {
-                'onyx': '#F4F4F5',
-                'champagne': '#1C1917',
-                'rose': '#FCE7EC'
+                'onyx': '#E4E4E7',
+                'champagne': '#1C1C20'
             };
             document.documentElement.style.backgroundColor = bgColors[val];
             document.documentElement.style.color = textColors[val];
         });
     "
     :class="{
-        'bg-[#050507] text-[#F4F4F5]': theme === 'onyx',
-        'bg-[#FAF7F0] text-[#1C1C20]': theme === 'champagne',
-        'bg-[#15060A] text-[#FCE7EC]': theme === 'rose'
+        'bg-[#0B0B0D] text-[#E4E4E7]': theme === 'onyx',
+        'bg-[#FAF7F0] text-[#1C1C20]': theme === 'champagne'
     }"
     class="min-h-screen font-sans antialiased relative text-left flex flex-col justify-between transition-colors duration-500 overflow-hidden"
 >
@@ -72,7 +69,7 @@
                    Curate Your Arrangement
                 </a>
 
-                <!-- Theme Switcher Pill (3 options, desktop only) -->
+                <!-- Theme Switcher Pill (2 options, desktop only) -->
                 <div class="hidden lg:flex items-center space-x-1 border border-neutral-500/10 rounded-full bg-neutral-500/5 p-1 animate-nav-item select-none relative" style="animation-delay: 300ms;">
                     <button @click="changeTheme('onyx')" 
                             @mouseenter="hoverTheme = 'onyx'" 
@@ -89,14 +86,6 @@
                             class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
                         <span class="w-1 h-1 rounded-full bg-current"></span>
                         <span>Champagne</span>
-                    </button>
-                    <button @click="changeTheme('rose')" 
-                            @mouseenter="hoverTheme = 'rose'" 
-                            @mouseleave="hoverTheme = null" 
-                            :class="theme === 'rose' ? 'bg-[#B76E79] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-[#B76E79] hover:bg-[#B76E79]/10'" 
-                            class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
-                        <span class="w-1 h-1 rounded-full bg-current"></span>
-                        <span>Rose</span>
                     </button>
 
                     <!-- Theme Hover Preview Popover Card -->
@@ -116,9 +105,9 @@
                             <span class="font-bold text-[#C5A880] tracking-wider uppercase text-[10px] block">Onyx Theme</span>
                             <p class="text-neutral-450 text-[11px] leading-relaxed font-light">Midnight Obsidian & Deep Velvet. A high-contrast dark aesthetic built for dramatic evening luxury.</p>
                             <div class="flex items-center space-x-1 pt-1">
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#050507]" title="Background"></span>
+                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#0B0B0D]" title="Background"></span>
                                 <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#C5A880]" title="Accent"></span>
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#F4F4F5]" title="Text"></span>
+                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#E4E4E7]" title="Text"></span>
                             </div>
                         </div>
 
@@ -132,22 +121,11 @@
                                 <span class="w-4 h-4 rounded-full border border-neutral-200 bg-[#1C1917]" title="Text"></span>
                             </div>
                         </div>
-
-                        <!-- Rose Preview Content -->
-                        <div x-show="hoverTheme === 'rose'" class="space-y-2">
-                            <span class="font-bold text-[#B76E79] tracking-wider uppercase text-[10px] block">Rose Theme</span>
-                            <p class="text-neutral-450 text-[11px] leading-relaxed font-light">Blushing Burgundy & Rose Quartz. A rich, romantic dark mode inspired by fresh Kenyan spray roses.</p>
-                            <div class="flex items-center space-x-1 pt-1">
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#15060A]" title="Background"></span>
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#B76E79]" title="Accent"></span>
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#FCE7EC]" title="Text"></span>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
                 <!-- Collapsed mobile theme switcher -->
-                <button @click="changeTheme(theme === 'onyx' ? 'champagne' : (theme === 'champagne' ? 'rose' : 'onyx'))" 
+                <button @click="changeTheme(theme === 'onyx' ? 'champagne' : 'onyx')" 
                         class="lg:hidden hover:text-neutral-200 transition-colors cursor-pointer select-none relative w-8 h-8 flex items-center justify-center border border-neutral-500/10 rounded-full bg-neutral-500/5 animate-nav-item"
                         style="animation-delay: 300ms;"
                         title="Cycle Theme"
@@ -729,28 +707,18 @@
             'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'champagne',
             'border-[#2D0D19]/40 bg-[#1D0C13] text-neutral-300': theme === 'rose'
         }"
-        class="border-t mt-32 py-16 px-6 transition-colors duration-500 z-10 relative theme-section"
+        class="border-t mt-20 py-10 px-6 transition-colors duration-500 z-10 relative theme-section"
     >
-        <div class="max-w-8xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-left">
-            <!-- Col 1: Brand Coordinates -->
+        <div class="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
+            <!-- Col 1: Brand & Info -->
             <div class="space-y-4">
                 <div class="flex items-baseline space-x-2">
                     <span class="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
-                    <h4 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">NOIR & BLOOM</h4>
+                    <h4 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">Noir & Bloom</h4>
                 </div>
                 <p class="text-xs font-light leading-relaxed max-w-xs">
                     Premium floral curation, bespoke gifting suites, and high-end events concierge. Sourcing directly from Rift Valley growers.
                 </p>
-                <div class="space-y-1 text-[12px] font-mono text-neutral-500">
-                    <div class="flex items-center space-x-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-                        <span>Nairobi: 1.2921° S, 36.8219° E</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-                        <span>Kiambu: 1.1478° S, 36.8524° E</span>
-                    </div>
-                </div>
             </div>
 
             <!-- Col 2: Showroom Catalog Links -->
@@ -798,8 +766,8 @@
             </div>
         </div>
 
-        <div :class="theme === 'champagne' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-8xl w-full mx-auto border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
-            <p>&copy; {{ date('Y') }} Noir &amp; Bloom Ltd. Registered Tax Entity.</p>
+        <div :class="theme === 'champagne' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-5xl w-full mx-auto border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
+            <p>&copy; {{ date('Y') }} Atelier Noir & Bloom. All rights reserved.</p>
             <div class="flex space-x-6">
                 <a href="#" class="hover:text-neutral-400">Terms of Curation</a>
                 <a href="#" class="hover:text-neutral-400">Logistics Policy</a>

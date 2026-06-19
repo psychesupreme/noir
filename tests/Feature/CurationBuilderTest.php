@@ -134,15 +134,18 @@ class CurationBuilderTest extends TestCase
     {
         $response = $this->get('/curate');
         $response->assertStatus(200);
-        $response->assertSee('Bespoke Curation Studio');
+        $response->assertSee('Curation Studio');
     }
 
     public function test_curation_builder_initial_state(): void
     {
         Livewire::test(\App\Livewire\CurationBuilder::class)
-            ->assertSet('selectedStems', [$this->redRoses->id => 24])
-            ->assertSet('selectedWrappingId', $this->glassVaseWrap->id)
-            ->assertSet('selectedMistId', $this->amberMist->id)
+            ->assertSet('selectedStems', [
+                $this->redRoses->id => 0,
+                $this->whiteLilies->id => 0
+            ])
+            ->assertSet('selectedWrappingId', null)
+            ->assertSet('selectedMistId', null)
             ->assertSee('Naivasha Volcanic Red Roses (Grade A)');
     }
 
@@ -156,8 +159,9 @@ class CurationBuilderTest extends TestCase
         // Expected total = 3600 + 500 + 1500 + 4500 + 1500 = 11,600 KSH
 
         Livewire::test(\App\Livewire\CurationBuilder::class)
-            ->call('adjustStemQuantity', $this->redRoses->id, -12) // 24 - 12 = 12 stems
+            ->call('adjustStemQuantity', $this->redRoses->id, 12) // 0 + 12 = 12 stems
             ->call('selectWrapping', $this->kraftWrap->id)
+            ->call('selectMist', $this->amberMist->id)
             ->call('adjustGiftQuantity', $this->merlotWine->id, 1)
             ->assertSet('subtotal', 11600);
     }
@@ -165,9 +169,11 @@ class CurationBuilderTest extends TestCase
     public function test_adding_curation_to_cart(): void
     {
         Livewire::test(\App\Livewire\CurationBuilder::class)
-            ->call('adjustStemQuantity', $this->redRoses->id, -12) // 24 - 12 = 12 stems
+            ->call('adjustStemQuantity', $this->redRoses->id, 12) // 0 + 12 = 12 stems
             ->call('selectWrapping', $this->kraftWrap->id)
+            ->call('selectMist', $this->amberMist->id)
             ->call('adjustGiftQuantity', $this->merlotWine->id, 1)
+            ->set('curationOccasion', 'anniversary')
             ->call('addToCart')
             ->assertRedirect(route('storefront'));
 
@@ -187,6 +193,10 @@ class CurationBuilderTest extends TestCase
 
         $this->assertArrayHasKey($this->handCurationProduct->id . '-standard', $cart);
         $this->assertEquals(1, $cart[$this->handCurationProduct->id . '-standard']);
+
+        $customizations = session()->get('noir_bloom_customizations');
+        $this->assertNotNull($customizations);
+        $this->assertEquals('anniversary', $customizations['curation_occasion']);
     }
 
     public function test_active_step_navigation(): void

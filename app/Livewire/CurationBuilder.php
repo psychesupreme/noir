@@ -29,6 +29,7 @@ class CurationBuilder extends Component
     public bool $hasCard = false;
     public string $cardMessage = '';
     public int $activeStep = 1;
+    public string $curationOccasion = 'birthday';
 
     // Calculated fields
     public $subtotal = 0;
@@ -66,28 +67,9 @@ class CurationBuilder extends Component
             ]
         );
 
-        // Set Default Selections: 24 Naomi Red Roses
-        $defaultStem = $this->availableStems->firstWhere('sku', 'NB-STM-NRO-01');
-        if ($defaultStem) {
-            $this->selectedStems[$defaultStem->id] = 24;
-        } elseif ($this->availableStems->isNotEmpty()) {
-            $this->selectedStems[$this->availableStems->first()->id] = 24;
-        }
-
-        // Default Wrap: Glass Vase Presentation
-        $defaultWrap = $this->availableWrappings->firstWhere('sku', 'NB-DEC-GVP-07');
-        if ($defaultWrap) {
-            $this->selectedWrappingId = $defaultWrap->id;
-        } elseif ($this->availableWrappings->isNotEmpty()) {
-            $this->selectedWrappingId = $this->availableWrappings->first()->id;
-        }
-
-        // Default Mist: Rosewood & Amber Mist
-        $defaultMist = $this->availableMists->firstWhere('sku', 'NB-DEC-ARA-04');
-        if ($defaultMist) {
-            $this->selectedMistId = $defaultMist->id;
-        } elseif ($this->availableMists->isNotEmpty()) {
-            $this->selectedMistId = $this->availableMists->first()->id;
+        // Initialize stems with quantity 0
+        foreach ($this->availableStems as $stem) {
+            $this->selectedStems[$stem->id] = 0;
         }
 
         // Initialize gifts with quantity 0
@@ -185,7 +167,7 @@ class CurationBuilder extends Component
             }
             $this->selectedStems[$stemId] = $newQty;
         } else {
-            unset($this->selectedStems[$stemId]);
+            $this->selectedStems[$stemId] = 0;
         }
         $this->calculateSubtotal();
         $this->dispatch('stems-updated');
@@ -360,7 +342,8 @@ class CurationBuilder extends Component
         session()->put('noir_bloom_customizations', [
             'card_message' => $this->hasCard ? $this->cardMessage : null,
             'ribbon_color' => $ribbonName !== 'None' ? $ribbonName : null,
-            'glitter' => $this->hasGlitter ? 'Yes' : 'No'
+            'glitter' => $this->hasGlitter ? 'Yes' : 'No',
+            'curation_occasion' => $this->curationOccasion
         ]);
 
         session()->put('open_curation_drawer_after_login', true);
@@ -380,9 +363,12 @@ class CurationBuilder extends Component
             }
         }
 
+        $cartCount = array_sum(session()->get('noir_bloom_cart', []));
+
         return view('livewire.curation-builder', [
             'subtotal' => $this->subtotal,
-            'activeScent' => $activeScent
+            'activeScent' => $activeScent,
+            'cartCount' => $cartCount
         ])->layout('components.layouts.app');
     }
 }

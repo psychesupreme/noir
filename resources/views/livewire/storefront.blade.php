@@ -1,24 +1,24 @@
 @section('meta')
-    <meta name="description" content="Explore Noir & Bloom's premium floral curations, Naivasha Rift Valley wholesale stems, and custom luxury gift hampers. Live eTIMS integration and instant M-Pesa checkout.">
+    <meta name="description" content="Explore Atelier Noir & Bloom's premium floral curations, Naivasha Rift Valley wholesale stems, and custom luxury gift hampers. Live eTIMS integration and instant M-Pesa checkout.">
     <meta name="keywords" content="premium bouquets, naivasha roses, flower shop Nairobi, luxury gift hampers Kenya, flower delivery Nairobi, eTIMS VAT invoices, safaricom mpesa checkout">
-    <meta name="author" content="Noir & Bloom Atelier">
+    <meta name="author" content="Atelier Noir & Bloom">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ url()->current() }}">
 
     <!-- Open Graph (Facebook / Pinterest / LinkedIn) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="Noir &amp; Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier">
-    <meta property="og:description" content="Explore Noir & Bloom's premium floral curations, Naivasha volcanic roses, and custom luxury gift hampers. Sourcing fresh stems from Limuru and Naivasha with elite concierge delivery.">
+    <meta property="og:title" content="Atelier Noir & Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier">
+    <meta property="og:description" content="Explore Atelier Noir & Bloom's premium floral curations, Naivasha volcanic roses, and custom luxury gift hampers. Sourcing fresh stems from Limuru and Naivasha with elite concierge delivery.">
     <meta property="og:image" content="{{ asset('media/og-storefront.jpg') }}">
-    <meta property="og:site_name" content="Noir & Bloom">
+    <meta property="og:site_name" content="Atelier Noir & Bloom">
     <meta property="og:locale" content="en_KE">
 
     <!-- Twitter / X Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{{ url()->current() }}">
-    <meta name="twitter:title" content="Noir &amp; Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier">
-    <meta name="twitter:description" content="Explore Noir & Bloom's premium floral curations, Naivasha volcanic roses, and custom luxury gift hampers. Sourcing fresh stems from Limuru and Naivasha with elite concierge delivery.">
+    <meta name="twitter:title" content="Atelier Noir & Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier">
+    <meta name="twitter:description" content="Explore Atelier Noir & Bloom's premium floral curations, Naivasha volcanic roses, and custom luxury gift hampers. Sourcing fresh stems from Limuru and Naivasha with elite concierge delivery.">
     <meta name="twitter:image" content="{{ asset('media/og-storefront.jpg') }}">
     <meta name="twitter:site" content="@NoirAndBloom">
 
@@ -27,7 +27,7 @@
     {
       "@@context": "https://schema.org",
       "@type": "ItemList",
-      "name": "Noir & Bloom Showroom Catalog",
+      "name": "Atelier Noir & Bloom Showroom Catalog",
       "description": "Showcase of premium floral designs, export-quality volcanic stems, and custom luxury hampers.",
       "url": "{{ url()->current() }}",
       "numberOfItems": {{ count($products) }},
@@ -63,7 +63,7 @@
     x-data="{ 
         drawerOpen: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
         checkoutMode: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
-        theme: 'champagne', 
+        theme: (localStorage.getItem('nb_theme') === 'onyx' || localStorage.getItem('nb_theme') === 'champagne') ? localStorage.getItem('nb_theme') : 'champagne', 
         accountPanelOpen: false, 
         chatOpen: false,
         quickViewOpen: false,
@@ -93,7 +93,7 @@
     }" 
     x-init="
         /* Initialize preloader lift */
-        setTimeout(() => { loading = false; }, 1600);
+        setTimeout(() => { loading = false; }, 3000);
 
         /* Auto-open curation cart drawer if redirect query parameter is present */
         const urlParams = new URLSearchParams(window.location.search);
@@ -108,14 +108,12 @@
             document.documentElement.className = val; 
             document.documentElement.setAttribute('data-theme', val);
             const bgColors = {
-                'onyx': '#050507',
-                'champagne': '#FAF7F0',
-                'rose': '#15060A'
+                'onyx': '#0B0B0D',
+                'champagne': '#FAF7F0'
             };
             const textColors = {
-                'onyx': '#F4F4F5',
-                'champagne': '#1C1917',
-                'rose': '#FCE7EC'
+                'onyx': '#E4E4E7',
+                'champagne': '#1C1C20'
             };
             document.documentElement.style.backgroundColor = bgColors[val];
             document.documentElement.style.color = textColors[val];
@@ -149,38 +147,94 @@
         @endauth
     "
     :class="{
-        'bg-[#050507] text-[#F4F4F5]': theme === 'onyx',
-        'bg-[#FAF7F0] text-[#1C1C20]': theme === 'champagne',
-        'bg-[#15060A] text-[#FCE7EC]': theme === 'rose'
+        'bg-[#0B0B0D] text-[#E4E4E7]': theme === 'onyx',
+        'bg-[#FAF7F0] text-[#1C1C20]': theme === 'champagne'
     }"
     class="min-h-screen font-sans antialiased relative text-left flex flex-col justify-between transition-colors duration-500 overflow-x-clip"
 >
-    <!-- Luxury Preshader (Preloader Screen) -->
+    <!-- Luxury Preshader (Preloader Screen with Raining Flowers) -->
     <div x-show="loading"
-         x-transition:leave="transition ease-in-out duration-700"
+         x-transition:leave="transition cubic-bezier(0.16, 1, 0.3, 1) duration-800"
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95 pointer-events-none"
-         class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#050507]"
+         :class="{
+             'bg-[#0B0B0D]/75 text-[#E4E4E7]': theme === 'onyx',
+             'bg-[#FAF7F0]/80 text-[#1C1C20]': theme === 'champagne'
+         }"
+         class="fixed inset-0 z-[100] overflow-hidden backdrop-blur-2xl transition-colors duration-500 flex items-center justify-center pointer-events-none"
     >
-        <div class="absolute inset-0 bg-gradient-to-tr from-black via-[#050507] to-amber-950/10 pointer-events-none"></div>
-        
-        <!-- Subtle Linen Overlay inside preloader -->
-        <div class="absolute inset-0 pointer-events-none fine-linen opacity-10" style="color: #C5A880"></div>
+        <style>
+            @keyframes rain-fall {
+                0% {
+                    transform: translateY(0) rotate(0deg);
+                }
+                100% {
+                    transform: translateY(120vh) rotate(360deg);
+                }
+            }
+        </style>
 
-        <div class="relative flex flex-col items-center space-y-6 z-10">
-            <!-- Breath-animated Monogram Outer Ring -->
-            <div class="w-20 h-20 flex items-center justify-center border border-[#C5A880]/30 rounded-full bg-neutral-900/50 backdrop-blur-md shadow-[0_0_50px_rgba(197,168,128,0.15)] animate-pulse">
-                <span class="text-xl font-mono tracking-[0.2em] text-[#C5A880] uppercase">NB</span>
+        <!-- Server-Side Rendered Falling Petals (Immediate Paint) -->
+        <div class="absolute inset-0 z-0 overflow-hidden">
+            @php
+                $petalTypes = ['rose', 'tulip', 'sakura', 'leaf'];
+                $petalColors = ['#EF4444', '#F43F5E', '#EC4899', '#F472B6', '#FCA5A5', '#F59E0B', '#B76E79', '#C5A880'];
+            @endphp
+            @for ($i = 0; $i < 40; $i++)
+                @php
+                    $left = mt_rand(0, 100);
+                    $top = mt_rand(-55, -15);
+                    $size = mt_rand(14, 40);
+                    $speed = mt_rand(22, 54) / 10; // 2.2 to 5.4 seconds
+                    $delay = mt_rand(0, 25) / 10;  // 0.0 to 2.5 seconds
+                    $rotate = mt_rand(0, 360);
+                    $type = $petalTypes[array_rand($petalTypes)];
+                    $color = $petalColors[array_rand($petalColors)];
+                @endphp
+                <div 
+                    class="absolute pointer-events-none"
+                    style="left: {{ $left }}%; top: {{ $top }}%; width: {{ $size }}px; height: {{ $size }}px; animation: rain-fall {{ $speed }}s linear infinite; animation-delay: {{ $delay }}s;"
+                >
+                    @if ($type === 'rose')
+                        <svg class="w-full h-full opacity-80" style="color: {{ $color }}; transform: rotate({{ $rotate }}deg);" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C8 6 6 10 6 14c0 3.3 2.7 6 6 6s6-2.7 6-6c0-4-2-8-6-12z" />
+                        </svg>
+                    @elseif ($type === 'tulip')
+                        <svg class="w-full h-full opacity-80" style="color: {{ $color }}; transform: rotate({{ $rotate }}deg);" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 21c-4.4 0-8-3.6-8-8 0-3.5 2-6.5 5-8l3-3 3 3c3 1.5 5 4.5 5 8 0 4.4-3.6 8-8 8z" />
+                        </svg>
+                    @elseif ($type === 'sakura')
+                        <svg class="w-full h-full opacity-80" style="color: {{ $color }}; transform: rotate({{ $rotate }}deg);" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2a4 4 0 0 0-4 4c0 2 1.5 3.5 3.5 3.9C9 10 7 12 7 14c0 2.2 1.8 4 4 4a4 4 0 0 0 4-4c0-2-1.5-3.5-3.5-3.9 2.5-.1 4.5-2.1 4.5-4.1 0-2.2-1.8-4-4-4z" />
+                        </svg>
+                    @else
+                        <svg class="w-full h-full opacity-80" style="color: {{ $color }}; transform: rotate({{ $rotate }}deg);" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17 2c-3.3 0-6 2.7-6 6 0 1 .2 2 .7 2.8L2 20.5 3.5 22l9.7-9.7c.8.5 1.8.7 2.8.7 3.3 0 6-2.7 6-6V2h-5z" />
+                        </svg>
+                    @endif
+                </div>
+            @endfor
+        </div>
+
+        <!-- Center brand overlay during load -->
+        <div class="relative flex flex-col items-center space-y-4 z-10 p-8 rounded-3xl bg-black/10 backdrop-blur-md border border-white/5 shadow-2xl">
+            <!-- Animated spinning single luxury rose bloom icon -->
+            <div class="w-16 h-16 flex items-center justify-center relative">
+                <svg class="w-12 h-12 text-[#C5A880] animate-spin-slow drop-shadow-[0_0_10px_rgba(197,168,128,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 12c2-2.5 4-3 5.5-1.5s.5 3.5-1.5 5.5S11 18 12 12z"/>
+                    <path d="M12 12c-2 2.5-4 3-5.5 1.5s-.5-3.5 1.5-5.5S13 6 12 12z"/>
+                    <path d="M12 12c2.5 2 3 4 1.5 5.5s-3.5.5-5.5-1.5S6 11 12 12z"/>
+                    <path d="M12 12c-2.5-2-3-4-1.5-5.5s3.5-.5 5.5 1.5S18 13 12 12z"/>
+                    <circle cx="12" cy="12" r="2"/>
+                </svg>
             </div>
             
-            <div class="text-center space-y-1.5">
-                <span class="text-[10px] font-mono tracking-[0.4em] text-[#C5A880] uppercase block">Atelier</span>
-                <span class="text-xs font-semibold text-white tracking-[0.3em] uppercase block font-outfit">NOIR & BLOOM</span>
-            </div>
-
-            <!-- Sleek gold progress line -->
-            <div class="w-48 h-[1px] bg-neutral-955 rounded-full overflow-hidden relative">
-                <div class="absolute left-0 top-0 h-full bg-[#C5A880] rounded-full animate-preloader-width" style="width: 0%;"></div>
+            <div class="text-center space-y-1">
+                <span class="text-[9px] font-mono tracking-[0.4em] text-neutral-450 uppercase block">Atelier</span>
+                <span :class="{
+                    'text-white': theme === 'onyx',
+                    'text-neutral-900': theme === 'champagne'
+                }" class="text-xs font-semibold tracking-[0.25em] uppercase block font-outfit">Noir & Bloom</span>
             </div>
         </div>
     </div>
@@ -243,6 +297,21 @@
 
     <!-- Stylesheet for background animations -->
     <style>
+        /* Smooth layout fade-in slide-down transition from top to bottom */
+        @keyframes layout-fade-slide-down {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-layout-transition {
+            animation: layout-fade-slide-down 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
         /* Preloader filling bar */
         @keyframes preloader-width {
             0% { width: 0%; }
@@ -330,28 +399,47 @@
             100% { opacity: 1; transform: translateY(0); }
         }
         .animate-card-fade-in {
-            animation: card-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: card-fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
     </style>
 
+    <div :class="!loading ? 'animate-layout-transition' : 'opacity-0'" class="flex-1 flex flex-col justify-between relative z-10">
 
     <!-- Interactive SVG ambient floral background overlay -->
 
     <svg id="flower-ambient-svg" wire:ignore x-data="storefrontAmbient" class="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden" style="perspective: 800px; transform-style: preserve-3d;"></svg>
 
     <!-- Fine Linen Organic Grid Overlay -->
-    <div class="absolute inset-0 pointer-events-none fine-linen z-0 opacity-80"></div>
+    <div class="absolute inset-0 pointer-events-none fine-linen z-0 opacity-[0.03]"></div>
     <header 
-        class="fixed top-4 inset-x-4 h-16 bg-white/90 border border-neutral-200/80 rounded-full z-50 transition-all duration-500 flex items-center shadow-md hover:shadow-lg group"
+        class="fixed top-4 inset-x-4 h-16 rounded-full z-50 transition-all duration-500 flex items-center shadow-md hover:shadow-lg group backdrop-blur-xl"
+        :class="{
+            'bg-[#0B0B0D]/90 border border-neutral-800/60 shadow-[0_4px_30px_rgba(0,0,0,0.3)]': theme === 'onyx',
+            'bg-white/90 border border-neutral-200/80 shadow-md': theme === 'champagne'
+        }"
     >
         {{-- FNP Green Bottom Glow Line --}}
-        <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-emerald-600/30 to-transparent"></div>
+        <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent to-transparent"
+             :class="{
+                 'via-[#C5A880]/30': theme === 'onyx',
+                 'via-emerald-600/30': theme === 'champagne',
+                 'via-[#B76E79]/30': theme === 'rose'
+             }"></div>
         <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-6">
-            <a href="/" class="shrink-0 flex items-center space-x-2 select-none cursor-pointer group-hover:scale-102 transition-transform duration-300">
-                <div class="w-8.5 h-8.5 rounded-full bg-emerald-800 flex items-center justify-center text-white font-serif italic text-sm font-semibold shadow-md shrink-0">N</div>
+            <a href="/" class="shrink-0 flex items-center select-none cursor-pointer group/brand transition-transform duration-300 hover:scale-[1.02]">
                 <div class="flex flex-col text-left leading-none">
-                    <span class="text-[9px] font-mono tracking-[0.3em] text-emerald-700 uppercase font-bold">Atelier</span>
-                    <span class="text-xs sm:text-sm md:text-base font-extrabold uppercase tracking-[0.15em] text-neutral-900 font-outfit mt-0.5">Noir & Bloom</span>
+                    <span class="text-[10px] font-mono tracking-[0.35em] uppercase font-bold brand-title-atelier transition-colors duration-500"
+                          :class="{
+                              'text-[#C5A880]': theme === 'onyx',
+                              'text-emerald-700': theme === 'champagne',
+                              'text-[#B76E79]': theme === 'rose'
+                          }">Atelier</span>
+                    <span class="text-base sm:text-lg md:text-xl font-extrabold uppercase tracking-[0.18em] font-outfit mt-0.5 brand-title-main transition-colors duration-500"
+                          :class="{
+                              'text-white': theme === 'onyx',
+                              'text-neutral-900': theme === 'champagne',
+                              'text-[#FCE7EC]': theme === 'rose'
+                          }">Noir & Bloom</span>
                 </div>
             </a>
             
@@ -364,9 +452,19 @@
                         @focus="focused = true"
                         @blur="focused = false"
                         placeholder="Search fresh flowers, luxury hampers, cakes, combinations..."
-                        class="w-full bg-neutral-50 border border-neutral-200 text-neutral-800 placeholder-neutral-400 hover:border-emerald-600 focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-600/10 rounded-full pl-10 pr-4 py-2 text-xs font-light font-sans focus:outline-none transition-all duration-300 shadow-sm"
+                        :class="{
+                            'bg-neutral-900/40 border-neutral-700 text-white placeholder-neutral-500 focus:border-[#C5A880] focus:ring-[#C5A880]/10': theme === 'onyx',
+                            'bg-neutral-50 border-neutral-200 text-neutral-800 placeholder-neutral-400 focus:border-emerald-600 focus:ring-emerald-600/10': theme === 'champagne',
+                            'bg-[#1C0A10]/40 border-[#2D121F] text-pink-100 placeholder-pink-300/40 focus:border-[#B76E79] focus:ring-[#B76E79]/10': theme === 'rose'
+                        }"
+                        class="w-full border hover:border-emerald-600 focus:bg-white rounded-full pl-10 pr-4 py-2 text-xs font-light font-sans focus:outline-none focus:ring-2 transition-all duration-300 shadow-sm"
                     >
-                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-neutral-400 group-focus-within:text-emerald-700 transition-colors">
+                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none transition-colors"
+                         :class="{
+                             'text-[#C5A880] group-focus-within:text-[#C5A880]': theme === 'onyx',
+                             'text-neutral-400 group-focus-within:text-emerald-700': theme === 'champagne',
+                             'text-[#B76E79] group-focus-within:text-[#B76E79]': theme === 'rose'
+                         }">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
                         </svg>
@@ -374,23 +472,80 @@
                 </div>
             </div>
 
-            <div class="flex items-center space-x-4 text-[12px] font-mono uppercase tracking-widest text-neutral-600">
-                <a href="{{ route('services-gifts') }}" class="hidden lg:inline-block hover:text-emerald-800 transition-colors duration-300 select-none cursor-pointer">Services</a>
+            <div class="flex items-center space-x-4 text-[12px] font-mono uppercase tracking-widest"
+                 :class="{
+                     'text-neutral-400': theme === 'onyx',
+                     'text-neutral-600': theme === 'champagne',
+                     'text-pink-200/60': theme === 'rose'
+                 }">
+                <a href="{{ route('services-gifts') }}" class="hidden lg:inline-block transition-colors duration-300 select-none cursor-pointer"
+                   :class="{
+                       'hover:text-[#C5A880]': theme === 'onyx',
+                       'hover:text-emerald-800': theme === 'champagne',
+                       'hover:text-[#B76E79]': theme === 'rose'
+                   }">Services</a>
                 <a href="{{ route('curate') }}" 
-                   class="hidden md:inline-block px-4 py-1.5 rounded-full border border-emerald-600/30 hover:border-emerald-600 hover:bg-emerald-600/5 text-emerald-800 font-medium transition-all duration-300 select-none cursor-pointer">
+                   class="hidden md:inline-block px-4 py-1.5 rounded-full font-medium transition-all duration-300 select-none cursor-pointer"
+                   :class="{
+                       'border border-[#C5A880]/30 hover:border-[#C5A880] hover:bg-[#C5A880]/5 text-[#C5A880]': theme === 'onyx',
+                       'border border-emerald-600/30 hover:border-emerald-600 hover:bg-emerald-600/5 text-emerald-800': theme === 'champagne'
+                   }">
                    Curation Studio
                 </a>
 
+                {{-- Theme Switcher (Header) --}}
+                <div class="hidden lg:flex items-center space-x-1 border rounded-full p-0.5 select-none transition-colors duration-500"
+                     :class="{
+                         'border-neutral-800 bg-neutral-900/40': theme === 'onyx',
+                         'border-neutral-200 bg-neutral-50': theme === 'champagne'
+                     }">
+                    <button @click="changeTheme('onyx')" 
+                            :class="theme === 'onyx' ? 'bg-[#C5A880] text-black shadow-sm font-semibold' : 'text-neutral-500 hover:text-neutral-800'" 
+                            class="px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center space-x-1">
+                        <span class="w-1.5 h-1.5 rounded-full" :class="theme === 'onyx' ? 'bg-black' : 'bg-neutral-600'"></span>
+                        <span>Onyx</span>
+                    </button>
+                    <button @click="changeTheme('champagne')" 
+                            :class="theme === 'champagne' ? 'bg-emerald-600 text-white shadow-sm font-semibold' : 'text-neutral-500 hover:text-neutral-800'" 
+                            class="px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center space-x-1">
+                        <span class="w-1.5 h-1.5 rounded-full" :class="theme === 'champagne' ? 'bg-white' : 'bg-neutral-400'"></span>
+                        <span>Champagne</span>
+                    </button>
+                </div>
+
+                <!-- Collapsed mobile theme switcher -->
+                <button @click="changeTheme(theme === 'onyx' ? 'champagne' : 'onyx')" 
+                        class="lg:hidden transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center rounded-full border shadow-sm"
+                        :class="{
+                            'border-neutral-700 bg-neutral-900/40 text-neutral-300 hover:text-white': theme === 'onyx',
+                            'border-neutral-200 bg-neutral-50 text-neutral-600 hover:text-neutral-900': theme === 'champagne'
+                        }"
+                        title="Cycle Theme"
+                >
+                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="5" />
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.77l1.42-1.42M18.36 5.64l1.42-1.42" />
+                    </svg>
+                </button>
+
                 {{-- Shopping Bag button --}}
                 <button @click="drawerOpen = true; checkoutMode = false;" 
-                        class="hover:text-emerald-700 transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-full bg-neutral-50 shadow-sm" 
+                        class="transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center rounded-full shadow-sm" 
+                        :class="{
+                            'border border-neutral-700 bg-neutral-900/40 text-neutral-300 hover:text-[#C5A880]': theme === 'onyx',
+                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'champagne'
+                        }"
                         title="View Curation Drawer"
                 >
-                    <svg class="w-4 h-4 stroke-current fill-none text-neutral-700" viewBox="0 0 24 24" stroke-width="2">
+                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
                         <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     @if($cartCount > 0)
-                        <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-emerald-600 text-white text-[9px] font-bold font-sans shadow-md">
+                        <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-white text-[9px] font-bold font-sans shadow-md"
+                              :class="{
+                                  'bg-[#C5A880]': theme === 'onyx',
+                                  'bg-emerald-600': theme === 'champagne'
+                              }">
                             {{ $cartCount }}
                         </span>
                     @endif
@@ -401,17 +556,32 @@
                     @auth
                         <!-- Initials-based Monogram Avatar Button (Shown when logged in) -->
                         <button @click="profileMenuOpen = !profileMenuOpen" 
-                                class="hover:border-emerald-600 border border-neutral-200 transition-all cursor-pointer select-none w-8 h-8 flex items-center justify-center rounded-full bg-neutral-100 shadow-sm"
+                                class="transition-all cursor-pointer select-none w-8 h-8 flex items-center justify-center rounded-full shadow-sm"
+                                :class="{
+                                    'hover:border-[#C5A880] border border-neutral-700 bg-neutral-900/40': theme === 'onyx',
+                                    'hover:border-emerald-600 border border-neutral-200 bg-neutral-100': theme === 'champagne',
+                                    'hover:border-[#B76E79] border border-[#2D121F] bg-[#1C0A10]/40': theme === 'rose'
+                                }"
                                 title="Profile Portal Options"
                         >
-                            <span class="text-[10px] font-mono font-bold tracking-wider text-emerald-800 uppercase">
+                            <span class="text-[10px] font-mono font-bold tracking-wider uppercase"
+                                  :class="{
+                                      'text-[#C5A880]': theme === 'onyx',
+                                      'text-emerald-800': theme === 'champagne',
+                                      'text-[#B76E79]': theme === 'rose'
+                                  }">
                                 {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
                             </span>
                         </button>
                     @else
                         <!-- Log In / Sign In Button for Guests -->
                         <button @click="profileMenuOpen = !profileMenuOpen" 
-                                class="transition-all duration-300 hover:scale-[1.03] cursor-pointer select-none px-4 h-8 flex items-center justify-center space-x-1.5 border border-neutral-200 rounded-full bg-neutral-50 text-[11px] font-sans font-light tracking-widest uppercase text-neutral-700 hover:text-emerald-800 hover:border-emerald-600"
+                                class="transition-all duration-300 hover:scale-[1.03] cursor-pointer select-none px-4 h-8 flex items-center justify-center space-x-1.5 rounded-full text-[11px] font-sans font-light tracking-widest uppercase"
+                                :class="{
+                                    'border border-neutral-700 bg-neutral-900/40 text-neutral-300 hover:text-[#C5A880] hover:border-[#C5A880]': theme === 'onyx',
+                                    'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-800 hover:border-emerald-600': theme === 'champagne',
+                                    'border border-[#2D121F] bg-[#1C0A10]/40 text-pink-200/60 hover:text-[#B76E79] hover:border-[#B76E79]': theme === 'rose'
+                                }"
                                 title="Log In or Sign In"
                         >
                             <svg class="w-3.5 h-3.5 stroke-current fill-none transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 24 24" stroke-width="1.5">
@@ -589,25 +759,22 @@
                 <div class="absolute inset-0 bg-cover bg-center select-none"
                      :class="{
                           'filter brightness-75 contrast-125 saturate-[0.8]': theme === 'onyx',
-                          'filter brightness-90 sepia-[0.15] saturate-[0.95]': theme === 'champagne',
-                          'filter brightness-75 contrast-110 saturate-[0.85]': theme === 'rose'
+                          'filter brightness-90 sepia-[0.15] saturate-[0.95]': theme === 'champagne'
                      }"
                      style="background-image: url('{{ $slide['bg_image'] }}');">
                 </div>
                 <!-- Linear Theme Blending Overlay -->
                 <div class="absolute inset-0 pointer-events-none mix-blend-multiply"
                      :class="{
-                          'bg-gradient-to-r from-[#050507]/95 via-[#050507]/50 to-transparent': theme === 'onyx',
-                          'bg-gradient-to-r from-[#FAF7F0]/95 via-[#FAF7F0]/60 to-transparent': theme === 'champagne',
-                          'bg-gradient-to-r from-[#15060A]/95 via-[#15060A]/60 to-transparent': theme === 'rose'
+                          'bg-gradient-to-r from-[#0B0B0D]/95 via-[#0B0B0D]/50 to-transparent': theme === 'onyx',
+                          'bg-gradient-to-r from-[#FAF7F0]/95 via-[#FAF7F0]/60 to-transparent': theme === 'champagne'
                      }">
                 </div>
                 <!-- Secondary Color Burn Blending -->
                 <div class="absolute inset-0 pointer-events-none mix-blend-color-burn opacity-60"
                      :class="{
                           'bg-[#0C1E1A]/10': theme === 'onyx',
-                          'bg-[#C5A880]/15': theme === 'champagne',
-                          'bg-[#B76E79]/20': theme === 'rose'
+                          'bg-[#C5A880]/15': theme === 'champagne'
                      }">
                 </div>
 
@@ -732,7 +899,7 @@
         </div>
     @endif
 
-        <h1 class="sr-only">Noir &amp; Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier</h1>
+        <h1 class="sr-only">Atelier Noir & Bloom | Premium Floral Curations &amp; Luxury Gifting Atelier</h1>
 
         <!-- FNP-Style Circular Category Navigation Menu -->
         <div class="w-full py-8">
@@ -1122,12 +1289,13 @@
 
                                 <!-- Section Grid -->
                                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid-flow-dense gap-6">
-                                    @foreach($section['items'] as $product)
+                                    @foreach($section['items'] as $index => $product)
                         @if($product->category === 'specializtion' || $product->category === 'specialization' || $product->category === 'specializations')
                             <!-- Rectangular Landscape Layout for specialized custom services (half height of standard card) -->
                             <div x-data="{ selectedSize: 'standard', basePrice: {{ $product->price }}, numberFormat(val) { return new Intl.NumberFormat().format(val); } }" 
                                  :class="theme === 'champagne' ? 'border-neutral-200 bg-white/70 shadow-sm text-neutral-900' : 'border-neutral-900/60 bg-[#0C0C0E]/50 text-white'"
                                  class="col-span-1 flex flex-row p-3 rounded-[24px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group text-left backdrop-blur-md product-card theme-section self-start min-h-[170px] animate-card-fade-in"
+                                 style="animation-delay: {{ ($index % 6) * 100 }}ms;"
                             >
                                 <!-- Left side: Squared Image Frame -->
                                 <div class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center">
@@ -1158,16 +1326,14 @@
                                             <span class="text-neutral-500 text-[8px] uppercase tracking-widest font-bold">Share:</span>
                                             <!-- Instagram Icon -->
                                             <a href="https://instagram.com" target="_blank" rel="noopener" class="hover:text-pink-500 transition-colors" title="Instagram">
-                                                <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
                                                 </svg>
                                             </a>
                                             <!-- Facebook Icon -->
                                             <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url('/')) }}" target="_blank" rel="noopener" class="hover:text-blue-500 transition-colors" title="Facebook">
-                                                <svg class="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/>
                                                 </svg>
                                             </a>
                                             <!-- X Icon -->
@@ -1202,6 +1368,7 @@
                             <div x-data="{ selectedSize: 'standard', basePrice: {{ $product->price }}, numberFormat(val) { return new Intl.NumberFormat().format(val); } }" 
                                  :class="theme === 'champagne' ? 'border-neutral-200 bg-white/70 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/50'"
                                  class="flex flex-col p-3 rounded-t-[200px] rounded-b-[32px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5 group text-left backdrop-blur-md product-card theme-section animate-card-fade-in"
+                                 style="animation-delay: {{ ($index % 6) * 100 }}ms;"
                             >
                                 <!-- Product Image Frame -->
                                 <div class="p-1 border border-neutral-500/10 rounded-t-[190px] rounded-b-[28px] overflow-hidden relative">
@@ -1210,7 +1377,7 @@
                                              class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 z-0">
                                         
                                         <div class="absolute bottom-3 inset-x-3 flex justify-between items-end z-10">
-                                            <span class="bg-[#050507]/60 border border-white/5 text-neutral-200 px-2 py-0.5 rounded text-[10px] font-outfit uppercase tracking-widest backdrop-blur-md">
+                                            <span class="bg-[#0B0B0D]/60 border border-white/5 text-neutral-200 px-2 py-0.5 rounded text-[10px] font-outfit uppercase tracking-widest backdrop-blur-md">
                                                 {{ $product->category }}
                                             </span>
                                             @if($product->grade)
@@ -1225,7 +1392,7 @@
                                 <!-- Details Section -->
                                 <div class="px-2 pt-4 pb-2 flex-1 flex flex-col justify-between">
                                     <div class="space-y-1.5">
-                                        <span class="text-[12px] uppercase tracking-[0.3em] text-neutral-400 font-outfit block font-light">Noir & Bloom Atelier</span>
+                                        <span class="text-[12px] uppercase tracking-[0.3em] text-neutral-400 font-outfit block font-light">Atelier Noir & Bloom</span>
                                         <h3 :class="theme === 'champagne' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-xl font-serif italic tracking-wider leading-snug">
                                             {{ $product->name }}
                                         </h3>
@@ -1248,17 +1415,17 @@
                                                     <span class="text-[12px] uppercase tracking-wider text-neutral-500 font-outfit">Curated Size</span>
                                                     <div class="flex items-center space-x-1.5">
                                                         <button type="button" @click="selectedSize = 'standard'" 
-                                                                :class="selectedSize === 'standard' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" 
+                                                                :class="selectedSize === 'standard' ? (theme === 'champagne' ? 'border-emerald-700 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 bg-white text-black font-semibold') : (theme === 'champagne' ? 'border-neutral-250 text-neutral-500 hover:text-neutral-700' : 'border-neutral-800/80 text-neutral-500 hover:text-neutral-300')" 
                                                                 @if($product->stock_standard <= 0) disabled title="Standard size out of stock" class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
                                                             Std
                                                          </button>
                                                         <button type="button" @click="selectedSize = 'deluxe'" 
-                                                                :class="selectedSize === 'deluxe' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" 
+                                                                :class="selectedSize === 'deluxe' ? (theme === 'champagne' ? 'border-emerald-700 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 bg-white text-black font-semibold') : (theme === 'champagne' ? 'border-neutral-250 text-neutral-500 hover:text-neutral-700' : 'border-neutral-800/80 text-neutral-500 hover:text-neutral-300')" 
                                                                 @if($product->stock_deluxe <= 0) disabled title="Deluxe size out of stock" class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
                                                             Dlx
                                                         </button>
                                                         <button type="button" @click="selectedSize = 'grand'" 
-                                                                :class="selectedSize === 'grand' ? 'border-neutral-800 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-white dark:text-black font-semibold' : 'border-neutral-250 text-neutral-500 hover:text-neutral-700 dark:border-neutral-800/80'" 
+                                                                :class="selectedSize === 'grand' ? (theme === 'champagne' ? 'border-emerald-700 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 bg-white text-black font-semibold') : (theme === 'champagne' ? 'border-neutral-250 text-neutral-500 hover:text-neutral-700' : 'border-neutral-800/80 text-neutral-500 hover:text-neutral-300')" 
                                                                 @if($product->stock_grand <= 0) disabled title="Grand size out of stock" class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
                                                             Gnd
                                                         </button>
@@ -1278,25 +1445,23 @@
                                             <div :class="theme === 'champagne' ? 'text-neutral-600' : 'text-neutral-400'" class="flex items-center justify-between border-t border-neutral-500/10 pt-2.5 text-[10px] font-outfit uppercase tracking-widest">
                                                 <span>Share:</span>
                                                 <div class="flex items-center space-x-3">
-                                                    <!-- WhatsApp Icon -->
-                                                    <a href="https://api.whatsapp.com/send?text=Check%20out%20this%20stunning%20{{ urlencode($product->name) }}%20arrangement%20at%20Noir%20%26%20Bloom:%20{{ urlencode(url('/')) }}" 
-                                                       target="_blank" rel="noopener" class="hover:text-emerald-500 transition-colors" title="Share via WhatsApp">
+                                                    <!-- Instagram Icon -->
+                                                    <a href="https://instagram.com" target="_blank" rel="noopener" class="hover:text-pink-500 transition-colors" title="Instagram">
                                                         <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                                                            <path d="M17.472 14.382c-.022-.08-.117-.146-.217-.196-.1-.05-1.002-.494-1.157-.552-.155-.058-.268-.088-.38.08-.112.167-.432.552-.53.662-.097.11-.197.125-.297.075-.1-.05-.422-.156-.803-.496-.297-.265-.497-.592-.555-.693-.058-.1-.006-.153.044-.203.045-.045.1-.117.15-.175.05-.058.067-.1.1-.167.033-.066.017-.125-.008-.175-.025-.05-.268-.646-.367-.883-.097-.235-.195-.203-.268-.203-.07 0-.15 0-.23 0-.08 0-.21.03-.32.15-.11.12-.42.41-.42 1.01s.44 1.18.5 1.26c.06.08.86 1.31 2.08 1.84.29.12.51.2.69.26.3.09.57.08.78.05.24-.03.73-.3 1.01-.58.28-.28.28-.58.26-.66zm-5.46-8.7c-4.148 0-7.53 3.38-7.53 7.53 0 1.32.345 2.613 1.003 3.753L4.5 20.5l3.65-.957c1.097.6 2.33.914 3.593.914 4.148 0 7.53-3.38 7.53-7.53 0-4.15-3.382-7.53-7.53-7.53zm0 13.82c-1.13 0-2.242-.3-3.213-.88l-.23-.136-2.39.626.637-2.33-.15-.24c-.64-.993-.978-2.15-.978-3.33 0-3.418 2.78-6.2 6.2-6.2s6.2 2.782 6.2 6.2-2.78 6.2-6.2 6.2z"/>
+                                                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+                                                        </svg>
+                                                    </a>
+                                                    <!-- Facebook Icon -->
+                                                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url('/')) }}" target="_blank" rel="noopener" class="hover:text-blue-500 transition-colors" title="Facebook">
+                                                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                                            <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/>
                                                         </svg>
                                                     </a>
                                                     <!-- X Icon -->
-                                                    <a href="https://twitter.com/intent/tweet?text=Loving%20the%20premium%20{{ urlencode($product->name) }}%20curation%20from%20@NoirAndBloom.%20Check%20it%20out:&url={{ urlencode(url('/')) }}" 
+                                                    <a href="https://twitter.com/intent/tweet?text=Loving%20the%20premium%20{{ urlencode($product->name) }}%20curation%2520from%20@NoirAndBloom.%20Check%20it%20out:&url={{ urlencode(url('/')) }}" 
                                                        target="_blank" rel="noopener" :class="theme === 'champagne' ? 'hover:text-black' : 'hover:text-white'" class="transition-colors" title="Share on X">
                                                         <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
                                                             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                                                        </svg>
-                                                    </a>
-                                                    <!-- Pinterest Icon -->
-                                                    <a href="https://pinterest.com/pin/create/button/?url={{ urlencode(url('/')) }}&media={{ urlencode($product->backdrop_url) }}&description=Noir%20%26%20Bloom%20-%20{{ urlencode($product->name) }}" 
-                                                       target="_blank" rel="noopener" class="hover:text-rose-500 transition-colors" title="Pin to Pinterest">
-                                                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                                                            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.947-.199-2.399.041-3.429.218-.927 1.408-5.965 1.408-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.204 0 1.03.397 2.133.893 2.734.1.121.114.227.085.345-.093.389-.3.122-.345-.067-.5-.208-1.579-.854-1.579-2.858 0-3.791 2.756-7.276 7.95-7.276 4.174 0 7.417 2.974 7.417 6.953 0 4.148-2.613 7.486-6.241 7.486-1.218 0-2.363-.633-2.756-1.379l-.752 2.863c-.272 1.04-.997 2.346-1.488 3.149 1.096.337 2.257.519 3.46.519 6.621 0 11.988-5.367 11.988-11.987C24.004 5.367 18.638 0 12.017 0z"/>
                                                         </svg>
                                                     </a>
                                                 </div>
@@ -1319,35 +1484,74 @@
                     @endif
                 </div>
 
-                <!-- Manual Scroll Loader Button & Curation End Marker -->
-                <div class="col-span-full py-16 flex flex-col items-center justify-center">
+                <!-- Infinite Scroll Auto-Loader & Curation End Marker -->
+                <div class="col-span-full py-12 flex flex-col items-center justify-center">
                     @if($hasMore)
                         <div 
-                            x-data="{ loading: false }"
-                            class="flex flex-col items-center justify-center space-y-3"
+                            x-data="{
+                                loading: false,
+                                observer: null,
+                                init() {
+                                    var self = this;
+                                    self.observer = new IntersectionObserver(function(entries) {
+                                        entries.forEach(function(entry) {
+                                            if (entry.isIntersecting && !self.loading) {
+                                                self.loading = true;
+                                                $wire.loadMore().then(function() {
+                                                    setTimeout(function() { self.loading = false; }, 400);
+                                                });
+                                            }
+                                        });
+                                    }, { rootMargin: '1000px' });
+                                    self.observer.observe(self.$el);
+                                },
+                                destroy() {
+                                    if (this.observer) this.observer.disconnect();
+                                }
+                            }"
+                            class="flex flex-col items-center justify-center space-y-4 w-full"
                         >
-                            <button 
-                                @click="
-                                    loading = true;
-                                    $wire.loadMore();
-                                    setTimeout(() => { loading = false; }, 1000);
-                                "
-                                :disabled="loading"
-                                :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'"
-                                class="px-6 py-3 rounded-full text-[11px] font-mono uppercase tracking-[0.25em] font-bold shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center space-x-2"
-                            >
-                                <svg x-show="loading" class="animate-spin h-3.5 w-3.5 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <!-- Shimmer skeleton loading indicator -->
+                            <div x-show="loading" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+                                <template x-for="i in 3" :key="i">
+                                    <div class="animate-pulse rounded-2xl overflow-hidden"
+                                         :class="theme === 'champagne' ? 'bg-neutral-100' : 'bg-neutral-900/40'">
+                                        <div class="aspect-[4/5] rounded-t-2xl"
+                                             :class="theme === 'champagne' ? 'bg-neutral-200' : 'bg-neutral-800'"></div>
+                                        <div class="p-4 space-y-3">
+                                            <div class="h-3 rounded-full w-3/4"
+                                                 :class="theme === 'champagne' ? 'bg-neutral-200' : 'bg-neutral-800'"></div>
+                                            <div class="h-2 rounded-full w-1/2"
+                                                 :class="theme === 'champagne' ? 'bg-neutral-200' : 'bg-neutral-800'"></div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- Subtle loading text -->
+                            <div x-show="loading" class="flex items-center space-x-2 py-2">
+                                <svg class="animate-spin h-3.5 w-3.5" :class="theme === 'champagne' ? 'text-neutral-400' : 'text-neutral-600'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" class="opacity-25"></circle>
                                     <path d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor"></path>
                                 </svg>
-                                <span x-text="loading ? 'Unveiling...' : 'Unveil More Curations'"></span>
-                            </button>
+                                <span class="text-[10px] font-mono uppercase tracking-[0.3em]" :class="theme === 'champagne' ? 'text-neutral-400' : 'text-neutral-600'">Curating more...</span>
+                            </div>
                         </div>
                     @else
-                        <!-- Elegant Market Friendly End of Curation Marker -->
+                        <!-- Elegant End of Curation Marker -->
                         <div class="flex flex-col items-center space-y-2 py-4 animate-hero-fade">
-                            <div class="h-[1px] w-24 bg-gradient-to-r from-transparent via-[#C5A880] to-transparent mb-1"></div>
-                            <span class="text-[11px] font-mono uppercase tracking-[0.3em] text-amber-600 block">&bull; End of Atelier Curation &bull;</span>
+                            <div class="h-[1px] w-32 bg-gradient-to-r from-transparent to-transparent mb-1"
+                                 :class="{
+                                     'via-[#C5A880]': theme === 'onyx',
+                                     'via-emerald-600': theme === 'champagne',
+                                     'via-[#B76E79]': theme === 'rose'
+                                 }"></div>
+                            <span class="text-[11px] font-mono uppercase tracking-[0.3em] block"
+                                  :class="{
+                                      'text-[#C5A880]': theme === 'onyx',
+                                      'text-emerald-700': theme === 'champagne',
+                                      'text-[#B76E79]': theme === 'rose'
+                                  }">&bull; End of Atelier Curation &bull;</span>
                             <span class="text-[11px] font-light text-neutral-500 font-serif italic">Every flower hand-selected, every gift packaged with devotion.</span>
                         </div>
                     @endif
@@ -1364,28 +1568,18 @@
             'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'champagne',
             'border-[#2D0D19]/40 bg-[#1D0C13] text-neutral-300': theme === 'rose'
         }"
-        class="border-t mt-32 py-16 px-6 transition-colors duration-500 z-10 relative theme-section"
+        class="border-t mt-20 py-10 px-6 transition-colors duration-500 z-10 relative theme-section"
     >
-        <div class="max-w-8xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-left">
-            <!-- Col 1: Brand & Coordinates -->
+        <div class="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
+            <!-- Col 1: Brand & Info -->
             <div class="space-y-4">
                 <div class="flex items-baseline space-x-2">
                     <span class="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
-                    <h4 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">NOIR & BLOOM</h4>
+                    <h4 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">Noir & Bloom</h4>
                 </div>
                 <p class="text-xs font-light leading-relaxed max-w-xs">
                     Premium floral curation, bespoke gifting suites, and high-end events concierge. Sourcing directly from Rift Valley growers.
                 </p>
-                <div class="space-y-1 text-[12px] font-mono text-neutral-500">
-                    <div class="flex items-center space-x-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-                        <span>Nairobi: 1.2921° S, 36.8219° E</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-                        <span>Kiambu: 1.1478° S, 36.8524° E</span>
-                    </div>
-                </div>
             </div>
 
             <!-- Col 2: Showroom & Catalog -->
@@ -1433,12 +1627,102 @@
             </div>
         </div>
 
-        <div :class="theme === 'champagne' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-8xl w-full mx-auto border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
-            <p>&copy; {{ date('Y') }} Noir &amp; Bloom Ltd. Registered Tax Entity.</p>
+        <div :class="theme === 'champagne' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-5xl w-full mx-auto border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
+            <p>&copy; {{ date('Y') }} Atelier Noir & Bloom. All rights reserved.</p>
+            
+            {{-- Social Media Icons --}}
+            <div class="flex items-center space-x-3.5">
+                {{-- Instagram --}}
+                <a href="https://instagram.com/noirandbloom" target="_blank" rel="noopener"
+                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
+                   :class="{
+                       'border-neutral-800 text-neutral-500 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.3)]': theme === 'onyx',
+                       'border-neutral-200 text-neutral-400 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.25)]': theme === 'champagne',
+                       'border-[#2D121F] text-pink-300/40 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.3)]': theme === 'rose'
+                   }"
+                   title="Follow us on Instagram">
+                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+                    </svg>
+                </a>
+                {{-- Facebook --}}
+                <a href="https://facebook.com/noirandbloom" target="_blank" rel="noopener"
+                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
+                   :class="{
+                       'border-neutral-800 text-neutral-500 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.3)]': theme === 'onyx',
+                       'border-neutral-200 text-neutral-400 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.25)]': theme === 'champagne',
+                       'border-[#2D121F] text-pink-300/40 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.3)]': theme === 'rose'
+                   }"
+                   title="Follow us on Facebook">
+                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/>
+                    </svg>
+                </a>
+                {{-- X (Twitter) --}}
+                <a href="https://twitter.com/NoirAndBloom" target="_blank" rel="noopener"
+                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
+                   :class="{
+                       'border-neutral-800 text-neutral-500 hover:text-white hover:border-white hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]': theme === 'onyx',
+                       'border-neutral-200 text-neutral-400 hover:text-black hover:border-black hover:shadow-[0_0_15px_rgba(0,0,0,0.15)]': theme === 'champagne',
+                       'border-[#2D121F] text-pink-300/40 hover:text-[#FCE7EC] hover:border-[#FCE7EC] hover:shadow-[0_0_15px_rgba(252,231,236,0.2)]': theme === 'rose'
+                   }"
+                   title="Follow us on X (Twitter)">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+                {{-- Pinterest --}}
+                <a href="https://pinterest.com/noirandbloom" target="_blank" rel="noopener"
+                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
+                   :class="{
+                       'border-neutral-800 text-neutral-500 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.3)]': theme === 'onyx',
+                       'border-neutral-200 text-neutral-400 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.25)]': theme === 'champagne',
+                       'border-[#2D121F] text-pink-300/40 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.3)]': theme === 'rose'
+                   }"
+                   title="Follow us on Pinterest">
+                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.395-5.92 1.395-5.92s-.36-.715-.36-1.777c0-1.664.962-2.907 2.162-2.907 1.02 0 1.513.766 1.513 1.682 0 1.026-.65 2.558-.99 3.978-.282 1.187.592 2.155 1.764 2.155 2.113 0 3.738-2.23 3.738-5.447 0-2.848-2.049-4.839-4.969-4.839-3.385 0-5.372 2.54-5.372 5.163 0 1.023.392 2.122.882 2.719.098.118.113.22.083.342-.09.378-.292 1.189-.331 1.348-.052.21-.173.253-.399.148-1.492-.695-2.423-2.88-2.423-4.636 0-3.774 2.744-7.24 7.907-7.24 4.15 0 7.375 2.957 7.375 6.9 0 4.124-2.597 7.443-6.204 7.443-1.213 0-2.355-.63-2.744-1.373l-.747 2.847c-.269 1.027-.997 2.316-1.488 3.118 4.417 1.282 9.21.365 12.825-2.525C22.617 19.387 24 15.86 24 11.987 24 5.367 18.63 0 12.017 0z"/>
+                    </svg>
+                </a>
+                {{-- WhatsApp --}}
+                <a href="https://wa.me/254712345678" target="_blank" rel="noopener"
+                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
+                   :class="{
+                       'border-neutral-800 text-neutral-500 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.3)]': theme === 'onyx',
+                       'border-neutral-200 text-neutral-400 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.25)]': theme === 'champagne',
+                       'border-[#2D121F] text-pink-300/40 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.3)]': theme === 'rose'
+                   }"
+                   title="Chat with us on WhatsApp">
+                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M19.005 3.175C17.252 1.42 14.927.453 12.443.453 7.429.453 3.353 4.53 3.353 9.544c0 1.602.418 3.167 1.213 4.544L2.247 22.25l8.36-2.193c1.332.726 2.828 1.11 4.363 1.112h.006c5.011 0 9.088-4.076 9.088-9.09 0-2.43-.946-4.714-2.703-6.471l-.356-.356zm-6.562 16.92c-1.442-.002-2.857-.388-4.095-1.116l-.294-.174-5.043 1.323 1.347-4.923-.19-.304c-.8-1.272-1.222-2.742-1.22-4.26.002-4.42 3.6-8.016 8.026-8.016 2.14 0 4.153.834 5.666 2.348 1.513 1.513 2.345 3.526 2.343 5.67-.004 4.42-3.601 8.018-8.026 8.018l-.534-.016zm4.414-6.027c-.242-.12-1.432-.707-1.654-.788-.222-.08-.383-.12-.544.12-.16.242-.624.788-.765.947-.14.16-.282.18-.523.06-.24-.12-1.018-.374-1.94-1.196-.718-.64-1.202-1.43-1.343-1.67-.14-.242-.015-.373.106-.493.11-.108.242-.282.363-.423.12-.14.16-.242.242-.403.08-.16.04-.302-.02-.423-.06-.12-.544-1.31-.746-1.794-.197-.473-.396-.408-.544-.416-.14-.007-.302-.007-.463-.007s-.423.06-.644.302c-.22.242-.845.826-.845 2.015 0 1.19.865 2.338.986 2.5.12.16 1.704 2.602 4.13 3.65.577.248.995.397 1.353.51.58.185 1.107.159 1.523.097.464-.068 1.432-.585 1.633-1.15.202-.564.202-1.047.14-1.15-.06-.102-.222-.162-.463-.282z"/>
+                    </svg>
+                </a>
+            </div>
+
+            {{-- Theme Switcher Pill --}}
+            <div class="flex items-center space-x-1 border rounded-full p-1 select-none transition-colors duration-500"
+                 :class="{
+                     'border-neutral-800 bg-neutral-900/40': theme === 'onyx',
+                     'border-neutral-200 bg-neutral-50': theme === 'champagne'
+                 }">
+                <button @click="changeTheme('onyx')" 
+                        :class="theme === 'onyx' ? 'bg-[#C5A880] text-black shadow-sm font-semibold' : 'text-neutral-500 hover:text-[#C5A880]'" 
+                        class="w-6 h-6 rounded-full text-[8px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center justify-center cursor-pointer"
+                        title="Onyx Theme">
+                    <span class="w-2 h-2 rounded-full" :class="theme === 'onyx' ? 'bg-black' : 'bg-neutral-600'"></span>
+                </button>
+                <button @click="changeTheme('champagne')" 
+                        :class="theme === 'champagne' ? 'bg-[#B59A7A] text-black shadow-sm font-semibold' : 'text-neutral-500 hover:text-[#B59A7A]'" 
+                        class="w-6 h-6 rounded-full text-[8px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center justify-center cursor-pointer"
+                        title="Champagne Theme">
+                    <span class="w-2 h-2 rounded-full" :class="theme === 'champagne' ? 'bg-white' : 'bg-neutral-400'"></span>
+                </button>
+            </div>
+
             <div class="flex space-x-6">
-                <a href="#" class="hover:text-neutral-400">Terms of Curation</a>
-                <a href="#" class="hover:text-neutral-400">Logistics Policy</a>
-                <a href="#" class="hover:text-neutral-400">eTIMS Verification</a>
+                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Terms of Curation</a>
+                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Logistics Policy</a>
+                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">eTIMS Verification</a>
             </div>
         </div>
     </footer>
@@ -1887,11 +2171,6 @@
                     <span class="text-xs uppercase font-mono text-neutral-300 tracking-wider font-semibold">Aura Concierge AI</span>
                     <span class="block text-[11px] text-emerald-400 font-mono mt-0.5">&bull; Active Curation Companion</span>
                 </div>
-                <button @click="chatOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Chat">
-                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </button>
             </div>
             <div class="flex-1 p-4 overflow-y-auto space-y-4 text-xs font-light scrollbar-none flex flex-col text-left">
                 @foreach($chatHistory as $msg)
@@ -2035,4 +2314,5 @@
         </div>
     </div>
 
+    </div>
 </div>

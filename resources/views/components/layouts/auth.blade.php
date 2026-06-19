@@ -14,7 +14,8 @@
     <!-- Persistent Theme Bootstrap -->
     <script>
         (function() {
-            const theme = localStorage.getItem('nb_theme') || 'onyx';
+            const storedTheme = localStorage.getItem('nb_theme');
+            const theme = (storedTheme === 'onyx' || storedTheme === 'champagne') ? storedTheme : 'onyx';
             document.documentElement.className = theme;
             document.documentElement.setAttribute('data-theme', theme);
         })();
@@ -70,7 +71,7 @@
         }
     </style>
 </head>
-<body x-data="{ theme: localStorage.getItem('nb_theme') || 'onyx' }" class="bg-bg-base text-text-primary antialiased font-sans transition-colors duration-500 selection:bg-rose-950 selection:text-rose-200 min-h-screen">
+<body x-data="{ theme: (localStorage.getItem('nb_theme') === 'onyx' || localStorage.getItem('nb_theme') === 'champagne') ? localStorage.getItem('nb_theme') : 'onyx' }" class="bg-bg-base text-text-primary antialiased font-sans transition-colors duration-500 selection:bg-[#C5A880]/30 selection:text-neutral-200 min-h-screen">
 
     <div class="min-h-screen flex flex-col lg:flex-row">
 
@@ -78,8 +79,7 @@
         <div 
             :class="{
                 'auth-gradient-onyx border-neutral-900/40': theme === 'onyx',
-                'auth-gradient-champagne border-[#E8E2D5]/50': theme === 'champagne',
-                'auth-gradient-rose border-[#2D0D19]/30': theme === 'rose'
+                'auth-gradient-champagne border-[#E8E2D5]/50': theme === 'champagne'
             }"
             class="hidden lg:flex lg:w-[45%] xl:w-[42%] relative overflow-hidden grain transition-colors duration-500"
         >
@@ -88,8 +88,7 @@
             <div class="absolute inset-0 bg-cover bg-center select-none z-0"
                  :class="{
                      'filter brightness-[0.45] contrast-[1.15] saturate-[0.8]': theme === 'onyx',
-                     'filter brightness-[0.95] sepia-[0.1] saturate-[0.8]': theme === 'champagne',
-                     'filter brightness-[0.45] contrast-[1.1] saturate-[0.7] font-semibold': theme === 'rose'
+                     'filter brightness-[0.95] sepia-[0.1] saturate-[0.8]': theme === 'champagne'
                  }"
                  style="background-image: url('{{ asset('media/auth_flower_bg.png') }}');">
             </div>
@@ -97,9 +96,8 @@
             <!-- Linear Theme Blending Overlay -->
             <div class="absolute inset-0 pointer-events-none mix-blend-multiply z-0"
                  :class="{
-                     'bg-gradient-to-b from-[#050507]/90 via-[#050507]/40 to-[#050507]/90': theme === 'onyx',
-                     'bg-gradient-to-b from-[#FAF7F0]/90 via-[#FAF7F0]/60 to-[#FAF7F0]/90': theme === 'champagne',
-                     'bg-gradient-to-b from-[#15060A]/90 via-[#15060A]/50 to-[#15060A]/90': theme === 'rose'
+                     'bg-gradient-to-b from-[#0B0B0D]/90 via-[#0B0B0D]/40 to-[#0B0B0D]/90': theme === 'onyx',
+                     'bg-gradient-to-b from-[#FAF7F0]/90 via-[#FAF7F0]/60 to-[#FAF7F0]/90': theme === 'champagne'
                  }">
             </div>
 
@@ -107,8 +105,7 @@
             <div class="absolute inset-0 pointer-events-none mix-blend-color-burn opacity-60 z-0"
                  :class="{
                      'bg-[#0C1E1A]/10': theme === 'onyx',
-                     'bg-[#C5A880]/15': theme === 'champagne',
-                     'bg-[#B76E79]/20': theme === 'rose'
+                     'bg-[#C5A880]/15': theme === 'champagne'
                  }">
             </div>
 
@@ -187,9 +184,8 @@
         {{-- Right Form Panel --}}
         <div 
             :class="{
-                'bg-[#050507]': theme === 'onyx',
-                'bg-[#FAF7F0]': theme === 'champagne',
-                'bg-[#15060A]': theme === 'rose'
+                'bg-[#0B0B0D]': theme === 'onyx',
+                'bg-[#FAF7F0]': theme === 'champagne'
             }"
             class="flex-1 flex flex-col min-h-screen relative z-10 transition-colors duration-500 overflow-hidden"
         >
@@ -199,8 +195,7 @@
                 <div 
                     :class="{
                         'ambient-glow-onyx': theme === 'onyx',
-                        'ambient-glow-champagne': theme === 'champagne',
-                        'ambient-glow-rose': theme === 'rose'
+                        'ambient-glow-champagne': theme === 'champagne'
                     }"
                     class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-90 transition-all duration-500"
                 ></div>

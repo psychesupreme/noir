@@ -1,24 +1,24 @@
 @section('meta')
-    <meta name="description" content="Explore Noir & Bloom's specialized corporate floral services, wedding designs, workspace subscriptions, and premium gifting hampers. Order directly online.">
+    <meta name="description" content="Explore Atelier Noir & Bloom's specialized corporate floral services, wedding designs, workspace subscriptions, and premium gifting hampers. Order directly online.">
     <meta name="keywords" content="wedding flowers Kenya, corporate flower subscription Nairobi, flower subscriptions Kiambu, custom gift hampers Nairobi, luxury event florist">
-    <meta name="author" content="Noir & Bloom Atelier">
+    <meta name="author" content="Atelier Noir & Bloom">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ url()->current() }}">
 
     <!-- Open Graph (Facebook / Pinterest / LinkedIn) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="Bespoke Services &amp; Luxury Gifting Suites | Noir &amp; Bloom">
-    <meta property="og:description" content="Explore Noir & Bloom's specialized corporate floral services, wedding designs, workspace subscriptions, and premium gifting hampers. Order directly online.">
+    <meta property="og:title" content="Bespoke Services &amp; Luxury Gifting Suites | Atelier Noir & Bloom">
+    <meta property="og:description" content="Explore Atelier Noir & Bloom's specialized corporate floral services, wedding designs, workspace subscriptions, and premium gifting hampers. Order directly online.">
     <meta property="og:image" content="{{ asset('media/og-services.jpg') }}">
-    <meta property="og:site_name" content="Noir & Bloom">
+    <meta property="og:site_name" content="Atelier Noir & Bloom">
     <meta property="og:locale" content="en_KE">
 
     <!-- Twitter / X Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{{ url()->current() }}">
-    <meta name="twitter:title" content="Bespoke Services &amp; Luxury Gifting Suites | Noir &amp; Bloom">
-    <meta name="twitter:description" content="Explore Noir & Bloom's specialized corporate floral services, wedding designs, workspace subscriptions, and premium gifting hampers. Order directly online.">
+    <meta name="twitter:title" content="Bespoke Services &amp; Luxury Gifting Suites | Atelier Noir & Bloom">
+    <meta name="twitter:description" content="Explore Atelier Noir & Bloom's specialized corporate floral services, wedding designs, workspace subscriptions, and premium gifting hampers. Order directly online.">
     <meta name="twitter:image" content="{{ asset('media/og-services.jpg') }}">
     <meta name="twitter:site" content="@NoirAndBloom">
 
@@ -30,7 +30,7 @@
         {
           "@type": "LocalBusiness",
           "@id": "{{ url('/') }}/#nairobi-branch",
-          "name": "Noir &amp; Bloom - Nairobi Atelier",
+          "name": "Atelier Noir & Bloom - Nairobi Branch",
           "image": "{{ asset('media/nairobi-atelier.jpg') }}",
           "telephone": "+254-712-345-678",
           "url": "{{ url('/') }}",
@@ -62,7 +62,7 @@
         {
           "@type": "LocalBusiness",
           "@id": "{{ url('/') }}/#kiambu-branch",
-          "name": "Noir &amp; Bloom - Kiambu Atelier",
+          "name": "Atelier Noir & Bloom - Kiambu Branch",
           "image": "{{ asset('media/kiambu-atelier.jpg') }}",
           "telephone": "+254-712-345-678",
           "url": "{{ url('/') }}",
@@ -98,7 +98,7 @@
 
 <div 
     x-data="{ 
-        theme: localStorage.getItem('nb_theme') || 'onyx',
+        theme: (localStorage.getItem('nb_theme') === 'onyx' || localStorage.getItem('nb_theme') === 'champagne') ? localStorage.getItem('nb_theme') : 'onyx',
         hoverTheme: null,
         changeTheme(targetTheme) {
             if (this.theme === targetTheme) return;
@@ -111,14 +111,12 @@
             document.documentElement.className = val; 
             document.documentElement.setAttribute('data-theme', val);
             const bgColors = {
-                'onyx': '#050507',
-                'champagne': '#FAF7F0',
-                'rose': '#15060A'
+                'onyx': '#0B0B0D',
+                'champagne': '#FAF7F0'
             };
             const textColors = {
-                'onyx': '#F4F4F5',
-                'champagne': '#1C1917',
-                'rose': '#FCE7EC'
+                'onyx': '#E4E4E7',
+                'champagne': '#1C1C20'
             };
             document.documentElement.style.backgroundColor = bgColors[val];
             document.documentElement.style.color = textColors[val];
@@ -136,7 +134,7 @@
     <canvas id="flower-ambient-canvas" wire:ignore x-data="canvasAmbient" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
     <!-- Fine Grain Noise Overlay -->
-    <div class="absolute inset-0 pointer-events-none storefront-grain z-0 opacity-80"></div>
+    <div class="absolute inset-0 pointer-events-none storefront-grain z-0 opacity-[0.03]"></div>
     
     <!-- Luxury Cohesive Header -->
     <header 
@@ -150,11 +148,20 @@
         <!-- Gold Accent Bottom Glow Line -->
         <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent via-[#C5A880]/30 to-transparent"></div>
         <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-8">
-            <a href="/" class="shrink-0 flex items-center space-x-2 select-none cursor-pointer group-hover:scale-102 transition-transform duration-300">
-                <div class="w-8.5 h-8.5 rounded-full bg-emerald-800 flex items-center justify-center text-white font-serif italic text-sm font-semibold shadow-md shrink-0">N</div>
+            <a href="/" class="shrink-0 flex items-center select-none cursor-pointer group/brand transition-transform duration-300 hover:scale-[1.02]">
                 <div class="flex flex-col text-left leading-none">
-                    <span class="text-[9px] font-mono tracking-[0.3em] text-emerald-700 uppercase font-bold">Atelier</span>
-                    <span :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" class="text-xs sm:text-sm md:text-base font-extrabold uppercase tracking-[0.15em] font-outfit mt-0.5">Noir & Bloom</span>
+                    <span class="text-[10px] font-mono tracking-[0.35em] uppercase font-bold brand-title-atelier transition-colors duration-500"
+                          :class="{
+                              'text-[#C5A880]': theme === 'onyx',
+                              'text-emerald-700': theme === 'champagne',
+                              'text-[#B76E79]': theme === 'rose'
+                          }">Atelier</span>
+                    <span class="text-base sm:text-lg md:text-xl font-extrabold uppercase tracking-[0.18em] font-outfit mt-0.5 brand-title-main transition-colors duration-500"
+                          :class="{
+                              'text-white': theme === 'onyx',
+                              'text-neutral-900': theme === 'champagne',
+                              'text-[#FCE7EC]': theme === 'rose'
+                          }">Noir & Bloom</span>
                 </div>
             </a>
             <!-- Spacing column to balance layout -->
@@ -169,7 +176,7 @@
                    Curate Your Arrangement
                 </a>
 
-                <!-- Theme Switcher Pill (3 options, desktop only) -->
+                <!-- Theme Switcher Pill (2 options, desktop only) -->
                 <div class="hidden lg:flex items-center space-x-1 border border-neutral-500/10 rounded-full bg-neutral-500/5 p-1 animate-nav-item select-none relative" style="animation-delay: 300ms;">
                     <button @click="changeTheme('onyx')" 
                             @mouseenter="hoverTheme = 'onyx'" 
@@ -186,14 +193,6 @@
                             class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
                         <span class="w-1 h-1 rounded-full bg-current"></span>
                         <span>Champagne</span>
-                    </button>
-                    <button @click="changeTheme('rose')" 
-                            @mouseenter="hoverTheme = 'rose'" 
-                            @mouseleave="hoverTheme = null" 
-                            :class="theme === 'rose' ? 'bg-[#B76E79] text-black shadow-sm font-semibold' : 'text-neutral-400 hover:text-[#B76E79] hover:bg-[#B76E79]/10'" 
-                            class="px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center space-x-1 cursor-pointer">
-                        <span class="w-1 h-1 rounded-full bg-current"></span>
-                        <span>Rose</span>
                     </button>
 
                     <!-- Theme Hover Preview Popover Card -->
@@ -229,22 +228,11 @@
                                 <span class="w-4 h-4 rounded-full border border-neutral-200 bg-[#1C1917]" title="Text"></span>
                             </div>
                         </div>
-
-                        <!-- Rose Preview Content -->
-                        <div x-show="hoverTheme === 'rose'" class="space-y-2">
-                            <span class="font-bold text-[#B76E79] tracking-wider uppercase text-[10px] block">Rose Theme</span>
-                            <p class="text-neutral-450 text-[11px] leading-relaxed font-light">Blushing Burgundy & Rose Quartz. A rich, romantic dark mode inspired by fresh Kenyan spray roses.</p>
-                            <div class="flex items-center space-x-1 pt-1">
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#15060A]" title="Background"></span>
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#B76E79]" title="Accent"></span>
-                                <span class="w-4 h-4 rounded-full border border-neutral-800 bg-[#FCE7EC]" title="Text"></span>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
                 <!-- Collapsed mobile theme switcher -->
-                <button @click="changeTheme(theme === 'onyx' ? 'champagne' : (theme === 'champagne' ? 'rose' : 'onyx'))" 
+                <button @click="changeTheme(theme === 'onyx' ? 'champagne' : 'onyx')" 
                         class="lg:hidden hover:text-neutral-200 transition-colors cursor-pointer select-none relative w-8 h-8 flex items-center justify-center border border-neutral-500/10 rounded-full bg-neutral-500/5 animate-nav-item"
                         style="animation-delay: 300ms;"
                         title="Cycle Theme"
@@ -411,7 +399,7 @@
 
     <main class="max-w-8xl w-full mx-auto px-6 pt-32 flex-1 flex flex-col z-10 relative">
         <div class="space-y-4 mb-12">
-            <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-[#C5A880] block">Noir & Bloom Atelier</span>
+            <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-[#C5A880] block">Atelier Noir & Bloom</span>
             <h1 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-4xl sm:text-5xl font-outfit font-semibold uppercase tracking-wider leading-tight">
                 Services &amp; Gifting Accents
             </h1>
@@ -551,28 +539,18 @@
             'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'champagne',
             'border-[#2D0D19]/40 bg-[#1D0C13] text-neutral-300': theme === 'rose'
         }"
-        class="border-t mt-32 py-16 px-6 transition-colors duration-500 z-10 relative theme-section"
+        class="border-t mt-20 py-10 px-6 transition-colors duration-500 z-10 relative theme-section"
     >
-        <div class="max-w-8xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-left">
-            <!-- Col 1: Brand Coordinates -->
+        <div class="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
+            <!-- Col 1: Brand & Info -->
             <div class="space-y-4">
                 <div class="flex items-baseline space-x-2">
                     <span class="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
-                    <h4 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">NOIR & BLOOM</h4>
+                    <h4 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">Noir & Bloom</h4>
                 </div>
                 <p class="text-xs font-light leading-relaxed max-w-xs">
                     Premium floral curation, bespoke gifting suites, and high-end events concierge. Sourcing directly from Rift Valley growers.
                 </p>
-                <div class="space-y-1 text-[12px] font-mono text-neutral-500">
-                    <div class="flex items-center space-x-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-                        <span>Nairobi: 1.2921° S, 36.8219° E</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-neutral-400"></span>
-                        <span>Kiambu: 1.1478° S, 36.8524° E</span>
-                    </div>
-                </div>
             </div>
 
             <!-- Col 2: Showroom Catalog Links -->
@@ -620,12 +598,77 @@
             </div>
         </div>
 
-        <div :class="theme === 'champagne' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-8xl w-full mx-auto border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
-            <p>&copy; {{ date('Y') }} Noir &amp; Bloom Ltd. Registered Tax Entity.</p>
+        <div :class="theme === 'champagne' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-5xl w-full mx-auto border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
+            <p>&copy; {{ date('Y') }} Atelier Noir & Bloom. All rights reserved.</p>
+            
+            {{-- Social Media Icons --}}
+            <div class="flex items-center space-x-3.5">
+                {{-- Instagram --}}
+                <a href="https://instagram.com/noirandbloom" target="_blank" rel="noopener"
+                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
+                   :class="{
+                       'border-neutral-800 text-neutral-500 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.3)]': theme === 'onyx',
+                       'border-neutral-200 text-neutral-400 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.25)]': theme === 'champagne',
+                       'border-[#2D121F] text-pink-300/40 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.3)]': theme === 'rose'
+                   }" title="Instagram">
+                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+                    </svg>
+                </a>
+                {{-- Facebook --}}
+                <a href="https://facebook.com/noirandbloom" target="_blank" rel="noopener"
+                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
+                   :class="{
+                       'border-neutral-800 text-neutral-500 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.3)]': theme === 'onyx',
+                       'border-neutral-200 text-neutral-400 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.25)]': theme === 'champagne',
+                       'border-[#2D121F] text-pink-300/40 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.3)]': theme === 'rose'
+                   }" title="Facebook">
+                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/>
+                    </svg>
+                </a>
+                {{-- X (Twitter) --}}
+                <a href="https://twitter.com/NoirAndBloom" target="_blank" rel="noopener"
+                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
+                   :class="{
+                       'border-neutral-800 text-neutral-500 hover:text-white hover:border-white hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]': theme === 'onyx',
+                       'border-neutral-200 text-neutral-400 hover:text-black hover:border-black hover:shadow-[0_0_15px_rgba(0,0,0,0.15)]': theme === 'champagne',
+                       'border-[#2D121F] text-pink-300/40 hover:text-[#FCE7EC] hover:border-[#FCE7EC] hover:shadow-[0_0_15px_rgba(252,231,236,0.2)]': theme === 'rose'
+                   }" title="X (Twitter)">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+                {{-- Pinterest --}}
+                <a href="https://pinterest.com/noirandbloom" target="_blank" rel="noopener"
+                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
+                   :class="{
+                       'border-neutral-800 text-neutral-500 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.3)]': theme === 'onyx',
+                       'border-neutral-200 text-neutral-400 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.25)]': theme === 'champagne',
+                       'border-[#2D121F] text-pink-300/40 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.3)]': theme === 'rose'
+                   }" title="Pinterest">
+                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.395-5.92 1.395-5.92s-.36-.715-.36-1.777c0-1.664.962-2.907 2.162-2.907 1.02 0 1.513.766 1.513 1.682 0 1.026-.65 2.558-.99 3.978-.282 1.187.592 2.155 1.764 2.155 2.113 0 3.738-2.23 3.738-5.447 0-2.848-2.049-4.839-4.969-4.839-3.385 0-5.372 2.54-5.372 5.163 0 1.023.392 2.122.882 2.719.098.118.113.22.083.342-.09.378-.292 1.189-.331 1.348-.052.21-.173.253-.399.148-1.492-.695-2.423-2.88-2.423-4.636 0-3.774 2.744-7.24 7.907-7.24 4.15 0 7.375 2.957 7.375 6.9 0 4.124-2.597 7.443-6.204 7.443-1.213 0-2.355-.63-2.744-1.373l-.747 2.847c-.269 1.027-.997 2.316-1.488 3.118 4.417 1.282 9.21.365 12.825-2.525C22.617 19.387 24 15.86 24 11.987 24 5.367 18.63 0 12.017 0z"/>
+                    </svg>
+                </a>
+                {{-- WhatsApp --}}
+                <a href="https://wa.me/254712345678" target="_blank" rel="noopener"
+                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
+                   :class="{
+                       'border-neutral-800 text-neutral-500 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.3)]': theme === 'onyx',
+                       'border-neutral-200 text-neutral-400 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.25)]': theme === 'champagne',
+                       'border-[#2D121F] text-pink-300/40 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.3)]': theme === 'rose'
+                   }" title="WhatsApp">
+                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M19.005 3.175C17.252 1.42 14.927.453 12.443.453 7.429.453 3.353 4.53 3.353 9.544c0 1.602.418 3.167 1.213 4.544L2.247 22.25l8.36-2.193c1.332.726 2.828 1.11 4.363 1.112h.006c5.011 0 9.088-4.076 9.088-9.09 0-2.43-.946-4.714-2.703-6.471l-.356-.356zm-6.562 16.92c-1.442-.002-2.857-.388-4.095-1.116l-.294-.174-5.043 1.323 1.347-4.923-.19-.304c-.8-1.272-1.222-2.742-1.22-4.26.002-4.42 3.6-8.016 8.026-8.016 2.14 0 4.153.834 5.666 2.348 1.513 1.513 2.345 3.526 2.343 5.67-.004 4.42-3.601 8.018-8.026 8.018l-.534-.016zm4.414-6.027c-.242-.12-1.432-.707-1.654-.788-.222-.08-.383-.12-.544.12-.16.242-.624.788-.765.947-.14.16-.282.18-.523.06-.24-.12-1.018-.374-1.94-1.196-.718-.64-1.202-1.43-1.343-1.67-.14-.242-.015-.373.106-.493.11-.108.242-.282.363-.423.12-.14.16-.242.242-.403.08-.16.04-.302-.02-.423-.06-.12-.544-1.31-.746-1.794-.197-.473-.396-.408-.544-.416-.14-.007-.302-.007-.463-.007s-.423.06-.644.302c-.22.242-.845.826-.845 2.015 0 1.19.865 2.338.986 2.5.12.16 1.704 2.602 4.13 3.65.577.248.995.397 1.353.51.58.185 1.107.159 1.523.097.464-.068 1.432-.585 1.633-1.15.202-.564.202-1.047.14-1.15-.06-.102-.222-.162-.463-.282z"/>
+                    </svg>
+                </a>
+            </div>
+            
             <div class="flex space-x-6">
-                <a href="#" class="hover:text-neutral-400">Terms of Curation</a>
-                <a href="#" class="hover:text-neutral-400">Logistics Policy</a>
-                <a href="#" class="hover:text-neutral-400">eTIMS Verification</a>
+                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Terms of Curation</a>
+                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Logistics Policy</a>
+                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">eTIMS Verification</a>
             </div>
         </div>
     </footer>

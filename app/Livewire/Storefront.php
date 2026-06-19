@@ -66,7 +66,7 @@ class Storefront extends Component
     public string $paymentMethod = 'mpesa'; // mpesa or net_30
     
     // Catalog Pagination
-    public int $perPage = 6;
+    public int $perPage = 12;
     
     // Support Chat logs
     public bool $chatOpen = false;
@@ -78,7 +78,7 @@ class Storefront extends Component
 
     public function loadMore(): void
     {
-        $this->perPage += 4;
+        $this->perPage += 12;
     }
 
     public function getAddressSuggestions(): array
@@ -297,12 +297,28 @@ class Storefront extends Component
         $lowerQuery = strtolower($userQuery);
         $reply = "I'm Aura, your luxury curation companion. I am currently consulting the database to assist you.";
 
-        if (str_contains($lowerQuery, 'delivery') || str_contains($lowerQuery, 'route')) {
-            $reply = "We offer standard delivery via our Nairobi and Kiambu hubs. You can also upgrade to a Secret Admirer delivery or an elegant Uniformed Concierge drop-off at checkout.";
+        if (str_contains($lowerQuery, 'secret admirer') || str_contains($lowerQuery, 'anonymous') || str_contains($lowerQuery, 'uniformed') || str_contains($lowerQuery, 'concierge delivery')) {
+            $reply = "For ultimate premium delivery, we support:\n• Secret Admirer Delivery: We deliver the luxury bouquet completely anonymously, keeping your identity secret from the recipient.\n• Uniformed Concierge Drop-off: A white-gloved professional in tailored attire delivers the bouquet, perfect for corporate events and formal occasions.";
+        } elseif (str_contains($lowerQuery, 'birthday') || str_contains($lowerQuery, 'anniversary') || str_contains($lowerQuery, 'sympathy') || str_contains($lowerQuery, 'graduation') || str_contains($lowerQuery, 'vase') || str_contains($lowerQuery, 'occasion')) {
+            $reply = "Our curation occasions are tailored to specific design philosophies:\n• Birthday Celebration: Uses festive, bright, and vibrant flower palettes.\n• Anniversary & Love: Centered around romantic deep reds, spray roses, and soft pastels.\n• Graduation & Success: Bright, celebratory color blends for achievement.\n• Sympathy & Comfort: Serene whites, calm lilies, and soothing tones.\n• Vase Bundle: Designed specifically for home/office structural defaults.";
+        } elseif (str_contains($lowerQuery, 'net 30') || str_contains($lowerQuery, 'b2b') || str_contains($lowerQuery, 'invoice') || str_contains($lowerQuery, 'credit limit') || str_contains($lowerQuery, 'corporate checkout')) {
+            $reply = "For registered corporate B2B clients, we offer net 30 payment options subject to credit limit approval. When checking out, choose the 'Corporate' tab, enter your KRA PIN, and select Net 30. A tax-compliant eTIMS invoice will be generated automatically upon approval.";
+        } elseif (str_contains($lowerQuery, 'source') || str_contains($lowerQuery, 'naivasha') || str_contains($lowerQuery, 'limuru') || str_contains($lowerQuery, 'farm') || str_contains($lowerQuery, 'export') || str_contains($lowerQuery, 'grower')) {
+            $reply = "We source our Grade A export-quality stems directly from premier growers in Naivasha and Limuru. Naivasha's volcanic soil yields large, vibrant rose heads, while Limuru's cool highlands produce elegant white lilies and lush green foliage.";
+        } elseif (str_contains($lowerQuery, 'delivery') || str_contains($lowerQuery, 'route') || str_contains($lowerQuery, 'ship')) {
+            $reply = "We offer standard delivery via our Nairobi and Kiambu hubs. You can also upgrade to a Secret Admirer delivery (keeping the sender anonymous) or an elegant Uniformed Concierge drop-off at checkout.";
+        } elseif (str_contains($lowerQuery, 'curat') || str_contains($lowerQuery, 'studio') || str_contains($lowerQuery, 'builder') || str_contains($lowerQuery, 'custom') || str_contains($lowerQuery, 'desk') || str_contains($lowerQuery, 'bouquet') || str_contains($lowerQuery, 'make') || str_contains($lowerQuery, 'design')) {
+            $reply = "Our Curation Studio is a bespoke luxury design desk. You can customize every aspect:\n1. Occasion (00 Occasion) to set the design philosophy (e.g. Birthday, Anniversary, Sympathy).\n2. Blooms (01 Blooms) to select fresh export-grade stems.\n3. Wrapping & Accents (02 Wrapping) to select premium packaging, satin ribbons, and glitter dust.\n4. Fragrance Mist (03 Scent) to mist the petals with custom scent.\n5. Treats (04 Treats) to pair with fine wine, jewelry, or chocolate.\n6. Handwritten Letter (05 Note) for calligraphy personalization.\nClick 'Curate Selection' in the top menu to start your creation!";
+        } elseif (str_contains($lowerQuery, 'theme') || str_contains($lowerQuery, 'color') || str_contains($lowerQuery, 'style') || str_contains($lowerQuery, 'onyx') || str_contains($lowerQuery, 'champagne') || str_contains($lowerQuery, 'rose')) {
+            $reply = "Atelier Noir & Bloom features three beautiful visual themes tailored to your aesthetic:\n• Onyx: A dark, gold-accented high-fashion mode.\n• Champagne: A clean, minimal, warm cream design system.\n• Rose: A romantic pink-blush luxury mode.\nYou can instantly change themes via the selector buttons in the top navigation header.";
+        } elseif (str_contains($lowerQuery, 'service') || str_contains($lowerQuery, 'subscription') || str_contains($lowerQuery, 'event') || str_contains($lowerQuery, 'wedding') || str_contains($lowerQuery, 'corp')) {
+            $reply = "Beyond retail arrangements, we offer premium bespoke services:\n• Corporate Subscriptions: Weekly fresh rotations for hotels, offices, and showrooms.\n• Event Curation: Visual design, setups, and floral structures for weddings, private dinners, and galas.\n• Custom Hampers: Tailored luxury gifting suites and treat baskets.\nContact our events concierge at concierge@noirbloom.co.ke for details.";
+        } elseif (str_contains($lowerQuery, 'contact') || str_contains($lowerQuery, 'phone') || str_contains($lowerQuery, 'email') || str_contains($lowerQuery, 'support') || str_contains($lowerQuery, 'concierge') || str_contains($lowerQuery, 'call') || str_contains($lowerQuery, 'number')) {
+            $reply = "Our concierge team is at your disposal:\n• Hotline Direct: +254 (0) 712 345 678\n• Email Dispatch: concierge@noirbloom.co.ke\nOperating Hours:\n• Mon - Sat: 07:00 - 20:00\n• Sunday: 09:00 - 17:00";
         } elseif (str_contains($lowerQuery, 'tims') || str_contains($lowerQuery, 'vat') || str_contains($lowerQuery, 'tax')) {
-            $reply = "Noir & Bloom is fully eTIMS compliant. Simply choose 'Corporate eTIMS' during checkout to input your KRA PIN and automatically generate a tax invoice.";
+            $reply = "Noir & Bloom is fully eTIMS compliant. Simply choose 'Corporate eTIMS' during checkout to input your KRA PIN and automatically generate a tax-compliant invoice.";
         } elseif (str_contains($lowerQuery, 'grade') || str_contains($lowerQuery, 'wholesale')) {
-            $reply = "Our wholesale line features premium export Grade A stem bundles sourced directly from Naivasha and Limuru growers.";
+            $reply = "Our wholesale line features premium export Grade A stem bundles sourced directly from Naivasha and Limuru growers. Minimum order quantities apply.";
         } elseif (str_contains($lowerQuery, 'product') || str_contains($lowerQuery, 'flower') || str_contains($lowerQuery, 'rose') || str_contains($lowerQuery, 'catalog')) {
             $products = Product::where('stock', '>', 0)->limit(3)->get();
             if ($products->count() > 0) {
@@ -325,12 +341,12 @@ class Storefront extends Component
             if ($cheapest && $expensive) {
                 $reply = "Our pricing starts at {$cheapest->formatted_price} for the '{$cheapest->name}' up to {$expensive->formatted_price} for our premium '{$expensive->name}'.";
             }
-        } elseif (str_contains($lowerQuery, 'loyalty') || str_contains($lowerQuery, 'points') || str_contains($lowerQuery, 'tier')) {
+        } elseif (str_contains($lowerQuery, 'loyalty') || str_contains($lowerQuery, 'point') || str_contains($lowerQuery, 'tier') || str_contains($lowerQuery, 'silver') || str_contains($lowerQuery, 'gold') || str_contains($lowerQuery, 'bronze')) {
             if (auth()->check()) {
                 $user = auth()->user();
-                $reply = "Hello " . $user->name . "! You currently have " . $user->loyalty_points . " loyalty points (Tier: " . ($user->account_tier->value ?? 'Standard') . "). You earn 1 point for every 100 KSH spent!";
+                $reply = "Hello " . $user->name . "! You currently have " . $user->loyalty_points . " loyalty points (Tier: " . ($user->account_tier->value ?? 'Standard') . "). You earn 1 point for every 100 KSH spent!\nOur loyalty program features four exclusive tiers:\n• Standard: Entry level for all registered members.\n• Bronze: Unlocks free premium mists on all curations.\n• Silver: Adds complimentary handwritten calligraphy greeting cards.\n• Gold: Grants free hand-curation service fees and early concierge access.";
             } else {
-                $reply = "Our Loyalty Program rewards you with 1 point for every 100 KSH spent. Sign up or log in at checkout to start earning points towards exclusive tiers!";
+                $reply = "Our Loyalty Program rewards you with 1 point for every 100 KSH spent. We feature four exclusive tiers:\n• Standard: Entry level for all registered members.\n• Bronze: Unlocks free premium mists on all curations.\n• Silver: Adds complimentary handwritten calligraphy greeting cards.\n• Gold: Grants free hand-curation service fees and early concierge access.\nSign up or log in at checkout to start earning points towards exclusive tiers!";
             }
         } elseif (str_contains($lowerQuery, 'status') || str_contains($lowerQuery, 'track') || str_contains($lowerQuery, 'order')) {
             if (auth()->check()) {
@@ -345,7 +361,7 @@ class Storefront extends Component
                 $reply = "To track your order, please log in to your account, or refer to the email updates sent by our logistics team.";
             }
         } else {
-            $reply = "I'm Aura, your luxury curation assistant. Ask me about popular arrangements, locations, my latest order status, or loyalty rewards!";
+            $reply = "I'm Aura, your luxury curation assistant. Ask me about custom designs/curations, visual themes, our events/corporate services, locations, latest order status, or loyalty rewards!";
         }
 
         $this->chatHistory[] = ['sender' => 'bot', 'text' => $reply];
@@ -457,8 +473,12 @@ class Storefront extends Component
             $customMsg = $customizations['card_message'] ?? null;
             $ribbonColor = $customizations['ribbon_color'] ?? null;
             $glitter = $customizations['glitter'] ?? 'No';
+            $curationOccasion = $customizations['curation_occasion'] ?? null;
 
             $specialInstructions = 'Delivery Package: ' . strtoupper($this->delivery_type);
+            if ($curationOccasion) {
+                $specialInstructions .= ' | Curation Occasion: ' . strtoupper($curationOccasion);
+            }
             if ($customMsg) {
                 $specialInstructions .= ' | Handwritten Note: ' . $customMsg;
             }
