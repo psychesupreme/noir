@@ -636,6 +636,10 @@
                         <p class="text-xs text-neutral-500 font-light mt-1">Audit previous curation dispatches, trace real-time fulfillment milestones, and retrieve invoices.</p>
                     </div>
 
+                    @if(session('success_orders'))
+                        <div class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl">{{ session('success_orders') }}</div>
+                    @endif
+
                     <!-- Order History Logs -->
                     <div :class="theme === 'champagne' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
                         <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Purchase Ledger Records Matrix</h4>
@@ -679,10 +683,32 @@
                                             <td class="py-4 px-2 text-right text-amber-500 font-semibold">{{ number_format($ord->total_amount) }} KSH</td>
                                             <td class="py-4 px-2 text-right">
                                                 <div class="flex items-center justify-end space-x-2">
-                                                    <!-- Timeline Tracking Trigger -->
-                                                    <button @click="selectedOrder = { id: {{ $ord->id }}, status: '{{ $ord->status }}', created: '{{ $ord->created_at->format('d M Y H:i') }}', total: '{{ number_format($ord->total_amount) }}', instructions: '{{ addslashes($ord->special_instructions) }}' }" class="bg-neutral-500/10 hover:bg-neutral-500/20 px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase cursor-pointer transition-all border border-neutral-500/10">
-                                                        Track
-                                                    </button>
+                                                    @if($ord->status === 'delivered')
+                                                        @if($ord->rating)
+                                                            <div class="flex items-center space-x-1" title="Feedback: {{ $ord->feedback }}">
+                                                                @for($i = 1; $i <= 5; $i++)
+                                                                    <span class="text-xs {{ $i <= $ord->rating ? 'text-[#C5A880]' : 'text-neutral-600' }}">★</span>
+                                                                @endfor
+                                                            </div>
+                                                        @else
+                                                            <div class="flex flex-col items-end space-y-1 p-1 border border-neutral-500/10 rounded-xl bg-neutral-500/5">
+                                                                <div class="flex items-center space-x-0.5">
+                                                                    @for($i = 1; $i <= 5; $i++)
+                                                                        <button wire:click="$set('orderRatings.{{ $ord->id }}', {{ $i }})" type="button" class="text-xs transition-transform hover:scale-125 focus:outline-none {{ ($orderRatings[$ord->id] ?? 0) >= $i ? 'text-[#C5A880]' : 'text-neutral-600' }}">★</button>
+                                                                    @endfor
+                                                                </div>
+                                                                @if(isset($orderRatings[$ord->id]))
+                                                                    <input type="text" wire:model="orderFeedbacks.{{ $ord->id }}" placeholder="Feedback..." class="text-[9px] px-1.5 py-0.5 rounded bg-neutral-950 border border-neutral-800 text-white max-w-[100px] focus:outline-none">
+                                                                    <button wire:click="submitRating({{ $ord->id }})" class="bg-[#C5A880] hover:bg-[#B59A7A] text-black text-[8px] font-bold px-2 py-0.5 rounded uppercase">Submit</button>
+                                                                @endif
+                                                            </div>
+                                                        @endif
+                                                    @else
+                                                        <!-- Timeline Tracking Trigger -->
+                                                        <button @click="selectedOrder = { id: {{ $ord->id }}, status: '{{ $ord->status }}', created: '{{ $ord->created_at->format('d M Y H:i') }}', total: '{{ number_format($ord->total_amount) }}', instructions: '{{ addslashes($ord->special_instructions) }}', distance_km: '{{ $ord->getRouteDetails()['distance_km'] ?? '' }}', duration_min: '{{ $ord->getRouteDetails()['duration_min'] ?? '' }}', hub_name: '{{ $ord->getRouteDetails()['hub_name'] ?? '' }}' }" class="bg-neutral-500/10 hover:bg-neutral-500/20 px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase cursor-pointer transition-all border border-neutral-500/10">
+                                                            Track
+                                                        </button>
+                                                    @endif
                                                     
                                                     <!-- Invoice download (only for completed or credit terms) -->
                                                     @php
@@ -771,6 +797,15 @@
                         <div class="border-t border-neutral-500/10 pt-4 text-[10px] font-mono leading-relaxed space-y-1">
                             <span class="text-neutral-500 block uppercase">Special Instructions/Details:</span>
                             <p class="text-neutral-350 italic font-sans" x-text="selectedOrder?.instructions || 'Standard delivery package settings'"></p>
+                        </div>
+
+                        <div class="border-t border-neutral-500/10 pt-4 text-[10px] font-mono leading-relaxed space-y-1" x-show="selectedOrder?.distance_km">
+                            <span class="text-neutral-500 block uppercase">Logistics & Route Approximation:</span>
+                            <div class="text-neutral-350 font-sans space-y-0.5">
+                                <div>Fulfilled from: <span class="font-semibold" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" x-text="selectedOrder?.hub_name"></span></div>
+                                <div>Estimated driving distance: <span class="font-semibold" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" x-text="selectedOrder?.distance_km + ' km'"></span></div>
+                                <div>Approximate driving duration: <span class="font-semibold" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" x-text="selectedOrder?.duration_min + ' minutes'"></span></div>
+                            </div>
                         </div>
                     </div>
                 </div>

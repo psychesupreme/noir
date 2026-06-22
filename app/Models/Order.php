@@ -61,6 +61,79 @@ class Order extends Model
         return $this->belongsTo(Branch::class);
     }
 
+    /**
+     * Approximate road routing distance and time from branch hub to client coordinates via OSRM.
+     */
+    public function getRouteDetails(): ?array
+    {
+        $address = $this->client->delivery_address ?? '';
+        if (!preg_match('/(-?\d+\.\d+),\s*(-?\d+\.\d+)/', $address, $matches)) {
+            return null;
+        }
+
+        $clientLat = (float) $matches[1];
+        $clientLng = (float) $matches[2];
+
+        $isKiambu = false;
+        if ($this->branch && strtolower($this->branch->location_city) === 'kiambu') {
+            $isKiambu = true;
+        } elseif ($this->client && strtolower($this->client->region) === 'kiambu') {
+            $isKiambu = true;
+        }
+
+        if ($isKiambu) {
+            $hubLat = -1.1444;
+            $hubLng = 36.6853;
+            $hubName = 'Kiambu Ridge Hub (Tigoni)';
+        } else {
+            $hubLat = -1.286389;
+            $hubLng = 36.817222;
+            $hubName = 'Nairobi Central Atelier (CBD)';
+        }
+
+        $cacheKey = "order_route_{$this->id}_" . md5("{$hubLat},{$hubLng};{$clientLat},{$clientLng}");
+
+        return \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addDays(7), function () use ($hubLat, $hubLng, $clientLat, $clientLng, $hubName) {
+            try {
+                $url = "http://router.project-osrm.org/route/v1/driving/{$hubLng},{$hubLat};{$clientLng},{$clientLat}?overview=false";
+                $response = \Illuminate\Support\Facades\Http::timeout(5)->get($url);
+                if ($response->successful()) {
+                    $data = $response->json();
+                    if (!empty($data['routes'][0])) {
+                        $route = $data['routes'][0];
+                        $distanceMeters = $route['distance'] ?? 0;
+                        $durationSeconds = $route['duration'] ?? 0;
+
+                        return [
+                            'distance_km' => round($distanceMeters / 1000, 1),
+                            'duration_min' => (int) round($durationSeconds / 60),
+                            'hub_name' => $hubName,
+                        ];
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore and fall back
+            }
+
+            // Fallback estimation (Haversine + 40km/h average speed)
+            $theta = $hubLng - $clientLng;
+            $dist = sin(deg2rad($hubLat)) * sin(deg2rad($clientLat)) +  cos(deg2rad($hubLat)) * cos(deg2rad($clientLat)) * cos(deg2rad($theta));
+            $dist = min(1.0, max(-1.0, $dist));
+            $dist = acos($dist);
+            $dist = rad2deg($dist);
+            $miles = $dist * 60 * 1.1515;
+            $km = round($miles * 1.609344, 1);
+            $durationMin = (int) round(($km / 40) * 60);
+
+            return [
+                'distance_km' => $km,
+                'duration_min' => max(5, $durationMin),
+                'hub_name' => $hubName,
+                'is_fallback' => true,
+            ];
+        });
+    }
+
     protected static function booted(): void
     {
         static::saved(function ($order) {

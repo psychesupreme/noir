@@ -67,6 +67,13 @@ class Storefront extends Component
     
     // Catalog Pagination
     public int $perPage = 12;
+
+    // Reviews properties
+    public ?int $quickViewProductId = null;
+    public array $newReview = [
+        'rating' => 5,
+        'comment' => ''
+    ];
     
     // Support Chat logs
     public bool $chatOpen = false;
@@ -841,5 +848,43 @@ class Storefront extends Component
         $user->update(['settings' => $settings]);
 
         session()->flash('success', $msg);
+    }
+
+    public function loadProductReviews(int $productId): void
+    {
+        $this->quickViewProductId = $productId;
+        $this->resetReviewForm();
+    }
+
+    public function resetReviewForm(): void
+    {
+        $this->newReview = [
+            'rating' => 5,
+            'comment' => ''
+        ];
+    }
+
+    public function submitProductReview(): void
+    {
+        $user = auth()->user();
+        if (!$user) {
+            session()->flash('error_review', 'Please log in to submit a review.');
+            return;
+        }
+
+        $this->validate([
+            'newReview.rating' => 'required|integer|min:1|max:5',
+            'newReview.comment' => 'required|string|min:3|max:1000',
+        ]);
+
+        \App\Models\Review::create([
+            'product_id' => $this->quickViewProductId,
+            'user_id' => $user->id,
+            'rating' => $this->newReview['rating'],
+            'comment' => $this->newReview['comment'],
+        ]);
+
+        $this->resetReviewForm();
+        session()->flash('success_review', 'Review submitted successfully!');
     }
 }

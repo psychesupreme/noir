@@ -367,6 +367,11 @@
 
         /* Print Media Query Optimization */
         @media print {
+            @page {
+                size: portrait;
+                margin: 8mm 12mm;
+            }
+
             body {
                 background-color: #ffffff !important;
                 color: #000000 !important;
@@ -381,12 +386,57 @@
             .receipt-container {
                 padding: 0 !important;
                 max-width: 100% !important;
+                margin: 0 !important;
             }
 
             .receipt-card {
                 box-shadow: none !important;
                 padding: 0 !important;
                 border-radius: 0 !important;
+            }
+
+            /* Shrink headers and spacing for one-page printing */
+            .receipt-header {
+                margin-bottom: 15px !important;
+                padding-bottom: 10px !important;
+            }
+
+            .atelier-logo {
+                font-size: 20px !important;
+            }
+
+            .receipt-meta {
+                margin-bottom: 15px !important;
+                gap: 15px !important;
+            }
+
+            .meta-section h3 {
+                font-size: 11px !important;
+                margin-bottom: 6px !important;
+                padding-bottom: 3px !important;
+            }
+
+            .items-table {
+                margin-bottom: 15px !important;
+            }
+
+            .items-table th, .items-table td {
+                padding: 5px 6px !important;
+                font-size: 11px !important;
+            }
+
+            .summary-wrapper {
+                margin-bottom: 15px !important;
+            }
+
+            .totals-row.grand-total {
+                font-size: 13px !important;
+                padding: 8px 0 !important;
+            }
+
+            .receipt-footer {
+                padding-top: 15px !important;
+                margin-top: 15px !important;
             }
 
             /* Enable direct ink-friendly colors */

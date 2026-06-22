@@ -39,6 +39,10 @@ class ProfilePortal extends Component
     // Logistics status update success feedback (for staff tab)
     public ?int $updatedOrderId = null;
 
+    // Order feedback & rating states
+    public array $orderRatings = [];
+    public array $orderFeedbacks = [];
+
     protected $rules = [
         'name' => 'required|string|min:3',
         'email' => 'required|email',
@@ -196,6 +200,26 @@ class ProfilePortal extends Component
             $order->update(['status' => $status]);
             $this->updatedOrderId = $orderId;
             session()->flash('success_logistics', 'Delivery run nb-ord-' . $orderId . ' status set to ' . strtoupper($status));
+        }
+    }
+
+    public function submitRating(int $orderId): void
+    {
+        $rating = $this->orderRatings[$orderId] ?? null;
+        $feedback = $this->orderFeedbacks[$orderId] ?? null;
+
+        if ($rating) {
+            $order = Order::find($orderId);
+            if ($order) {
+                $user = auth()->user();
+                if ($user && $order->client && $order->client->email === $user->email) {
+                    $order->update([
+                        'rating' => $rating,
+                        'feedback' => $feedback,
+                    ]);
+                    session()->flash('success_orders', 'Thank you for your feedback on order #NB-ORD-' . $orderId . '!');
+                }
+            }
         }
     }
 

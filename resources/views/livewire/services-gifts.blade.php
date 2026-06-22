@@ -103,9 +103,19 @@
         changeTheme(targetTheme) {
             if (this.theme === targetTheme) return;
             this.theme = targetTheme;
-        }
+        },
+        quickViewOpen: false,
+        quickViewProduct: null,
+        quickViewSize: 'standard',
+        numberFormat(val) { return new Intl.NumberFormat().format(val); }
     }" 
     x-init="
+        $watch('quickViewOpen', val => {
+            if (val && quickViewProduct) {
+                $wire.loadProductReviews(quickViewProduct.id);
+            }
+        });
+
         $watch('theme', val => { 
             localStorage.setItem('nb_theme', val); 
             document.documentElement.className = val; 
@@ -408,6 +418,17 @@
             </p>
         </div>
 
+        @if(session('success_wishlist'))
+            <div class="mb-6 p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl">
+                {{ session('success_wishlist') }}
+            </div>
+        @endif
+        @if(session('error_wishlist'))
+            <div class="mb-6 p-3 border border-dashed border-rose-800 bg-rose-950/20 text-rose-400 text-xs font-mono rounded-xl">
+                {{ session('error_wishlist') }}
+            </div>
+        @endif
+
         <!-- 1. Rectangular Cards for Custom Services/Specializations -->
         <section class="space-y-6 mb-16">
             <h3 class="text-[14px] font-mono uppercase tracking-[0.25em] text-neutral-400 font-bold border-b border-neutral-500/10 pb-2">
@@ -421,7 +442,29 @@
                     >
                         <!-- Left side: Squared Image Frame -->
                         <div class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center">
-                            <img src="{{ $srv->image_url }}" alt="{{ $srv->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 z-0">
+                            <img src="{{ $srv->image_url }}" alt="{{ $srv->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 z-0 cursor-pointer" @click="quickViewProduct = { id: {{ $srv->id }}, name: {{ \Illuminate\Support\Js::from($srv->name) }}, price: {{ $srv->price }}, description: {{ \Illuminate\Support\Js::from($srv->description) }}, image: {{ \Illuminate\Support\Js::from($srv->backdrop_url) }}, category: {{ \Illuminate\Support\Js::from($srv->category) }}, stock_standard: {{ $srv->stock_standard }}, stock_deluxe: {{ $srv->stock_deluxe }}, stock_grand: {{ $srv->stock_grand }} }; quickViewSize = 'standard'; quickViewOpen = true;">
+                            
+                            @auth
+                                @php
+                                    $inWishlist = in_array($srv->id, auth()->user()->settings['wishlist'] ?? []);
+                                @endphp
+                            @else
+                                @php
+                                    $inWishlist = false;
+                                @endphp
+                            @endauth
+                            <!-- Wishlist Button -->
+                            <button 
+                                type="button" 
+                                wire:click="toggleWishlist({{ $srv->id }})" 
+                                class="absolute top-2 right-2 z-20 w-6 h-6 rounded-full flex items-center justify-center bg-[#0B0B0D]/60 border border-white/5 text-[#C5A880] hover:scale-110 hover:bg-neutral-900 transition-all cursor-pointer shadow-md"
+                                title="{{ $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
+                            >
+                                <svg class="w-3.5 h-3.5 fill-current {{ $inWishlist ? 'text-rose-500' : 'text-neutral-400 fill-none stroke-current' }}" viewBox="0 0 24 24" stroke-width="1.5">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </button>
+
                             <div class="absolute bottom-2 left-2 z-10">
                                 <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded-full text-[8px] font-mono font-bold tracking-wider uppercase shadow-md">
                                     {{ $srv->grade ?? 'Service' }}
@@ -432,7 +475,7 @@
                         <div class="flex-1 pl-3 flex flex-col justify-between overflow-hidden">
                             <div class="space-y-1 overflow-hidden">
                                 <span class="text-[9px] uppercase tracking-[0.2em] text-[#C5A880] font-mono block font-bold truncate">Specialization</span>
-                                <h4 class="text-sm font-serif italic tracking-wide leading-tight truncate text-current">{{ $srv->name }}</h4>
+                                <h4 class="text-sm font-serif italic tracking-wide leading-tight truncate text-current cursor-pointer hover:underline" @click="quickViewProduct = { id: {{ $srv->id }}, name: {{ \Illuminate\Support\Js::from($srv->name) }}, price: {{ $srv->price }}, description: {{ \Illuminate\Support\Js::from($srv->description) }}, image: {{ \Illuminate\Support\Js::from($srv->backdrop_url) }}, category: {{ \Illuminate\Support\Js::from($srv->category) }}, stock_standard: {{ $srv->stock_standard }}, stock_deluxe: {{ $srv->stock_deluxe }}, stock_grand: {{ $srv->stock_grand }} }; quickViewSize = 'standard'; quickViewOpen = true;">{{ $srv->name }}</h4>
                                 <p class="text-neutral-500 font-light text-[11px] leading-snug line-clamp-2">{{ $srv->description }}</p>
                             </div>
 
@@ -494,7 +537,29 @@
                         class="flex flex-col p-3 rounded-[32px] border relative transition-all duration-500 hover:-translate-y-1 group backdrop-blur-md"
                     >
                         <div class="aspect-[1/1] rounded-[24px] relative overflow-hidden bg-neutral-950/5">
-                            <img src="{{ $gift->image_url }}" alt="{{ $gift->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105">
+                            <img src="{{ $gift->image_url }}" alt="{{ $gift->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 cursor-pointer" @click="quickViewProduct = { id: {{ $gift->id }}, name: {{ \Illuminate\Support\Js::from($gift->name) }}, price: {{ $gift->price }}, description: {{ \Illuminate\Support\Js::from($gift->description) }}, image: {{ \Illuminate\Support\Js::from($gift->backdrop_url) }}, category: {{ \Illuminate\Support\Js::from($gift->category) }}, stock_standard: {{ $gift->stock_standard }}, stock_deluxe: {{ $gift->stock_deluxe }}, stock_grand: {{ $gift->stock_grand }} }; quickViewSize = 'standard'; quickViewOpen = true;">
+                            
+                            @auth
+                                @php
+                                    $inWishlist = in_array($gift->id, auth()->user()->settings['wishlist'] ?? []);
+                                @endphp
+                            @else
+                                @php
+                                    $inWishlist = false;
+                                @endphp
+                            @endauth
+                            <!-- Wishlist Button -->
+                            <button 
+                                type="button" 
+                                wire:click="toggleWishlist({{ $gift->id }})" 
+                                class="absolute top-3 right-3 z-20 w-6 h-6 rounded-full flex items-center justify-center bg-[#0B0B0D]/60 border border-white/5 text-[#C5A880] hover:scale-110 hover:bg-neutral-900 transition-all cursor-pointer shadow-md"
+                                title="{{ $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
+                            >
+                                <svg class="w-3.5 h-3.5 fill-current {{ $inWishlist ? 'text-rose-500' : 'text-neutral-400 fill-none stroke-current' }}" viewBox="0 0 24 24" stroke-width="1.5">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </button>
+
                             <div class="absolute bottom-3 left-3">
                                 <span class="bg-black/50 text-neutral-300 border border-white/10 px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider">
                                     {{ $gift->unit_type }}
@@ -503,7 +568,7 @@
                         </div>
                         <div class="px-2 pt-4 pb-2 flex-1 flex flex-col justify-between">
                             <div class="space-y-1">
-                                <h4 class="text-base font-serif italic tracking-wide leading-snug">{{ $gift->name }}</h4>
+                                <h4 class="text-base font-serif italic tracking-wide leading-snug cursor-pointer hover:underline" @click="quickViewProduct = { id: {{ $gift->id }}, name: {{ \Illuminate\Support\Js::from($gift->name) }}, price: {{ $gift->price }}, description: {{ \Illuminate\Support\Js::from($gift->description) }}, image: {{ \Illuminate\Support\Js::from($gift->backdrop_url) }}, category: {{ \Illuminate\Support\Js::from($gift->category) }}, stock_standard: {{ $gift->stock_standard }}, stock_deluxe: {{ $gift->stock_deluxe }}, stock_grand: {{ $gift->stock_grand }} }; quickViewSize = 'standard'; quickViewOpen = true;">{{ $gift->name }}</h4>
                                 <p class="text-neutral-500 font-light text-xs line-clamp-2">{{ $gift->description }}</p>
                                 
                                 <!-- Social Sharing Direct Links for SMM -->
@@ -673,5 +738,176 @@
         </div>
     </footer>
 
+
+    <!-- Product Detail Modal (FNP-style) -->
+    <div x-show="quickViewOpen" @click="quickViewOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+    
+    <div
+        x-show="quickViewOpen"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-32px)] sm:w-[640px] max-h-[90vh] z-50 bg-white/90 border border-neutral-200/80 text-neutral-900 shadow-2xl flex flex-col justify-between text-left rounded-[28px] overflow-hidden font-sans backdrop-blur-xl"
+        style="display: none;"
+    >
+        <div class="p-5 border-b border-neutral-100 flex items-center justify-between shrink-0">
+            <div>
+                <span class="text-[9px] uppercase tracking-widest text-emerald-800 font-bold block" x-text="quickViewProduct ? quickViewProduct.category.replace('_', ' ') : ''"></span>
+                <h3 class="text-lg font-serif italic text-neutral-800" x-text="quickViewProduct ? quickViewProduct.name : ''"></h3>
+            </div>
+            <button @click="quickViewOpen = false" class="text-neutral-450 hover:text-neutral-800 cursor-pointer select-none transition-colors" title="Close Details">
+                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1 space-y-6">
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Image column -->
+                <div class="w-full md:w-1/2 shrink-0">
+                    <div class="w-full h-48 md:h-64 rounded-2xl overflow-hidden bg-neutral-150 relative">
+                        <img :src="quickViewProduct ? quickViewProduct.image : ''" :alt="quickViewProduct ? quickViewProduct.name : ''" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-xs text-neutral-500 font-light mt-3 leading-relaxed" x-text="quickViewProduct ? quickViewProduct.description : ''"></p>
+                </div>
+                <!-- Config column -->
+                <div class="flex-1 flex flex-col gap-4">
+                    <!-- Size Selector -->
+                    <div>
+                        <span class="text-xs font-bold text-neutral-700 block mb-2">Select Sizing & Volume</span>
+                        <div class="flex flex-wrap gap-2">
+                            <!-- Standard -->
+                            <button type="button" @click="quickViewSize = 'standard'"
+                                :class="quickViewSize === 'standard' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
+                                class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
+                                :disabled="quickViewProduct && quickViewProduct.stock_standard <= 0"
+                            >
+                                <span class="block">Standard</span>
+                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price) + ' KSH' : ''"></span>
+                                <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_standard <= 0">Out of Stock</span>
+                            </button>
+                            <!-- Deluxe -->
+                            <button type="button" @click="quickViewSize = 'deluxe'"
+                                :class="quickViewSize === 'deluxe' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
+                                class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
+                                :disabled="quickViewProduct && quickViewProduct.stock_deluxe <= 0"
+                            >
+                                <span class="block">Deluxe</span>
+                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 1.5)) + ' KSH' : ''"></span>
+                                <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_deluxe <= 0">Out of Stock</span>
+                            </button>
+                            <!-- Grand -->
+                            <button type="button" @click="quickViewSize = 'grand'"
+                                :class="quickViewSize === 'grand' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
+                                class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
+                                :disabled="quickViewProduct && quickViewProduct.stock_grand <= 0"
+                            >
+                                <span class="block">Grand</span>
+                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 2.2)) + ' KSH' : ''"></span>
+                                <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_grand <= 0">Out of Stock</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Reactive Stock Level Indicator in Quick View -->
+                        <template x-if="quickViewProduct">
+                            <div class="mt-2.5 text-left">
+                                <span x-show="(quickViewSize === 'standard' && quickViewProduct.stock_standard <= 0) || (quickViewSize === 'deluxe' && quickViewProduct.stock_deluxe <= 0) || (quickViewSize === 'grand' && quickViewProduct.stock_grand <= 0)" 
+                                      class="inline-block text-rose-600 font-semibold bg-rose-500/10 px-2.5 py-1 rounded uppercase tracking-wider text-[9px] font-outfit">
+                                    Out of Stock
+                                </span>
+                                <span x-show="(quickViewSize === 'standard' && quickViewProduct.stock_standard > 0 && quickViewProduct.stock_standard <= 5) || (quickViewSize === 'deluxe' && quickViewProduct.stock_deluxe > 0 && quickViewProduct.stock_deluxe <= 5) || (quickViewSize === 'grand' && quickViewProduct.stock_grand > 0 && quickViewProduct.stock_grand <= 5)" 
+                                      class="inline-block text-amber-600 font-semibold bg-amber-500/10 px-2.5 py-1 rounded uppercase tracking-wider text-[9px] font-outfit animate-pulse">
+                                    Limited Items
+                                </span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Tab/Section -->
+            <div class="border-t border-neutral-100 pt-6 space-y-4">
+                <h4 class="text-sm font-serif italic text-neutral-800">Reviews &amp; Client Feedback</h4>
+                
+                @if(session('success_review'))
+                    <div class="p-2.5 bg-emerald-50 border border-dashed border-emerald-300 text-emerald-800 text-[11px] font-mono rounded-xl">
+                        {{ session('success_review') }}
+                    </div>
+                @endif
+                @if(session('error_review'))
+                    <div class="p-2.5 bg-rose-50 border border-dashed border-rose-300 text-rose-800 text-[11px] font-mono rounded-xl">
+                        {{ session('error_review') }}
+                    </div>
+                @endif
+
+                <!-- Review list -->
+                @php
+                    $reviews = $quickViewProductId ? \App\Models\Review::where('product_id', $quickViewProductId)->with('user')->latest()->get() : collect();
+                @endphp
+
+                <div class="space-y-3 max-h-48 overflow-y-auto pr-1">
+                    @forelse($reviews as $rev)
+                        <div class="p-3 bg-neutral-50 rounded-2xl border border-neutral-100 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-semibold text-neutral-700">{{ $rev->user ? $rev->user->name : 'Anonymous Client' }}</span>
+                                <div class="flex items-center space-x-0.5">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <span class="text-[10px] {{ $i <= $rev->rating ? 'text-amber-500' : 'text-neutral-200' }}">★</span>
+                                    @endfor
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-neutral-600 font-light leading-relaxed">{{ $rev->comment }}</p>
+                            <span class="text-[8px] text-neutral-400 block font-mono">{{ $rev->created_at->format('d M Y') }}</span>
+                        </div>
+                    @empty
+                        <p class="text-[11px] text-neutral-400 italic">No reviews logged for this arrangement yet. Be the first to share your experience!</p>
+                    @endforelse
+                </div>
+
+                <!-- Submit Review Form -->
+                @auth
+                    <form wire:submit.prevent="submitProductReview" class="p-3 border border-neutral-100 rounded-2xl bg-neutral-50/50 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-neutral-700 uppercase tracking-wider">Leave a Review</span>
+                            <div class="flex items-center space-x-1">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <button type="button" wire:click="$set('newReview.rating', {{ $i }})" class="text-xs focus:outline-none transition-transform hover:scale-125 {{ ($newReview['rating'] ?? 5) >= $i ? 'text-amber-500' : 'text-neutral-350' }}">★</button>
+                                @endfor
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <textarea wire:model="newReview.comment" placeholder="Describe your experience with this arrangement..." class="w-full text-xs p-2 border border-neutral-200 rounded-xl bg-white focus:outline-none focus:border-neutral-400 font-light" rows="2" required></textarea>
+                            @error('newReview.comment') <span class="text-rose-600 text-[9px] block">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-emerald-800 hover:bg-emerald-950 text-white font-mono text-[9px] uppercase font-bold px-4 py-1.5 rounded-full cursor-pointer transition-colors">Submit Review</button>
+                        </div>
+                    </form>
+                @else
+                    <div class="p-3 bg-neutral-50 rounded-2xl text-center border border-neutral-100">
+                        <p class="text-[10px] text-neutral-500 font-light">Please <a href="/login" class="text-emerald-800 font-bold hover:underline">sign in</a> to submit reviews.</p>
+                    </div>
+                @endauth
+            </div>
+        </div>
+
+        <div class="p-5 border-t border-neutral-100 bg-neutral-50/80 backdrop-blur-md shrink-0 flex items-center justify-between">
+            <div>
+                <span class="text-[10px] text-neutral-500 uppercase tracking-wider block">Price</span>
+                <span class="text-base font-bold text-neutral-850 font-mono">
+                    <span x-text="quickViewProduct ? numberFormat(quickViewSize === 'standard' ? quickViewProduct.price : (quickViewSize === 'deluxe' ? Math.round(quickViewProduct.price * 1.5) : Math.round(quickViewProduct.price * 2.2))) : ''"></span> KSH
+                </span>
+            </div>
+            
+            <button
+                type="button"
+                :disabled="(quickViewSize === 'standard' && quickViewProduct && quickViewProduct.stock_standard <= 0) || (quickViewSize === 'deluxe' && quickViewProduct && quickViewProduct.stock_deluxe <= 0) || (quickViewSize === 'grand' && quickViewProduct && quickViewProduct.stock_grand <= 0)"
+                @click="$wire.addToCuration(quickViewProduct.id, quickViewSize); quickViewOpen = false;"
+                class="px-6 py-2.5 bg-emerald-800 hover:bg-emerald-950 text-white rounded-xl text-xs uppercase tracking-wider font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+                Add to Curation
+            </button>
+        </div>
+    </div>
 
 </div>
