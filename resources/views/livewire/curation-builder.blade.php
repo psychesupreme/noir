@@ -1164,14 +1164,14 @@
             <div class="flex space-x-6">
                 <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Terms of Curation</a>
                 <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Logistics Policy</a>
-                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">eTIMS Verification</a>
+                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Invoice Request</a>
             </div>
         </div>
     </footer>
 
     <!-- Mobile Sticky Footer Bar (visible only on mobile/tablet) -->
     <div 
-        :class="theme === 'champagne' ? 'bg-white/95 border-neutral-200 shadow-lg' : 'bg-[#0B0B0D]/95 border-neutral-800/20 shadow-2xl'"
+        :class="theme === 'champagne' ? 'bg-white/70 border-neutral-200 shadow-lg backdrop-blur-xl' : 'bg-[#0B0B0D]/75 border-neutral-800/20 shadow-2xl backdrop-blur-xl'"
         class="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t backdrop-blur-md px-6 py-4 flex items-center justify-between transition-all duration-500"
     >
         <div>

@@ -13,7 +13,7 @@ class Client extends Model
 
     protected $fillable = [
         'user_id', 'company_name', 'kra_pin', 'contact_name', 'email', 'phone', 'region', 'delivery_address',
-        'payment_terms', 'credit_limit', 'outstanding_balance'
+        'payment_terms', 'credit_limit', 'outstanding_balance', 'gender', 'dob'
     ];
 
     public function user()

@@ -1,6 +1,6 @@
 @section('meta')
-    <meta name="description" content="Explore Atelier Noir & Bloom's premium floral curations, Naivasha Rift Valley wholesale stems, and custom luxury gift hampers. Live eTIMS integration and instant M-Pesa checkout.">
-    <meta name="keywords" content="premium bouquets, naivasha roses, flower shop Nairobi, luxury gift hampers Kenya, flower delivery Nairobi, eTIMS VAT invoices, safaricom mpesa checkout">
+    <meta name="description" content="Explore Atelier Noir & Bloom's premium floral curations, Naivasha Rift Valley wholesale stems, and custom luxury gift hampers. Detailed proforma invoices and instant M-Pesa checkout.">
+    <meta name="keywords" content="premium bouquets, naivasha roses, flower shop Nairobi, luxury gift hampers Kenya, flower delivery Nairobi, detailed proforma invoices, safaricom mpesa checkout">
     <meta name="author" content="Atelier Noir & Bloom">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ url()->current() }}">
@@ -93,7 +93,7 @@
     }" 
     x-init="
         /* Initialize preloader lift */
-        setTimeout(() => { loading = false; }, 3000);
+        setTimeout(() => { loading = false; }, 1000);
 
         /* Auto-open curation cart drawer if redirect query parameter is present */
         const urlParams = new URLSearchParams(window.location.search);
@@ -154,12 +154,12 @@
 >
     <!-- Luxury Preshader (Preloader Screen with Raining Flowers) -->
     <div x-show="loading"
-         x-transition:leave="transition cubic-bezier(0.16, 1, 0.3, 1) duration-800"
-         x-transition:leave-start="opacity-100 scale-100"
-         x-transition:leave-end="opacity-0 scale-95 pointer-events-none"
+         x-transition:leave="transition ease-out duration-700"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0 pointer-events-none"
          :class="{
-             'bg-[#0B0B0D]/75 text-[#E4E4E7]': theme === 'onyx',
-             'bg-[#FAF7F0]/80 text-[#1C1C20]': theme === 'champagne'
+             'bg-[#0B0B0D]/65 text-[#E4E4E7]': theme === 'onyx',
+             'bg-[#FAF7F0]/70 text-[#1C1C20]': theme === 'champagne'
          }"
          class="fixed inset-0 z-[100] overflow-hidden backdrop-blur-2xl transition-colors duration-500 flex items-center justify-center pointer-events-none"
     >
@@ -295,21 +295,46 @@
         </div>
     @endif
 
+    @if(session()->has('success'))
+        <div x-data="{ show: true }" 
+             x-show="show" 
+             x-init="setTimeout(() => show = false, 4000)"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 translate-y-2"
+             class="fixed bottom-20 left-6 z-[100] max-w-sm"
+        >
+            <div class="bg-emerald-950/90 border border-emerald-800/80 text-emerald-100 px-4 py-3 rounded-xl backdrop-blur-md shadow-2xl flex items-center justify-between gap-4">
+                <span class="text-xs font-light">{{ session('success') }}</span>
+                <button @click="show = false" class="text-emerald-300 hover:text-white cursor-pointer select-none">
+                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
+
     <!-- Stylesheet for background animations -->
     <style>
         /* Smooth layout fade-in slide-down transition from top to bottom */
         @keyframes layout-fade-slide-down {
             0% {
-                opacity: 0;
-                transform: translateY(-20px);
+                opacity: 0.3;
+                filter: blur(2px);
+                transform: translateY(-12px);
             }
             100% {
                 opacity: 1;
+                filter: blur(0);
                 transform: translateY(0);
             }
         }
         .animate-layout-transition {
-            animation: layout-fade-slide-down 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation: layout-fade-slide-down 1.0s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         /* Preloader filling bar */
@@ -403,7 +428,7 @@
         }
     </style>
 
-    <div :class="!loading ? 'animate-layout-transition' : 'opacity-0'" class="flex-1 flex flex-col justify-between relative z-10">
+    <div :class="!loading ? 'animate-layout-transition' : 'opacity-30 blur-[2px]'" class="flex-1 flex flex-col justify-between relative z-10 transition-all duration-1000">
 
     <!-- Interactive SVG ambient floral background overlay -->
 
@@ -690,7 +715,7 @@
                                           'text-[#B59A7A]': theme === 'champagne',
                                           'text-[#B76E79]': theme === 'rose'
                                       }">Atelier Loyalty Circle</span>
-                                <p class="text-neutral-400 font-light text-[11px] leading-relaxed">Sign in to track orders, manage eTIMS profiles, and earn loyalty rewards.</p>
+                                <p class="text-neutral-400 font-light text-[11px] leading-relaxed">Sign in to track orders, manage billing profiles, and earn loyalty rewards.</p>
                                 <div class="flex flex-col gap-2.5 pt-1">
                                     <!-- Sign In Button with theme-aware hover glow and scale -->
                                     <a href="/login" 
@@ -946,61 +971,7 @@
             </div>
         </div>
 
-        <!-- FNP-Style Global Location & Date Checker Bar -->
-        <div class="w-full bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 md:p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm text-left">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800 shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25a7.5 7.5 0 1 1 15 0Z" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-sm font-semibold text-neutral-800">Select Delivery Details</h3>
-                    <p class="text-xs text-neutral-500 font-light">Confirm destination city and date to view available collections and slots.</p>
-                </div>
-            </div>
-            
-            <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <!-- Delivery City -->
-                <div class="flex-1 min-w-[160px]">
-                    <select wire:model.live="deliveryCity" class="w-full bg-white border border-neutral-200 rounded-lg px-3 py-2 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/20 font-sans cursor-pointer">
-                        <option value="">-- Select City --</option>
-                        <option value="Nairobi">Nairobi</option>
-                        <option value="Kiambu">Kiambu</option>
-                        <option value="Mombasa">Mombasa</option>
-                        <option value="Kisumu">Kisumu</option>
-                        <option value="Nakuru">Nakuru</option>
-                    </select>
-                </div>
-                
-                <!-- Delivery Date -->
-                <div class="flex-1 min-w-[160px]">
-                    <input type="date" wire:model.live="deliveryDate" min="{{ date('Y-m-d') }}" class="w-full bg-white border border-neutral-200 rounded-lg px-3 py-2 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/20 font-sans">
-                </div>
-                
-                <!-- Delivery Slot -->
-                <div class="flex-1 min-w-[160px]">
-                    <select wire:model.live="deliverySlot" class="w-full bg-white border border-neutral-200 rounded-lg px-3 py-2 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/20 font-sans cursor-pointer">
-                        <option value="standard">Standard (Free)</option>
-                        <option value="midnight">Midnight (1,500 KSH)</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Delivery Status Message -->
-            <div class="shrink-0 text-xs">
-                @if($deliveryDetailsValid)
-                    <span class="text-emerald-700 font-medium flex items-center gap-1.5 bg-emerald-100/50 px-3 py-1.5 rounded-lg border border-emerald-200">
-                        ✓ Delivering to <span class="font-bold">{{ $deliveryCity }}</span> on <span class="font-bold">{{ \Carbon\Carbon::parse($deliveryDate)->format('d M Y') }}</span> ({{ ucfirst($deliverySlot) }})
-                    </span>
-                @else
-                    <span class="text-amber-700 font-medium flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 animate-pulse">
-                        ⚠ Enter details to check availability
-                    </span>
-                @endif
-            </div>
-        </div>
+        <!-- FNP checker bar removed and scheduling consolidated into checkout logistics spec -->
 
 
         <!-- Double Column Layout: Left Sticky Sidebar, Right Catalog showroom -->
@@ -1302,6 +1273,39 @@
                                     <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
                                          class="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-all duration-700 z-0">
                                     
+                                    <!-- Stock Status Overlay -->
+                                    @if($product->stock <= 0)
+                                        <span class="absolute top-1.5 left-1.5 z-20 bg-rose-600/90 text-white text-[8px] font-outfit uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full backdrop-blur-md shadow-sm">
+                                            Out of Stock
+                                        </span>
+                                    @elseif($product->stock <= 5)
+                                        <span class="absolute top-1.5 left-1.5 z-20 bg-amber-600/90 text-white text-[8px] font-outfit uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full backdrop-blur-md shadow-sm animate-pulse">
+                                            Limited Items
+                                        </span>
+                                    @endif
+                                    
+                                    @auth
+                                        @php
+                                            $inWishlist = in_array($product->id, auth()->user()->settings['wishlist'] ?? []);
+                                        @endphp
+                                    @else
+                                        @php
+                                            $inWishlist = false;
+                                        @endphp
+                                    @endauth
+
+                                    <!-- Wishlist Button -->
+                                    <button 
+                                        type="button" 
+                                        wire:click="toggleWishlist({{ $product->id }})" 
+                                        class="absolute top-2 right-2 z-20 w-6 h-6 rounded-full flex items-center justify-center bg-[#0B0B0D]/60 border border-white/5 text-[#C5A880] hover:scale-110 hover:bg-neutral-900 transition-all cursor-pointer shadow-md"
+                                        title="{{ $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
+                                    >
+                                        <svg class="w-3.5 h-3.5 fill-current {{ $inWishlist ? 'text-rose-500' : 'text-neutral-400 fill-none stroke-current' }}" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                        </svg>
+                                    </button>
+
                                     <div class="absolute bottom-2 left-2 z-10">
                                         <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded-full text-[8px] font-outfit font-bold tracking-wider uppercase shadow-md">
                                             {{ $product->grade ?? 'Service' }}
@@ -1375,6 +1379,39 @@
                                     <div class="aspect-[4/5] rounded-t-[180px] rounded-b-[24px] relative overflow-hidden bg-neutral-950/5">
                                         <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
                                              class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 z-0">
+                                        
+                                        <!-- Stock Status Overlay -->
+                                        @if($product->stock <= 0)
+                                            <span class="absolute top-3 left-3 z-20 bg-rose-600/90 text-white text-[9px] font-outfit uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full backdrop-blur-md shadow-sm">
+                                                Out of Stock
+                                            </span>
+                                        @elseif($product->stock <= 5)
+                                            <span class="absolute top-3 left-3 z-20 bg-amber-600/90 text-white text-[9px] font-outfit uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full backdrop-blur-md shadow-sm animate-pulse">
+                                                Limited Items
+                                            </span>
+                                        @endif
+                                        
+                                        @auth
+                                            @php
+                                                $inWishlist = in_array($product->id, auth()->user()->settings['wishlist'] ?? []);
+                                            @endphp
+                                        @else
+                                            @php
+                                                $inWishlist = false;
+                                            @endphp
+                                        @endauth
+
+                                        <!-- Wishlist Button -->
+                                        <button 
+                                            type="button" 
+                                            wire:click="toggleWishlist({{ $product->id }})" 
+                                            class="absolute top-3 right-3 z-20 w-8 h-8 rounded-full flex items-center justify-center bg-[#0B0B0D]/60 border border-white/5 text-[#C5A880] hover:scale-110 hover:bg-neutral-900 transition-all cursor-pointer shadow-md"
+                                            title="{{ $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
+                                        >
+                                            <svg class="w-4 h-4 fill-current {{ $inWishlist ? 'text-rose-500' : 'text-neutral-400 fill-none stroke-current' }}" viewBox="0 0 24 24" stroke-width="1.5">
+                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                            </svg>
+                                        </button>
                                         
                                         <div class="absolute bottom-3 inset-x-3 flex justify-between items-end z-10">
                                             <span class="bg-[#0B0B0D]/60 border border-white/5 text-neutral-200 px-2 py-0.5 rounded text-[10px] font-outfit uppercase tracking-widest backdrop-blur-md">
@@ -1722,12 +1759,13 @@
             <div class="flex space-x-6">
                 <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Terms of Curation</a>
                 <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Logistics Policy</a>
-                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">eTIMS Verification</a>
+                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Invoice Request</a>
             </div>
         </div>
     </footer>
 
     <!-- No Account Drawer here (Profile details managed inside dedicated /profile-portal) -->
+    </div> <!-- Close transformed layout transition container here to lift curation modal out of transformed context -->
     
     <!-- Backdrop for Curation Drawer -->
     <div x-show="drawerOpen" @click="drawerOpen = false" class="fixed inset-0 z-45 bg-black/40 backdrop-blur-xl" style="display: none;"></div>
@@ -1737,7 +1775,7 @@
         x-show="drawerOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'champagne' ? 'bg-white border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/95 border border-neutral-900 text-white shadow-2xl'"
+        :class="theme === 'champagne' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[520px] max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
         style="display: none;"
     >
@@ -1762,7 +1800,7 @@
                             <h4 :class="theme === 'champagne' ? 'text-neutral-855' : 'text-white'" class="font-normal">{{ $item['product']->name }}</h4>
                             <p class="text-neutral-500 font-mono">{{ number_format($item['product']->price) }} KSH &bull; <span class="uppercase text-[10px]">Pack/{{ $item['product']->unit_type }}</span></p>
                         </div>
-                        <div :class="theme === 'champagne' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="flex items-center space-x-3 px-2.5 py-1.5 border rounded-full">
+                        <div :class="theme === 'champagne' ? 'bg-[#FAF7F0]/40 border-neutral-200/50 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="flex items-center space-x-3 px-2.5 py-1.5 border rounded-full">
                             <button wire:click="removeFromCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="text-neutral-400 font-bold font-mono cursor-pointer select-none">-</button>
                             <span class="text-xs font-mono min-w-[15px] text-center">{{ $item['quantity'] }}</span>
                             <button wire:click="addToCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="text-neutral-400 font-bold font-mono cursor-pointer select-none">+</button>
@@ -1825,7 +1863,7 @@
 
                     <div :class="theme === 'champagne' ? 'bg-neutral-100 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-1 border rounded-full grid grid-cols-2 text-center text-[11px] font-mono uppercase tracking-wider shadow-inner">
                         <button type="button" @click="$wire.set('checkoutType', 'standard')" :class="$wire.checkoutType === 'standard' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Personal Delivery</button>
-                        <button type="button" @click="$wire.set('checkoutType', 'corporate')" :class="$wire.checkoutType === 'corporate' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Corporate eTIMS</button>
+                        <button type="button" @click="$wire.set('checkoutType', 'corporate')" :class="$wire.checkoutType === 'corporate' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Corporate Billing</button>
                     </div>
 
                     @if($checkoutType === 'corporate')
@@ -1869,7 +1907,7 @@
                             <div><span class="text-neutral-500">Contact Payer:</span> <span class="font-semibold text-neutral-300 dark:text-white">{{ $full_name }}</span></div>
                             <div><span class="text-neutral-500">Secure Comm:</span> <span class="font-mono">{{ $phone }} &bull; {{ $email }}</span></div>
                             @if($checkoutType === 'corporate')
-                                <div><span class="text-neutral-500 font-mono">eTIMS KRA PIN:</span> <span class="font-mono text-amber-500 font-semibold uppercase">{{ $kra_pin }}</span></div>
+                                <div><span class="text-neutral-500 font-mono">KRA PIN:</span> <span class="font-mono text-amber-500 font-semibold uppercase">{{ $kra_pin }}</span></div>
                             @endif
                         </div>
                     </div>
@@ -1890,24 +1928,177 @@
                                 <span class="font-mono text-[11px] text-emerald-500 font-semibold">+ 1,500 KSH</span>
                             </button>
                         </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-500">Distribution Node *</label>
-                            <select wire:model.live="region" :class="theme === 'champagne' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
+                            <label class="text-xs uppercase tracking-wider text-neutral-550">Distribution Node *</label>
+                            <select wire:model.live="region" :class="theme === 'champagne' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
                                 <option value="Nairobi">Nairobi Metropolitan</option>
                                 <option value="Kiambu">Kiambu Ridge Hub</option>
                             </select>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-500">Landmarks Address *</label>
-                            <input type="text" list="premium-address-nodes" placeholder="Type complex, street, or estate..." wire:model="delivery_address" :class="theme === 'champagne' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
+                            <label class="text-xs uppercase tracking-wider text-neutral-550">Landmarks Address *</label>
+                            <input type="text" list="premium-address-nodes" placeholder="Type complex, street, or estate..." wire:model="delivery_address" :class="theme === 'champagne' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
                             <datalist id="premium-address-nodes">
                                 @foreach($this->getAddressSuggestions() as $node) <option value="{{ $node }}"></option> @endforeach
                             </datalist>
                         </div>
                     </div>
+
+                    <!-- Delivery Date & Slot Picker in Logistics Spec -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase tracking-wider text-neutral-555 font-mono block">Delivery Date *</label>
+                            <input type="date" wire:model.live="deliveryDate" min="{{ date('Y-m-d') }}" :class="theme === 'champagne' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans">
+                            @error('deliveryDate') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase tracking-wider text-neutral-555 font-mono block">Delivery Time Slot *</label>
+                            <select wire:model.live="deliverySlot" :class="theme === 'champagne' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans cursor-pointer">
+                                <option value="standard">Standard (Free)</option>
+                                <option value="midnight">Midnight (1,500 KSH)</option>
+                            </select>
+                            @error('deliverySlot') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <!-- Free OpenStreetMap Interactive Map Locator with Autocomplete Search -->
+                    <div class="space-y-2" wire:ignore>
+                        <label class="text-[10px] uppercase tracking-wider text-neutral-555 font-mono block">Interactive Curation Dispatch Map (Click/drag marker to pinpoint location for free)</label>
+                        
+                        <div 
+                            x-data="{
+                                map: null,
+                                marker: null,
+                                searchQuery: '',
+                                searchResults: [],
+                                initMap() {
+                                    let lat = -1.2921;
+                                    let lng = 36.8219;
+                                    
+                                    let match = $wire.delivery_address.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
+                                    if (match) {
+                                        lat = parseFloat(match[1]);
+                                        lng = parseFloat(match[2]);
+                                    }
+
+                                    setTimeout(() => {
+                                        this.map = L.map('checkout-map').setView([lat, lng], 13);
+                                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                            attribution: '&copy; OpenStreetMap contributors'
+                                        }).addTo(this.map);
+                                        
+                                        this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
+                                        
+                                        this.marker.on('dragend', (e) => {
+                                            let position = this.marker.getLatLng();
+                                            this.updateCoords(position.lat, position.lng);
+                                        });
+                                        
+                                        this.map.on('click', (e) => {
+                                            this.marker.setLatLng(e.latlng);
+                                            this.updateCoords(e.latlng.lat, e.latlng.lng);
+                                        });
+
+                                        // ResizeObserver ensures Leaflet renders properly inside modal transitions
+                                        const observer = new ResizeObserver(() => {
+                                            this.map.invalidateSize();
+                                        });
+                                        observer.observe(document.getElementById('checkout-map'));
+                                    }, 400);
+
+                                    $watch('$wire.region', (val) => {
+                                        let centerCoords = val === 'Kiambu' ? [-1.1578, 36.8407] : [-1.2921, 36.8219];
+                                        this.map.setView(centerCoords, 13);
+                                        this.marker.setLatLng(centerCoords);
+                                        this.updateCoords(centerCoords[0], centerCoords[1]);
+                                    });
+                                },
+                                searchQueryClean() {
+                                    return this.searchQuery.trim();
+                                },
+                                searchLocation() {
+                                    let q = this.searchQueryClean();
+                                    if (!q) return;
+                                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`)
+                                        .then(res => res.json())
+                                        .then(data => {
+                                            this.searchResults = data;
+                                        })
+                                        .catch(() => {});
+                                },
+                                selectResult(res) {
+                                    let lat = parseFloat(res.lat);
+                                    let lng = parseFloat(res.lon);
+                                    this.map.setView([lat, lng], 14);
+                                    this.marker.setLatLng([lat, lng]);
+                                    this.updateCoords(lat, lng);
+                                    this.searchResults = [];
+                                    this.searchQuery = res.display_name.split(',').slice(0, 3).join(',').trim();
+                                },
+                                updateCoords(lat, lng) {
+                                    let coords = lat.toFixed(6) + ', ' + lng.toFixed(6);
+                                    $wire.delivery_address = coords;
+                                    
+                                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+                                        .then(res => res.json())
+                                        .then(data => {
+                                            if (data && data.display_name) {
+                                                let shortName = data.display_name.split(',').slice(0, 3).join(',').trim();
+                                                $wire.delivery_address = coords + ' (' + shortName + ')';
+                                            }
+                                        })
+                                        .catch(() => {});
+                                }
+                            }"
+                            x-init="initMap()"
+                            class="relative"
+                        >
+                            <!-- Map Search Autocomplete Input -->
+                            <div class="relative z-40 mb-2">
+                                <div class="flex gap-2">
+                                    <input 
+                                        type="text" 
+                                        x-model="searchQuery" 
+                                        @keydown.enter.prevent="searchLocation()"
+                                        placeholder="Search delivery address (e.g. Kilimani)..." 
+                                        :class="theme === 'champagne' ? 'bg-white border-neutral-200 text-black placeholder-neutral-400' : 'bg-[#0A0A0A] border-neutral-800 text-white placeholder-neutral-600'"
+                                        class="flex-1 border rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-neutral-400 font-sans"
+                                    >
+                                    <button 
+                                        type="button" 
+                                        @click="searchLocation()"
+                                        :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'"
+                                        class="px-3.5 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold"
+                                    >
+                                        Find
+                                    </button>
+                                </div>
+                                <div 
+                                    x-show="searchResults.length > 0" 
+                                    @click.away="searchResults = []"
+                                    :class="theme === 'champagne' ? 'bg-[#FAF7F0] border-neutral-200 text-neutral-900' : 'bg-[#0F0F12] border-neutral-900 text-white'"
+                                    class="absolute left-0 right-0 z-[1000] mt-1 max-h-48 overflow-y-auto border rounded-xl shadow-xl text-xs"
+                                    style="display: none;"
+                                >
+                                    <template x-for="res in searchResults" :key="res.place_id">
+                                        <div 
+                                            @click="selectResult(res)"
+                                            :class="theme === 'champagne' ? 'hover:bg-neutral-200/50' : 'hover:bg-white/10'"
+                                            class="px-3 py-2 cursor-pointer transition-colors border-b last:border-b-0 border-neutral-500/10 font-sans"
+                                            x-text="res.display_name"
+                                        ></div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Leaflet Map Container -->
+                            <div 
+                                id="checkout-map"
+                                class="w-full h-32 rounded-xl overflow-hidden border border-neutral-500/10 z-10"
+                            ></div>
+                        </div>
+                    </div>      </div>
                 </div>
 
                 <div :class="theme === 'champagne' ? 'border-neutral-200 bg-neutral-50/60' : 'border-neutral-900 bg-black/40'" class="p-5 border-t space-y-4 shrink-0 text-xs">
@@ -1915,7 +2106,7 @@
                         <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block pb-1 border-b border-neutral-500/10">Itemized Pre-Payment Statement</span>
                         
                         <!-- Product Item list -->
-                        <div class="space-y-1.5 border-b border-neutral-500/5 pb-2">
+                        <div class="space-y-1.5 border-b border-neutral-500/5 pb-2 max-h-24 overflow-y-auto scrollbar-none">
                             @foreach($cartItems as $item)
                                 <div class="flex justify-between text-neutral-400">
                                     <span>{{ $item['product']->name }} ({{ strtoupper(substr($item['size'], 0, 3)) }} × {{ $item['quantity'] }})</span>
@@ -1978,7 +2169,7 @@
                                  <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block pb-1 border-b border-neutral-500/10">Remittance Statement Summary</span>
                                  
                                  <!-- Itemized pricing lines -->
-                                 <div class="space-y-1.5 border-b border-neutral-500/5 pb-2">
+                                 <div class="space-y-1.5 border-b border-neutral-500/5 pb-2 max-h-24 overflow-y-auto scrollbar-none">
                                      @foreach($cartItems as $item)
                                          <div class="flex justify-between text-neutral-400">
                                              <span>{{ $item['product']->name }} ({{ strtoupper(substr($item['size'], 0, 3)) }} × {{ $item['quantity'] }})</span>
@@ -2084,7 +2275,7 @@
                                      @else
                                          <div class="flex justify-between"><span>Billing Terms:</span><span class="text-amber-500 font-bold uppercase">Net 30 Credit Invoice</span></div>
                                      @endif
-                                     <div class="flex justify-between"><span>eTIMS Invoiced:</span><span class="text-emerald-400">16% VAT COMPLIANT</span></div>
+                                     <div class="flex justify-between"><span>Proforma Invoice:</span><span class="text-emerald-400">DETAILED RECEIPT</span></div>
                                  </div>
                                 </div>
 
@@ -2093,7 +2284,7 @@
                                         <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
                                             <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
-                                        <span>Download PDF Receipt</span>
+                                        <span>Download Proforma Invoice</span>
                                     </a>
                                 </div>
                             </div>
@@ -2131,18 +2322,18 @@
                         <span>Clear & Return to Showroom</span>
                     </button>
                 </div>
+                </div>
             </div>
         @endif
     </div>
 
-    <!-- Redundant Floating Round Cart Button removed in favor of header navigation cart -->
 
     <!-- Floating Chat Widget -->
     <div x-show="!drawerOpen" x-transition class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
         <!-- Jumping Animated Circular Icon Button -->
         <button 
             @click="chatOpen = !chatOpen" 
-            :class="theme === 'champagne' ? 'bg-[#FAF7F0] text-black border-neutral-200 shadow-sm' : 'bg-[#0A0A0A] text-white border-neutral-800 shadow-2xl'"
+            :class="theme === 'champagne' ? 'bg-[#FAF7F0]/85 text-black border-neutral-250/60 shadow-md backdrop-blur-md' : 'bg-[#0A0A0A]/85 text-white border-neutral-800 shadow-2xl backdrop-blur-md'"
             class="w-14 h-14 rounded-full flex items-center justify-center border cursor-pointer hover:scale-105 transition-all duration-300 animate-aura-bounce relative theme-section"
             title="Aura Curation Companion"
         >
@@ -2165,8 +2356,8 @@
             </span>
         </button>
  
-        <div x-show="chatOpen" style="display: none;" x-transition class="mt-3 w-80 md:w-96 h-[420px] bg-[#0F0F0F] border border-neutral-800 rounded-3xl shadow-2xl flex flex-col justify-between overflow-hidden">
-            <div class="p-4 border-b border-neutral-800 bg-[#0A0A0A] flex items-center justify-between text-left">
+        <div x-show="chatOpen" style="display: none;" x-transition class="mt-3 w-80 md:w-96 h-[420px] bg-[#0F0F0F]/90 border border-neutral-800 rounded-3xl shadow-2xl flex flex-col justify-between overflow-hidden backdrop-blur-xl">
+            <div class="p-4 border-b border-neutral-800 bg-[#0A0A0A]/90 flex items-center justify-between text-left">
                 <div>
                     <span class="text-xs uppercase font-mono text-neutral-300 tracking-wider font-semibold">Aura Concierge AI</span>
                     <span class="block text-[11px] text-emerald-400 font-mono mt-0.5">&bull; Active Curation Companion</span>
@@ -2174,16 +2365,15 @@
             </div>
             <div class="flex-1 p-4 overflow-y-auto space-y-4 text-xs font-light scrollbar-none flex flex-col text-left">
                 @foreach($chatHistory as $msg)
-                    <div class="max-w-[85%] rounded px-3 py-2.5 leading-relaxed {{ $msg['sender'] === 'bot' ? 'bg-neutral-900 text-neutral-300 self-start border border-neutral-800/40' : 'bg-white text-black font-normal self-end shadow-md' }}">{{ $msg['text'] }}</div>
+                    <div class="max-w-[85%] rounded px-3 py-2.5 leading-relaxed {{ $msg['sender'] === 'bot' ? 'bg-neutral-900/80 text-neutral-300 self-start border border-neutral-800/40' : 'bg-white/90 text-black font-normal self-end shadow-md' }}">{{ $msg['text'] }}</div>
                 @endforeach
             </div>
-            <form wire:submit.prevent="sendChatMessage" class="p-3 border-t border-neutral-800 bg-[#0A0A0A] flex items-center gap-2">
-                <input type="text" wire:model="chatMessage" placeholder="Ask Aura about arrangements, branches, points..." class="flex-1 bg-[#141414] border border-neutral-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-700 font-light font-sans">
+            <form wire:submit.prevent="sendChatMessage" class="p-3 border-t border-neutral-800 bg-[#0A0A0A]/90 flex items-center gap-2">
+                <input type="text" wire:model="chatMessage" placeholder="Ask Aura about arrangements, branches, points..." class="flex-1 bg-[#141414]/90 border border-neutral-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-700 font-light font-sans">
                 <button type="submit" class="bg-white text-black font-mono text-[11px] uppercase font-bold px-3.5 py-2 rounded-full cursor-pointer hover:bg-neutral-200 transition-colors">Ask</button>
             </form>
         </div>
     </div>
-
 
     <!-- Product Detail Modal (FNP-style) -->
     <div x-show="quickViewOpen" @click="quickViewOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
@@ -2192,7 +2382,7 @@
         x-show="quickViewOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-32px)] sm:w-[640px] max-h-[90vh] z-50 bg-white border border-neutral-200 text-neutral-900 shadow-2xl flex flex-col justify-between text-left rounded-[28px] overflow-hidden font-sans"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-32px)] sm:w-[640px] max-h-[90vh] z-50 bg-white/90 border border-neutral-200/80 text-neutral-900 shadow-2xl flex flex-col justify-between text-left rounded-[28px] overflow-hidden font-sans backdrop-blur-xl"
         style="display: none;"
     >
         <div class="p-5 border-b border-neutral-100 flex items-center justify-between shrink-0">
@@ -2210,7 +2400,7 @@
         <div class="p-6 overflow-y-auto flex-1 flex flex-col md:flex-row gap-6">
             <!-- Image column -->
             <div class="w-full md:w-1/2 shrink-0">
-                <div class="w-full h-48 md:h-64 rounded-2xl overflow-hidden bg-neutral-100 relative">
+                <div class="w-full h-48 md:h-64 rounded-2xl overflow-hidden bg-neutral-150 relative">
                     <img :src="quickViewProduct ? quickViewProduct.image : ''" :alt="quickViewProduct ? quickViewProduct.name : ''" class="w-full h-full object-cover">
                 </div>
                 <p class="text-xs text-neutral-500 font-light mt-3 leading-relaxed" x-text="quickViewProduct ? quickViewProduct.description : ''"></p>
@@ -2252,50 +2442,25 @@
                             <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_grand <= 0">Out of Stock</span>
                         </button>
                     </div>
-                </div>
-
-                <!-- Location & Date Picker -->
-                <div class="bg-neutral-50 rounded-xl p-3 border border-neutral-100 flex flex-col gap-2.5">
-                    <span class="text-xs font-bold text-neutral-700 block">Fulfillment Details</span>
                     
-                    <!-- Delivery City -->
-                    <div>
-                        <label class="text-[10px] text-neutral-500 uppercase font-semibold block mb-1">City</label>
-                        <select wire:model.live="deliveryCity" class="w-full bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 font-sans cursor-pointer">
-                            <option value="">-- Select City --</option>
-                            <option value="Nairobi">Nairobi</option>
-                            <option value="Kiambu">Kiambu</option>
-                            <option value="Mombasa">Mombasa</option>
-                            <option value="Kisumu">Kisumu</option>
-                            <option value="Nakuru">Nakuru</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Delivery Date -->
-                    <div>
-                        <label class="text-[10px] text-neutral-500 uppercase font-semibold block mb-1">Delivery Date</label>
-                        <input type="date" wire:model.live="deliveryDate" min="{{ date('Y-m-d') }}" class="w-full bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 font-sans">
-                    </div>
-                    
-                    <!-- Delivery Slot -->
-                    <div>
-                        <label class="text-[10px] text-neutral-500 uppercase font-semibold block mb-1">Delivery Time Slot</label>
-                        <select wire:model.live="deliverySlot" class="w-full bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5 text-xs text-neutral-800 focus:outline-none focus:border-emerald-600 font-sans cursor-pointer">
-                            <option value="standard">Standard (Free)</option>
-                            <option value="midnight">Midnight (1,500 KSH)</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- Validation Warning -->
-                <div x-show="!$wire.deliveryCity || !$wire.deliveryDate" class="text-xs text-amber-700 font-medium bg-amber-50 border border-amber-200/60 rounded-lg px-3 py-2 flex items-start gap-1.5 animate-pulse">
-                    <span>⚠</span>
-                    <span>Please enter delivery city and date above to enable adding this item to your curation.</span>
+                    <!-- Reactive Stock Level Indicator in Quick View -->
+                    <template x-if="quickViewProduct">
+                        <div class="mt-2.5 text-left">
+                            <span x-show="(quickViewSize === 'standard' && quickViewProduct.stock_standard <= 0) || (quickViewSize === 'deluxe' && quickViewProduct.stock_deluxe <= 0) || (quickViewSize === 'grand' && quickViewProduct.stock_grand <= 0)" 
+                                  class="inline-block text-rose-600 font-semibold bg-rose-500/10 px-2.5 py-1 rounded uppercase tracking-wider text-[9px] font-outfit">
+                                Out of Stock
+                            </span>
+                            <span x-show="(quickViewSize === 'standard' && quickViewProduct.stock_standard > 0 && quickViewProduct.stock_standard <= 5) || (quickViewSize === 'deluxe' && quickViewProduct.stock_deluxe > 0 && quickViewProduct.stock_deluxe <= 5) || (quickViewSize === 'grand' && quickViewProduct.stock_grand > 0 && quickViewProduct.stock_grand <= 5)" 
+                                  class="inline-block text-amber-600 font-semibold bg-amber-500/10 px-2.5 py-1 rounded uppercase tracking-wider text-[9px] font-outfit animate-pulse">
+                                Limited Items
+                            </span>
+                        </div>
+                    </template>
                 </div>
             </div>
         </div>
 
-        <div class="p-5 border-t border-neutral-100 bg-neutral-50 shrink-0 flex items-center justify-between">
+        <div class="p-5 border-t border-neutral-100 bg-neutral-50/80 backdrop-blur-md shrink-0 flex items-center justify-between">
             <div>
                 <span class="text-[10px] text-neutral-500 uppercase tracking-wider block">Price</span>
                 <span class="text-base font-bold text-neutral-850 font-mono">
@@ -2305,7 +2470,7 @@
             
             <button
                 type="button"
-                :disabled="!$wire.deliveryCity || !$wire.deliveryDate || (quickViewProduct && (quickViewSize === 'standard' && quickViewProduct.stock_standard <= 0) || (quickViewProduct && (quickViewSize === 'deluxe' && quickViewProduct.stock_deluxe <= 0) || (quickViewProduct && (quickViewSize === 'grand' && quickViewProduct.stock_grand <= 0))))"
+                :disabled="(quickViewSize === 'standard' && quickViewProduct && quickViewProduct.stock_standard <= 0) || (quickViewSize === 'deluxe' && quickViewProduct && quickViewProduct.stock_deluxe <= 0) || (quickViewSize === 'grand' && quickViewProduct && quickViewProduct.stock_grand <= 0)"
                 @click="$wire.addToCuration(quickViewProduct.id, quickViewSize); quickViewOpen = false; drawerOpen = true; checkoutMode = false;"
                 class="px-6 py-2.5 bg-emerald-800 hover:bg-emerald-950 text-white rounded-xl text-xs uppercase tracking-wider font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
@@ -2314,5 +2479,4 @@
         </div>
     </div>
 
-    </div>
 </div>

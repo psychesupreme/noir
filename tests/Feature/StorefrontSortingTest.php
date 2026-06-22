@@ -146,4 +146,67 @@ class StorefrontSortingTest extends TestCase
             ->set('sortBy', 'price_asc')
             ->assertSet('perPage', 6);
     }
+
+    public function test_wishlist_toggle_functionality(): void
+    {
+        $user = \App\Models\User::factory()->create([
+            'account_tier' => \App\Enums\UserRole::Retail,
+        ]);
+
+        $this->get('/');
+
+        // Unauthenticated user -> expect error message
+        Livewire::test(\App\Livewire\Storefront::class)
+            ->call('toggleWishlist', $this->productA->id)
+            ->assertSee('Please log in to manage your wishlist.');
+
+        // Authenticated user -> expect success toggling
+        $this->actingAs($user);
+
+        Livewire::test(\App\Livewire\Storefront::class)
+            ->call('toggleWishlist', $this->productA->id)
+            ->assertSee('Item added to wishlist.');
+
+        $user->refresh();
+        $this->assertContains($this->productA->id, $user->settings['wishlist'] ?? []);
+
+        // Toggle again to remove
+        Livewire::test(\App\Livewire\Storefront::class)
+            ->call('toggleWishlist', $this->productA->id)
+            ->assertSee('Item removed from wishlist.');
+
+        $user->refresh();
+        $this->assertNotContains($this->productA->id, $user->settings['wishlist'] ?? []);
+    }
+
+    public function test_curation_addition_without_delivery_details(): void
+    {
+        Livewire::test(\App\Livewire\Storefront::class)
+            ->set('deliveryCity', '')
+            ->set('deliveryDate', '')
+            ->call('addToCuration', $this->productA->id)
+            ->assertHasNoErrors()
+            ->assertViewHas('cartItems', function ($cartItems) {
+                return count($cartItems) === 1;
+            });
+    }
+
+    public function test_checkout_validation_requires_delivery_city_and_date(): void
+    {
+        $user = \App\Models\User::factory()->create([
+            'account_tier' => \App\Enums\UserRole::Retail,
+        ]);
+        $this->actingAs($user);
+
+        Livewire::test(\App\Livewire\Storefront::class)
+            ->set('full_name', 'Test User')
+            ->set('email', 'test@example.com')
+            ->set('phone', '0712345678')
+            ->set('delivery_address', '123 Test Street')
+            ->set('region', 'Nairobi')
+            ->set('deliveryCity', '')
+            ->set('deliveryDate', '')
+            ->call('submitCurationRequest')
+            ->assertHasErrors(['deliveryCity', 'deliveryDate']);
+    }
 }

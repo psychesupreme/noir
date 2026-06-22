@@ -1,9 +1,27 @@
+@php
+    if (!function_exists('formatInvoicePhone')) {
+        function formatInvoicePhone($phone) {
+            if (empty($phone)) return 'Not Provided';
+            $digits = preg_replace('/\D/', '', $phone);
+            if (str_starts_with($digits, '254') && strlen($digits) === 12) {
+                return '+254 ' . substr($digits, 3);
+            }
+            if (str_starts_with($digits, '0') && strlen($digits) === 10) {
+                return '+254 ' . substr($digits, 1);
+            }
+            if (strlen($digits) === 9) {
+                return '+254 ' . $digits;
+            }
+            return '+' . $digits;
+        }
+    }
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tax Receipt - Order #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }} - Noir & Bloom</title>
+    <title>Proforma Invoice - Order #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }} - Noir & Bloom</title>
     
     <!-- Premium Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -399,7 +417,7 @@
         <div class="btn-group">
             <button onclick="window.print()" class="btn btn-primary">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top: -2px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                Print Receipt
+                Print Invoice
             </button>
             <a href="{{ route('storefront') }}" class="btn btn-secondary">
                 Return to Store
@@ -414,7 +432,7 @@
             <!-- Atelier Header -->
             <div class="receipt-header">
                 <div class="atelier-logo">Noir & Bloom</div>
-                <div class="receipt-subtitle">Official Tax Receipt & Fiscal Invoice</div>
+                <div class="receipt-subtitle">PROFORMA INVOICE / PURCHASE RECEIPT</div>
             </div>
 
             <!-- Meta Information Grid -->
@@ -455,7 +473,7 @@
                     @endif
                     <div class="meta-row">
                         <span class="meta-label">Contact Phone:</span>
-                        <span class="meta-value mono">{{ $order->client->phone }}</span>
+                        <span class="meta-value mono">{{ formatInvoicePhone($order->client->phone) }}</span>
                     </div>
                     <div class="meta-row">
                         <span class="meta-label">Email Address:</span>
@@ -489,27 +507,20 @@
                 </tbody>
             </table>
 
-            <!-- Bottom Invoice Summary Wrapper -->
-            <div class="summary-wrapper">
-                
-                <!-- eTIMS Compliance & QR Details -->
-                <div class="etims-verification-block">
-                    <div class="qr-wrapper">
-                        {!! $qrCodeSvg !!}
-                    </div>
-                    <div class="etims-details">
-                        <h4 class="etims-title">KRA eTIMS FISCAL PROOF</h4>
-                        <div><strong>CU Invoice No:</strong></div>
-                        <div class="etims-code" style="margin-bottom: 4px;">{{ $invoice?->cu_invoice_number ?? 'MOCK-CU-UNTRANSMITTED' }}</div>
-                        <div><strong>Status:</strong> <span style="text-transform: uppercase; font-weight: 600;">{{ $invoice?->status ?? 'pending' }}</span></div>
-                        <div style="font-size: 8px; color: var(--text-muted); margin-top: 6px; line-height: 1.2;">
-                            This is an official digital tax representation validated under Section 23A of the KRA Tax Procedures Act.
-                        </div>
-                    </div>
-                </div>
+            @if($order->special_instructions)
+            <div style="font-size: 11px; margin-bottom: 25px; border: 1px dashed var(--rose-gold); padding: 15px; border-radius: 4px; background: rgba(197, 168, 128, 0.03); text-align: left;">
+                <h4 style="font-family: var(--font-serif); margin: 0 0 6px 0; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; color: var(--rose-gold); font-weight: 600;">Curation Specifications (Hand Curator copy)</h4>
+                <p style="margin: 0; line-height: 1.5; color: var(--text-dark); font-style: italic;">
+                    {{ $order->special_instructions }}
+                </p>
+            </div>
+            @endif
 
+            <!-- Bottom Invoice Summary Wrapper -->
+            <div class="summary-wrapper" style="display: flex; justify-content: flex-end;">
+                
                 <!-- Financial Totals -->
-                <div class="totals-block">
+                <div class="totals-block" style="width: 100%; max-width: 380px;">
                     <div class="totals-row">
                         <span class="meta-label">Subtotal:</span>
                         <span class="mono-num">KES {{ number_format($order->total_amount - $order->service_fee_amount) }}</span>
@@ -542,7 +553,7 @@
                 <h4 style="font-family: var(--font-serif); margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1px; font-size: 11px;">M-Pesa Payment Details</h4>
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
                     <div><span class="meta-label">Receipt Number:</span> <strong class="mono-num" style="display:block;">{{ $completedPayment->mpesa_receipt_number }}</strong></div>
-                    <div><span class="meta-label">Payer Mobile:</span> <span class="mono-num" style="display:block;">{{ $completedPayment->phone_number }}</span></div>
+                    <div><span class="meta-label">Payer Mobile:</span> <span class="mono-num" style="display:block;">{{ formatInvoicePhone($completedPayment->phone_number) }}</span></div>
                     <div><span class="meta-label">Payment ID:</span> <span class="mono-num" style="display:block;">{{ $completedPayment->merchant_request_id ?: 'STK-' . $completedPayment->id }}</span></div>
                 </div>
             </div>

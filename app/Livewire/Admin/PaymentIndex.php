@@ -104,7 +104,7 @@ class PaymentIndex extends Component
     {
         $this->validate([
             'editingStatus' => 'required|in:pending,completed,failed',
-            'editingReceiptNumber' => 'nullable|string|max:100',
+            'editingReceiptNumber' => $this->editingStatus === 'completed' ? 'required|string|min:5|max:100' : 'nullable|string|max:100',
             'editingResultDesc' => 'nullable|string|max:255',
         ]);
 
@@ -119,7 +119,7 @@ class PaymentIndex extends Component
         DB::transaction(function () use ($payment, $oldStatus, $newStatus) {
             $payment->update([
                 'status' => $newStatus,
-                'mpesa_receipt_number' => $newStatus === 'completed' ? $this->editingReceiptNumber : ($newStatus === 'pending' ? null : $payment->mpesa_receipt_number),
+                'mpesa_receipt_number' => ($newStatus === 'completed' && trim($this->editingReceiptNumber) !== '') ? trim($this->editingReceiptNumber) : ($newStatus === 'pending' ? null : $payment->mpesa_receipt_number),
                 'result_description' => $this->editingResultDesc,
             ]);
 

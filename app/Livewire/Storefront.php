@@ -128,6 +128,8 @@ class Storefront extends Component
     public function updatedRegion($value): void
     {
         $this->delivery_address = '';
+        $this->deliveryCity = $value;
+        $this->validateDeliveryDetails();
     }
 
     public function mount(): void
@@ -158,6 +160,10 @@ class Storefront extends Component
             $this->delivery_address = $user->default_delivery_address ?? '';
             $this->region = $user->default_region ?? 'Nairobi';
             $this->checkoutType = $user->account_tier?->value === 'corporate' ? 'corporate' : 'standard';
+
+            if (empty($this->deliveryCity)) {
+                $this->deliveryCity = $this->region;
+            }
         }
 
         if (session()->get('open_curation_drawer_after_login')) {
@@ -229,11 +235,6 @@ class Storefront extends Component
     {
         $this->orderSubmitted = false;
         $this->mpesaErrorMessage = null;
-
-        if (empty($this->deliveryCity) || empty($this->deliveryDate)) {
-            session()->flash('error', 'Please select a delivery city and date before adding items to curation.');
-            return;
-        }
 
         $product = Product::find($productId);
         if (!$product) return;
@@ -377,19 +378,14 @@ class Storefront extends Component
         }
         \Illuminate\Support\Facades\RateLimiter::hit($ipKey, 60);
 
-        if (empty($this->deliveryCity) || empty($this->deliveryDate)) {
-            $this->addError('deliveryCity', 'Please select a delivery city.');
-            $this->addError('deliveryDate', 'Please select a delivery date.');
-            session()->flash('error', 'Please select a delivery city and date.');
-            return;
-        }
-
         $this->validate([
             'full_name'        => 'required|string|min:3',
             'email'            => 'required|email',
             'phone'            => 'required|string',
             'delivery_address' => 'required|string|min:6',
             'region'           => 'required|in:Nairobi,Kiambu',
+            'deliveryCity'     => 'required|string',
+            'deliveryDate'     => 'required|date|after_or_equal:today',
             'recipient_name'   => $this->is_gift ? 'required|string|min:3' : 'nullable',
             'recipient_phone'  => $this->is_gift ? 'required|string|min:9' : 'nullable',
             'kra_pin'          => $this->checkoutType === 'corporate' ? 'required|string|min:11' : 'nullable',
@@ -820,5 +816,30 @@ class Storefront extends Component
     {
         session()->put('open_curation_drawer_after_login', true);
         $this->redirect($target, navigate: true);
+    }
+
+    public function toggleWishlist(int $productId): void
+    {
+        if (!auth()->check()) {
+            session()->flash('error', 'Please log in to manage your wishlist.');
+            return;
+        }
+
+        $user = auth()->user();
+        $settings = $user->settings ?? [];
+        $wishlist = $settings['wishlist'] ?? [];
+
+        if (in_array($productId, $wishlist)) {
+            $wishlist = array_values(array_filter($wishlist, fn($id) => $id != $productId));
+            $msg = 'Item removed from wishlist.';
+        } else {
+            $wishlist[] = $productId;
+            $msg = 'Item added to wishlist.';
+        }
+
+        $settings['wishlist'] = $wishlist;
+        $user->update(['settings' => $settings]);
+
+        session()->flash('success', $msg);
     }
 }

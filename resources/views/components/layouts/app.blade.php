@@ -76,6 +76,10 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-serif:400,400i|plus-jakarta-sans:300,400,500|outfit:300,400,600,700" rel="stylesheet" />
 
+    <!-- Leaflet Map CSS & JS CDN (100% Free OpenStreetMap client) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
     <!-- Tailwind CSS v4 Build Layer & Livewire Asset Core -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles

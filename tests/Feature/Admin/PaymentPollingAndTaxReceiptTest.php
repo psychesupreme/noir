@@ -181,7 +181,7 @@ class PaymentPollingAndTaxReceiptTest extends TestCase
         $response->assertSee('Jane Doe');
         $response->assertSee('A001234567Z'); // KRA PIN
         $response->assertSee('REC-12345'); // M-Pesa Receipt
-        $response->assertSee('KRA-TIMS-CU-1234567890'); // CU number
+        $response->assertDontSee('KRA-TIMS-CU-1234567890'); // CU number removed from end-user receipt
     }
 
     /**
