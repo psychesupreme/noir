@@ -35,7 +35,7 @@ class ProfilePortal extends Component
     public bool $notification_sms = false;
     public bool $notification_concierge = false;
     public bool $notification_newsletter = false;
-    public string $preferred_theme = 'onyx';
+    public string $preferred_theme = 'dark';
 
     // Logistics status update success feedback (for staff tab)
     public ?int $updatedOrderId = null;
@@ -82,7 +82,9 @@ class ProfilePortal extends Component
             $this->notification_sms = $settings['notification_sms'] ?? false;
             $this->notification_concierge = $settings['notification_concierge'] ?? false;
             $this->notification_newsletter = $settings['notification_newsletter'] ?? false;
-            $this->preferred_theme = $settings['preferred_theme'] ?? 'onyx';
+            
+            $theme = $settings['preferred_theme'] ?? 'dark';
+            $this->preferred_theme = ($theme === 'onyx' || $theme === 'dark') ? 'dark' : 'light';
         }
     }
 

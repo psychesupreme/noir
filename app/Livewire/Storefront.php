@@ -73,6 +73,9 @@ class Storefront extends Component
     public ?int $quickViewProductId = null;
     public array $newReview = [
         'rating' => 5,
+        'quality_rating' => 5,
+        'freshness_rating' => 5,
+        'value_rating' => 5,
         'comment' => ''
     ];
     
@@ -861,6 +864,9 @@ class Storefront extends Component
     {
         $this->newReview = [
             'rating' => 5,
+            'quality_rating' => 5,
+            'freshness_rating' => 5,
+            'value_rating' => 5,
             'comment' => ''
         ];
     }
@@ -875,6 +881,9 @@ class Storefront extends Component
 
         $this->validate([
             'newReview.rating' => 'required|integer|min:1|max:5',
+            'newReview.quality_rating' => 'required|integer|min:1|max:5',
+            'newReview.freshness_rating' => 'required|integer|min:1|max:5',
+            'newReview.value_rating' => 'required|integer|min:1|max:5',
             'newReview.comment' => 'required|string|min:3|max:1000',
         ]);
 
@@ -882,10 +891,19 @@ class Storefront extends Component
             'product_id' => $this->quickViewProductId,
             'user_id' => $user->id,
             'rating' => $this->newReview['rating'],
+            'quality_rating' => $this->newReview['quality_rating'],
+            'freshness_rating' => $this->newReview['freshness_rating'],
+            'value_rating' => $this->newReview['value_rating'],
             'comment' => $this->newReview['comment'],
         ]);
 
         $this->resetReviewForm();
         session()->flash('success_review', 'Review submitted successfully!');
+    }
+
+    public function clearCuration(): void
+    {
+        $this->cart = [];
+        session()->forget('noir_bloom_cart');
     }
 }

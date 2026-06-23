@@ -11,9 +11,9 @@
                     if (pref) return pref;
                 @endauth
                 const stored = localStorage.getItem('nb_theme');
-                return (stored === 'onyx' || stored === 'champagne' || stored === 'rose') ? stored : 'champagne';
+                return (stored === 'dark' || stored === 'light') ? stored : 'dark';
             } catch (e) {
-                return 'champagne';
+                return 'light';
             }
         })(),
         hoverTheme: null,
@@ -31,14 +31,12 @@
             document.documentElement.className = val; 
             document.documentElement.setAttribute('data-theme', val);
             const bgColors = {
-                'onyx': '#050507',
-                'champagne': '#FAF7F0',
-                'rose': '#1C0A10'
+                'dark': '#050507',
+                'light': '#FAF7F0',
             };
             const textColors = {
-                'onyx': '#E4E4E7',
-                'champagne': '#1C1C20',
-                'rose': '#FADDE7'
+                'dark': '#E4E4E7',
+                'light': '#1C1C20',
             };
             if (bgColors[val]) {
                 document.documentElement.style.backgroundColor = bgColors[val];
@@ -57,9 +55,8 @@
         });
     "
     :class="{
-        'bg-[#050507] text-[#E4E4E7]': theme === 'onyx',
-        'bg-[#FAF7F0] text-[#1C1C20]': theme === 'champagne',
-        'bg-[#15060A] text-[#FCE7EC]': theme === 'rose'
+        'bg-[#050507] text-[#E4E4E7]': theme === 'dark',
+        'bg-[#FAF7F0] text-[#1C1C20]': theme === 'light',
     }"
     class="min-h-screen font-sans antialiased relative text-left flex flex-col justify-between transition-colors duration-500 overflow-x-hidden storefront-grain"
 >
@@ -71,45 +68,41 @@
     
     <!-- Luxury Cohesive Header -->
     <header 
-        class="fixed top-0 inset-x-0 w-full h-20 z-50 transition-all duration-500 flex items-center shadow-md hover:shadow-lg group backdrop-blur-xl animate-layer-1 theme-section"
+        class="fixed top-0 inset-x-0 w-full h-24 z-50 transition-all duration-500 flex items-center shadow-md hover:shadow-lg group backdrop-blur-xl animate-layer-1 theme-section"
         :class="{
-            'bg-[#050507]/80 border-b border-neutral-800/60 shadow-2xl text-white': theme === 'onyx',
-            'bg-[#FAF7F0]/80 border-b border-neutral-200 shadow-md text-neutral-900': theme === 'champagne',
-            'bg-[#15060A]/80 border-b border-[#2D121F] shadow-2xl text-[#FCE7EC]': theme === 'rose'
+            'bg-[#050507]/80 border-b border-neutral-800/60 shadow-2xl text-white': theme === 'dark',
+            'bg-[#FAF7F0]/80 border-b border-neutral-200 shadow-md text-neutral-900': theme === 'light',
         }"
     >
         {{-- Bottom Glow Line --}}
         <div class="absolute bottom-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent to-transparent"
              :class="{
-                 'via-[#C5A880]/30': theme === 'onyx',
-                 'via-emerald-600/30': theme === 'champagne',
-                 'via-[#B76E79]/30': theme === 'rose'
+                 'via-[#C5A880]/30': theme === 'dark',
+                 'via-emerald-600/30': theme === 'light',
              }"></div>
         <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-8">
             <a href="/" class="shrink-0 flex items-center select-none cursor-pointer group/brand transition-transform duration-300 hover:scale-[1.02]">
                 <div class="flex flex-col text-left leading-none">
-                    <span class="text-[10px] font-mono tracking-[0.35em] uppercase font-bold brand-title-atelier transition-colors duration-500"
+                    <span class="text-[12px] font-mono tracking-[0.35em] uppercase font-bold brand-title-atelier transition-colors duration-500"
                           :class="{
-                              'text-[#C5A880]': theme === 'onyx',
-                              'text-emerald-700': theme === 'champagne',
-                              'text-[#B76E79]': theme === 'rose'
+                              'text-[#C5A880]': theme === 'dark',
+                              'text-emerald-700': theme === 'light',
                           }">Atelier</span>
-                    <span class="text-base sm:text-lg md:text-xl font-extrabold uppercase tracking-[0.18em] font-outfit mt-0.5 brand-title-main transition-colors duration-500"
+                    <span class="text-lg sm:text-xl md:text-2xl font-extrabold uppercase tracking-[0.18em] font-outfit mt-0.5 brand-title-main transition-colors duration-500"
                           :class="{
-                              'text-white': theme === 'onyx',
-                              'text-neutral-900': theme === 'champagne',
-                              'text-[#FCE7EC]': theme === 'rose'
+                              'text-white': theme === 'dark',
+                              'text-neutral-900': theme === 'light',
                           }">Noir & Bloom</span>
                 </div>
             </a>
             <!-- Spacing column to balance layout -->
             <div class="flex-1 hidden md:block"></div>
 
-            <div class="flex items-center space-x-6 text-[12px] font-mono uppercase tracking-widest text-neutral-400">
+            <div class="flex items-center space-x-6 text-sm font-mono font-semibold uppercase tracking-widest text-neutral-400">
                 <!-- Navigation links -->
                 <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer" style="animation-delay: 200ms;">Services</a>
                 <a href="{{ route('curate') }}" 
-                   class="hidden md:inline-block px-4 py-1.5 rounded-full border transition-all duration-300 animate-nav-item select-none cursor-pointer {{ request()->routeIs('curate') ? 'border-[#C5A880] bg-[#C5A880]/10 text-[#C5A880] font-semibold' : 'border-[#C5A880]/30 hover:border-[#C5A880] hover:bg-[#C5A880]/5 text-[#C5A880]' }}"
+                   class="hidden md:inline-block px-5 py-2.5 rounded-full border transition-all duration-300 animate-nav-item select-none cursor-pointer {{ request()->routeIs('curate') ? 'border-[#C5A880] bg-[#C5A880]/10 text-[#C5A880] font-semibold' : 'border-[#C5A880]/30 hover:border-[#C5A880] hover:bg-[#C5A880]/5 text-[#C5A880]' }}"
                    style="animation-delay: 250ms;">
                    Curation Studio
                 </a>
@@ -117,21 +110,19 @@
                 {{-- Theme Switcher Dropdown (Header) --}}
                 <div x-data="{ themeMenuOpen: false }" class="relative inline-block text-left select-none animate-nav-item">
                     <button @click="themeMenuOpen = !themeMenuOpen" 
-                            class="px-4 py-2 border rounded-full text-xs font-medium tracking-[0.1em] transition-all flex items-center space-x-2 cursor-pointer"
+                            class="px-5 py-2.5 border rounded-full text-xs font-semibold tracking-[0.1em] transition-all flex items-center space-x-2 cursor-pointer"
                             :class="{
-                                'border-neutral-800 bg-neutral-900/40 text-neutral-350 hover:text-white': theme === 'onyx',
-                                'border-neutral-250 bg-neutral-50 text-neutral-700 hover:text-neutral-900': theme === 'champagne',
-                                'border-[#2D121F] bg-[#1C0A10]/40 text-pink-200/60 hover:text-[#B76E79]': theme === 'rose'
+                                'border-neutral-800 bg-neutral-900/40 text-neutral-350 hover:text-white': theme === 'dark',
+                                'border-neutral-250 bg-neutral-50 text-neutral-700 hover:text-neutral-900': theme === 'light',
                             }"
                     >
                         <span class="w-2.5 h-2.5 rounded-full"
                               :class="{
-                                  'bg-[#C5A880]': theme === 'onyx',
-                                  'bg-emerald-600': theme === 'champagne',
-                                  'bg-[#B76E79]': theme === 'rose'
+                                  'bg-[#C5A880]': theme === 'dark',
+                                  'bg-emerald-600': theme === 'light',
                               }"></span>
-                        <span class="uppercase font-mono text-[10px] tracking-widest" x-text="theme"></span>
-                        <svg class="w-3 h-3 stroke-current fill-none transition-transform duration-300" :class="{ 'rotate-180': themeMenuOpen }" viewBox="0 0 24 24" stroke-width="2">
+                        <span class="uppercase font-mono text-xs tracking-widest" x-text="theme"></span>
+                        <svg class="w-3.5 h-3.5 stroke-current fill-none transition-transform duration-300" :class="{ 'rotate-180': themeMenuOpen }" viewBox="0 0 24 24" stroke-width="2">
                             <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </button>
@@ -145,9 +136,8 @@
                          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                          x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
                          :class="{
-                             'bg-[#0F0F12]/95 border-neutral-900 text-white shadow-2xl': theme === 'onyx',
-                             'bg-white/95 border-neutral-200 text-neutral-900 shadow-xl': theme === 'champagne',
-                             'bg-[#1D0C13]/95 border-[#2D121F] text-pink-100 shadow-xl': theme === 'rose'
+                             'bg-[#0F0F12]/95 border-neutral-900 text-white shadow-2xl': theme === 'dark',
+                             'bg-white/95 border-neutral-200 text-neutral-900 shadow-xl': theme === 'light',
                          }"
                          class="absolute right-0 mt-2.5 w-64 rounded-2xl border p-4.5 z-50 backdrop-blur-md space-y-3"
                          style="display: none;"
@@ -157,9 +147,9 @@
                         </div>
                         <div class="space-y-2 text-[11px] font-sans">
                             <!-- Onyx Option -->
-                            <button @click="changeTheme('onyx'); themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
+                            <button @click="changeTheme('dark'); themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
                                 <div class="flex items-center space-x-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#C5A880]"></span>
+                                    <span class="w-3 h-3 rounded-full bg-[#C5A880]"></span>
                                     <div>
                                         <span class="font-bold font-mono tracking-wider block text-[10px] uppercase">Onyx Theme</span>
                                         <span class="text-[8px] text-neutral-500 font-light block mt-0.5">Obsidian mode with deep gold accents.</span>
@@ -167,22 +157,12 @@
                                 </div>
                             </button>
                             <!-- Champagne Option -->
-                            <button @click="changeTheme('champagne'); themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
+                            <button @click="changeTheme('light'); themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
                                 <div class="flex items-center space-x-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                                    <span class="w-3 h-3 rounded-full bg-emerald-600"></span>
                                     <div>
                                         <span class="font-bold font-mono tracking-wider block text-[10px] uppercase">Champagne Theme</span>
                                         <span class="text-[8px] text-neutral-500 font-light block mt-0.5">Creamy light mode with emerald highlights.</span>
-                                    </div>
-                                </div>
-                            </button>
-                            <!-- Rose Option -->
-                            <button @click="changeTheme('rose'); themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
-                                <div class="flex items-center space-x-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#B76E79]"></span>
-                                    <div>
-                                        <span class="font-bold font-mono tracking-wider block text-[10px] uppercase">Rose Theme</span>
-                                        <span class="text-[8px] text-neutral-500 font-light block mt-0.5">Blush floral style with rose-gold accents.</span>
                                     </div>
                                 </div>
                             </button>
@@ -192,23 +172,21 @@
 
                 {{-- Notification Bell button --}}
                 <button @click="notificationsOpen = true" 
-                        class="transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center rounded-full shadow-sm" 
+                        class="transition-colors cursor-pointer select-none relative w-11 h-11 flex items-center justify-center rounded-full shadow-sm" 
                         :class="{
-                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'onyx',
-                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'champagne',
-                            'border border-[#2D121F] bg-[#1C0A10]/40 text-pink-200/60 hover:text-[#B76E79]': theme === 'rose'
+                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
+                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
                         }"
                         title="View Notifications"
                 >
-                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                    <svg class="w-5.5 h-5.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     @if($unreadNotificationsCount > 0)
-                        <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-white text-[9px] font-bold font-sans shadow-md animate-pulse"
+                        <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-white text-[10px] font-bold font-sans shadow-md animate-pulse"
                               :class="{
-                                  'bg-[#C5A880]': theme === 'onyx',
-                                  'bg-emerald-600': theme === 'champagne',
-                                  'bg-[#B76E79]': theme === 'rose'
+                                  'bg-[#C5A880]': theme === 'dark',
+                                  'bg-emerald-600': theme === 'light',
                               }">
                             {{ $unreadNotificationsCount }}
                         </span>
@@ -217,24 +195,22 @@
 
                 <!-- Modern SVG shopping bag cart button redirecting to storefront open cart -->
                 <a href="/?open_cart=true" 
-                        class="transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center rounded-full shadow-sm animate-nav-item" 
+                        class="transition-colors cursor-pointer select-none relative w-11 h-11 flex items-center justify-center rounded-full shadow-sm animate-nav-item" 
                         :class="{
-                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'onyx',
-                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'champagne',
-                            'border border-[#2D121F] bg-[#1C0A10]/40 text-pink-200/60 hover:text-[#B76E79]': theme === 'rose'
+                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
+                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
                         }"
                         style="animation-delay: 400ms;"
                         title="View Curation Drawer"
                 >
-                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                    <svg class="w-5.5 h-5.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
                         <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     @if($cartCount > 0)
-                        <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-white text-[9px] font-bold font-sans shadow-md"
+                        <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-white text-[10px] font-bold font-sans shadow-md"
                               :class="{
-                                  'bg-[#C5A880]': theme === 'onyx',
-                                  'bg-emerald-600': theme === 'champagne',
-                                  'bg-[#B76E79]': theme === 'rose'
+                                  'bg-[#C5A880]': theme === 'dark',
+                                  'bg-emerald-600': theme === 'light',
                               }">
                             {{ $cartCount }}
                         </span>
@@ -246,10 +222,10 @@
                     @auth
                         <!-- Initials-based Monogram Avatar Button -->
                         <button @click="profileOpen = true" 
-                                class="transition-all cursor-pointer select-none w-8 h-8 flex items-center justify-center rounded-full shadow-sm shadow-[#C5A880]/10 border border-[#C5A880]"
+                                class="transition-all cursor-pointer select-none w-10 h-10 flex items-center justify-center rounded-full shadow-sm shadow-[#C5A880]/10 border border-[#C5A880]"
                                 title="Profile Portal Options"
                         >
-                            <span class="text-[10px] font-mono font-bold tracking-wider uppercase text-[#C5A880]">
+                            <span class="text-xs font-mono font-bold tracking-wider uppercase text-[#C5A880]">
                                 {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
                             </span>
                         </button>
@@ -259,16 +235,16 @@
         </div>
     </header>
 
-    <main class="max-w-8xl w-full mx-auto px-6 pt-32 flex-1 flex flex-col lg:flex-row gap-8 z-10 relative">
+    <main class="max-w-8xl w-full mx-auto px-6 pt-36 flex-1 flex flex-col lg:flex-row gap-8 z-10 relative">
         
         <!-- Left Sidebar Navigation -->
         <aside 
-            :class="theme === 'champagne' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" 
+            :class="theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" 
             class="w-full lg:w-64 shrink-0 sticky top-28 p-6 border rounded-[32px] backdrop-blur-xl space-y-6 text-left transition-all duration-500 self-start h-auto"
         >
             <div class="border-b border-neutral-500/10 pb-4">
                 <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-neutral-500 block">Atelier Personal Portal</span>
-                <h4 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs font-semibold uppercase tracking-widest mt-1">Dashboard Portal</h4>
+                <h4 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs font-semibold uppercase tracking-widest mt-1">Dashboard Portal</h4>
             </div>
 
             <!-- Tab Buttons -->
@@ -336,7 +312,7 @@
                         </svg>
                         <span>Logistics Hub</span>
                     </button>
-                    <a href="/admin" :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full mt-2 py-2 rounded-xl text-[10px] font-mono uppercase tracking-wider font-semibold transition-all cursor-pointer text-center block shadow-sm">
+                    <a href="/admin" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full mt-2 py-2 rounded-xl text-[10px] font-mono uppercase tracking-wider font-semibold transition-all cursor-pointer text-center block shadow-sm">
                         Admin Dashboard
                     </a>
                 @endif
@@ -368,7 +344,7 @@
                     </div>
 
                     <!-- Dynamic Profile Header Card with Real-time Gender Avatar Selector -->
-                    <div :class="theme === 'champagne' ? 'bg-white/50 border-neutral-200 text-neutral-900' : 'bg-neutral-900/30 text-white border-neutral-900/40'" class="border p-6 rounded-[32px] flex flex-col sm:flex-row gap-6 items-center backdrop-blur-md">
+                    <div :class="theme === 'light' ? 'bg-white/50 border-neutral-200 text-neutral-900' : 'bg-neutral-900/30 text-white border-neutral-900/40'" class="border p-6 rounded-[32px] flex flex-col sm:flex-row gap-6 items-center backdrop-blur-md">
                         <div class="relative group shrink-0">
                             <!-- SVG Dynamic Avatar Wrapper -->
                             <div class="w-20 h-20 rounded-full flex items-center justify-center border-2 border-[#C5A880]/30 shadow-lg relative overflow-hidden transition-all duration-500">
@@ -394,7 +370,7 @@
                     </div>
 
                     <!-- Profile Form & Optional Configuration -->
-                    <div :class="theme === 'champagne' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
+                    <div :class="theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
                         <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Personal Information Parameters</h4>
                         
                         @if(session('success_profile'))
@@ -405,27 +381,27 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">Full Name</label>
-                                    <input type="text" wire:model="name" :class="theme === 'champagne' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
+                                    <input type="text" wire:model="name" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
                                     @error('name') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">Email Address</label>
-                                    <input type="email" wire:model="email" :class="theme === 'champagne' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
+                                    <input type="email" wire:model="email" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
                                     @error('email') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">Phone Number</label>
-                                    <input type="text" wire:model="phone_number" :class="theme === 'champagne' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
+                                    <input type="text" wire:model="phone_number" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
                                     @error('phone_number') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">KRA PIN (Optional)</label>
-                                    <input type="text" wire:model="kra_pin" placeholder="A000000000Z" :class="theme === 'champagne' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans uppercase">
+                                    <input type="text" wire:model="kra_pin" placeholder="A000000000Z" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans uppercase">
                                     @error('kra_pin') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">Gender (Optional)</label>
-                                    <select wire:model="gender" :class="theme === 'champagne' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-3 py-2 focus:outline-none text-sm font-sans cursor-pointer">
+                                    <select wire:model="gender" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-3 py-2 focus:outline-none text-sm font-sans cursor-pointer">
                                         <option value="">Choose Gender</option>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
@@ -436,12 +412,12 @@
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">Date of Birth (Optional)</label>
-                                    <input type="date" wire:model="dob" :class="theme === 'champagne' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
+                                    <input type="date" wire:model="dob" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
                                     @error('dob') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">Default Hub Region</label>
-                                    <select wire:model="default_region" :class="theme === 'champagne' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-3 py-2 focus:outline-none text-sm font-sans cursor-pointer">
+                                    <select wire:model="default_region" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-3 py-2 focus:outline-none text-sm font-sans cursor-pointer">
                                         <option value="Nairobi">Nairobi</option>
                                         <option value="Kiambu">Kiambu</option>
                                     </select>
@@ -449,7 +425,7 @@
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">Default Delivery Coordinates/Landmark</label>
-                                    <input type="text" wire:model="default_delivery_address" placeholder="Estate, Complex, Street Name" :class="theme === 'champagne' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
+                                    <input type="text" wire:model="default_delivery_address" placeholder="Estate, Complex, Street Name" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
                                     @error('default_delivery_address') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5 md:col-span-2" wire:ignore>
@@ -550,13 +526,13 @@
                                                     x-model="searchQuery" 
                                                     @keydown.enter.prevent="searchLocation()"
                                                     placeholder="Search location (e.g. Westlands)..." 
-                                                    :class="theme === 'champagne' ? 'bg-white border-neutral-250 text-black placeholder-neutral-400' : 'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600'"
+                                                    :class="theme === 'light' ? 'bg-white border-neutral-250 text-black placeholder-neutral-400' : 'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600'"
                                                     class="flex-1 border rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-neutral-400 font-sans"
                                                 >
                                                 <button 
                                                     type="button" 
                                                     @click="searchLocation()"
-                                                    :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'"
+                                                    :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'"
                                                     class="px-3.5 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold"
                                                 >
                                                     Find
@@ -566,14 +542,14 @@
                                             <div 
                                                 x-show="searchResults.length > 0" 
                                                 @click.away="searchResults = []"
-                                                :class="theme === 'champagne' ? 'bg-[#FAF7F0] border-neutral-250 text-neutral-900 shadow-lg' : 'bg-[#0F0F12] border-neutral-800 text-white shadow-lg'"
+                                                :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-250 text-neutral-900 shadow-lg' : 'bg-[#0F0F12] border-neutral-800 text-white shadow-lg'"
                                                 class="absolute left-0 right-0 z-[1000] mt-1 max-h-48 overflow-y-auto border rounded-xl text-xs"
                                                 style="display: none;"
                                             >
                                                 <template x-for="res in searchResults" :key="res.place_id">
                                                     <div 
                                                         @click="selectResult(res)"
-                                                        :class="theme === 'champagne' ? 'hover:bg-neutral-200/50' : 'hover:bg-white/10'"
+                                                        :class="theme === 'light' ? 'hover:bg-neutral-200/50' : 'hover:bg-white/10'"
                                                         class="px-3 py-2 cursor-pointer transition-colors border-b last:border-b-0 border-neutral-500/10 font-sans"
                                                         x-text="res.display_name"
                                                     ></div>
@@ -590,7 +566,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full py-2.5 rounded-xl transition-all duration-300 font-bold uppercase cursor-pointer">
+                            <button type="submit" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full py-2.5 rounded-xl transition-all duration-300 font-bold uppercase cursor-pointer">
                                 Save Profile Changes
                             </button>
                         </form>
@@ -608,7 +584,7 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Update Password Form -->
-                        <div :class="theme === 'champagne' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
+                        <div :class="theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
                             <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Reset Security Credentials</h4>
                             
                             @if(session('success_password'))
@@ -620,25 +596,25 @@
                             <form wire:submit.prevent="updatePassword" class="space-y-4 text-xs font-mono">
                                 <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">Current Password</label>
-                                    <input type="password" wire:model="current_password" :class="theme === 'champagne' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
+                                    <input type="password" wire:model="current_password" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">New Password</label>
-                                    <input type="password" wire:model="new_password" :class="theme === 'champagne' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
+                                    <input type="password" wire:model="new_password" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
                                     @error('new_password') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">Confirm New Password</label>
-                                    <input type="password" wire:model="new_password_confirmation" :class="theme === 'champagne' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
+                                    <input type="password" wire:model="new_password_confirmation" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
                                 </div>
-                                <button type="submit" :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full py-2.5 rounded-xl transition-all duration-300 font-bold uppercase cursor-pointer">
+                                <button type="submit" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full py-2.5 rounded-xl transition-all duration-300 font-bold uppercase cursor-pointer">
                                     Update Security Key
                                 </button>
                             </form>
                         </div>
 
                         <!-- Session Logs (Mock Security Details) -->
-                        <div :class="theme === 'champagne' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
+                        <div :class="theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
                             <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Active Security Audit Logs</h4>
                             
                             <div class="space-y-3.5 text-xs font-mono">
@@ -671,7 +647,7 @@
                     @endif
 
                     <!-- Order History Logs -->
-                    <div :class="theme === 'champagne' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
+                    <div :class="theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
                         <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Purchase Ledger Records Matrix</h4>
                         
                         <div class="overflow-x-auto">
@@ -767,7 +743,7 @@
 
                 <!-- Beautiful Timeline Tracking Dialog Modal (Alpine-controlled) -->
                 <div x-show="selectedOrder !== null" @click="selectedOrder = null" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4" style="display: none;">
-                    <div @click.stop :class="theme === 'champagne' ? 'bg-white/95 border-neutral-250 text-neutral-900' : 'bg-[#0F0F12]/95 border-neutral-850 text-white'" class="w-full max-w-md border rounded-[32px] p-6 space-y-6 shadow-2xl backdrop-blur-xl">
+                    <div @click.stop :class="theme === 'light' ? 'bg-white/95 border-neutral-250 text-neutral-900' : 'bg-[#0F0F12]/95 border-neutral-850 text-white'" class="w-full max-w-md border rounded-[32px] p-6 space-y-6 shadow-2xl backdrop-blur-xl">
                         <div class="flex items-center justify-between border-b border-neutral-500/10 pb-3">
                             <div>
                                 <span class="text-[9px] font-mono uppercase tracking-widest text-[#C5A880] block" x-text="'Timeline - #NB-ORD-' + String(selectedOrder?.id).padStart(4, '0')"></span>
@@ -831,9 +807,9 @@
                         <div class="border-t border-neutral-500/10 pt-4 text-[10px] font-mono leading-relaxed space-y-1" x-show="selectedOrder?.distance_km">
                             <span class="text-neutral-500 block uppercase">Logistics & Route Approximation:</span>
                             <div class="text-neutral-350 font-sans space-y-0.5">
-                                <div>Fulfilled from: <span class="font-semibold" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" x-text="selectedOrder?.hub_name"></span></div>
-                                <div>Estimated driving distance: <span class="font-semibold" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" x-text="selectedOrder?.distance_km + ' km'"></span></div>
-                                <div>Approximate driving duration: <span class="font-semibold" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" x-text="selectedOrder?.duration_min + ' minutes'"></span></div>
+                                <div>Fulfilled from: <span class="font-semibold" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" x-text="selectedOrder?.hub_name"></span></div>
+                                <div>Estimated driving distance: <span class="font-semibold" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" x-text="selectedOrder?.distance_km + ' km'"></span></div>
+                                <div>Approximate driving duration: <span class="font-semibold" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" x-text="selectedOrder?.duration_min + ' minutes'"></span></div>
                             </div>
                         </div>
                     </div>
@@ -854,7 +830,7 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         @forelse($wishlistProducts as $prod)
-                            <div :class="theme === 'champagne' ? 'border-neutral-200 bg-white/45 hover:bg-white/75 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 hover:bg-[#0C0C0E]/70 shadow-2xl'" class="border p-4.5 rounded-[28px] space-y-3 transition-all duration-300 relative group backdrop-blur-xl flex flex-col justify-between h-auto">
+                            <div :class="theme === 'light' ? 'border-neutral-200 bg-white/45 hover:bg-white/75 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 hover:bg-[#0C0C0E]/70 shadow-2xl'" class="border p-4.5 rounded-[28px] space-y-3 transition-all duration-300 relative group backdrop-blur-xl flex flex-col justify-between h-auto">
                                 <div class="space-y-3">
                                     <!-- Image Frame -->
                                     <div class="w-full h-44 rounded-2xl overflow-hidden bg-neutral-950 relative border border-neutral-900/20 shadow-inner">
@@ -871,14 +847,14 @@
                                     <!-- Details -->
                                     <div class="space-y-1">
                                         <span class="text-[9px] uppercase tracking-widest text-emerald-800 font-mono font-bold block">{{ str_replace('_', ' ', $prod->category) }}</span>
-                                        <h4 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" class="text-sm font-serif italic truncate">{{ $prod->name }}</h4>
+                                        <h4 :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="text-sm font-serif italic truncate">{{ $prod->name }}</h4>
                                         <p class="text-[10px] text-neutral-450 line-clamp-2 leading-relaxed font-light font-sans">{{ $prod->description }}</p>
                                     </div>
                                 </div>
 
                                 <div class="pt-3 border-t border-neutral-500/10 flex items-center justify-between mt-auto">
                                     <span class="text-xs font-mono font-bold text-amber-500">{{ number_format($prod->price) }} KSH</span>
-                                    <button wire:click="addToCurationFromWishlist({{ $prod->id }})" :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="px-4 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider font-semibold cursor-pointer transition-all shadow-sm">
+                                    <button wire:click="addToCurationFromWishlist({{ $prod->id }})" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="px-4 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider font-semibold cursor-pointer transition-all shadow-sm">
                                         Curate
                                     </button>
                                 </div>
@@ -904,7 +880,7 @@
                         <p class="text-xs text-neutral-500 font-light mt-1">Configure automated notifications, marketing preferences, and preferred default user interface theme settings.</p>
                     </div>
 
-                    <div :class="theme === 'champagne' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-6 backdrop-blur-xl">
+                    <div :class="theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-6 backdrop-blur-xl">
                         <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Personal Preferences</h4>
                         
                         @if(session('success_settings'))
@@ -916,10 +892,10 @@
                             <div class="space-y-2 border-b border-neutral-500/5 pb-4">
                                 <label class="text-neutral-400 uppercase font-semibold">Preferred Workspace Default Theme</label>
                                 <div class="grid grid-cols-2 gap-4 pt-1 max-w-sm">
-                                    <button type="button" wire:click="$set('preferred_theme', 'onyx')" :class="preferred_theme === 'onyx' ? 'border-[#C5A880] bg-[#C5A880]/15 text-[#C5A880] font-bold' : 'border-neutral-500/20 text-neutral-500 hover:text-neutral-300'" class="p-3 border rounded-2xl cursor-pointer text-center transition-all">
+                                    <button type="button" wire:click="$set('preferred_theme', 'dark')" :class="preferred_theme === 'dark' ? 'border-[#C5A880] bg-[#C5A880]/15 text-[#C5A880] font-bold' : 'border-neutral-500/20 text-neutral-500 hover:text-neutral-300'" class="p-3 border rounded-2xl cursor-pointer text-center transition-all">
                                         Onyx (Dark)
                                     </button>
-                                    <button type="button" wire:click="$set('preferred_theme', 'champagne')" :class="preferred_theme === 'champagne' ? 'border-[#B59A7A] bg-[#B59A7A]/15 text-[#B59A7A] font-bold' : 'border-neutral-500/20 text-neutral-500 hover:text-neutral-300'" class="p-3 border rounded-2xl cursor-pointer text-center transition-all">
+                                    <button type="button" wire:click="$set('preferred_theme', 'light')" :class="preferred_theme === 'light' ? 'border-[#B59A7A] bg-[#B59A7A]/15 text-[#B59A7A] font-bold' : 'border-neutral-500/20 text-neutral-500 hover:text-neutral-300'" class="p-3 border rounded-2xl cursor-pointer text-center transition-all">
                                         Champagne (Light)
                                     </button>
                                 </div>
@@ -950,7 +926,7 @@
                                 </label>
                             </div>
 
-                            <button type="button" wire:click="updateSettings" :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full py-2.5 rounded-xl transition-all duration-300 font-bold uppercase cursor-pointer mt-4">
+                            <button type="button" wire:click="updateSettings" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full py-2.5 rounded-xl transition-all duration-300 font-bold uppercase cursor-pointer mt-4">
                                 Save Atelier Settings
                             </button>
                         </div>
@@ -970,7 +946,7 @@
                         <div class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl">{{ session('success_logistics') }}</div>
                     @endif
 
-                    <div :class="theme === 'champagne' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
+                    <div :class="theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
                         <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Assigned Dispatch Runs Sheet</h4>
                         
                         <div class="overflow-x-auto">
@@ -1060,8 +1036,8 @@
     <!-- Fully-Featured Luxury Atelier Footer -->
     <footer 
         :class="{
-            'border-neutral-900 bg-[#070709] text-neutral-400': theme === 'onyx',
-            'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'champagne'
+            'border-neutral-900 bg-[#070709] text-neutral-400': theme === 'dark',
+            'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'light'
         }"
         class="border-t mt-20 py-10 px-6 transition-colors duration-500 z-10 relative theme-section"
     >
@@ -1069,7 +1045,7 @@
             <div class="space-y-4">
                 <div class="flex items-baseline space-x-2">
                     <span class="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
-                    <h4 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">Noir & Bloom</h4>
+                    <h4 :class="theme === 'light' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">Noir & Bloom</h4>
                 </div>
                 <p class="text-xs font-light leading-relaxed max-w-xs">
                     Premium floral curation, bespoke gifting suites, and high-end events concierge. Sourcing directly from Rift Valley growers.
@@ -1077,7 +1053,7 @@
             </div>
 
             <div class="space-y-4">
-                <h5 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Showroom</h5>
+                <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Showroom</h5>
                 <ul class="space-y-2 text-xs font-light">
                     <li><a href="/?collection=retail" class="hover:underline">Bespoke Retail Arrays</a></li>
                     <li><a href="/?collection=wholesale" class="hover:underline">Wholesale Graded Stems</a></li>
@@ -1087,7 +1063,7 @@
             </div>
 
             <div class="space-y-4">
-                <h5 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">Concierge Dispatch</h5>
+                <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">Concierge Dispatch</h5>
                 <ul class="space-y-2 text-xs font-light">
                     <li><span class="block text-neutral-500">Operating Hours</span> Mon &mdash; Sat: 07:00 &mdash; 20:00</li>
                     <li>Sunday: 09:00 &mdash; 17:00</li>
@@ -1097,7 +1073,7 @@
             </div>
 
             <div class="space-y-4">
-                <h5 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Atelier Bulletin</h5>
+                <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Atelier Bulletin</h5>
                 <p class="text-xs font-light leading-relaxed">
                     Subscribe for seasonal curation updates, wholesale catalog changes, and exclusive releases.
                 </p>
@@ -1105,11 +1081,11 @@
                     <input 
                         type="email" 
                         placeholder="you@company.co.ke" 
-                        :class="theme === 'champagne' ? 'bg-white border-neutral-300 text-black placeholder-neutral-400 focus:border-neutral-500' : 'bg-neutral-900/60 border-neutral-800 text-white placeholder-neutral-700 focus:border-neutral-700'"
+                        :class="theme === 'light' ? 'bg-white border-neutral-300 text-black placeholder-neutral-400 focus:border-neutral-500' : 'bg-neutral-900/60 border-neutral-800 text-white placeholder-neutral-700 focus:border-neutral-700'"
                         class="flex-1 text-xs px-3.5 py-2.5 border rounded-xl focus:outline-none transition-all"
                     >
                     <button 
-                        :class="theme === 'champagne' ? 'bg-neutral-950 text-white hover:bg-black' : 'bg-white text-black hover:bg-neutral-200'"
+                        :class="theme === 'light' ? 'bg-neutral-950 text-white hover:bg-black' : 'bg-white text-black hover:bg-neutral-200'"
                         class="px-4 py-2.5 text-[11px] font-mono uppercase tracking-wider font-semibold rounded-full transition-all"
                     >
                         Join
@@ -1118,7 +1094,7 @@
             </div>
         </div>
 
-        <div :class="theme === 'champagne' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-5xl w-full mx-auto border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
+        <div :class="theme === 'light' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-5xl w-full mx-auto border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
             <p>&copy; {{ date('Y') }} Atelier Noir & Bloom. All rights reserved.</p>
             <div class="flex space-x-6">
                 <a href="#" class="hover:text-neutral-400">Terms of Curation</a>
@@ -1136,13 +1112,13 @@
         x-show="profileOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'champagne' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : (theme === 'rose' ? 'bg-[#1D0C13]/90 border border-[#2D121F] text-pink-100 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl')"
+        :class="theme === 'light' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
         style="display: none;"
     >
-        <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
+        <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
             <div>
-                <h3 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Profile Portal</h3>
+                <h3 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Profile Portal</h3>
                 <span class="text-[9px] text-neutral-500 font-light">Atelier Customer Account</span>
             </div>
             <button @click="profileOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Modal">
@@ -1163,27 +1139,24 @@
                 <div class="flex items-center space-x-4 pb-4 border-b border-neutral-500/10">
                     <div class="w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-tr from-neutral-950 via-neutral-900 to-neutral-955 border-2 shadow-md shrink-0"
                          :class="{
-                             'border-[#C5A880]/40': theme === 'onyx',
-                             'border-emerald-600/40': theme === 'champagne',
-                             'border-[#B76E79]/40': theme === 'rose'
+                             'border-[#C5A880]/40': theme === 'dark',
+                             'border-emerald-600/40': theme === 'light',
                          }">
                         <span class="text-base font-mono font-bold tracking-wider"
                               :class="{
-                                  'text-[#C5A880]': theme === 'onyx',
-                                  'text-emerald-800': theme === 'champagne',
-                                  'text-[#B76E79]': theme === 'rose'
+                                  'text-[#C5A880]': theme === 'dark',
+                                  'text-emerald-800': theme === 'light',
                               }">
                             {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
                         </span>
                     </div>
                     <div class="truncate space-y-0.5">
                         <div class="flex items-center space-x-2">
-                            <span class="font-serif italic text-base tracking-wide font-semibold block truncate" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->name }}</span>
+                            <span class="font-serif italic text-base tracking-wide font-semibold block truncate" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->name }}</span>
                             <span class="text-[8px] font-mono uppercase tracking-widest px-2 py-0.5 border rounded-full shrink-0"
                                   :class="{
-                                      'border-[#C5A880]/30 bg-[#C5A880]/5 text-[#C5A880]': theme === 'onyx',
-                                      'border-emerald-600/30 bg-emerald-55 text-emerald-850': theme === 'champagne',
-                                      'border-[#B76E79]/30 bg-[#B76E79]/5 text-[#B76E79]': theme === 'rose'
+                                      'border-[#C5A880]/30 bg-[#C5A880]/5 text-[#C5A880]': theme === 'dark',
+                                      'border-emerald-600/30 bg-emerald-55 text-emerald-850': theme === 'light',
                                   }">
                                 {{ auth()->user()->loyalty_tier }}
                             </span>
@@ -1196,15 +1169,15 @@
                 <div class="grid grid-cols-3 gap-2.5 text-center py-2">
                     <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
                         <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Client Since</span>
-                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'">{{ auth()->user()->created_at->format('M Y') }}</span>
+                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ auth()->user()->created_at->format('M Y') }}</span>
                     </div>
                     <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
                         <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Total Curations</span>
-                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'">{{ $totalOrdersCount }}</span>
+                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ $totalOrdersCount }}</span>
                     </div>
                     <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
                         <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Active dispatches</span>
-                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'">{{ $activeOrdersCount }}</span>
+                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ $activeOrdersCount }}</span>
                     </div>
                 </div>
 
@@ -1212,12 +1185,12 @@
                 <div class="space-y-3 font-sans py-1 text-xs">
                     <div class="flex items-center space-x-2 text-neutral-400">
                         <span class="font-bold text-[9px] uppercase tracking-wider text-[#C5A880]/80">Phone:</span>
-                        <span class="font-mono" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->phone_number ?: 'Not Provided' }}</span>
+                        <span class="font-mono" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->phone_number ?: 'Not Provided' }}</span>
                     </div>
 
                     <div class="leading-relaxed">
                         <span class="font-bold text-[9px] uppercase tracking-wider text-[#C5A880]/80 block">Main Address</span>
-                        <span class="block truncate" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" title="{{ auth()->user()->default_delivery_address }}">{{ auth()->user()->default_delivery_address ?: 'No Address Set' }}</span>
+                        <span class="block truncate" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" title="{{ auth()->user()->default_delivery_address }}">{{ auth()->user()->default_delivery_address ?: 'No Address Set' }}</span>
                         @if(auth()->user()->default_region)
                             <span class="text-[9px] font-mono text-neutral-500 uppercase tracking-wider block mt-0.5">{{ auth()->user()->default_region }}</span>
                         @endif
@@ -1246,9 +1219,8 @@
                 <div class="space-y-2.5 pt-4">
                     <button @click="profileOpen = false; $wire.setTab('details')" 
                        :class="{
-                           'bg-[#C5A880] hover:bg-[#B59A7A] text-black': theme === 'onyx',
-                           'bg-emerald-800 hover:bg-emerald-950 text-white': theme === 'champagne',
-                           'bg-[#B76E79] hover:bg-[#A55E69] text-white': theme === 'rose'
+                           'bg-[#C5A880] hover:bg-[#B59A7A] text-black': theme === 'dark',
+                           'bg-emerald-800 hover:bg-emerald-950 text-white': theme === 'light',
                        }"
                        class="w-full text-center font-mono font-bold uppercase tracking-wider py-3 rounded-full text-[10px] flex items-center justify-center space-x-2 transition-all transform hover:scale-[1.01] shadow-md cursor-pointer border-none"
                     >
@@ -1262,9 +1234,8 @@
                         @csrf
                         <button type="submit" 
                                 :class="{
-                                    'border-neutral-800 text-neutral-400 hover:text-rose-500 hover:border-rose-950': theme === 'onyx',
-                                    'border-neutral-200 text-neutral-500 hover:text-rose-600 hover:border-rose-250': theme === 'champagne',
-                                    'border-[#2D121F] text-pink-300/60 hover:text-rose-500 hover:border-rose-950': theme === 'rose'
+                                    'border-neutral-800 text-neutral-400 hover:text-rose-500 hover:border-rose-950': theme === 'dark',
+                                    'border-neutral-200 text-neutral-500 hover:text-rose-600 hover:border-rose-250': theme === 'light',
                                 }"
                                 class="w-full border font-mono font-bold uppercase tracking-wider py-2.5 rounded-full text-[9px] flex items-center justify-center space-x-2 transition-all cursor-pointer bg-transparent"
                         >
@@ -1287,13 +1258,13 @@
         x-show="notificationsOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'champagne' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : (theme === 'rose' ? 'bg-[#1D0C13]/90 border border-[#2D121F] text-pink-100 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl')"
+        :class="theme === 'light' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[80vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
         style="display: none;"
     >
-        <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
+        <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
             <div>
-                <h3 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Notification Log</h3>
+                <h3 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Notification Log</h3>
                 <span class="text-[9px] text-neutral-500 font-light">Inbox logs & system alerts</span>
             </div>
             <button @click="notificationsOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Modal">
@@ -1325,9 +1296,8 @@
                             @if(!$notif['is_read'])
                                 <span class="absolute top-4 right-4 w-2 h-2 rounded-full"
                                       :class="{
-                                          'bg-[#C5A880]': theme === 'onyx',
-                                          'bg-emerald-600': theme === 'champagne',
-                                          'bg-[#B76E79]': theme === 'rose'
+                                          'bg-[#C5A880]': theme === 'dark',
+                                          'bg-emerald-600': theme === 'light',
                                       }"></span>
                             @endif
                             
@@ -1375,7 +1345,7 @@
             
             @auth
                 @if(count($notificationsList) > 0)
-                    <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-4 border-t bg-neutral-500/5 flex items-center justify-between shrink-0">
+                    <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-4 border-t bg-neutral-500/5 flex items-center justify-between shrink-0">
                         <button wire:click="clearAllNotifications" class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 hover:text-red-400 cursor-pointer">
                             [ Clear All ]
                         </button>
@@ -1395,13 +1365,13 @@
 
         <!-- Rating Overlay Panel (Center Modal) -->
         <div 
-            :class="theme === 'champagne' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : (theme === 'rose' ? 'bg-[#1D0C13]/90 border border-[#2D121F] text-pink-100 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl')"
+            :class="theme === 'light' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
             class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[90vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl border rounded-[32px] overflow-hidden"
         >
             <!-- Modal Header -->
-            <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
+            <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
                 <div>
-                    <h3 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Rate Order #NB-ORD-{{ $ratingOrderId }}</h3>
+                    <h3 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Rate Order #NB-ORD-{{ $ratingOrderId }}</h3>
                     <span class="text-[9px] text-neutral-500 font-light">Share your feedback to help us bloom</span>
                 </div>
                 <button wire:click="$set('ratingOrderId', null)" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Modal">
@@ -1457,13 +1427,13 @@
                 <div class="space-y-2">
                     <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-450 block">Additional Remarks</label>
                     <textarea wire:model="ratingComments" rows="3" placeholder="Tell us about your experience..."
-                              :class="theme === 'champagne' ? 'bg-neutral-50 border-neutral-200 text-neutral-900 focus:border-emerald-600' : (theme === 'rose' ? 'bg-[#15060A]/60 border-[#2D121F] text-pink-100 focus:border-[#B76E79]' : 'bg-neutral-900 border-neutral-800 text-white focus:border-[#C5A880]')"
+                              :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-neutral-900 focus:border-emerald-600' : 'bg-neutral-900 border-neutral-800 text-white focus:border-[#C5A880]'"
                               class="w-full text-xs p-3 rounded-2xl border transition-colors focus:outline-none"></textarea>
                 </div>
             </div>
 
             <!-- Modal Footer -->
-            <div :class="theme === 'champagne' ? 'border-neutral-100 bg-neutral-50/50' : 'border-neutral-900 bg-neutral-500/5'" class="p-4 border-t flex items-center justify-between shrink-0">
+            <div :class="theme === 'light' ? 'border-neutral-100 bg-neutral-50/50' : 'border-neutral-900 bg-neutral-500/5'" class="p-4 border-t flex items-center justify-between shrink-0">
                 <button wire:click="$set('ratingOrderId', null)" class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 hover:text-red-400 cursor-pointer">
                     Cancel
                 </button>

@@ -7,7 +7,7 @@
              return this.accountType === 'retail' ? 'translate-x-0' : 'translate-x-full';
          },
          get sliderColor() {
-             if (this.theme === 'champagne') {
+             if (this.theme === 'light') {
                  return this.accountType === 'retail' ? 'bg-[#1C1917] text-white shadow-sm' : 'bg-[#B59A7A] text-white shadow-sm';
              }
              return this.accountType === 'retail' ? 'bg-white text-black shadow-sm' : 'bg-[#C5A880] text-black shadow-sm';
@@ -40,14 +40,14 @@
         <div class="flex items-baseline gap-2">
             <span class="text-[8px] font-mono tracking-[0.4em] text-[#D4AF37]/50 uppercase">Atelier</span>
             <span 
-                :class="theme === 'champagne' ? 'text-neutral-800/80' : 'text-white/80'"
+                :class="theme === 'light' ? 'text-neutral-800/80' : 'text-white/80'"
                 class="text-[10px] font-semibold uppercase tracking-[0.3em] transition-colors"
             >Noir & Bloom</span>
         </div>
 
         <div class="space-y-1">
             <h2 
-                :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'"
+                :class="theme === 'light' ? 'text-neutral-900' : 'text-white'"
                 class="text-[24px] font-[Instrument_Serif] font-normal leading-tight transition-colors"
             >
                 Create your account
@@ -56,15 +56,14 @@
                 Join our exclusive floral &amp; gifting concierge.
             </p>
         </div>
-        <div :class="theme === 'champagne' ? 'bg-neutral-200' : 'bg-neutral-800'" class="w-10 h-px transition-colors"></div>
+        <div :class="theme === 'light' ? 'bg-neutral-200' : 'bg-neutral-800'" class="w-10 h-px transition-colors"></div>
     </div>
 
     {{-- Main registration card with glassmorphism, texture, and edges --}}
     <div 
         :class="{
-            'bg-[#0C0C0E]/70 border-neutral-900/60 shadow-[0_0_50px_rgba(0,0,0,0.8)]': theme === 'onyx',
-            'bg-white/70 border-neutral-200/80 shadow-[0_0_40px_rgba(28,25,23,0.03)]': theme === 'champagne',
-            'bg-[#19080E]/75 border-[#2D0D19]/45 shadow-[0_0_50px_rgba(0,0,0,0.9)]': theme === 'rose',
+            'bg-[#0C0C0E]/70 border-neutral-900/60 shadow-[0_0_50px_rgba(0,0,0,0.8)]': theme === 'dark',
+            'bg-white/70 border-neutral-200/80 shadow-[0_0_40px_rgba(28,25,23,0.03)]': theme === 'light',
             'animate-shake': errorsCount > 0
         }"
         class="border backdrop-blur-md rounded-[28px] p-6 lg:p-8 space-y-6 transition-all duration-500 relative overflow-hidden noise-card text-left"
@@ -81,7 +80,7 @@
                 <button
                     type="button"
                     wire:click="socialLogin('google')"
-                    :class="theme === 'champagne' ? 'border-neutral-250 bg-neutral-50/50 hover:bg-neutral-100 text-neutral-800' : 'border-neutral-800 bg-[#0F0F12]/60 hover:bg-[#121215] text-white'"
+                    :class="theme === 'light' ? 'border-neutral-250 bg-neutral-50/50 hover:bg-neutral-100 text-neutral-800' : 'border-neutral-800 bg-[#0F0F12]/60 hover:bg-[#121215] text-white'"
                     class="border rounded-xl py-3 flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-sm z-10"
                     title="Register automatically with Google"
                 >
@@ -93,7 +92,7 @@
                 <button
                     type="button"
                     wire:click="socialLogin('apple')"
-                    :class="theme === 'champagne' ? 'border-neutral-250 bg-neutral-50/50 hover:bg-neutral-100 text-neutral-800' : 'border-neutral-800 bg-[#0F0F12]/60 hover:bg-[#121215] text-white'"
+                    :class="theme === 'light' ? 'border-neutral-250 bg-neutral-50/50 hover:bg-neutral-100 text-neutral-800' : 'border-neutral-800 bg-[#0F0F12]/60 hover:bg-[#121215] text-white'"
                     class="border rounded-xl py-3 flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-sm z-10"
                     title="Register automatically with Apple"
                 >
@@ -105,7 +104,7 @@
                 <button
                     type="button"
                     wire:click="socialLogin('microsoft')"
-                    :class="theme === 'champagne' ? 'border-neutral-250 bg-neutral-50/50 hover:bg-neutral-100 text-neutral-800' : 'border-neutral-800 bg-[#0F0F12]/60 hover:bg-[#121215] text-white'"
+                    :class="theme === 'light' ? 'border-neutral-250 bg-neutral-50/50 hover:bg-neutral-100 text-neutral-800' : 'border-neutral-800 bg-[#0F0F12]/60 hover:bg-[#121215] text-white'"
                     class="border rounded-xl py-3 flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-sm z-10"
                     title="Register automatically with Microsoft"
                 >
@@ -129,13 +128,13 @@
             {{-- Account Type Toggle --}}
             <div class="space-y-1.5">
                 <label 
-                    :class="theme === 'champagne' ? 'text-neutral-600' : 'text-neutral-500'"
+                    :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-500'"
                     class="text-[10px] uppercase tracking-[0.2em] font-mono block transition-colors"
                 >
                     Account Type <span class="text-rose-500 font-sans font-bold inline-block ml-0.5 animate-pulse">&bull;</span>
                 </label>
                 <div 
-                    :class="theme === 'champagne' ? 'bg-neutral-200/50 border-neutral-300' : 'bg-[#0A0A0A] border-neutral-850'"
+                    :class="theme === 'light' ? 'bg-neutral-200/50 border-neutral-300' : 'bg-[#0A0A0A] border-neutral-850'"
                     class="border p-1 rounded-full grid grid-cols-2 text-center text-[9px] font-mono uppercase tracking-wider transition-colors relative h-10 overflow-hidden select-none"
                 >
                     {{-- Sliding Pill background --}}
@@ -168,7 +167,7 @@
                 <div class="flex items-center justify-between">
                     <label 
                         for="name" 
-                        :class="theme === 'champagne' ? 'text-neutral-600' : 'text-neutral-500'"
+                        :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-500'"
                         class="text-[10px] uppercase tracking-[0.2em] font-mono block transition-colors"
                     >
                         Full Name <span class="text-rose-500 font-sans font-bold inline-block ml-0.5 animate-pulse">&bull;</span>
@@ -184,8 +183,8 @@
                     placeholder="{{ $account_type === 'corporate' ? 'Company or Contact Name' : 'Your full name' }}"
                     autocomplete="name"
                     :class="{
-                        'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500': theme === 'champagne' && !@json($errors->has('name')),
-                        'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600': theme !== 'champagne' && !@json($errors->has('name')),
+                        'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500': theme === 'light' && !@json($errors->has('name')),
+                        'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600': theme !== 'light' && !@json($errors->has('name')),
                         'border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 bg-rose-50/5 text-rose-500': @json($errors->has('name'))
                     }"
                     class="border rounded-xl px-4 py-3 text-sm focus:outline-none transition-all w-full font-light"
@@ -205,7 +204,7 @@
                 <div class="flex items-center justify-between">
                     <label 
                         for="reg-email" 
-                        :class="theme === 'champagne' ? 'text-neutral-600' : 'text-neutral-500'"
+                        :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-500'"
                         class="text-[10px] uppercase tracking-[0.2em] font-mono block transition-colors"
                     >
                         Email Address <span class="text-rose-500 font-sans font-bold inline-block ml-0.5 animate-pulse">&bull;</span>
@@ -221,8 +220,8 @@
                     placeholder="you@company.co.ke"
                     autocomplete="email"
                     :class="{
-                        'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500': theme === 'champagne' && !@json($errors->has('email')),
-                        'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600': theme !== 'champagne' && !@json($errors->has('email')),
+                        'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500': theme === 'light' && !@json($errors->has('email')),
+                        'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600': theme !== 'light' && !@json($errors->has('email')),
                         'border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 bg-rose-50/5 text-rose-500': @json($errors->has('email'))
                     }"
                     class="border rounded-xl px-4 py-3 text-sm focus:outline-none transition-all w-full font-light"
@@ -242,7 +241,7 @@
                 <div class="flex items-center justify-between">
                     <label 
                         for="phone" 
-                        :class="theme === 'champagne' ? 'text-neutral-600' : 'text-neutral-500'"
+                        :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-500'"
                         class="text-[10px] uppercase tracking-[0.2em] font-mono block transition-colors"
                     >
                         Phone Number <span class="text-rose-500 font-sans font-bold inline-block ml-0.5 animate-pulse">&bull;</span>
@@ -253,7 +252,7 @@
                 </div>
                 <div class="relative flex items-center">
                     <span 
-                        :class="theme === 'champagne' ? 'text-neutral-400' : 'text-neutral-600'"
+                        :class="theme === 'light' ? 'text-neutral-400' : 'text-neutral-600'"
                         class="absolute left-4 text-[11px] font-mono select-none pointer-events-none transition-colors"
                     >+254</span>
                     <input
@@ -263,8 +262,8 @@
                         placeholder="712 345 678"
                         autocomplete="tel"
                         :class="{
-                            'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500': theme === 'champagne' && !@json($errors->has('phone_number')),
-                            'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600': theme !== 'champagne' && !@json($errors->has('phone_number')),
+                            'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500': theme === 'light' && !@json($errors->has('phone_number')),
+                            'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600': theme !== 'light' && !@json($errors->has('phone_number')),
                             'border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 bg-rose-50/5 text-rose-500': @json($errors->has('phone_number'))
                         }"
                         class="pl-14 pr-4 py-3 text-sm focus:outline-none transition-all w-full font-light font-mono border rounded-xl"
@@ -285,7 +284,7 @@
                 <div class="flex items-center justify-between">
                     <label 
                         for="reg-password" 
-                        :class="theme === 'champagne' ? 'text-neutral-600' : 'text-neutral-500'"
+                        :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-500'"
                         class="text-[10px] uppercase tracking-[0.2em] font-mono block transition-colors"
                     >
                         Password <span class="text-rose-500 font-sans font-bold inline-block ml-0.5 animate-pulse">&bull;</span>
@@ -302,8 +301,8 @@
                         placeholder="Min 8 characters (Enforced caps, num, sym)"
                         autocomplete="new-password"
                         :class="{
-                            'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500': theme === 'champagne' && !@json($errors->has('password')),
-                            'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600': theme !== 'champagne' && !@json($errors->has('password')),
+                            'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500': theme === 'light' && !@json($errors->has('password')),
+                            'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600': theme !== 'light' && !@json($errors->has('password')),
                             'border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 bg-rose-50/5 text-rose-500': @json($errors->has('password'))
                         }"
                         class="border rounded-xl pl-4 pr-11 py-3 text-sm focus:outline-none transition-all w-full font-light"
@@ -311,7 +310,7 @@
                     <button
                         type="button"
                         @click="showPassword = !showPassword"
-                        :class="theme === 'champagne' ? 'text-neutral-400 hover:text-neutral-700' : 'text-neutral-500 hover:text-neutral-300'"
+                        :class="theme === 'light' ? 'text-neutral-400 hover:text-neutral-700' : 'text-neutral-500 hover:text-neutral-300'"
                         class="absolute right-4 transition-colors cursor-pointer"
                         title="Toggle password visibility"
                     >
@@ -344,7 +343,7 @@
                 <div class="flex items-center justify-between">
                     <label 
                         for="password_confirmation" 
-                        :class="theme === 'champagne' ? 'text-neutral-600' : 'text-neutral-500'"
+                        :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-500'"
                         class="text-[10px] uppercase tracking-[0.2em] font-mono block transition-colors"
                     >
                         Confirm Password <span class="text-rose-500 font-sans font-bold inline-block ml-0.5 animate-pulse">&bull;</span>
@@ -361,8 +360,8 @@
                         placeholder="Re-enter your password"
                         autocomplete="new-password"
                         :class="{
-                            'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500': theme === 'champagne' && !@json($errors->has('password_confirmation')),
-                            'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600': theme !== 'champagne' && !@json($errors->has('password_confirmation')),
+                            'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500': theme === 'light' && !@json($errors->has('password_confirmation')),
+                            'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600': theme !== 'light' && !@json($errors->has('password_confirmation')),
                             'border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 bg-rose-50/5 text-rose-500': @json($errors->has('password_confirmation'))
                         }"
                         class="border rounded-xl pl-4 pr-11 py-3 text-sm focus:outline-none transition-all w-full font-light"
@@ -370,7 +369,7 @@
                     <button
                         type="button"
                         @click="showConfirm = !showConfirm"
-                        :class="theme === 'champagne' ? 'text-neutral-400 hover:text-neutral-700' : 'text-neutral-500 hover:text-neutral-300'"
+                        :class="theme === 'light' ? 'text-neutral-400 hover:text-neutral-700' : 'text-neutral-500 hover:text-neutral-300'"
                         class="absolute right-4 transition-colors cursor-pointer"
                         title="Toggle confirm password visibility"
                     >
@@ -404,7 +403,7 @@
                     type="submit"
                     wire:loading.attr="disabled"
                     wire:target="register"
-                    :class="theme === 'champagne' ? 'bg-[#1C1917] text-white hover:bg-black' : 'bg-white text-black hover:bg-neutral-200'"
+                    :class="theme === 'light' ? 'bg-[#1C1917] text-white hover:bg-black' : 'bg-white text-black hover:bg-neutral-200'"
                     class="w-full font-semibold text-[10px] uppercase tracking-[0.2em] py-4 transition-all cursor-pointer rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md"
                 >
                     <span wire:loading wire:target="register" class="animate-spin rounded-full h-3 w-3 border-2 border-neutral-400 border-t-transparent inline-block"></span>
@@ -418,12 +417,12 @@
 
     {{-- Footer link --}}
     <div class="text-center">
-        <p :class="theme === 'champagne' ? 'text-neutral-500' : 'text-neutral-600'" class="text-[11px] font-light transition-colors">
+        <p :class="theme === 'light' ? 'text-neutral-500' : 'text-neutral-600'" class="text-[11px] font-light transition-colors">
             Already have an account?
             <a 
                 href="/login" 
                 wire:navigate 
-                :class="theme === 'champagne' ? 'text-neutral-900 hover:text-black decoration-neutral-300 hover:decoration-neutral-500 font-medium' : 'text-white/70 hover:text-white decoration-neutral-700 hover:decoration-neutral-500 font-medium'"
+                :class="theme === 'light' ? 'text-neutral-900 hover:text-black decoration-neutral-300 hover:decoration-neutral-500 font-medium' : 'text-white/70 hover:text-white decoration-neutral-700 hover:decoration-neutral-500 font-medium'"
                 class="underline underline-offset-4 transition-colors"
             >
                 Sign in

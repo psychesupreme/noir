@@ -1,9 +1,8 @@
 <div 
     x-data="curationStudio"
     :class="{
-        'bg-[#0B0B0D] text-[#E4E4E7]': theme === 'onyx',
-        'bg-[#FAF7F0] text-[#1C1C20]': theme === 'champagne',
-        'bg-[#15060A] text-[#FCE7EC]': theme === 'rose'
+        'bg-[#0B0B0D] text-[#E4E4E7]': theme === 'dark',
+        'bg-[#FAF7F0] text-[#1C1C20]': theme === 'light',
     }"
     class="min-h-screen font-sans antialiased relative text-left flex flex-col justify-between transition-colors duration-500 overflow-x-clip"
 >
@@ -22,45 +21,41 @@
 
     <!-- Luxury Cohesive Header -->
     <header 
-        class="fixed top-0 inset-x-0 w-full h-20 z-50 transition-all duration-500 flex items-center shadow-md hover:shadow-lg group backdrop-blur-xl animate-layer-1 theme-section"
+        class="fixed top-0 inset-x-0 w-full h-24 z-50 transition-all duration-500 flex items-center shadow-md hover:shadow-lg group backdrop-blur-xl animate-layer-1 theme-section"
         :class="{
-            'bg-[#0B0B0D]/80 border-b border-neutral-800/60 shadow-2xl text-white': theme === 'onyx',
-            'bg-[#FAF7F0]/80 border-b border-neutral-200 shadow-md text-neutral-900': theme === 'champagne',
-            'bg-[#15060A]/80 border-b border-[#2D121F] shadow-2xl text-[#FCE7EC]': theme === 'rose'
+            'bg-[#0B0B0D]/80 border-b border-neutral-800/60 shadow-2xl text-white': theme === 'dark',
+            'bg-[#FAF7F0]/80 border-b border-neutral-200 shadow-md text-neutral-900': theme === 'light',
         }"
     >
         {{-- Bottom Glow Line --}}
         <div class="absolute bottom-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent to-transparent"
              :class="{
-                 'via-[#C5A880]/30': theme === 'onyx',
-                 'via-emerald-600/30': theme === 'champagne',
-                 'via-[#B76E79]/30': theme === 'rose'
+                 'via-[#C5A880]/30': theme === 'dark',
+                 'via-emerald-600/30': theme === 'light',
              }"></div>
         <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-8">
             <a href="/" class="shrink-0 flex items-center select-none cursor-pointer group/brand transition-transform duration-300 hover:scale-[1.02]">
                 <div class="flex flex-col text-left leading-none">
-                    <span class="text-[10px] font-mono tracking-[0.35em] uppercase font-bold brand-title-atelier transition-colors duration-500"
+                    <span class="text-[12px] font-mono tracking-[0.35em] uppercase font-bold brand-title-atelier transition-colors duration-500"
                           :class="{
-                              'text-[#C5A880]': theme === 'onyx',
-                              'text-emerald-700': theme === 'champagne',
-                              'text-[#B76E79]': theme === 'rose'
+                              'text-[#C5A880]': theme === 'dark',
+                              'text-emerald-700': theme === 'light',
                           }">Atelier</span>
-                    <span class="text-base sm:text-lg md:text-xl font-extrabold uppercase tracking-[0.18em] font-outfit mt-0.5 brand-title-main transition-colors duration-500"
+                    <span class="text-lg sm:text-xl md:text-2xl font-extrabold uppercase tracking-[0.18em] font-outfit mt-0.5 brand-title-main transition-colors duration-500"
                           :class="{
-                              'text-white': theme === 'onyx',
-                              'text-neutral-900': theme === 'champagne',
-                              'text-[#FCE7EC]': theme === 'rose'
+                              'text-white': theme === 'dark',
+                              'text-neutral-900': theme === 'light',
                           }">Noir & Bloom</span>
                 </div>
             </a>
             <!-- Spacing column to balance layout -->
             <div class="flex-1 hidden md:block"></div>
 
-            <div class="flex items-center space-x-6 text-[12px] font-mono uppercase tracking-widest text-neutral-400">
+            <div class="flex items-center space-x-6 text-sm font-mono font-semibold uppercase tracking-widest text-neutral-400">
                 <!-- Navigation links -->
                 <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer" style="animation-delay: 200ms;">Services</a>
                 <a href="{{ route('curate') }}" 
-                   class="hidden md:inline-block px-4 py-1.5 rounded-full border transition-all duration-300 animate-nav-item select-none cursor-pointer border-[#C5A880] bg-[#C5A880]/10 text-[#C5A880] font-semibold"
+                   class="hidden md:inline-block px-5 py-2.5 rounded-full border transition-all duration-300 animate-nav-item select-none cursor-pointer border-[#C5A880] bg-[#C5A880]/10 text-[#C5A880] font-semibold"
                    style="animation-delay: 250ms;">
                    Curation Studio
                 </a>
@@ -68,21 +63,19 @@
                 {{-- Theme Switcher Dropdown (Header) --}}
                 <div x-data="{ themeMenuOpen: false }" class="relative inline-block text-left select-none animate-nav-item">
                     <button @click="themeMenuOpen = !themeMenuOpen" 
-                            class="px-4 py-2 border rounded-full text-xs font-medium tracking-[0.1em] transition-all flex items-center space-x-2 cursor-pointer"
+                            class="px-5 py-2.5 border rounded-full text-xs font-semibold tracking-[0.1em] transition-all flex items-center space-x-2 cursor-pointer"
                             :class="{
-                                'border-neutral-800 bg-neutral-900/40 text-neutral-350 hover:text-white': theme === 'onyx',
-                                'border-neutral-250 bg-neutral-50 text-neutral-700 hover:text-neutral-900': theme === 'champagne',
-                                'border-[#2D121F] bg-[#1C0A10]/40 text-pink-200/60 hover:text-[#B76E79]': theme === 'rose'
+                                'border-neutral-800 bg-neutral-900/40 text-neutral-350 hover:text-white': theme === 'dark',
+                                'border-neutral-250 bg-neutral-50 text-neutral-700 hover:text-neutral-900': theme === 'light',
                             }"
                     >
                         <span class="w-2.5 h-2.5 rounded-full"
                               :class="{
-                                  'bg-[#C5A880]': theme === 'onyx',
-                                  'bg-emerald-600': theme === 'champagne',
-                                  'bg-[#B76E79]': theme === 'rose'
+                                  'bg-[#C5A880]': theme === 'dark',
+                                  'bg-emerald-600': theme === 'light',
                               }"></span>
-                        <span class="uppercase font-mono text-[10px] tracking-widest" x-text="theme"></span>
-                        <svg class="w-3 h-3 stroke-current fill-none transition-transform duration-300" :class="{ 'rotate-180': themeMenuOpen }" viewBox="0 0 24 24" stroke-width="2">
+                        <span class="uppercase font-mono text-xs tracking-widest" x-text="theme"></span>
+                        <svg class="w-3.5 h-3.5 stroke-current fill-none transition-transform duration-300" :class="{ 'rotate-180': themeMenuOpen }" viewBox="0 0 24 24" stroke-width="2">
                             <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </button>
@@ -96,9 +89,8 @@
                          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                          x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
                          :class="{
-                             'bg-[#0F0F12]/95 border-neutral-900 text-white shadow-2xl': theme === 'onyx',
-                             'bg-white/95 border-neutral-200 text-neutral-900 shadow-xl': theme === 'champagne',
-                             'bg-[#1D0C13]/95 border-[#2D121F] text-pink-100 shadow-xl': theme === 'rose'
+                             'bg-[#0F0F12]/95 border-neutral-900 text-white shadow-2xl': theme === 'dark',
+                             'bg-white/95 border-neutral-200 text-neutral-900 shadow-xl': theme === 'light',
                          }"
                          class="absolute right-0 mt-2.5 w-64 rounded-2xl border p-4.5 z-50 backdrop-blur-md space-y-3"
                          style="display: none;"
@@ -108,9 +100,9 @@
                         </div>
                         <div class="space-y-2 text-[11px] font-sans">
                             <!-- Onyx Option -->
-                            <button @click="theme = 'onyx'; themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
+                            <button @click="theme = 'dark'; themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
                                 <div class="flex items-center space-x-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#C5A880]"></span>
+                                    <span class="w-3 h-3 rounded-full bg-[#C5A880]"></span>
                                     <div>
                                         <span class="font-bold font-mono tracking-wider block text-[10px] uppercase">Onyx Theme</span>
                                         <span class="text-[8px] text-neutral-500 font-light block mt-0.5">Obsidian mode with deep gold accents.</span>
@@ -118,22 +110,12 @@
                                 </div>
                             </button>
                             <!-- Champagne Option -->
-                            <button @click="theme = 'champagne'; themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
+                            <button @click="theme = 'light'; themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
                                 <div class="flex items-center space-x-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                                    <span class="w-3 h-3 rounded-full bg-emerald-600"></span>
                                     <div>
                                         <span class="font-bold font-mono tracking-wider block text-[10px] uppercase">Champagne Theme</span>
                                         <span class="text-[8px] text-neutral-500 font-light block mt-0.5">Creamy light mode with emerald highlights.</span>
-                                    </div>
-                                </div>
-                            </button>
-                            <!-- Rose Option -->
-                            <button @click="theme = 'rose'; themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
-                                <div class="flex items-center space-x-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#B76E79]"></span>
-                                    <div>
-                                        <span class="font-bold font-mono tracking-wider block text-[10px] uppercase">Rose Theme</span>
-                                        <span class="text-[8px] text-neutral-500 font-light block mt-0.5">Blush floral style with rose-gold accents.</span>
                                     </div>
                                 </div>
                             </button>
@@ -143,23 +125,21 @@
 
                 {{-- Notification Bell button --}}
                 <button @click="notificationsOpen = true" 
-                        class="transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center rounded-full shadow-sm" 
+                        class="transition-colors cursor-pointer select-none relative w-11 h-11 flex items-center justify-center rounded-full shadow-sm" 
                         :class="{
-                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'onyx',
-                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'champagne',
-                            'border border-[#2D121F] bg-[#1C0A10]/40 text-pink-200/60 hover:text-[#B76E79]': theme === 'rose'
+                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
+                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
                         }"
                         title="View Notifications"
                 >
-                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                    <svg class="w-5.5 h-5.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     @if(($unreadNotificationsCount ?? 0) > 0)
-                        <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-white text-[9px] font-bold font-sans shadow-md animate-pulse"
+                        <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-white text-[10px] font-bold font-sans shadow-md animate-pulse"
                               :class="{
-                                  'bg-[#C5A880]': theme === 'onyx',
-                                  'bg-emerald-600': theme === 'champagne',
-                                  'bg-[#B76E79]': theme === 'rose'
+                                  'bg-[#C5A880]': theme === 'dark',
+                                  'bg-emerald-600': theme === 'light',
                               }">
                             {{ $unreadNotificationsCount }}
                         </span>
@@ -168,24 +148,22 @@
 
                 <!-- Modern SVG shopping bag cart button redirecting to storefront open cart -->
                 <a href="/?open_cart=true" 
-                        class="transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center rounded-full shadow-sm animate-nav-item" 
+                        class="transition-colors cursor-pointer select-none relative w-11 h-11 flex items-center justify-center rounded-full shadow-sm animate-nav-item" 
                         :class="{
-                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'onyx',
-                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'champagne',
-                            'border border-[#2D121F] bg-[#1C0A10]/40 text-pink-200/60 hover:text-[#B76E79]': theme === 'rose'
+                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
+                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
                         }"
                         style="animation-delay: 400ms;"
                         title="View Curation Drawer"
                 >
-                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                    <svg class="w-5.5 h-5.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
                         <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     @if(($cartCount ?? 0) > 0)
-                        <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-white text-[9px] font-bold font-sans shadow-md"
+                        <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-white text-[10px] font-bold font-sans shadow-md"
                               :class="{
-                                  'bg-[#C5A880]': theme === 'onyx',
-                                  'bg-emerald-600': theme === 'champagne',
-                                  'bg-[#B76E79]': theme === 'rose'
+                                  'bg-[#C5A880]': theme === 'dark',
+                                  'bg-emerald-600': theme === 'light',
                               }">
                             {{ $cartCount }}
                         </span>
@@ -197,19 +175,17 @@
                     @auth
                         <!-- Initials-based Monogram Avatar Button -->
                         <button @click="profileOpen = true" 
-                                class="transition-all cursor-pointer select-none w-8 h-8 flex items-center justify-center rounded-full shadow-sm"
+                                class="transition-all cursor-pointer select-none w-10 h-10 flex items-center justify-center rounded-full shadow-sm"
                                 :class="{
-                                    'hover:border-[#C5A880] border border-neutral-700 bg-neutral-900/40': theme === 'onyx',
-                                    'hover:border-emerald-600 border border-neutral-200 bg-neutral-100': theme === 'champagne',
-                                    'hover:border-[#B76E79] border border-[#2D121F] bg-[#1C0A10]/40': theme === 'rose'
+                                    'hover:border-[#C5A880] border border-neutral-700 bg-neutral-900/40': theme === 'dark',
+                                    'hover:border-emerald-600 border border-neutral-200 bg-neutral-100': theme === 'light',
                                 }"
                                 title="Profile Portal Options"
                         >
-                            <span class="text-[10px] font-mono font-bold tracking-wider uppercase"
+                            <span class="text-xs font-mono font-bold tracking-wider uppercase"
                                   :class="{
-                                      'text-[#C5A880]': theme === 'onyx',
-                                      'text-emerald-800': theme === 'champagne',
-                                      'text-[#B76E79]': theme === 'rose'
+                                      'text-[#C5A880]': theme === 'dark',
+                                      'text-emerald-800': theme === 'light',
                                   }">
                                 {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
                             </span>
@@ -217,15 +193,14 @@
                     @else
                         <!-- Log In / Sign In Button for Guests -->
                         <button @click="profileOpen = true" 
-                                class="transition-all duration-300 hover:scale-[1.03] cursor-pointer select-none px-4 h-8 flex items-center justify-center space-x-1.5 rounded-full text-[11px] font-sans font-light tracking-widest uppercase"
+                                class="transition-all duration-300 hover:scale-[1.03] cursor-pointer select-none px-5 h-11 flex items-center justify-center space-x-2 rounded-full text-xs font-sans font-semibold tracking-widest uppercase"
                                 :class="{
-                                    'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880] hover:border-[#C5A880]': theme === 'onyx',
-                                    'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-800 hover:border-emerald-600': theme === 'champagne',
-                                    'border border-[#2D121F] bg-[#1C0A10]/40 text-pink-200/60 hover:text-[#B76E79] hover:border-[#B76E79]': theme === 'rose'
+                                    'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880] hover:border-[#C5A880]': theme === 'dark',
+                                    'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-800 hover:border-emerald-600': theme === 'light',
                                 }"
                                 title="Log In or Sign In"
                         >
-                            <svg class="w-3.5 h-3.5 stroke-current fill-none transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 24 24" stroke-width="1.5">
+                            <svg class="w-4 h-4 stroke-current fill-none transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 24 24" stroke-width="1.5">
                                 <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3M15 12" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                             <span class="hidden sm:inline">Sign In</span>
@@ -237,7 +212,7 @@
     </header>
 
     <!-- Main split workspace -->
-    <main class="flex-1 pt-24 pb-32 px-4 md:px-6 z-10 flex flex-col lg:flex-row lg:items-start gap-6 max-w-7xl mx-auto w-full">
+    <main class="flex-1 pt-28 pb-32 px-4 md:px-6 z-10 flex flex-col lg:flex-row lg:items-start gap-6 max-w-7xl mx-auto w-full">
         
         <!-- Left Panel: Fixed Visual Anchor & Invoice Summary (Locked on Desktop) -->
         <div class="w-full lg:w-5/12 lg:sticky lg:top-28 lg:h-[calc(100vh-8rem)] lg:max-h-[760px] lg:min-h-[580px] lg:overflow-y-auto scrollbar-none rounded-3xl border border-neutral-800/20 relative flex flex-col justify-between p-6 bg-black/10 backdrop-blur-md shadow-2xl">
@@ -430,7 +405,7 @@
         <div class="w-full lg:w-7/12 space-y-12">
             
             <!-- Floating Navigation Quick-links -->
-            <div :class="theme === 'champagne' ? 'bg-[#FAF7F0]/90 border-neutral-200 shadow-sm' : 'bg-[#09090D]/90 border-neutral-800/60 shadow-xl'" class="sticky top-24 backdrop-blur-md border p-1 rounded-full z-40 flex items-center justify-between text-[9px] font-mono tracking-widest uppercase overflow-x-auto scrollbar-none gap-1">
+            <div :class="theme === 'light' ? 'bg-[#FAF7F0]/90 border-neutral-200 shadow-sm' : 'bg-[#09090D]/90 border-neutral-800/60 shadow-xl'" class="sticky top-24 backdrop-blur-md border p-1 rounded-full z-40 flex items-center justify-between text-[9px] font-mono tracking-widest uppercase overflow-x-auto scrollbar-none gap-1">
                 <button 
                     @click="scrollToSection('section-occasion')" 
                     :class="activeSection === 'section-occasion' ? 'bg-[#C5A880] text-black font-bold shadow-md' : 'text-neutral-400 hover:text-white'"
@@ -518,8 +493,8 @@
                             :class="{
                                 'border-[#C5A880] bg-[#C5A880]/5 shadow-md': curationOccasion === occ.id,
                                 'border-neutral-800/20 hover:border-neutral-700/30': curationOccasion !== occ.id,
-                                'bg-white/80': theme === 'champagne',
-                                'bg-[#09090D]/40': theme !== 'champagne'
+                                'bg-white/80': theme === 'light',
+                                'bg-[#09090D]/40': theme !== 'light'
                             }"
                             class="flex flex-col text-left p-4 rounded-2xl border transition-all cursor-pointer group"
                         >
@@ -548,13 +523,12 @@
                             :class="{
                                 'border-[#C5A880] bg-[#C5A880]/5 shadow-lg': (localStems[{{ $stem->id }}] || 0) > 0 && {{ $stem->stock }} > 0,
                                 'border-neutral-800/20': !((localStems[{{ $stem->id }}] || 0) > 0) || {{ $stem->stock }} <= 0,
-                                'bg-white/80': theme === 'champagne',
-                                'bg-[#09090D]/40': theme !== 'champagne',
+                                'bg-white/80': theme === 'light',
+                                'bg-[#09090D]/40': theme !== 'light',
                                 'opacity-60 saturate-50': {{ $stem->stock }} <= 0,
                                 'animate-shake border-red-500/50': shake,
-                                'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'onyx' && {{ $stem->stock }} > 0,
-                                'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'champagne' && {{ $stem->stock }} > 0,
-                                'hover:shadow-[0_0_20px_rgba(183,110,121,0.25)] hover:border-[#B76E79]/40': theme === 'rose' && {{ $stem->stock }} > 0
+                                'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'dark' && {{ $stem->stock }} > 0,
+                                'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'light' && {{ $stem->stock }} > 0,
                             }"
                             class="flex flex-col justify-between p-5 rounded-2xl border transition-all relative group cursor-pointer"
                         >
@@ -618,13 +592,12 @@
                             :class="{
                                 'border-[#C5A880] bg-[#C5A880]/5 shadow-lg': selectedWrappingId == {{ $wrap->id }} && {{ $wrap->stock }} > 0,
                                 'border-neutral-800/20': selectedWrappingId != {{ $wrap->id }} || {{ $wrap->stock }} <= 0,
-                                'bg-white/80': theme === 'champagne',
-                                'bg-[#09090D]/40': theme !== 'champagne',
+                                'bg-white/80': theme === 'light',
+                                'bg-[#09090D]/40': theme !== 'light',
                                 'opacity-60 saturate-50': {{ $wrap->stock }} <= 0,
                                 'animate-shake border-red-500/50': shake,
-                                'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'onyx' && {{ $wrap->stock }} > 0,
-                                'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'champagne' && {{ $wrap->stock }} > 0,
-                                'hover:shadow-[0_0_20px_rgba(183,110,121,0.25)] hover:border-[#B76E79]/40': theme === 'rose' && {{ $wrap->stock }} > 0
+                                'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'dark' && {{ $wrap->stock }} > 0,
+                                'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'light' && {{ $wrap->stock }} > 0,
                             }"
                             class="flex items-center gap-4 p-4 rounded-2xl border transition-all cursor-pointer group relative"
                         >
@@ -655,8 +628,8 @@
                             :class="{
                                 'border-[#C5A880] bg-[#C5A880]/5': hasGlitter,
                                 'border-neutral-800/20 hover:border-neutral-500/30': !hasGlitter,
-                                'bg-white/80': theme === 'champagne',
-                                'bg-[#09090D]/40': theme !== 'champagne'
+                                'bg-white/80': theme === 'light',
+                                'bg-[#09090D]/40': theme !== 'light'
                             }"
                             class="flex items-center gap-4 p-4 rounded-2xl border transition-all cursor-pointer group"
                         >
@@ -692,8 +665,8 @@
                                     :class="{
                                         'bg-[#C5A880] text-black font-semibold border-transparent shadow-md': selectedRibbonId == {{ $ribbon->id }},
                                         'border-neutral-800/20 text-neutral-400 hover:text-white': selectedRibbonId != {{ $ribbon->id }},
-                                        'bg-[#09090D]/40': theme !== 'champagne',
-                                        'bg-white': theme === 'champagne'
+                                        'bg-[#09090D]/40': theme !== 'light',
+                                        'bg-white': theme === 'light'
                                     }"
                                     class="px-4 py-2 border rounded-full text-xs font-mono transition-all cursor-pointer focus:outline-none"
                                 >
@@ -723,13 +696,12 @@
                             :class="{
                                 'border-[#C5A880] bg-[#C5A880]/5': selectedMistId == {{ $mist->id }} && {{ $mist->stock }} > 0,
                                 'border-neutral-800/20': selectedMistId != {{ $mist->id }} || {{ $mist->stock }} <= 0,
-                                'bg-white/80': theme === 'champagne',
-                                'bg-[#09090D]/40': theme !== 'champagne',
+                                'bg-white/80': theme === 'light',
+                                'bg-[#09090D]/40': theme !== 'light',
                                 'opacity-60 saturate-50': {{ $mist->stock }} <= 0,
                                 'animate-shake border-red-500/50': shake,
-                                'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'onyx' && {{ $mist->stock }} > 0,
-                                'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'champagne' && {{ $mist->stock }} > 0,
-                                'hover:shadow-[0_0_20px_rgba(183,110,121,0.25)] hover:border-[#B76E79]/40': theme === 'rose' && {{ $mist->stock }} > 0
+                                'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'dark' && {{ $mist->stock }} > 0,
+                                'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'light' && {{ $mist->stock }} > 0,
                             }"
                             class="p-4 rounded-2xl border transition-all cursor-pointer relative group flex flex-col justify-between h-full"
                         >
@@ -770,13 +742,12 @@
                                 :class="{
                                     'border-[#C5A880] bg-[#C5A880]/5 shadow-lg': (localGifts[{{ $wine->id }}] || 0) > 0 && {{ $wine->stock }} > 0,
                                     'border-neutral-800/20': !(localGifts[{{ $wine->id }}] || 0) > 0 || {{ $wine->stock }} <= 0,
-                                    'bg-white/80': theme === 'champagne',
-                                    'bg-[#09090D]/40': theme !== 'champagne',
+                                    'bg-white/80': theme === 'light',
+                                    'bg-[#09090D]/40': theme !== 'light',
                                     'opacity-60 saturate-50': {{ $wine->stock }} <= 0,
                                     'animate-shake border-red-500/50': shake,
-                                    'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'onyx' && {{ $wine->stock }} > 0,
-                                    'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'champagne' && {{ $wine->stock }} > 0,
-                                    'hover:shadow-[0_0_20px_rgba(183,110,121,0.25)] hover:border-[#B76E79]/40': theme === 'rose' && {{ $wine->stock }} > 0
+                                    'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'dark' && {{ $wine->stock }} > 0,
+                                    'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'light' && {{ $wine->stock }} > 0,
                                 }"
                                 class="flex flex-col justify-between p-4 rounded-2xl border transition-all relative group cursor-pointer"
                             >
@@ -828,13 +799,12 @@
                                 :class="{
                                     'border-[#C5A880] bg-[#C5A880]/5 shadow-lg': (localGifts[{{ $choc->id }}] || 0) > 0 && {{ $choc->stock }} > 0,
                                     'border-neutral-800/20': !(localGifts[{{ $choc->id }}] || 0) > 0 || {{ $choc->stock }} <= 0,
-                                    'bg-white/80': theme === 'champagne',
-                                    'bg-[#09090D]/40': theme !== 'champagne',
+                                    'bg-white/80': theme === 'light',
+                                    'bg-[#09090D]/40': theme !== 'light',
                                     'opacity-60 saturate-50': {{ $choc->stock }} <= 0,
                                     'animate-shake border-red-500/50': shake,
-                                    'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'onyx' && {{ $choc->stock }} > 0,
-                                    'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'champagne' && {{ $choc->stock }} > 0,
-                                    'hover:shadow-[0_0_20px_rgba(183,110,121,0.25)] hover:border-[#B76E79]/40': theme === 'rose' && {{ $choc->stock }} > 0
+                                    'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'dark' && {{ $choc->stock }} > 0,
+                                    'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'light' && {{ $choc->stock }} > 0,
                                 }"
                                 class="flex flex-col justify-between p-4 rounded-2xl border transition-all relative group cursor-pointer"
                             >
@@ -886,13 +856,12 @@
                                 :class="{
                                     'border-[#C5A880] bg-[#C5A880]/5 shadow-lg': (localGifts[{{ $jewel->id }}] || 0) > 0 && {{ $jewel->stock }} > 0,
                                     'border-neutral-800/20': !(localGifts[{{ $jewel->id }}] || 0) > 0 || {{ $jewel->stock }} <= 0,
-                                    'bg-white/80': theme === 'champagne',
-                                    'bg-[#09090D]/40': theme !== 'champagne',
+                                    'bg-white/80': theme === 'light',
+                                    'bg-[#09090D]/40': theme !== 'light',
                                     'opacity-60 saturate-50': {{ $jewel->stock }} <= 0,
                                     'animate-shake border-red-500/50': shake,
-                                    'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'onyx' && {{ $jewel->stock }} > 0,
-                                    'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'champagne' && {{ $jewel->stock }} > 0,
-                                    'hover:shadow-[0_0_20px_rgba(183,110,121,0.25)] hover:border-[#B76E79]/40': theme === 'rose' && {{ $jewel->stock }} > 0
+                                    'hover:shadow-[0_0_20px_rgba(197,168,128,0.15)] hover:border-[#C5A880]/40': theme === 'dark' && {{ $jewel->stock }} > 0,
+                                    'hover:shadow-[0_0_20px_rgba(181,154,122,0.25)] hover:border-[#B59A7A]/40': theme === 'light' && {{ $jewel->stock }} > 0,
                                 }"
                                 class="flex flex-col justify-between p-4 rounded-2xl border transition-all relative group cursor-pointer"
                             >
@@ -948,8 +917,8 @@
                         :class="{
                             'border-[#C5A880] bg-[#C5A880]/5': hasCard,
                             'border-neutral-800/20 hover:border-neutral-500/30': !hasCard,
-                            'bg-white/80': theme === 'champagne',
-                            'bg-[#09090D]/40': theme !== 'champagne'
+                            'bg-white/80': theme === 'light',
+                            'bg-[#09090D]/40': theme !== 'light'
                         }"
                         class="flex items-center justify-between p-5 rounded-2xl border transition-all cursor-pointer group"
                     >
@@ -981,8 +950,8 @@
                         placeholder="Type your birthday greeting or special note here... e.g. happy birthday"
                         rows="4"
                         :class="{
-                            'bg-black/35 border-neutral-800 focus:border-[#C5A880]': theme !== 'champagne',
-                            'bg-white border-neutral-350 focus:border-[#C5A880]': theme === 'champagne'
+                            'bg-black/35 border-neutral-800 focus:border-[#C5A880]': theme !== 'light',
+                            'bg-white border-neutral-350 focus:border-[#C5A880]': theme === 'light'
                         }"
                         class="w-full rounded-2xl p-4 text-xs font-light tracking-wide outline-none transition-colors border shadow-inner placeholder-neutral-500 font-sans"
                     ></textarea>
@@ -994,9 +963,8 @@
     <!-- Luxury Atelier Footer -->
     <footer 
         :class="{
-            'border-neutral-900 bg-[#070709] text-neutral-400': theme === 'onyx',
-            'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'champagne',
-            'border-[#2D0D19]/40 bg-[#1D0C13] text-neutral-300': theme === 'rose'
+            'border-neutral-900 bg-[#070709] text-neutral-400': theme === 'dark',
+            'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'light',
         }"
         class="border-t mt-20 py-10 px-6 transition-colors duration-500 z-10 relative theme-section"
     >
@@ -1005,7 +973,7 @@
             <div class="space-y-4">
                 <div class="flex items-baseline space-x-2">
                     <span class="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
-                    <h4 :class="theme === 'champagne' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">Noir & Bloom</h4>
+                    <h4 :class="theme === 'light' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">Noir & Bloom</h4>
                 </div>
                 <p class="text-xs font-light leading-relaxed max-w-xs">
                     Premium floral curation, bespoke gifting suites, and high-end events concierge. Sourcing directly from Rift Valley growers.
@@ -1014,7 +982,7 @@
 
             <!-- Col 2: Showroom Catalog Links -->
             <div class="space-y-4">
-                <h5 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Showroom</h5>
+                <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Showroom</h5>
                 <ul class="space-y-2 text-xs font-light">
                     <li><a href="/?collection=retail" class="hover:underline">Bespoke Retail Arrays</a></li>
                     <li><a href="/?collection=wholesale" class="hover:underline">Wholesale Graded Stems</a></li>
@@ -1025,7 +993,7 @@
 
             <!-- Col 3: Hours & Support -->
             <div class="space-y-4">
-                <h5 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">Concierge Dispatch</h5>
+                <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">Concierge Dispatch</h5>
                 <ul class="space-y-2 text-xs font-light">
                     <li><span class="block text-neutral-500">Operating Hours</span> Mon &mdash; Sat: 07:00 &mdash; 20:00</li>
                     <li>Sunday: 09:00 &mdash; 17:00</li>
@@ -1036,7 +1004,7 @@
 
             <!-- Col 4: Newsletter -->
             <div class="space-y-4">
-                <h5 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Atelier Bulletin</h5>
+                <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Atelier Bulletin</h5>
                 <p class="text-xs font-light leading-relaxed">
                     Subscribe for seasonal curation updates, wholesale catalog changes, and exclusive releases.
                 </p>
@@ -1044,11 +1012,11 @@
                     <input 
                         type="email" 
                         placeholder="you@company.co.ke" 
-                        :class="theme === 'champagne' ? 'bg-white border-neutral-300 text-black placeholder-neutral-400 focus:border-neutral-500' : 'bg-neutral-900/60 border-neutral-800 text-white placeholder-neutral-700 focus:border-neutral-700'"
+                        :class="theme === 'light' ? 'bg-white border-neutral-300 text-black placeholder-neutral-400 focus:border-neutral-500' : 'bg-neutral-900/60 border-neutral-800 text-white placeholder-neutral-700 focus:border-neutral-700'"
                         class="flex-1 text-xs px-3.5 py-2.5 border rounded-xl focus:outline-none transition-all"
                     >
                     <button 
-                        :class="theme === 'champagne' ? 'bg-neutral-950 text-white hover:bg-black' : 'bg-white text-black hover:bg-neutral-200'"
+                        :class="theme === 'light' ? 'bg-neutral-950 text-white hover:bg-black' : 'bg-white text-black hover:bg-neutral-200'"
                         class="px-4 py-2.5 text-[11px] font-mono uppercase tracking-wider font-semibold rounded-full transition-all"
                     >
                         Join
@@ -1057,7 +1025,7 @@
             </div>
         </div>
 
-        <div :class="theme === 'champagne' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-5xl w-full mx-auto border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
+        <div :class="theme === 'light' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-5xl w-full mx-auto border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
             <p>&copy; {{ date('Y') }} Atelier Noir & Bloom. All rights reserved.</p>
             
             {{-- Social Media Icons --}}
@@ -1066,9 +1034,8 @@
                 <a href="https://instagram.com/noirandbloom" target="_blank" rel="noopener"
                    class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
                    :class="{
-                       'border-neutral-800 text-neutral-500 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.3)]': theme === 'onyx',
-                       'border-neutral-200 text-neutral-400 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.25)]': theme === 'champagne',
-                       'border-[#2D121F] text-pink-300/40 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.3)]': theme === 'rose'
+                       'border-neutral-800 text-neutral-500 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.3)]': theme === 'dark',
+                       'border-neutral-200 text-neutral-400 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.25)]': theme === 'light',
                    }"
                    title="Follow us on Instagram">
                     <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
@@ -1079,9 +1046,8 @@
                 <a href="https://facebook.com/noirandbloom" target="_blank" rel="noopener"
                    class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
                    :class="{
-                       'border-neutral-800 text-neutral-500 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.3)]': theme === 'onyx',
-                       'border-neutral-200 text-neutral-400 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.25)]': theme === 'champagne',
-                       'border-[#2D121F] text-pink-300/40 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.3)]': theme === 'rose'
+                       'border-neutral-800 text-neutral-500 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.3)]': theme === 'dark',
+                       'border-neutral-200 text-neutral-400 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.25)]': theme === 'light',
                    }"
                    title="Follow us on Facebook">
                     <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
@@ -1092,9 +1058,8 @@
                 <a href="https://twitter.com/NoirAndBloom" target="_blank" rel="noopener"
                    class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
                    :class="{
-                       'border-neutral-800 text-neutral-500 hover:text-white hover:border-white hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]': theme === 'onyx',
-                       'border-neutral-200 text-neutral-400 hover:text-black hover:border-black hover:shadow-[0_0_15px_rgba(0,0,0,0.15)]': theme === 'champagne',
-                       'border-[#2D121F] text-pink-300/40 hover:text-[#FCE7EC] hover:border-[#FCE7EC] hover:shadow-[0_0_15px_rgba(252,231,236,0.2)]': theme === 'rose'
+                       'border-neutral-800 text-neutral-500 hover:text-white hover:border-white hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]': theme === 'dark',
+                       'border-neutral-200 text-neutral-400 hover:text-black hover:border-black hover:shadow-[0_0_15px_rgba(0,0,0,0.15)]': theme === 'light',
                    }"
                    title="Follow us on X (Twitter)">
                     <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -1105,9 +1070,8 @@
                 <a href="https://pinterest.com/noirandbloom" target="_blank" rel="noopener"
                    class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
                    :class="{
-                       'border-neutral-800 text-neutral-500 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.3)]': theme === 'onyx',
-                       'border-neutral-200 text-neutral-400 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.25)]': theme === 'champagne',
-                       'border-[#2D121F] text-pink-300/40 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.3)]': theme === 'rose'
+                       'border-neutral-800 text-neutral-500 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.3)]': theme === 'dark',
+                       'border-neutral-200 text-neutral-400 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.25)]': theme === 'light',
                    }"
                    title="Follow us on Pinterest">
                     <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
@@ -1118,9 +1082,8 @@
                 <a href="https://wa.me/254712345678" target="_blank" rel="noopener"
                    class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
                    :class="{
-                       'border-neutral-800 text-neutral-500 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.3)]': theme === 'onyx',
-                       'border-neutral-200 text-neutral-400 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.25)]': theme === 'champagne',
-                       'border-[#2D121F] text-pink-300/40 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.3)]': theme === 'rose'
+                       'border-neutral-800 text-neutral-500 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.3)]': theme === 'dark',
+                       'border-neutral-200 text-neutral-400 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.25)]': theme === 'light',
                    }"
                    title="Chat with us on WhatsApp">
                     <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
@@ -1130,16 +1093,16 @@
             </div>
             
             <div class="flex space-x-6">
-                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Terms of Curation</a>
-                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Logistics Policy</a>
-                <a href="#" :class="theme === 'champagne' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Invoice Request</a>
+                <a href="#" :class="theme === 'light' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Terms of Curation</a>
+                <a href="#" :class="theme === 'light' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Logistics Policy</a>
+                <a href="#" :class="theme === 'light' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Invoice Request</a>
             </div>
         </div>
     </footer>
 
     <!-- Mobile Sticky Footer Bar (visible only on mobile/tablet) -->
     <div 
-        :class="theme === 'champagne' ? 'bg-white/70 border-neutral-200 shadow-lg backdrop-blur-xl' : 'bg-[#0B0B0D]/75 border-neutral-800/20 shadow-2xl backdrop-blur-xl'"
+        :class="theme === 'light' ? 'bg-white/70 border-neutral-200 shadow-lg backdrop-blur-xl' : 'bg-[#0B0B0D]/75 border-neutral-800/20 shadow-2xl backdrop-blur-xl'"
         class="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t backdrop-blur-md px-6 py-4 flex items-center justify-between transition-all duration-500"
     >
         <div>
@@ -1190,7 +1153,7 @@
             x-transition:leave="transition ease-in duration-200 transform"
             x-transition:leave-start="translate-y-0"
             x-transition:leave-end="translate-y-full"
-            :class="theme === 'champagne' ? 'bg-[#FAF7F0]' : 'bg-[#09090D]'"
+            :class="theme === 'light' ? 'bg-[#FAF7F0]' : 'bg-[#09090D]'"
             class="absolute bottom-0 inset-x-0 rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto border-t border-neutral-800/20 flex flex-col justify-between"
         >
             <!-- Header -->
@@ -1350,9 +1313,9 @@
                                 if (pref) return pref;
                             @endauth
                             const stored = localStorage.getItem('nb_theme');
-                            return (stored === 'onyx' || stored === 'champagne' || stored === 'rose') ? stored : 'champagne';
+                            return (stored === 'dark' || stored === 'light') ? stored : 'dark';
                         } catch (e) {
-                            return 'champagne';
+                            return 'light';
                         }
                     })(),
                     profileOpen: false,
@@ -1406,9 +1369,9 @@
                         var storedTheme = localStorage.getItem('nb_theme');
                         @auth
                             const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
-                            this.theme = pref || (storedTheme === 'onyx' || storedTheme === 'champagne' || storedTheme === 'rose' ? storedTheme : 'champagne');
+                            this.theme = pref || (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'light' ? storedTheme : 'light');
                         @else
-                            this.theme = (storedTheme === 'onyx' || storedTheme === 'champagne' || storedTheme === 'rose') ? storedTheme : 'champagne';
+                            this.theme = (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'light') ? storedTheme : 'light';
                         @endauth
                         var self = this;
 
@@ -1419,14 +1382,12 @@
                             self.$dispatch('theme-changed', val);
                             
                             const bgColors = {
-                                'onyx': '#0B0B0D',
-                                'champagne': '#FAF7F0',
-                                'rose': '#1C0A10'
+                                'dark': '#0B0B0D',
+                                'light': '#FAF7F0',
                             };
                             const textColors = {
-                                'onyx': '#E4E4E7',
-                                'champagne': '#1C1C20',
-                                'rose': '#FADDE7'
+                                'dark': '#E4E4E7',
+                                'light': '#1C1C20',
                             };
                             if (bgColors[val]) {
                                 document.documentElement.style.backgroundColor = bgColors[val];
@@ -1603,13 +1564,13 @@
         x-show="profileOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'champagne' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : (theme === 'rose' ? 'bg-[#1D0C13]/90 border border-[#2D121F] text-pink-100 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl')"
+        :class="theme === 'light' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
         style="display: none;"
     >
-        <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
+        <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
             <div>
-                <h3 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Profile Portal</h3>
+                <h3 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Profile Portal</h3>
                 <span class="text-[9px] text-neutral-500 font-light">Atelier Customer Account</span>
             </div>
             <button @click="profileOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Modal">
@@ -1630,27 +1591,24 @@
                 <div class="flex items-center space-x-4 pb-4 border-b border-neutral-500/10">
                     <div class="w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-tr from-neutral-950 via-neutral-900 to-neutral-955 border-2 shadow-md shrink-0"
                          :class="{
-                             'border-[#C5A880]/40': theme === 'onyx',
-                             'border-emerald-600/40': theme === 'champagne',
-                             'border-[#B76E79]/40': theme === 'rose'
+                             'border-[#C5A880]/40': theme === 'dark',
+                             'border-emerald-600/40': theme === 'light',
                          }">
                         <span class="text-base font-mono font-bold tracking-wider"
                               :class="{
-                                  'text-[#C5A880]': theme === 'onyx',
-                                  'text-emerald-800': theme === 'champagne',
-                                  'text-[#B76E79]': theme === 'rose'
+                                  'text-[#C5A880]': theme === 'dark',
+                                  'text-emerald-800': theme === 'light',
                               }">
                             {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
                         </span>
                     </div>
                     <div class="truncate space-y-0.5">
                         <div class="flex items-center space-x-2">
-                            <span class="font-serif italic text-base tracking-wide font-semibold block truncate" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->name }}</span>
+                            <span class="font-serif italic text-base tracking-wide font-semibold block truncate" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->name }}</span>
                             <span class="text-[8px] font-mono uppercase tracking-widest px-2 py-0.5 border rounded-full shrink-0"
                                   :class="{
-                                      'border-[#C5A880]/30 bg-[#C5A880]/5 text-[#C5A880]': theme === 'onyx',
-                                      'border-emerald-600/30 bg-emerald-55 text-emerald-850': theme === 'champagne',
-                                      'border-[#B76E79]/30 bg-[#B76E79]/5 text-[#B76E79]': theme === 'rose'
+                                      'border-[#C5A880]/30 bg-[#C5A880]/5 text-[#C5A880]': theme === 'dark',
+                                      'border-emerald-600/30 bg-emerald-55 text-emerald-850': theme === 'light',
                                   }">
                                 {{ auth()->user()->loyalty_tier }}
                             </span>
@@ -1663,15 +1621,15 @@
                 <div class="grid grid-cols-3 gap-2.5 text-center py-2">
                     <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
                         <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Client Since</span>
-                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'">{{ auth()->user()->created_at->format('M Y') }}</span>
+                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ auth()->user()->created_at->format('M Y') }}</span>
                     </div>
                     <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
                         <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Total Curations</span>
-                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'">{{ $totalOrdersCount }}</span>
+                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ $totalOrdersCount }}</span>
                     </div>
                     <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
                         <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Active dispatches</span>
-                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'">{{ $activeOrdersCount }}</span>
+                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ $activeOrdersCount }}</span>
                     </div>
                 </div>
 
@@ -1679,12 +1637,12 @@
                 <div class="space-y-3 font-sans py-1 text-xs">
                     <div class="flex items-center space-x-2 text-neutral-400">
                         <span class="font-bold text-[9px] uppercase tracking-wider text-[#C5A880]/80">Phone:</span>
-                        <span class="font-mono" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->phone_number ?: 'Not Provided' }}</span>
+                        <span class="font-mono" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->phone_number ?: 'Not Provided' }}</span>
                     </div>
 
                     <div class="leading-relaxed">
                         <span class="font-bold text-[9px] uppercase tracking-wider text-[#C5A880]/80 block">Main Address</span>
-                        <span class="block truncate" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" title="{{ auth()->user()->default_delivery_address }}">{{ auth()->user()->default_delivery_address ?: 'No Address Set' }}</span>
+                        <span class="block truncate" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" title="{{ auth()->user()->default_delivery_address }}">{{ auth()->user()->default_delivery_address ?: 'No Address Set' }}</span>
                         @if(auth()->user()->default_region)
                             <span class="text-[9px] font-mono text-neutral-500 uppercase tracking-wider block mt-0.5">{{ auth()->user()->default_region }}</span>
                         @endif
@@ -1713,9 +1671,8 @@
                 <div class="space-y-2.5 pt-4">
                     <a href="/profile-portal" 
                        :class="{
-                           'bg-[#C5A880] hover:bg-[#B59A7A] text-black': theme === 'onyx',
-                           'bg-emerald-800 hover:bg-emerald-950 text-white': theme === 'champagne',
-                           'bg-[#B76E79] hover:bg-[#A55E69] text-white': theme === 'rose'
+                           'bg-[#C5A880] hover:bg-[#B59A7A] text-black': theme === 'dark',
+                           'bg-emerald-800 hover:bg-emerald-950 text-white': theme === 'light',
                        }"
                        class="w-full text-center font-mono font-bold uppercase tracking-wider py-3 rounded-full text-[10px] flex items-center justify-center space-x-2 transition-all transform hover:scale-[1.01] shadow-md cursor-pointer"
                     >
@@ -1729,9 +1686,8 @@
                         @csrf
                         <button type="submit" 
                                 :class="{
-                                    'border-neutral-800 text-neutral-400 hover:text-rose-500 hover:border-rose-950': theme === 'onyx',
-                                    'border-neutral-200 text-neutral-500 hover:text-rose-600 hover:border-rose-250': theme === 'champagne',
-                                    'border-[#2D121F] text-pink-300/60 hover:text-rose-500 hover:border-rose-950': theme === 'rose'
+                                    'border-neutral-800 text-neutral-400 hover:text-rose-500 hover:border-rose-950': theme === 'dark',
+                                    'border-neutral-200 text-neutral-500 hover:text-rose-600 hover:border-rose-250': theme === 'light',
                                 }"
                                 class="w-full border font-mono font-bold uppercase tracking-wider py-2.5 rounded-full text-[9px] flex items-center justify-center space-x-2 transition-all cursor-pointer bg-transparent"
                         >
@@ -1744,17 +1700,17 @@
                 </div>
             @else
                 <div class="text-center py-2.5 space-y-4">
-                    <span class="font-serif text-xl italic block" :class="theme === 'champagne' ? 'text-[#B59A7A]' : (theme === 'rose' ? 'text-[#B76E79]' : 'text-[#C5A880]')">Atelier Loyalty Circle</span>
+                    <span class="font-serif text-xl italic block" :class="theme === 'light' ? 'text-[#B59A7A]' : 'text-[#C5A880]'">Atelier Loyalty Circle</span>
                     <p class="text-neutral-450 font-light text-[11px] leading-relaxed">Sign in to track orders, manage billing profiles, and earn loyalty rewards.</p>
                     <div class="flex flex-col gap-2.5 pt-1">
                         <a href="/login" 
-                           :class="theme === 'champagne' ? 'bg-[#B59A7A] text-white hover:bg-neutral-800' : (theme === 'rose' ? 'bg-[#B76E79] text-white hover:bg-[#1C0A10]' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]')"
+                           :class="theme === 'light' ? 'bg-[#B59A7A] text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'"
                            class="font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] text-center block shadow-md"
                         >
                             Sign In
                         </a>
                         <a href="/register" 
-                           :class="theme === 'champagne' ? 'border-neutral-250 text-neutral-600 hover:text-[#B59A7A]' : (theme === 'rose' ? 'border-[#2D121F] text-pink-300/60 hover:text-[#B76E79]' : 'border-neutral-800 text-neutral-450 hover:text-[#C5A880]')"
+                           :class="theme === 'light' ? 'border-neutral-250 text-neutral-600 hover:text-[#B59A7A]' : 'border-neutral-800 text-neutral-450 hover:text-[#C5A880]'"
                            class="border font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] text-center block"
                         >
                             Create Account
@@ -1773,13 +1729,13 @@
         x-show="notificationsOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'champagne' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : (theme === 'rose' ? 'bg-[#1D0C13]/90 border border-[#2D121F] text-pink-100 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl')"
+        :class="theme === 'light' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[80vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
         style="display: none;"
     >
-        <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
+        <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
             <div>
-                <h3 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Notification Log</h3>
+                <h3 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Notification Log</h3>
                 <span class="text-[9px] text-neutral-500 font-light">Inbox logs & system alerts</span>
             </div>
             <button @click="notificationsOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Modal">
@@ -1811,9 +1767,8 @@
                             @if(!$notif['is_read'])
                                 <span class="absolute top-4 right-4 w-2 h-2 rounded-full"
                                       :class="{
-                                          'bg-[#C5A880]': theme === 'onyx',
-                                          'bg-emerald-600': theme === 'champagne',
-                                          'bg-[#B76E79]': theme === 'rose'
+                                          'bg-[#C5A880]': theme === 'dark',
+                                          'bg-emerald-600': theme === 'light',
                                       }"></span>
                             @endif
                             
@@ -1861,7 +1816,7 @@
             
             @auth
                 @if(count($notificationsList) > 0)
-                    <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-4 border-t bg-neutral-500/5 flex items-center justify-between shrink-0">
+                    <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-4 border-t bg-neutral-500/5 flex items-center justify-between shrink-0">
                         <button wire:click="clearAllNotifications" class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 hover:text-red-400 cursor-pointer">
                             [ Clear All ]
                         </button>
