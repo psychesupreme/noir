@@ -21,7 +21,12 @@ class Order extends Model
         'service_fee_amount',
         'status',
         'special_instructions',
-        'required_delivery_at'
+        'required_delivery_at',
+        'rating',
+        'feedback',
+        'product_rating',
+        'packaging_rating',
+        'delivery_rating',
     ];
 
     protected $casts = [
@@ -29,6 +34,59 @@ class Order extends Model
         'total_amount' => 'integer',
         'service_fee_amount' => 'integer',
     ];
+
+    protected static function booted()
+    {
+        static::updated(function ($order) {
+            if ($order->isDirty('status')) {
+                $oldStatus = $order->getOriginal('status');
+                $newStatus = $order->status;
+
+                // Write system log
+                \App\Models\SystemLog::write('info', 'order', "Order #NB-ORD-{$order->id} status updated from {$oldStatus} to {$newStatus}.", [
+                    'order_id' => $order->id,
+                    'old_status' => $oldStatus,
+                    'new_status' => $newStatus,
+                ]);
+
+                // Create user notification
+                if ($order->client && $order->client->user_id) {
+                    \App\Models\Notification::create([
+                        'user_id' => $order->client->user_id,
+                        'title' => 'Order Status Updated',
+                        'message' => "Your order #NB-ORD-{$order->id} status has been updated to " . strtoupper($newStatus) . ".",
+                        'type' => 'order',
+                    ]);
+                }
+            }
+        });
+
+        static::created(function ($order) {
+            // Write system log
+            \App\Models\SystemLog::write('info', 'order', "Order #NB-ORD-{$order->id} created with total amount " . number_format($order->total_amount) . " KSH.", [
+                'order_id' => $order->id,
+                'total_amount' => $order->total_amount,
+            ]);
+
+            // Create user notification
+            if ($order->client && $order->client->user_id) {
+                \App\Models\Notification::create([
+                    'user_id' => $order->client->user_id,
+                    'title' => 'Order Placed Successfully',
+                    'message' => "Your order #NB-ORD-{$order->id} for " . number_format($order->total_amount) . " KSH has been placed.",
+                    'type' => 'order',
+                ]);
+            }
+        });
+
+        static::saved(function ($order) {
+            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        });
+
+        static::deleted(function ($order) {
+            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        });
+    }
 
     public function client(): BelongsTo
     {
@@ -134,14 +192,4 @@ class Order extends Model
         });
     }
 
-    protected static function booted(): void
-    {
-        static::saved(function ($order) {
-            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
-        });
-
-        static::deleted(function ($order) {
-            \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
-        });
-    }
 }

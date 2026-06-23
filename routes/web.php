@@ -61,6 +61,7 @@ Route::middleware(['auth', 'role:admin,staff'])->prefix('admin')->group(function
     Route::get('/accounts-receivable', \App\Livewire\Admin\AccountsReceivableIndex::class)->name('admin.accounts-receivable');
     Route::get('/tax', TaxIndex::class)->name('admin.tax');
     Route::get('/reports', ReportIndex::class)->name('admin.reports');
+    Route::get('/system-logs', \App\Livewire\Admin\SystemLogIndex::class)->name('admin.system-logs');
     Route::get('/settings', SettingsIndex::class)->name('admin.settings');
 });
 

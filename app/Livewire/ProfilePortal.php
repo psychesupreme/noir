@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfilePortal extends Component
 {
+    use \App\Livewire\Traits\HasNotificationsAndTheme;
     // Tabs: details, security, orders, wishlist, settings, logistics
     public string $activeTab = 'details';
 
@@ -42,6 +43,14 @@ class ProfilePortal extends Component
     // Order feedback & rating states
     public array $orderRatings = [];
     public array $orderFeedbacks = [];
+
+    // Detailed rating modal states
+    public ?int $ratingOrderId = null;
+    public int $ratingOverall = 0;
+    public int $ratingProduct = 0;
+    public int $ratingPackaging = 0;
+    public int $ratingDelivery = 0;
+    public string $ratingComments = '';
 
     protected $rules = [
         'name' => 'required|string|min:3',
@@ -219,6 +228,44 @@ class ProfilePortal extends Component
                     ]);
                     session()->flash('success_orders', 'Thank you for your feedback on order #NB-ORD-' . $orderId . '!');
                 }
+            }
+        }
+    }
+
+    public function openRatingModal(int $orderId): void
+    {
+        $this->ratingOrderId = $orderId;
+        $this->ratingOverall = 0;
+        $this->ratingProduct = 0;
+        $this->ratingPackaging = 0;
+        $this->ratingDelivery = 0;
+        $this->ratingComments = '';
+    }
+
+    public function submitDetailedRating(): void
+    {
+        $this->validate([
+            'ratingOverall' => 'required|integer|min:1|max:5',
+            'ratingProduct' => 'required|integer|min:1|max:5',
+            'ratingPackaging' => 'required|integer|min:1|max:5',
+            'ratingDelivery' => 'required|integer|min:1|max:5',
+            'ratingComments' => 'nullable|string',
+        ]);
+
+        $order = Order::find($this->ratingOrderId);
+        if ($order) {
+            $user = auth()->user();
+            if ($user && $order->client && $order->client->email === $user->email) {
+                $order->update([
+                    'rating' => $this->ratingOverall,
+                    'feedback' => $this->ratingComments,
+                    'product_rating' => $this->ratingProduct,
+                    'packaging_rating' => $this->ratingPackaging,
+                    'delivery_rating' => $this->ratingDelivery,
+                ]);
+
+                session()->flash('success_orders', 'Thank you for your feedback on order #NB-ORD-' . $this->ratingOrderId . '!');
+                $this->ratingOrderId = null;
             }
         }
     }

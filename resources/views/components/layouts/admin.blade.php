@@ -63,11 +63,15 @@
                         ['icon' => '⛃', 'label' => 'AR Ledger',     'route' => '/admin/accounts-receivable', 'active' => request()->is('admin/accounts-receivable*'), 'future' => false],
                         ['icon' => '▣', 'label' => 'Tax & eTIMS',   'route' => '/admin/tax',       'active' => request()->is('admin/tax*'), 'future' => false],
                         ['icon' => '◇', 'label' => 'Reports',       'route' => '/admin/reports',   'active' => request()->is('admin/reports*'), 'future' => false],
+                        ['icon' => '▤', 'label' => 'System Logs',   'route' => '/admin/system-logs','active' => request()->is('admin/system-logs*'), 'future' => false],
                         ['icon' => '⚙', 'label' => 'Settings',      'route' => '/admin/settings',  'active' => request()->is('admin/settings*'), 'future' => false],
                     ];
                 @endphp
 
                 @foreach ($navItems as $item)
+                    @if (($item['label'] === 'System Logs' || $item['label'] === 'Reports') && !auth()->user()->isAdmin())
+                        @continue
+                    @endif
                     @if ($item['future'])
                         <span class="flex items-center space-x-3 px-4 py-2.5 text-xs tracking-wider rounded-sm text-neutral-500 opacity-40 cursor-not-allowed select-none">
                             <span class="w-5 text-center">{{ $item['icon'] }}</span>

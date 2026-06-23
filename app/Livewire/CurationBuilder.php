@@ -7,6 +7,8 @@ use Livewire\Component;
 
 class CurationBuilder extends Component
 {
+    use \App\Livewire\Traits\HasNotificationsAndTheme;
+
     // Database catalogs
     public $availableStems;
     public $availableWrappings;

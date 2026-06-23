@@ -65,12 +65,8 @@
         checkoutMode: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
         theme: (() => {
             try {
-                @auth
-                    const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
-                    if (pref) return pref;
-                @endauth
                 const stored = localStorage.getItem('nb_theme');
-                return (stored === 'onyx' || stored === 'champagne' || stored === 'rose') ? stored : 'champagne';
+                return (stored === 'onyx' || stored === 'champagne') ? stored : 'champagne';
             } catch (e) {
                 return 'champagne';
             }
@@ -123,24 +119,15 @@
             document.documentElement.className = val; 
             document.documentElement.setAttribute('data-theme', val);
             const bgColors = {
-                'onyx': '#050507',
-                'champagne': '#FAF7F0',
-                'rose': '#15060A'
+                'onyx': '#0B0B0D',
+                'champagne': '#FAF7F0'
             };
             const textColors = {
                 'onyx': '#E4E4E7',
-                'champagne': '#1C1C20',
-                'rose': '#FCE7EC'
+                'champagne': '#1C1C20'
             };
-            if (bgColors[val]) {
-                document.documentElement.style.backgroundColor = bgColors[val];
-            }
-            if (textColors[val]) {
-                document.documentElement.style.color = textColors[val];
-            }
-            @auth
-                $wire.updatePreferredTheme(val);
-            @endauth
+            document.documentElement.style.backgroundColor = bgColors[val];
+            document.documentElement.style.color = textColors[val];
         });
 
         /* Setup session timeout timer for authenticated users */
@@ -171,9 +158,8 @@
         @endauth
     "
     :class="{
-        'bg-[#050507] text-[#E4E4E7]': theme === 'onyx',
-        'bg-[#FAF7F0] text-[#1C1C20]': theme === 'champagne',
-        'bg-[#15060A] text-[#FCE7EC]': theme === 'rose'
+        'bg-[#0B0B0D] text-[#E4E4E7]': theme === 'onyx',
+        'bg-[#FAF7F0] text-[#1C1C20]': theme === 'champagne'
     }"
     class="min-h-screen font-sans antialiased relative text-left flex flex-col justify-between transition-colors duration-500 overflow-x-clip"
 >
@@ -399,15 +385,14 @@
     <!-- Fine Linen Organic Grid Overlay -->
     <div class="absolute inset-0 pointer-events-none fine-linen z-0 opacity-[0.03]"></div>
     <header 
-        class="fixed top-0 inset-x-0 w-full h-20 z-50 transition-all duration-500 flex items-center shadow-md hover:shadow-lg group backdrop-blur-xl animate-layer-1 theme-section"
+        class="fixed top-4 inset-x-4 h-16 rounded-full z-50 transition-all duration-500 flex items-center shadow-md hover:shadow-lg group backdrop-blur-xl animate-layer-1"
         :class="{
-            'bg-[#050507]/80 border-b border-neutral-800/60 shadow-2xl text-white': theme === 'onyx',
-            'bg-[#FAF7F0]/80 border-b border-neutral-200 shadow-md text-neutral-900': theme === 'champagne',
-            'bg-[#15060A]/80 border-b border-[#2D121F] shadow-2xl text-[#FCE7EC]': theme === 'rose'
+            'bg-[#0B0B0D]/90 border border-neutral-800/60 shadow-[0_4px_30px_rgba(0,0,0,0.3)]': theme === 'onyx',
+            'bg-white/90 border border-neutral-200/80 shadow-md': theme === 'champagne'
         }"
     >
-        {{-- Bottom Glow Line --}}
-        <div class="absolute bottom-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent to-transparent"
+        {{-- FNP Green Bottom Glow Line --}}
+        <div class="absolute bottom-0 inset-x-8 h-[1px] bg-gradient-to-r from-transparent to-transparent"
              :class="{
                  'via-[#C5A880]/30': theme === 'onyx',
                  'via-emerald-600/30': theme === 'champagne',
@@ -433,11 +418,12 @@
             
             {{-- Prominent Header Search Bar (FNP-style) --}}
             <div class="flex-1 max-w-lg mx-auto hidden md:block">
-                <div class="relative group" x-data="{ focused: false }" @click.away="focused = false">
+                <div class="relative group" x-data="{ focused: false }">
                     <input 
                         type="text" 
                         wire:model.live.debounce.200ms="search"
                         @focus="focused = true"
+                        @blur="focused = false"
                         placeholder="Search fresh flowers, luxury hampers, cakes, combinations..."
                         :class="{
                             'bg-neutral-900/40 border-neutral-700 text-white placeholder-neutral-500 focus:border-[#C5A880] focus:ring-[#C5A880]/10': theme === 'onyx',
@@ -456,80 +442,6 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
                         </svg>
                     </div>
-
-                    @if(!empty($search))
-                        <div x-show="focused"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
-                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                             x-transition:leave="transition ease-in duration-150"
-                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                             x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
-                             :class="theme === 'champagne' ? 'bg-white border-neutral-200 text-neutral-900 shadow-xl' : (theme === 'rose' ? 'bg-[#1D0C13] border-[#2D121F] text-pink-100 shadow-xl' : 'bg-[#0F0F12] border-neutral-900 text-white shadow-2xl')"
-                             class="absolute left-0 right-0 mt-2 border rounded-2xl z-50 text-left overflow-hidden divide-y divide-neutral-500/10 font-sans shadow-2xl"
-                             style="display: none;"
-                        >
-                            <!-- Product Suggestions -->
-                            <div class="p-3 space-y-2">
-                                <span class="text-[9px] font-mono uppercase tracking-wider text-neutral-500 block">Matching Arrangements</span>
-                                <div class="space-y-1">
-                                    @forelse($suggestions as $prod)
-                                        <button type="button" 
-                                                @click="quickViewProduct = {{ json_encode($prod) }}; quickViewSize = 'standard'; quickViewOpen = true; focused = false;" 
-                                                :class="theme === 'champagne' ? 'hover:bg-neutral-100' : 'hover:bg-white/5'"
-                                                class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer"
-                                        >
-                                            <div class="flex items-center space-x-2.5 truncate">
-                                                <div class="w-8 h-8 rounded-lg overflow-hidden bg-neutral-100 shrink-0">
-                                                    <img src="{{ $prod->image_url }}" alt="" class="w-full h-full object-cover">
-                                                </div>
-                                                <div class="truncate">
-                                                    <span class="font-medium text-xs block truncate" :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'">{{ $prod->name }}</span>
-                                                    <span class="text-[8px] text-neutral-500 uppercase tracking-widest">{{ str_replace('_', ' ', $prod->category) }}</span>
-                                                </div>
-                                            </div>
-                                            <span class="font-mono text-[10px] text-neutral-450 shrink-0">{{ number_format($prod->price) }} KSH</span>
-                                        </button>
-                                    @empty
-                                        <span class="text-xs text-neutral-450 italic px-2 block py-1">No matching arrangements found.</span>
-                                    @endforelse
-                                </div>
-                            </div>
-                            
-                            <!-- Categories & Occasions -->
-                            @php
-                                $matchingOccasions = $occasions->filter(fn($o) => str_contains(strtolower($o->name), strtolower($search)));
-                                $matchingCategories = collect(['stems', 'bouquet', 'giftings', 'bundle'])->filter(fn($c) => str_contains($c, strtolower($search)));
-                            @endphp
-                            @if($matchingOccasions->isNotEmpty() || $matchingCategories->isNotEmpty())
-                                <div class="p-3 space-y-2">
-                                    <span class="text-[9px] font-mono uppercase tracking-wider text-neutral-500 block">Suggested Categories</span>
-                                    <div class="flex flex-wrap gap-1.5">
-                                        @foreach($matchingCategories as $cat)
-                                            <button type="button" 
-                                                    wire:click="selectCategory('{{ $cat }}')"
-                                                    @click="focused = false; document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'});"
-                                                    :class="theme === 'champagne' ? 'border-neutral-250 bg-neutral-50 hover:bg-neutral-100 text-neutral-700' : (theme === 'rose' ? 'border-[#2D121F] bg-[#1C0A10]/40 hover:bg-[#1C0A10] text-pink-200' : 'border-neutral-800 bg-neutral-900/40 hover:bg-neutral-900 text-neutral-300')"
-                                                    class="px-3 py-1.5 border rounded-full text-[9px] font-mono uppercase tracking-wider cursor-pointer"
-                                            >
-                                                Category: {{ $cat }}
-                                            </button>
-                                        @endforeach
-                                        @foreach($matchingOccasions as $occ)
-                                            <button type="button" 
-                                                    wire:click="filterByOccasion('{{ $occ->slug }}')"
-                                                    @click="focused = false; document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'});"
-                                                    :class="theme === 'champagne' ? 'border-neutral-250 bg-neutral-50 hover:bg-neutral-100 text-neutral-700' : (theme === 'rose' ? 'border-[#2D121F] bg-[#1C0A10]/40 hover:bg-[#1C0A10] text-pink-200' : 'border-neutral-800 bg-neutral-900/40 hover:bg-neutral-900 text-neutral-300')"
-                                                    class="px-3 py-1.5 border rounded-full text-[9px] font-mono uppercase tracking-wider cursor-pointer"
-                                            >
-                                                Mood: {{ $occ->name }}
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    @endif
                 </div>
             </div>
 
@@ -1106,6 +1018,62 @@
                         <button @click="active = 'bundle'; $wire.selectCategory('bundle')" :class="active === 'bundle' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-500/10'" class="px-4 py-2 rounded-full transition-all cursor-pointer">Bundle</button>
                     </div>
                 </div>
+                <!-- Search bar & Filters container -->
+                <div class="flex flex-col md:flex-row md:items-center justify-end gap-4 pb-2 border-b border-neutral-500/5">
+                    <!-- Minimize size search bar -->
+                    <div class="w-full max-w-xs text-left">
+                        <div class="relative group" x-data="{ focused: false }">
+                            <input 
+                                type="text" 
+                                wire:model.live.debounce.200ms="search"
+                                @focus="focused = true"
+                                @blur="focused = false"
+                                placeholder="Search curation..."
+                                :class="{
+                                    'bg-neutral-900/40 border-neutral-850/60 text-white placeholder-neutral-550 hover:border-[#C5A880]/50 hover:shadow-[0_0_12px_rgba(197,168,128,0.08)]': theme === 'onyx',
+                                    'bg-white border-neutral-250 text-neutral-900 placeholder-neutral-450 hover:border-[#B59A7A]/50 hover:shadow-[0_0_12px_rgba(181,154,122,0.08)]': theme === 'champagne',
+                                    'bg-[#1C0A10]/40 border-[#2D121F] text-pink-100 placeholder-pink-300/40 hover:border-[#B76E79]/50 hover:shadow-[0_0_12px_rgba(183,110,121,0.08)]': theme === 'rose',
+                                    
+                                    'shadow-[0_0_15px_rgba(197,168,128,0.2)] !border-[#C5A880]': focused && theme === 'onyx',
+                                    'shadow-[0_0_15px_rgba(181,154,122,0.2)] !border-[#B59A7A]': focused && theme === 'champagne',
+                                    'shadow-[0_0_15px_rgba(183,110,121,0.2)] !border-[#B76E79]': focused && theme === 'rose'
+                                }"
+                                class="w-full border rounded-full pl-9 pr-4 py-1.5 text-xs font-light font-sans focus:outline-none transition-all duration-300 shadow-sm"
+                                style="transition-property: all; font-size: 12px;"
+                            >
+                            <!-- Search Icon -->
+                            <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none transition-colors duration-300"
+                                 :class="{
+                                     'text-[#C5A880]': theme === 'onyx',
+                                     'text-[#B59A7A]': theme === 'champagne',
+                                     'text-[#B76E79]': theme === 'rose'
+                                 }">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+                                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
+                                 </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Restored Curation Mood filter buttons -->
+                    <div class="flex flex-wrap gap-2 text-[10px] font-mono uppercase tracking-wider items-center">
+                        <button wire:click="filterByOccasion(null)" 
+                                :class="theme === 'champagne' ? 
+                                    ( '{{ is_null($selectedOccasion) }}' ? 'bg-[#B59A7A] text-white font-medium' : 'text-neutral-500 border border-neutral-250 hover:bg-neutral-50' ) : 
+                                    ( '{{ is_null($selectedOccasion) }}' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-500 border border-neutral-800/80 hover:text-neutral-300' )"
+                                class="px-3 py-1 rounded-full cursor-pointer transition-all">All Curation Moods</button>
+                        @foreach($occasions as $occasion)
+                            <button wire:click="filterByOccasion('{{ $occasion->slug }}')" 
+                                    :class="theme === 'champagne' ? 
+                                        ( '{{ $selectedOccasion === $occasion->slug }}' ? 'bg-[#B59A7A] text-white font-medium' : 'text-neutral-500 border border-neutral-250 hover:bg-neutral-50' ) : 
+                                        ( '{{ $selectedOccasion === $occasion->slug }}' ? 'font-bold text-white' : 'text-neutral-500 border border-neutral-800/80 hover:text-neutral-300' )"
+                                    class="px-3 py-1 rounded-full cursor-pointer transition-all hover:scale-102"
+                                    style="{{ $selectedOccasion === $occasion->slug ? 'background-color: '.$occasion->accent_color.'; border-color: '.$occasion->accent_color.';' : '' }}">
+                                {{ $occasion->name }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
 
                 <!-- Showroom Grid (Cathedral Arched product cards & Landscape custom rectangular cards) -->
                 @php
@@ -1516,6 +1484,7 @@
             </div>
 
         </div>
+    </div>
 
     <!-- Luxury Atelier Footer -->
     <footer 
@@ -1686,1061 +1655,3 @@
     <!-- No Account Drawer here (Profile details managed inside dedicated /profile-portal) -->
     </div> <!-- Close transformed layout transition container here to lift curation modal out of transformed context -->
     
-    <!-- Backdrop for Curation Drawer -->
-    <div x-show="drawerOpen" @click="drawerOpen = false" class="fixed inset-0 z-45 bg-black/40 backdrop-blur-xl" style="display: none;"></div>
-    
-    <!-- Floating Cart Overlay Panel (Center Modal) -->
-    <div 
-        x-show="drawerOpen"
-        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'champagne' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[520px] max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
-        style="display: none;"
-    >
-        <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
-            <div>
-                <h3 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Selected Curations</h3>
-                <span class="text-[9px] text-neutral-500 font-light">Bespoke Arrangement Hub</span>
-            </div>
-            <button @click="drawerOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Drawer">
-                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </button>
-        </div>
-
-        <!-- Cart items list (visible if not checking out) -->
-        <div x-show="!checkoutMode && !@json($orderSubmitted)" class="flex-1 flex flex-col justify-between overflow-hidden">
-            <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-220px)] scrollbar-none">
-                @forelse($cartItems as $item)
-                    <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900/60'" class="flex items-center justify-between space-x-4 border-b pb-4 text-xs animate-hero-fade">
-                        <div class="flex-1 space-y-0.5">
-                            <h4 :class="theme === 'champagne' ? 'text-neutral-855' : 'text-white'" class="font-normal">{{ $item['product']->name }}</h4>
-                            <p class="text-neutral-500 font-mono">{{ number_format($item['product']->price) }} KSH &bull; <span class="uppercase text-[10px]">Pack/{{ $item['product']->unit_type }}</span></p>
-                        </div>
-                        <div :class="theme === 'champagne' ? 'bg-[#FAF7F0]/40 border-neutral-200/50 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="flex items-center space-x-3 px-2.5 py-1.5 border rounded-full">
-                            <button wire:click="removeFromCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="text-neutral-400 font-bold font-mono cursor-pointer select-none">-</button>
-                            <span class="text-xs font-mono min-w-[15px] text-center">{{ $item['quantity'] }}</span>
-                            <button wire:click="addToCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="text-neutral-400 font-bold font-mono cursor-pointer select-none">+</button>
-                        </div>
-                    </div>
-                @empty
-                    <div class="h-full flex flex-col items-center justify-center text-center space-y-3 pt-28 text-neutral-500 animate-pulse">
-                        <svg class="w-10 h-10 text-neutral-500 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                        <span class="text-[10px] font-mono uppercase tracking-[0.2em]">Empty</span>
-                        <p class="text-[11px] font-light max-w-[220px]">Browse the showroom to compile premium items into your workspace configuration.</p>
-                    </div>
-                @endforelse
-            </div>
-
-            @if(count($cartItems) > 0)
-                <div :class="theme === 'champagne' ? 'border-neutral-200 bg-neutral-50/60' : 'border-neutral-900 bg-black/40'" class="p-5 border-t space-y-4 shrink-0">
-                    <div class="flex justify-between items-baseline text-xs font-light">
-                        <span class="text-neutral-500 tracking-wider">Estimated Subtotal</span>
-                        <span :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" class="text-base font-mono font-semibold">{{ number_format($cartTotal) }} KSH</span>
-                    </div>
-                    @auth
-                        <button @click="checkoutMode = true" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-4 cursor-pointer rounded-full btn-curate">
-                            Proceed to Logistics Spec
-                        </button>
-                    @else
-                        <!-- Guest authentication request block -->
-                        <div class="border border-dashed border-[#C5A880]/30 rounded-2xl p-4.5 bg-[#C5A880]/5 text-center space-y-3.5">
-                            <span class="text-[10px] font-sans uppercase tracking-[0.2em] text-[#C5A880] block font-semibold">✦ Authentication Required ✦</span>
-                            <p class="text-neutral-400 font-light text-[11.5px] leading-relaxed font-sans">Please sign in or create an account to configure logistics details and checkout.</p>
-                            <div class="grid grid-cols-2 gap-3 pt-1.5">
-                                <button type="button" wire:click="prepareGuestCheckoutRedirect('/login')" class="bg-[#C5A880] text-black font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] hover:bg-[#B59A7A] transition-all cursor-pointer shadow-md">
-                                    Sign In
-                                </button>
-                                <button type="button" wire:click="prepareGuestCheckoutRedirect('/register')" class="border border-neutral-800 text-neutral-450 hover:text-white hover:border-neutral-600 font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] transition-all cursor-pointer">
-                                    Register
-                                </button>
-                            </div>
-                        </div>
-                    @endauth
-                </div>
-            @endif
-        </div>
-
-        <!-- Checkout forms area -->
-        <div x-show="checkoutMode && !@json($orderSubmitted)" class="flex-1 flex flex-col justify-between overflow-hidden" style="display: none;">
-            <form wire:submit.prevent="submitCurationRequest" class="flex-1 flex flex-col justify-between overflow-hidden">
-                
-                <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-210px)] scrollbar-none text-xs">
-                    <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="flex items-center justify-between pb-2 border-b">
-                        <span class="text-xs uppercase tracking-wider text-neutral-400">Atelier Delivery Profile</span>
-                        <button type="button" @click="checkoutMode = false" class="text-neutral-500 hover:text-neutral-400 text-xs font-mono cursor-pointer flex items-center space-x-1">
-                            <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                                <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <span>Back</span>
-                        </button>
-                    </div>
-
-                    <div :class="theme === 'champagne' ? 'bg-neutral-100 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-1 border rounded-full grid grid-cols-2 text-center text-[11px] font-mono uppercase tracking-wider shadow-inner">
-                        <button type="button" @click="$wire.set('checkoutType', 'standard')" :class="$wire.checkoutType === 'standard' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Personal Delivery</button>
-                        <button type="button" @click="$wire.set('checkoutType', 'corporate')" :class="$wire.checkoutType === 'corporate' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Corporate Billing</button>
-                    </div>
-
-                    @if($checkoutType === 'corporate')
-                        <div class="space-y-1.5 bg-black/10 border border-neutral-900 p-3 rounded-2xl">
-                            <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Remittance Protocol</label>
-                            <div :class="theme === 'champagne' ? 'bg-neutral-100 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-1 border rounded-full grid grid-cols-2 text-center text-[11px] font-mono uppercase tracking-wider shadow-inner">
-                                <button type="button" @click="$wire.set('paymentMethod', 'mpesa')" :class="$wire.paymentMethod === 'mpesa' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">M-Pesa Push</button>
-                                <button type="button" @click="$wire.set('paymentMethod', 'net_30')" :class="$wire.paymentMethod === 'net_30' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Credit Invoice (Net 30)</button>
-                            </div>
-                            @error('paymentMethod')
-                                <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    @endif
-
-                    <div :class="theme === 'champagne' ? 'bg-neutral-50 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-4 border rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" class="text-xs font-normal block">Send this order as a luxury gift delivery?</span>
-                                <span class="text-xs text-neutral-500 font-light block mt-0.5">Recipient delivery parameters will cleanly isolate away from receipt parameters.</span>
-                            </div>
-                            <input type="checkbox" wire:model.live="is_gift" class="w-3.5 h-3.5 rounded text-black border-neutral-800 focus:ring-0 cursor-pointer">
-                        </div>
-                    </div>
-
-                    <div x-show="$wire.is_gift" class="space-y-4 border border-dashed border-neutral-800 p-4 rounded-xl bg-black/5" style="display: none;" x-transition>
-                        <span class="text-[11px] font-mono uppercase text-amber-500 tracking-wider block font-bold">&bull; Recipient Delivery Profile</span>
-                        <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-500">Recipient Full Name *</label>
-                            <input type="text" placeholder="Enter full recipient name" wire:model="recipient_name" :class="theme === 'champagne' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-500">Recipient Contact Line *</label>
-                            <input type="text" placeholder="e.g. 0712345678 (Required for courier logistics)" wire:model="recipient_phone" :class="theme === 'champagne' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
-                        </div>
-                    </div>
-
-                    <div x-show="!$wire.is_gift" x-transition>
-                        <div :class="theme === 'champagne' ? 'bg-neutral-100 text-black border-neutral-200' : 'bg-neutral-900/60 text-neutral-400 border-neutral-900'" class="p-3.5 border rounded-xl text-xs font-light space-y-1.5">
-                            <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block pb-1 border-b border-neutral-500/10">Pre-authenticated Customer Ledger Record</span>
-                            <div><span class="text-neutral-500">Contact Payer:</span> <span class="font-semibold text-neutral-300 dark:text-white">{{ $full_name }}</span></div>
-                            <div><span class="text-neutral-500">Secure Comm:</span> <span class="font-mono">{{ $phone }} &bull; {{ $email }}</span></div>
-                            @if($checkoutType === 'corporate')
-                                <div><span class="text-neutral-500 font-mono">KRA PIN:</span> <span class="font-mono text-amber-500 font-semibold uppercase">{{ $kra_pin }}</span></div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-xs uppercase tracking-wider text-neutral-500 block">Presentation Customization Packages (Pure delivery is free of added cost)</label>
-                        <div class="grid grid-cols-1 gap-2">
-                            <button type="button" wire:click="$set('delivery_type', 'standard')" :class="$wire.delivery_type === 'standard' ? 'border-black dark:border-white bg-neutral-500/5 font-medium shadow-sm' : 'border-neutral-800 text-neutral-400'" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
-                                <div><span class="block">Standard Courier Dispatch</span><span class="text-[11px] text-neutral-500 block mt-0.5">Premium transport routing directly to your destination building coordinates.</span></div>
-                                <span class="font-mono text-[11px]">+ 0 KSH</span>
-                            </button>
-                            <button type="button" wire:click="$set('delivery_type', 'secret')" :class="$wire.delivery_type === 'secret' ? 'border-amber-600 bg-amber-950/10 text-amber-500 font-medium' : 'border-neutral-800 text-neutral-400'" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
-                                <div><span class="block">The Secret Admirer Protocol</span><span class="text-[11px] text-neutral-500 block mt-0.5">We will fully conceal your sender profile parameters behind wax-sealed card enclosures.</span></div>
-                                <span class="font-mono text-[11px] text-amber-500 font-semibold">+ 500 KSH</span>
-                            </button>
-                            <button type="button" wire:click="$set('delivery_type', 'concierge')" :class="$wire.delivery_type === 'concierge' ? 'border-emerald-600 bg-emerald-950/10 text-emerald-500 font-medium' : 'border-neutral-800 text-neutral-400'" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
-                                <div><span class="block">Uniformed Concierge Presentation</span><span class="text-[11px] text-neutral-500 block mt-0.5">Hand-delivered via sharp, uniformed corporate couriers. Elite tier presentation statement.</span></div>
-                                <span class="font-mono text-[11px] text-emerald-500 font-semibold">+ 1,500 KSH</span>
-                            </button>
-                        </div>
-                                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-550">Distribution Node *</label>
-                            <select wire:model.live="region" :class="theme === 'champagne' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
-                                <option value="Nairobi">Nairobi Metropolitan</option>
-                                <option value="Kiambu">Kiambu Ridge Hub</option>
-                            </select>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-550">Landmarks Address *</label>
-                            <input type="text" list="premium-address-nodes" placeholder="Type complex, street, or estate..." wire:model="delivery_address" :class="theme === 'champagne' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
-                            <datalist id="premium-address-nodes">
-                                @foreach($this->getAddressSuggestions() as $node) <option value="{{ $node }}"></option> @endforeach
-                            </datalist>
-                        </div>
-                    </div>
-
-                    <!-- Delivery Date & Slot Picker in Logistics Spec -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[10px] uppercase tracking-wider text-neutral-555 font-mono block">Delivery Date *</label>
-                            <input type="date" wire:model.live="deliveryDate" min="{{ date('Y-m-d') }}" :class="theme === 'champagne' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans">
-                            @error('deliveryDate') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] uppercase tracking-wider text-neutral-555 font-mono block">Delivery Time Slot *</label>
-                            <select wire:model.live="deliverySlot" :class="theme === 'champagne' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans cursor-pointer">
-                                <option value="standard">Standard (Free)</option>
-                                <option value="midnight">Midnight (1,500 KSH)</option>
-                            </select>
-                            @error('deliverySlot') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-
-                    <!-- Free OpenStreetMap Interactive Map Locator with Autocomplete Search -->
-                    <div class="space-y-2" wire:ignore>
-                        <label class="text-[10px] uppercase tracking-wider text-neutral-555 font-mono block">Interactive Curation Dispatch Map (Click/drag marker to pinpoint location for free)</label>
-                        
-                        <div 
-                            x-data="{
-                                map: null,
-                                marker: null,
-                                searchQuery: '',
-                                searchResults: [],
-                                initMap() {
-                                    let lat = -1.2921;
-                                    let lng = 36.8219;
-                                    
-                                    let match = $wire.delivery_address.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
-                                    if (match) {
-                                        lat = parseFloat(match[1]);
-                                        lng = parseFloat(match[2]);
-                                    }
-
-                                    setTimeout(() => {
-                                        this.map = L.map('checkout-map').setView([lat, lng], 13);
-                                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                            attribution: '&copy; OpenStreetMap contributors'
-                                        }).addTo(this.map);
-                                        
-                                        this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
-                                        
-                                        this.marker.on('dragend', (e) => {
-                                            let position = this.marker.getLatLng();
-                                            this.updateCoords(position.lat, position.lng);
-                                        });
-                                        
-                                        this.map.on('click', (e) => {
-                                            this.marker.setLatLng(e.latlng);
-                                            this.updateCoords(e.latlng.lat, e.latlng.lng);
-                                        });
-
-                                        // ResizeObserver ensures Leaflet renders properly inside modal transitions
-                                        const observer = new ResizeObserver(() => {
-                                            this.map.invalidateSize();
-                                        });
-                                        observer.observe(document.getElementById('checkout-map'));
-                                    }, 400);
-
-                                    $watch('$wire.region', (val) => {
-                                        let centerCoords = val === 'Kiambu' ? [-1.1578, 36.8407] : [-1.2921, 36.8219];
-                                        this.map.setView(centerCoords, 13);
-                                        this.marker.setLatLng(centerCoords);
-                                        this.updateCoords(centerCoords[0], centerCoords[1]);
-                                    });
-                                },
-                                searchQueryClean() {
-                                    return this.searchQuery.trim();
-                                },
-                                searchLocation() {
-                                    let q = this.searchQueryClean();
-                                    if (!q) return;
-                                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`)
-                                        .then(res => res.json())
-                                        .then(data => {
-                                            this.searchResults = data;
-                                        })
-                                        .catch(() => {});
-                                },
-                                selectResult(res) {
-                                    let lat = parseFloat(res.lat);
-                                    let lng = parseFloat(res.lon);
-                                    this.map.setView([lat, lng], 14);
-                                    this.marker.setLatLng([lat, lng]);
-                                    this.updateCoords(lat, lng);
-                                    this.searchResults = [];
-                                    this.searchQuery = res.display_name.split(',').slice(0, 3).join(',').trim();
-                                },
-                                updateCoords(lat, lng) {
-                                    let coords = lat.toFixed(6) + ', ' + lng.toFixed(6);
-                                    $wire.delivery_address = coords;
-                                    
-                                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
-                                        .then(res => res.json())
-                                        .then(data => {
-                                            if (data && data.display_name) {
-                                                let shortName = data.display_name.split(',').slice(0, 3).join(',').trim();
-                                                $wire.delivery_address = coords + ' (' + shortName + ')';
-                                            }
-                                        })
-                                        .catch(() => {});
-                                }
-                            }"
-                            x-init="initMap()"
-                            class="relative"
-                        >
-                            <!-- Map Search Autocomplete Input -->
-                            <div class="relative z-40 mb-2">
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="text" 
-                                        x-model="searchQuery" 
-                                        @keydown.enter.prevent="searchLocation()"
-                                        placeholder="Search delivery address (e.g. Kilimani)..." 
-                                        :class="theme === 'champagne' ? 'bg-white border-neutral-200 text-black placeholder-neutral-400' : 'bg-[#0A0A0A] border-neutral-800 text-white placeholder-neutral-600'"
-                                        class="flex-1 border rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-neutral-400 font-sans"
-                                    >
-                                    <button 
-                                        type="button" 
-                                        @click="searchLocation()"
-                                        :class="theme === 'champagne' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'"
-                                        class="px-3.5 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold"
-                                    >
-                                        Find
-                                    </button>
-                                </div>
-                                <div 
-                                    x-show="searchResults.length > 0" 
-                                    @click.away="searchResults = []"
-                                    :class="theme === 'champagne' ? 'bg-[#FAF7F0] border-neutral-200 text-neutral-900' : 'bg-[#0F0F12] border-neutral-900 text-white'"
-                                    class="absolute left-0 right-0 z-[1000] mt-1 max-h-48 overflow-y-auto border rounded-xl shadow-xl text-xs"
-                                    style="display: none;"
-                                >
-                                    <template x-for="res in searchResults" :key="res.place_id">
-                                        <div 
-                                            @click="selectResult(res)"
-                                            :class="theme === 'champagne' ? 'hover:bg-neutral-200/50' : 'hover:bg-white/10'"
-                                            class="px-3 py-2 cursor-pointer transition-colors border-b last:border-b-0 border-neutral-500/10 font-sans"
-                                            x-text="res.display_name"
-                                        ></div>
-                                    </template>
-                                </div>
-                            </div>
-
-                            <!-- Leaflet Map Container -->
-                            <div 
-                                id="checkout-map"
-                                class="w-full h-32 rounded-xl overflow-hidden border border-neutral-500/10 z-10"
-                            ></div>
-                        </div>
-                    </div>      </div>
-                </div>
-
-                <div :class="theme === 'champagne' ? 'border-neutral-200 bg-neutral-50/60' : 'border-neutral-900 bg-black/40'" class="p-5 border-t space-y-4 shrink-0 text-xs">
-                    <div class="space-y-3">
-                        <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block pb-1 border-b border-neutral-500/10">Itemized Pre-Payment Statement</span>
-                        
-                        <!-- Product Item list -->
-                        <div class="space-y-1.5 border-b border-neutral-500/5 pb-2 max-h-24 overflow-y-auto scrollbar-none">
-                            @foreach($cartItems as $item)
-                                <div class="flex justify-between text-neutral-400">
-                                    <span>{{ $item['product']->name }} ({{ strtoupper(substr($item['size'], 0, 3)) }} × {{ $item['quantity'] }})</span>
-                                    <span class="font-mono text-neutral-300">{{ number_format($item['subtotal']) }} KSH</span>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <!-- Financial/Tax Breakdown -->
-                        <div class="space-y-1 text-neutral-500 font-mono text-[11px]">
-                            <div class="flex justify-between">
-                                <span>Taxable Net Base (Excl. VAT):</span>
-                                <span>{{ number_format((int)round(($cartTotal + $service_fee) / 1.16)) }} KSH</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>VAT Compliance (16%):</span>
-                                <span>{{ number_format(($cartTotal + $service_fee) - (int)round(($cartTotal + $service_fee) / 1.16)) }} KSH</span>
-                            </div>
-                            @if($service_fee > 0)
-                                <div class="flex justify-between text-amber-500">
-                                    <span>Order Fulfillment (Upsell):</span>
-                                    <span>+ {{ number_format($service_fee) }} KSH</span>
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Total -->
-                        <div class="flex justify-between items-baseline text-sm font-normal pt-2 border-t border-neutral-500/10">
-                            <span class="text-neutral-400">Grand Dispatch Total:</span>
-                            <span :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" class="text-md font-mono font-bold tracking-tight">{{ number_format($cartTotal + $service_fee) }} KSH</span>
-                        </div>
-                    </div>
-                    
-                    <button 
-                        type="submit" wire:loading.attr="disabled" wire:target="submitCurationRequest"
-                        class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-4 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center space-x-2 rounded-full btn-curate"
-                    >
-                        <span wire:loading wire:target="submitCurationRequest" class="animate-spin rounded-full h-2.5 w-2.5 border border-neutral-400 border-t-transparent inline-block"></span>
-                        <span wire:loading.remove wire:target="submitCurationRequest">Request Atelier Dispatch</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Mpesa Payment Initiation Page (Visible once orderSubmitted is true) -->
-        @if($orderSubmitted)
-            <div class="flex-1 flex flex-col justify-between overflow-hidden shrink-0 h-full">
-                <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-200px)] scrollbar-none w-full text-xs">
-                    <div class="space-y-6 max-w-sm mx-auto w-full pt-4">
-                        
-                        @if($paymentStatus === 'idle')
-                            {{-- State: IDLE - Prompt phone number --}}
-                            <div class="w-10 h-10 rounded-full border border-neutral-800 flex items-center justify-center bg-neutral-900/50 mx-auto">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10B981]"></span>
-                            </div>
-                            <div class="space-y-1 text-center">
-                                <h4 :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" class="text-sm uppercase tracking-[0.2em] font-medium">Dispatch Mapped</h4>
-                                <p class="text-xs text-neutral-500 font-light leading-relaxed">Your curation specs are locked. Dispatch Safaricom API prompts down below.</p>
-                                <div :class="theme === 'champagne' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A]/80 border-neutral-900 text-neutral-300'" class="p-4 border rounded-xl text-xs font-light space-y-2.5">
-                                 <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block pb-1 border-b border-neutral-500/10">Remittance Statement Summary</span>
-                                 
-                                 <!-- Itemized pricing lines -->
-                                 <div class="space-y-1.5 border-b border-neutral-500/5 pb-2 max-h-24 overflow-y-auto scrollbar-none">
-                                     @foreach($cartItems as $item)
-                                         <div class="flex justify-between text-neutral-400">
-                                             <span>{{ $item['product']->name }} ({{ strtoupper(substr($item['size'], 0, 3)) }} × {{ $item['quantity'] }})</span>
-                                             <span class="font-mono text-neutral-300">{{ number_format($item['product']->price * $item['quantity']) }} KSH</span>
-                                         </div>
-                                     @endforeach
-                                 </div>
-
-                                 <!-- Client Billing Context -->
-                                 <div class="space-y-1 text-neutral-400 border-b border-neutral-500/5 pb-2">
-                                     <div><span class="text-neutral-500">Payer Account:</span> <span class="font-medium text-neutral-300">{{ $full_name }}</span></div>
-                                     @if($is_gift)
-                                         <div><span class="text-amber-500 font-medium">Gift Delivery For:</span> <span class="text-amber-500 font-medium">{{ $recipient_name }} ({{ $recipient_phone }})</span></div>
-                                     @endif
-                                     <div><span class="text-neutral-500">Destination:</span> <span>{{ $delivery_address }}, Node/{{ $region }}</span></div>
-                                 </div>
-
-                                 <!-- Financial and Tax Splits -->
-                                 <div class="space-y-1 text-neutral-400">
-                                     <div class="flex justify-between">
-                                         <span>Taxable Net Base:</span>
-                                         <span class="font-mono text-[11px]">{{ number_format((int)round(($cartTotal + $service_fee) / 1.16)) }} KSH</span>
-                                     </div>
-                                     <div class="flex justify-between">
-                                         <span>VAT (16% Rate Compliance):</span>
-                                         <span class="font-mono text-[11px]">{{ number_format(($cartTotal + $service_fee) - (int)round(($cartTotal + $service_fee) / 1.16)) }} KSH</span>
-                                     </div>
-                                     @if($service_fee > 0)
-                                         <div class="flex justify-between">
-                                             <span>Order Fulfillment (Concierge):</span>
-                                             <span class="font-mono text-[11px]">+ {{ number_format($service_fee) }} KSH</span>
-                                         </div>
-                                     @endif
-                                 </div>
-
-                                 <div class="flex justify-between pt-2 border-t border-neutral-500/10 text-emerald-400 font-semibold">
-                                     <span>Grand Total:</span>
-                                     <span class="font-mono text-sm text-emerald-400 font-bold">{{ number_format($cartTotal + $service_fee) }} KSH</span>
-                                 </div>
-                             </div>
-                            </div>
-
-                            <div :class="theme === 'champagne' ? 'bg-white border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="space-y-3 p-4 border rounded-2xl shadow-2xl">
-                                <div class="space-y-1">
-                                    <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono">Safaricom Authorization Line</label>
-                                    <div class="relative flex items-center">
-                                        <span class="absolute left-3 text-xs font-mono text-neutral-600">+254</span>
-                                        <input type="tel" wire:model="phone" placeholder="712345678" :class="theme === 'champagne' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0F0F0F] border-neutral-800 text-white'" class="w-full border rounded-xl pl-14 pr-3 py-1.5 text-xs font-mono focus:outline-none focus:border-neutral-400">
-                                    </div>
-                                </div>
-
-                                @if($mpesaErrorMessage)
-                                    <div class="p-2 border border-dashed border-rose-900 bg-rose-950/20 text-[10px] font-mono text-rose-400 rounded-sm">{{ $mpesaErrorMessage }}</div>
-                                @endif
-
-                                <button type="button" wire:click="initiateMpesaPayment" wire:loading.attr="disabled" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-3 cursor-pointer rounded-full flex items-center justify-center space-x-2 btn-curate">
-                                    <span wire:loading wire:target="initiateMpesaPayment" class="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent inline-block"></span>
-                                    <span wire:loading.remove wire:target="initiateMpesaPayment">Authorize STK Push</span>
-                                </button>
-                            </div>
-                        @elseif($paymentStatus === 'pending')
-                            {{-- State: PENDING - Polling state checking payment callbacks --}}
-                            <div wire:poll.3s="checkPaymentStatus" class="space-y-6 text-center py-8">
-                                <div x-data="{ timer: 60 }" x-init="const interval = setInterval(() => { if(timer > 0) { timer--; } else { clearInterval(interval); } }, 1000)" class="space-y-6">
-                                    <div class="relative w-16 h-16 mx-auto flex items-center justify-center">
-                                        <span class="absolute inline-flex h-12 w-12 rounded-full bg-amber-500/20 animate-ping"></span>
-                                        <div class="w-12 h-12 rounded-full border border-neutral-800 flex items-center justify-center bg-neutral-900/60 z-10">
-                                            <svg class="w-5 h-5 text-amber-500 animate-spin" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <h4 :class="theme === 'champagne' ? 'text-neutral-900 font-semibold' : 'text-white'" class="text-sm uppercase tracking-[0.2em] font-medium font-mono text-amber-500">Awaiting PIN Auth</h4>
-                                        <p class="text-xs text-neutral-500 font-light leading-relaxed">
-                                            An M-Pesa prompt has been dispatched to <span class="font-mono text-neutral-300 font-semibold">+254{{ $phone }}</span>.<br>Enter your Safaricom PIN to complete checkout.
-                                        </p>
-                                    </div>
-                                    <div class="text-[10px] font-mono text-neutral-600 uppercase tracking-widest bg-neutral-950/20 py-2 border border-neutral-900/50 max-w-[200px] mx-auto rounded-full">
-                                        Expiry in <span class="font-bold text-white" x-text="timer"></span>s
-                                    </div>
-                                </div>
-                            </div>
-                        @elseif($paymentStatus === 'completed')
-                            {{-- State: COMPLETED - Success state + Invoice retrieval --}}
-                            <div class="space-y-8 text-center py-6">
-                                <div class="w-16 h-16 rounded-full border border-emerald-800 bg-emerald-950/20 flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                                    <svg class="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                    </svg>
-                                </div>
-                                <div class="space-y-2">
-                                    <h4 class="text-sm uppercase tracking-[0.2em] font-semibold text-emerald-400 font-mono">Remittance Confirmed</h4>
-                                    <p class="text-xs text-neutral-500 font-light leading-relaxed">
-                                        Your payment has been cleared by Safaricom Daraja. Your order is now queued for design and atelier fulfillment.
-                                    </p>
-                                    <div :class="theme === 'champagne' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A]/60 border-neutral-900 text-neutral-300'" class="p-4 border rounded-xl text-[11px] font-mono text-left space-y-2 max-w-sm mx-auto">
-                                     <span class="text-[9px] uppercase tracking-wider text-neutral-500 block border-b border-neutral-500/10 pb-1.5 font-bold">Transaction Compliance Audit</span>
-                                     <div class="flex justify-between"><span>Atelier Order ID:</span><span class="text-white font-semibold">#NB-ORD-{{ str_pad($trackedOrderId, 4, '0', STR_PAD_LEFT) }}</span></div>
-                                     @if($mpesaReceiptNumber)
-                                         <div class="flex justify-between"><span>M-Pesa Receipt:</span><span class="text-amber-500 font-bold uppercase">{{ $mpesaReceiptNumber }}</span></div>
-                                     @else
-                                         <div class="flex justify-between"><span>Billing Terms:</span><span class="text-amber-500 font-bold uppercase">Net 30 Credit Invoice</span></div>
-                                     @endif
-                                     <div class="flex justify-between"><span>Proforma Invoice:</span><span class="text-emerald-400">DETAILED RECEIPT</span></div>
-                                 </div>
-                                </div>
-
-                                <div class="space-y-3 max-w-sm mx-auto pt-4">
-                                    <a href="{{ URL::signedRoute('receipt.download', ['order' => $trackedOrderId]) }}" target="_blank" class="w-full bg-[#C5A880] hover:bg-[#B59A7A] text-black text-xs font-mono font-bold uppercase tracking-[0.2em] py-3 rounded-full flex items-center justify-center space-x-2 transition-all shadow-md transform hover:scale-[1.02]">
-                                        <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
-                                            <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                        <span>Download Proforma Invoice</span>
-                                    </a>
-                                </div>
-                            </div>
-                        @elseif($paymentStatus === 'failed')
-                            {{-- State: FAILED - Failure notification + retry option --}}
-                            <div class="space-y-8 text-center py-6">
-                                <div class="w-16 h-16 rounded-full border border-rose-800 bg-rose-950/20 flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-                                    <svg class="w-8 h-8 text-rose-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                    </svg>
-                                </div>
-                                <div class="space-y-2">
-                                    <h4 class="text-sm uppercase tracking-[0.2em] font-semibold text-rose-500 font-mono">Remittance Failed</h4>
-                                    <p class="text-xs text-rose-400 font-mono bg-rose-950/25 border border-rose-900/30 p-3 rounded-xl max-w-sm mx-auto leading-relaxed">
-                                        {{ $mpesaErrorMessage }}
-                                    </p>
-                                </div>
-                                
-                                <div class="pt-4 max-w-sm mx-auto">
-                                    <button type="button" wire:click="$set('paymentStatus', 'idle')" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-3 cursor-pointer rounded-full btn-curate">
-                                        Retry M-Pesa Authorization
-                                    </button>
-                                </div>
-                            </div>
-                        @endif
-
-                    </div>
-                </div>
-
-                <div class="text-center p-4 border-t border-neutral-500/5 shrink-0 bg-black/10 flex justify-center">
-                    <button @click="drawerOpen = false; checkoutMode = false;" wire:click="returnToCollections" class="text-neutral-500 hover:text-neutral-450 text-xs font-mono tracking-widest uppercase cursor-pointer flex items-center space-x-1">
-                        <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <span>Clear & Return to Showroom</span>
-                    </button>
-                </div>
-                </div>
-        @endif
-    </div>
-
-
-    <!-- Floating Chat Widget -->
-    <div x-show="!drawerOpen" x-transition class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
-        <!-- Jumping Animated Circular Icon Button -->
-        <button 
-            @click="chatOpen = !chatOpen" 
-            :class="theme === 'champagne' ? 'bg-[#FAF7F0]/85 text-black border-neutral-250/60 shadow-md backdrop-blur-md' : 'bg-[#0A0A0A]/85 text-white border-neutral-800 shadow-2xl backdrop-blur-md'"
-            class="w-14 h-14 rounded-full flex items-center justify-center border cursor-pointer hover:scale-105 transition-all duration-300 animate-aura-bounce relative theme-section"
-            title="Aura Curation Companion"
-        >
-            <span x-show="!chatOpen" class="absolute top-1 right-1 flex h-3.5 w-3.5">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
-            </span>
-            
-            <span x-show="!chatOpen" class="flex items-center justify-center">
-                <!-- Chat SVG icon -->
-                <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </span>
-            <span x-show="chatOpen" style="display: none;" class="flex items-center justify-center">
-                <!-- Close SVG icon -->
-                <svg class="w-6 h-6 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </span>
-        </button>
- 
-        <div x-show="chatOpen" style="display: none;" x-transition class="mt-3 w-80 md:w-96 h-[420px] bg-[#0F0F0F]/90 border border-neutral-800 rounded-3xl shadow-2xl flex flex-col justify-between overflow-hidden backdrop-blur-xl">
-            <div class="p-4 border-b border-neutral-800 bg-[#0A0A0A]/90 flex items-center justify-between text-left">
-                <div>
-                    <span class="text-xs uppercase font-mono text-neutral-300 tracking-wider font-semibold">Aura Concierge AI</span>
-                    <span class="block text-[11px] text-emerald-400 font-mono mt-0.5">&bull; Active Curation Companion</span>
-                </div>
-            </div>
-            <div class="flex-1 p-4 overflow-y-auto space-y-4 text-xs font-light scrollbar-none flex flex-col text-left">
-                @foreach($chatHistory as $msg)
-                    <div class="max-w-[85%] rounded px-3 py-2.5 leading-relaxed {{ $msg['sender'] === 'bot' ? 'bg-neutral-900/80 text-neutral-300 self-start border border-neutral-800/40' : 'bg-white/90 text-black font-normal self-end shadow-md' }}">{{ $msg['text'] }}</div>
-                @endforeach
-            </div>
-            <form wire:submit.prevent="sendChatMessage" class="p-3 border-t border-neutral-800 bg-[#0A0A0A]/90 flex items-center gap-2">
-                <input type="text" wire:model="chatMessage" placeholder="Ask Aura about arrangements, branches, points..." class="flex-1 bg-[#141414]/90 border border-neutral-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-700 font-light font-sans">
-                <button type="submit" class="bg-white text-black font-mono text-[11px] uppercase font-bold px-3.5 py-2 rounded-full cursor-pointer hover:bg-neutral-200 transition-colors">Ask</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Product Detail Modal (FNP-style) -->
-    <div x-show="quickViewOpen" @click="quickViewOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
-    
-    <div
-        x-show="quickViewOpen"
-        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-32px)] sm:w-[640px] max-h-[90vh] z-50 bg-white/90 border border-neutral-200/80 text-neutral-900 shadow-2xl flex flex-col justify-between text-left rounded-[28px] overflow-hidden font-sans backdrop-blur-xl"
-        style="display: none;"
-    >
-        <div class="p-5 border-b border-neutral-100 flex items-center justify-between shrink-0">
-            <div>
-                <span class="text-[9px] uppercase tracking-widest text-emerald-800 font-bold block" x-text="quickViewProduct ? quickViewProduct.category.replace('_', ' ') : ''"></span>
-                <h3 class="text-lg font-serif italic text-neutral-800" x-text="quickViewProduct ? quickViewProduct.name : ''"></h3>
-            </div>
-            <button @click="quickViewOpen = false" class="text-neutral-450 hover:text-neutral-800 cursor-pointer select-none transition-colors" title="Close Details">
-                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </button>
-        </div>
-
-        <div class="p-6 overflow-y-auto flex-1 space-y-6">
-            <div class="flex flex-col md:flex-row gap-6">
-                <!-- Image column -->
-                <div class="w-full md:w-1/2 shrink-0">
-                    <div class="w-full h-48 md:h-64 rounded-2xl overflow-hidden bg-neutral-150 relative">
-                        <img :src="quickViewProduct ? quickViewProduct.image : ''" :alt="quickViewProduct ? quickViewProduct.name : ''" class="w-full h-full object-cover">
-                    </div>
-                    <p class="text-xs text-neutral-500 font-light mt-3 leading-relaxed" x-text="quickViewProduct ? quickViewProduct.description : ''"></p>
-                </div>
-                <!-- Config column -->
-                <div class="flex-1 flex flex-col gap-4">
-                    <!-- Size Selector -->
-                    <div>
-                        <span class="text-xs font-bold text-neutral-700 block mb-2">Select Sizing & Volume</span>
-                        <div class="flex flex-wrap gap-2">
-                            <!-- Standard -->
-                            <button type="button" @click="quickViewSize = 'standard'"
-                                :class="quickViewSize === 'standard' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
-                                class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
-                                :disabled="quickViewProduct && quickViewProduct.stock_standard <= 0"
-                            >
-                                <span class="block">Standard</span>
-                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price) + ' KSH' : ''"></span>
-                                <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_standard <= 0">Out of Stock</span>
-                            </button>
-                            <!-- Deluxe -->
-                            <button type="button" @click="quickViewSize = 'deluxe'"
-                                :class="quickViewSize === 'deluxe' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
-                                class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
-                                :disabled="quickViewProduct && quickViewProduct.stock_deluxe <= 0"
-                            >
-                                <span class="block">Deluxe</span>
-                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 1.5)) + ' KSH' : ''"></span>
-                                <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_deluxe <= 0">Out of Stock</span>
-                            </button>
-                            <!-- Grand -->
-                            <button type="button" @click="quickViewSize = 'grand'"
-                                :class="quickViewSize === 'grand' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
-                                class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
-                                :disabled="quickViewProduct && quickViewProduct.stock_grand <= 0"
-                            >
-                                <span class="block">Grand</span>
-                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 2.2)) + ' KSH' : ''"></span>
-                                <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_grand <= 0">Out of Stock</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Reactive Stock Level Indicator in Quick View -->
-                        <template x-if="quickViewProduct">
-                            <div class="mt-2.5 text-left">
-                                <span x-show="(quickViewSize === 'standard' && quickViewProduct.stock_standard <= 0) || (quickViewSize === 'deluxe' && quickViewProduct.stock_deluxe <= 0) || (quickViewSize === 'grand' && quickViewProduct.stock_grand <= 0)" 
-                                      class="inline-block text-rose-600 font-semibold bg-rose-500/10 px-2.5 py-1 rounded uppercase tracking-wider text-[9px] font-outfit">
-                                    Out of Stock
-                                </span>
-                                <span x-show="(quickViewSize === 'standard' && quickViewProduct.stock_standard > 0 && quickViewProduct.stock_standard <= 5) || (quickViewSize === 'deluxe' && quickViewProduct.stock_deluxe > 0 && quickViewProduct.stock_deluxe <= 5) || (quickViewSize === 'grand' && quickViewProduct.stock_grand > 0 && quickViewProduct.stock_grand <= 5)" 
-                                      class="inline-block text-amber-600 font-semibold bg-amber-500/10 px-2.5 py-1 rounded uppercase tracking-wider text-[9px] font-outfit animate-pulse">
-                                    Limited Items
-                                </span>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reviews Tab/Section -->
-            <div class="border-t border-neutral-100 pt-6 space-y-4">
-                <h4 class="text-sm font-serif italic text-neutral-800">Reviews &amp; Client Feedback</h4>
-                
-                @if(session('success_review'))
-                    <div class="p-2.5 bg-emerald-50 border border-dashed border-emerald-300 text-emerald-800 text-[11px] font-mono rounded-xl">
-                        {{ session('success_review') }}
-                    </div>
-                @endif
-                @if(session('error_review'))
-                    <div class="p-2.5 bg-rose-50 border border-dashed border-rose-300 text-rose-800 text-[11px] font-mono rounded-xl">
-                        {{ session('error_review') }}
-                    </div>
-                @endif
-
-                <!-- Review list -->
-                @php
-                    $reviews = $quickViewProductId ? \App\Models\Review::where('product_id', $quickViewProductId)->with('user')->latest()->get() : collect();
-                @endphp
-
-                <div class="space-y-3 max-h-48 overflow-y-auto pr-1">
-                    @forelse($reviews as $rev)
-                        <div class="p-3 bg-neutral-50 rounded-2xl border border-neutral-100 space-y-1">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-semibold text-neutral-700">{{ $rev->user ? $rev->user->name : 'Anonymous Client' }}</span>
-                                <div class="flex items-center space-x-0.5">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <span class="text-[10px] {{ $i <= $rev->rating ? 'text-amber-500' : 'text-neutral-200' }}">★</span>
-                                    @endfor
-                                </div>
-                            </div>
-                            <p class="text-[11px] text-neutral-600 font-light leading-relaxed">{{ $rev->comment }}</p>
-                            <span class="text-[8px] text-neutral-400 block font-mono">{{ $rev->created_at->format('d M Y') }}</span>
-                        </div>
-                    @empty
-                        <p class="text-[11px] text-neutral-400 italic">No reviews logged for this arrangement yet. Be the first to share your experience!</p>
-                    @endforelse
-                </div>
-
-                <!-- Submit Review Form -->
-                @auth
-                    <form wire:submit.prevent="submitProductReview" class="p-3 border border-neutral-100 rounded-2xl bg-neutral-50/50 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold text-neutral-700 uppercase tracking-wider">Leave a Review</span>
-                            <div class="flex items-center space-x-1">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <button type="button" wire:click="$set('newReview.rating', {{ $i }})" class="text-xs focus:outline-none transition-transform hover:scale-125 {{ ($newReview['rating'] ?? 5) >= $i ? 'text-amber-500' : 'text-neutral-350' }}">★</button>
-                                @endfor
-                            </div>
-                        </div>
-                        <div class="space-y-1">
-                            <textarea wire:model="newReview.comment" placeholder="Describe your experience with this arrangement..." class="w-full text-xs p-2 border border-neutral-200 rounded-xl bg-white focus:outline-none focus:border-neutral-400 font-light" rows="2" required></textarea>
-                            @error('newReview.comment') <span class="text-rose-600 text-[9px] block">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="flex justify-end">
-                            <button type="submit" class="bg-emerald-800 hover:bg-emerald-950 text-white font-mono text-[9px] uppercase font-bold px-4 py-1.5 rounded-full cursor-pointer transition-colors">Submit Review</button>
-                        </div>
-                    </form>
-                @else
-                    <div class="p-3 bg-neutral-50 rounded-2xl text-center border border-neutral-100">
-                        <p class="text-[10px] text-neutral-500 font-light">Please <a href="/login" class="text-emerald-800 font-bold hover:underline">sign in</a> to submit reviews.</p>
-                    </div>
-                @endauth
-            </div>
-        </div>
-
-        <div class="p-5 border-t border-neutral-100 bg-neutral-50/80 backdrop-blur-md shrink-0 flex items-center justify-between">
-            <div>
-                <span class="text-[10px] text-neutral-500 uppercase tracking-wider block">Price</span>
-                <span class="text-base font-bold text-neutral-850 font-mono">
-                    <span x-text="quickViewProduct ? numberFormat(quickViewSize === 'standard' ? quickViewProduct.price : (quickViewSize === 'deluxe' ? Math.round(quickViewProduct.price * 1.5) : Math.round(quickViewProduct.price * 2.2))) : ''"></span> KSH
-                </span>
-            </div>
-            
-            <button
-                type="button"
-                :disabled="(quickViewSize === 'standard' && quickViewProduct && quickViewProduct.stock_standard <= 0) || (quickViewSize === 'deluxe' && quickViewProduct && quickViewProduct.stock_deluxe <= 0) || (quickViewSize === 'grand' && quickViewProduct && quickViewProduct.stock_grand <= 0)"
-                @click="$wire.addToCuration(quickViewProduct.id, quickViewSize); quickViewOpen = false; drawerOpen = true; checkoutMode = false;"
-                class="px-6 py-2.5 bg-emerald-800 hover:bg-emerald-950 text-white rounded-xl text-xs uppercase tracking-wider font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-                Add to Curation
-            </button>
-        </div>
-    </div>
-
-    <!-- Backdrop for Profile Modal -->
-    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/40 backdrop-blur-xl" style="display: none;"></div>
-
-    <!-- Profile Overlay Panel (Center Modal) -->
-    <div 
-        x-show="profileOpen"
-        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'champagne' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : (theme === 'rose' ? 'bg-[#1D0C13]/90 border border-[#2D121F] text-pink-100 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl')"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
-        style="display: none;"
-    >
-        <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
-            <div>
-                <h3 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Profile Portal</h3>
-                <span class="text-[9px] text-neutral-500 font-light">Atelier Customer Account</span>
-            </div>
-            <button @click="profileOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Modal">
-                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </button>
-        </div>
-
-        <div class="flex-1 overflow-y-auto p-6 space-y-4 max-h-[calc(85vh-150px)] scrollbar-none">
-            @auth
-                @php
-                    $client = \App\Models\Client::where('email', auth()->user()->email)->first();
-                    $totalOrdersCount = $client ? $client->orders()->count() : 0;
-                    $activeOrdersCount = $client ? $client->orders()->whereNotIn('status', ['delivered', 'cancelled'])->count() : 0;
-                @endphp
-                <!-- Profile Header Segment -->
-                <div class="flex items-center space-x-4 pb-4 border-b border-neutral-500/10">
-                    <div class="w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-tr from-neutral-950 via-neutral-900 to-neutral-955 border-2 shadow-md shrink-0"
-                         :class="{
-                             'border-[#C5A880]/40': theme === 'onyx',
-                             'border-emerald-600/40': theme === 'champagne',
-                             'border-[#B76E79]/40': theme === 'rose'
-                         }">
-                        <span class="text-base font-mono font-bold tracking-wider"
-                              :class="{
-                                  'text-[#C5A880]': theme === 'onyx',
-                                  'text-emerald-800': theme === 'champagne',
-                                  'text-[#B76E79]': theme === 'rose'
-                              }">
-                            {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
-                        </span>
-                    </div>
-                    <div class="truncate space-y-0.5">
-                        <div class="flex items-center space-x-2">
-                            <span class="font-serif italic text-base tracking-wide font-semibold block truncate" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->name }}</span>
-                            <span class="text-[8px] font-mono uppercase tracking-widest px-2 py-0.5 border rounded-full shrink-0"
-                                  :class="{
-                                      'border-[#C5A880]/30 bg-[#C5A880]/5 text-[#C5A880]': theme === 'onyx',
-                                      'border-emerald-600/30 bg-emerald-50 text-emerald-800': theme === 'champagne',
-                                      'border-[#B76E79]/30 bg-[#B76E79]/5 text-[#B76E79]': theme === 'rose'
-                                  }">
-                                {{ auth()->user()->loyalty_tier }}
-                            </span>
-                        </div>
-                        <span class="text-[10px] text-neutral-450 block font-mono tracking-tight">{{ auth()->user()->email }}</span>
-                    </div>
-                </div>
-
-                <!-- Account Stats Grid -->
-                <div class="grid grid-cols-3 gap-2.5 text-center py-2">
-                    <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
-                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Client Since</span>
-                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'">{{ auth()->user()->created_at->format('M Y') }}</span>
-                    </div>
-                    <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
-                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Total Curations</span>
-                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'">{{ $totalOrdersCount }}</span>
-                    </div>
-                    <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
-                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Active dispatches</span>
-                        <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'">{{ $activeOrdersCount }}</span>
-                    </div>
-                </div>
-
-                <!-- Info Segment -->
-                <div class="space-y-3 font-sans py-1 text-xs">
-                    <div class="flex items-center space-x-2 text-neutral-400">
-                        <span class="font-bold text-[9px] uppercase tracking-wider text-[#C5A880]/80">Phone:</span>
-                        <span class="font-mono" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->phone_number ?: 'Not Provided' }}</span>
-                    </div>
-
-                    <div class="leading-relaxed">
-                        <span class="font-bold text-[9px] uppercase tracking-wider text-[#C5A880]/80 block">Main Address</span>
-                        <span class="block truncate" :class="theme === 'champagne' ? 'text-neutral-900' : 'text-white'" title="{{ auth()->user()->default_delivery_address }}">{{ auth()->user()->default_delivery_address ?: 'No Address Set' }}</span>
-                        @if(auth()->user()->default_region)
-                            <span class="text-[9px] font-mono text-neutral-500 uppercase tracking-wider block mt-0.5">{{ auth()->user()->default_region }}</span>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Loyalty Points -->
-                <div class="border-t border-neutral-500/10 pt-4 space-y-2 font-mono text-[11px]">
-                    <div class="flex justify-between items-center">
-                        <span class="text-neutral-500">Loyalty Balance:</span>
-                        @if(auth()->user()->loyalty_points > 1)
-                            <span class="loyalty-vip-glow bg-amber-500/10 border border-amber-500/30 text-amber-500 font-bold px-2.5 py-1 rounded-full text-[10px] flex items-center space-x-1">
-                                <span class="relative flex h-1.5 w-1.5 shrink-0">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
-                                </span>
-                                <span class="loyalty-shimmer-text tracking-wide font-black">{{ number_format(auth()->user()->loyalty_points) }} PTS</span>
-                            </span>
-                        @else
-                            <span class="text-neutral-450 font-bold">{{ number_format(auth()->user()->loyalty_points) }} PTS</span>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="space-y-2.5 pt-4">
-                    <a href="/profile-portal" 
-                       :class="{
-                           'bg-[#C5A880] hover:bg-[#B59A7A] text-black': theme === 'onyx',
-                           'bg-emerald-800 hover:bg-emerald-950 text-white': theme === 'champagne',
-                           'bg-[#B76E79] hover:bg-[#A55E69] text-white': theme === 'rose'
-                       }"
-                       class="w-full text-center font-mono font-bold uppercase tracking-wider py-3 rounded-full text-[10px] flex items-center justify-center space-x-2 transition-all transform hover:scale-[1.01] shadow-md cursor-pointer"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 18c-2.204 0-4.224-.788-5.79-2.104m0 0L3.75 18M12 13.5a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" />
-                        </svg>
-                        <span>View Profile Dashboard</span>
-                    </a>
-                    
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" 
-                                :class="{
-                                    'border-neutral-800 text-neutral-400 hover:text-rose-500 hover:border-rose-950': theme === 'onyx',
-                                    'border-neutral-200 text-neutral-500 hover:text-rose-600 hover:border-rose-250': theme === 'champagne',
-                                    'border-[#2D121F] text-pink-300/60 hover:text-rose-500 hover:border-rose-950': theme === 'rose'
-                                }"
-                                class="w-full border font-mono font-bold uppercase tracking-wider py-2.5 rounded-full text-[9px] flex items-center justify-center space-x-2 transition-all cursor-pointer bg-transparent"
-                        >
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
-                            </svg>
-                            <span>Sign Out of Atelier</span>
-                        </button>
-                    </form>
-                </div>
-            @else
-                <div class="text-center py-2.5 space-y-4">
-                    <span class="font-serif text-xl italic block" :class="theme === 'champagne' ? 'text-[#B59A7A]' : (theme === 'rose' ? 'text-[#B76E79]' : 'text-[#C5A880]')">Atelier Loyalty Circle</span>
-                    <p class="text-neutral-450 font-light text-[11px] leading-relaxed">Sign in to track orders, manage billing profiles, and earn loyalty rewards.</p>
-                    <div class="flex flex-col gap-2.5 pt-1">
-                        <a href="/login" 
-                           :class="theme === 'champagne' ? 'bg-[#B59A7A] text-white hover:bg-neutral-800' : (theme === 'rose' ? 'bg-[#B76E79] text-white hover:bg-[#1C0A10]' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]')"
-                           class="font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] text-center block shadow-md"
-                        >
-                            Sign In
-                        </a>
-                        <a href="/register" 
-                           :class="theme === 'champagne' ? 'border-neutral-250 text-neutral-600 hover:text-[#B59A7A]' : (theme === 'rose' ? 'border-[#2D121F] text-pink-300/60 hover:text-[#B76E79]' : 'border-neutral-800 text-neutral-450 hover:text-[#C5A880]')"
-                           class="border font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] text-center block"
-                        >
-                            Create Account
-                        </a>
-                    </div>
-                </div>
-            @endauth
-        </div>
-    </div>
-
-    <!-- Backdrop for Notifications Modal -->
-    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-45 bg-black/40 backdrop-blur-xl" style="display: none;"></div>
-
-    <!-- Notifications Overlay Panel (Center Modal) -->
-    <div 
-        x-show="notificationsOpen"
-        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'champagne' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : (theme === 'rose' ? 'bg-[#1D0C13]/90 border border-[#2D121F] text-pink-100 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl')"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[80vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
-        style="display: none;"
-    >
-        <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
-            <div>
-                <h3 :class="theme === 'champagne' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Notification Log</h3>
-                <span class="text-[9px] text-neutral-500 font-light">Inbox logs & system alerts</span>
-            </div>
-            <button @click="notificationsOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Modal">
-                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </button>
-        </div>
-
-        <div class="flex-1 flex flex-col justify-between overflow-hidden">
-            <div class="flex-1 overflow-y-auto p-5 space-y-4 max-h-[calc(80vh-160px)] scrollbar-none">
-                @auth
-                    @forelse($notificationsList as $notif)
-                        @php
-                            $notifCls = match($notif['type'] ?? 'info') {
-                                'success' => 'bg-emerald-500/10 border-emerald-500/25',
-                                'warning' => 'bg-amber-500/10 border-amber-500/25',
-                                'order' => 'bg-teal-500/10 border-teal-500/25',
-                                default => 'bg-neutral-500/5 border-neutral-500/10'
-                            };
-                            $badgeCls = match($notif['type'] ?? 'info') {
-                                'success' => 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
-                                'warning' => 'text-amber-500 bg-amber-500/10 border-amber-500/20',
-                                'order' => 'text-teal-500 bg-teal-500/10 border-teal-500/20',
-                                default => 'text-neutral-400 bg-neutral-500/10 border-neutral-500/20'
-                            };
-                        @endphp
-                        <div x-data="{ expanded: false }" class="border p-4 rounded-2xl transition-all {{ $notifCls }} flex flex-col gap-2 relative group text-xs">
-                            @if(!$notif['is_read'])
-                                <span class="absolute top-4 right-4 w-2 h-2 rounded-full"
-                                      :class="{
-                                          'bg-[#C5A880]': theme === 'onyx',
-                                          'bg-emerald-600': theme === 'champagne',
-                                          'bg-[#B76E79]': theme === 'rose'
-                                      }"></span>
-                            @endif
-                            
-                            <div class="flex items-center space-x-2">
-                                <span class="px-2 py-0.5 border text-[8px] font-mono uppercase tracking-widest rounded-md {{ $badgeCls }}">
-                                    {{ $notif['type'] ?? 'info' }}
-                                </span>
-                                <span class="text-[9px] font-mono text-neutral-500">
-                                    {{ \Carbon\Carbon::parse($notif['created_at'])->diffForHumans() }}
-                                </span>
-                            </div>
-
-                            <div>
-                                <h4 class="font-serif italic text-xs tracking-wide font-semibold text-text-primary">{{ $notif['title'] }}</h4>
-                                <p @click="expanded = !expanded" class="text-[11px] text-neutral-450 leading-relaxed font-light mt-1 cursor-pointer" :class="{ 'line-clamp-2': !expanded }">
-                                    {{ $notif['message'] }}
-                                </p>
-                            </div>
-
-                            <div class="flex items-center space-x-2 pt-2 border-t border-neutral-500/5 mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                                @if(!$notif['is_read'])
-                                    <button wire:click="markNotificationAsRead({{ $notif['id'] }})" class="text-[9px] font-mono uppercase tracking-widest text-[#C5A880] hover:underline cursor-pointer">
-                                        [ Mark Read ]
-                                    </button>
-                                @endif
-                                <button wire:click="deleteNotification({{ $notif['id'] }})" class="text-[9px] font-mono uppercase tracking-widest text-neutral-500 hover:text-red-400 hover:underline cursor-pointer">
-                                    [ Delete ]
-                                </button>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-12 text-neutral-500 text-xs flex flex-col items-center justify-center space-y-2">
-                            <svg class="w-8 h-8 text-neutral-600 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <span>Your notification log is currently clear.</span>
-                        </div>
-                    @endforelse
-                @else
-                    <div class="text-center py-12 text-neutral-500 text-xs">
-                        Please sign in to view your notification logs.
-                    </div>
-                @endauth
-            </div>
-            
-            @auth
-                @if(count($notificationsList) > 0)
-                    <div :class="theme === 'champagne' ? 'border-neutral-100' : 'border-neutral-900'" class="p-4 border-t bg-neutral-500/5 flex items-center justify-between shrink-0">
-                        <button wire:click="clearAllNotifications" class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 hover:text-red-400 cursor-pointer">
-                            [ Clear All ]
-                        </button>
-                        <button @click="notificationsOpen = false" class="bg-[#C5A880] hover:bg-[#B59A7A] text-black text-[9px] font-mono font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all cursor-pointer">
-                            Dismiss
-                        </button>
-                    </div>
-                @endif
-            @endauth
-        </div>
-    </div>
-
-</div>

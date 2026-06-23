@@ -16,6 +16,7 @@ use Exception;
 
 class Storefront extends Component
 {
+    use \App\Livewire\Traits\HasNotificationsAndTheme;
     #[Url(as: 'collection', history: true)]
     public ?string $selectedOccasion = null;
 

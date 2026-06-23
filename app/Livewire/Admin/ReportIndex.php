@@ -16,6 +16,7 @@ class ReportIndex extends Component
 
     public function mount(): void
     {
+        abort_unless(auth()->user()->isAdmin(), 403, 'Unauthorized: Admin reports are restricted.');
         $this->startDate = now()->subDays(30)->format('Y-m-d');
         $this->endDate = now()->format('Y-m-d');
     }

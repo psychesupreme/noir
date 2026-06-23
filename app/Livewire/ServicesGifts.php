@@ -7,6 +7,8 @@ use Livewire\Component;
 
 class ServicesGifts extends Component
 {
+    use \App\Livewire\Traits\HasNotificationsAndTheme;
+
     public ?int $quickViewProductId = null;
     public array $newReview = [
         'rating' => 5,

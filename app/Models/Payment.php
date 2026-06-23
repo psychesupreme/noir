@@ -38,5 +38,33 @@ class Payment extends Model
         static::deleted(function ($payment) {
             \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
         });
+
+        static::updated(function ($payment) {
+            if ($payment->isDirty('status')) {
+                $oldStatus = $payment->getOriginal('status');
+                $newStatus = $payment->status;
+
+                \App\Models\SystemLog::write('info', 'payment', "Payment ID {$payment->id} status updated from {$oldStatus} to {$newStatus}.", [
+                    'payment_id' => $payment->id,
+                    'old_status' => $oldStatus,
+                    'new_status' => $newStatus,
+                    'order_id' => $payment->order_id,
+                ]);
+
+                // Create user notification on payment success
+                if ($newStatus === 'completed') {
+                    // Eagerly load order/client if not set
+                    $order = $payment->order;
+                    if ($order && $order->client && $order->client->user_id) {
+                        \App\Models\Notification::create([
+                            'user_id' => $order->client->user_id,
+                            'title' => 'Payment Received',
+                            'message' => "Your payment of " . number_format($payment->amount) . " KSH for order #NB-ORD-{$payment->order_id} has been processed successfully.",
+                            'type' => 'success',
+                        ]);
+                    }
+                }
+            }
+        });
     }
 }

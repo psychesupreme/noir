@@ -106,6 +106,21 @@ class Product extends Model
         return (float) round($this->reviews()->avg('rating') ?: 0, 1);
     }
 
+    public function getAverageQualityRatingAttribute(): float
+    {
+        return (float) round($this->reviews()->avg('quality_rating') ?: 0, 1);
+    }
+
+    public function getAverageFreshnessRatingAttribute(): float
+    {
+        return (float) round($this->reviews()->avg('freshness_rating') ?: 0, 1);
+    }
+
+    public function getAverageValueRatingAttribute(): float
+    {
+        return (float) round($this->reviews()->avg('value_rating') ?: 0, 1);
+    }
+
     // ── Query Scopes ─────────────────────────────────────────────────────
 
     /**
