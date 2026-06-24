@@ -40,25 +40,58 @@ class OccasionSeeder extends Seeder
             'is_major_holiday' => false,
         ]);
 
+        $anniversary = Occasion::create([
+            'name' => 'Anniversary Elegance',
+            'slug' => 'anniversary-elegance',
+            'accent_color' => '#B59A7A', // Warm Champagne Gold
+            'is_major_holiday' => false,
+        ]);
+
+        $birthday = Occasion::create([
+            'name' => 'Vibrant Birthday',
+            'slug' => 'vibrant-birthday',
+            'accent_color' => '#D97706', // Warm Amber
+            'is_major_holiday' => false,
+        ]);
+
+        $congrats = Occasion::create([
+            'name' => 'Bespoke Congrats',
+            'slug' => 'bespoke-congrats',
+            'accent_color' => '#065F46', // Elegant Emerald Green
+            'is_major_holiday' => false,
+        ]);
+
+        $romance = Occasion::create([
+            'name' => 'Silent Romance',
+            'slug' => 'silent-romance',
+            'accent_color' => '#BE185D', // Deep Blush Pink
+            'is_major_holiday' => false,
+        ]);
+
         // 2. Attach existing products to these occasions safely
-        $noirClassic = Product::where('sku', 'NB-BQT-RRH-01')->first();
-        if ($noirClassic) {
-            $noirClassic->occasions()->sync([$valentines->id]);
-        }
-
-        $alabasterDream = Product::where('sku', 'NB-BQT-CWR-02')->first();
-        if ($alabasterDream) {
-            $alabasterDream->occasions()->sync([$corporate->id]);
-        }
-        
-        $safariSunset = Product::where('sku', 'NB-BQT-BGP-03')->first();
-        if ($safariSunset) {
-            $safariSunset->occasions()->sync([$sympathy->id]);
-        }
-
-        $riftValley = Product::where('sku', 'NB-STM-NRO-01')->first();
-        if ($riftValley) {
-            $riftValley->occasions()->sync([$corporate->id]);
+        $products = Product::all();
+        foreach ($products as $index => $product) {
+            // Distribute products into occasions based on index
+            if ($product->sku === 'NB-BQT-RRH-01') {
+                $product->occasions()->sync([$valentines->id, $romance->id]);
+            } elseif ($product->sku === 'NB-BQT-CWR-02') {
+                $product->occasions()->sync([$corporate->id, $anniversary->id]);
+            } elseif ($product->sku === 'NB-BQT-BGP-03') {
+                $product->occasions()->sync([$sympathy->id]);
+            } elseif ($product->sku === 'NB-STM-NRO-01') {
+                $product->occasions()->sync([$corporate->id]);
+            } else {
+                // Distribute others deterministically
+                $occ_id = match ($index % 6) {
+                    0 => $birthday->id,
+                    1 => $anniversary->id,
+                    2 => $congrats->id,
+                    3 => $romance->id,
+                    4 => $corporate->id,
+                    default => $sympathy->id,
+                };
+                $product->occasions()->sync([$occ_id]);
+            }
         }
     }
 }

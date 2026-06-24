@@ -17,8 +17,7 @@ use Exception;
 class Storefront extends Component
 {
     use \App\Livewire\Traits\HasNotificationsAndTheme;
-    #[Url(as: 'collection', history: true)]
-    public ?string $selectedOccasion = null;
+
 
     #[Url(as: 'find', history: true)]
     public string $search = '';
@@ -219,11 +218,6 @@ class Storefront extends Component
         };
     }
 
-    public function filterByOccasion(?string $slug = null): void
-    {
-        $this->selectedOccasion = $slug;
-        $this->perPage = 6;
-    }
 
     public function selectCategory(string $category): void
     {
@@ -786,11 +780,7 @@ class Storefront extends Component
             });
         }
 
-        if ($this->selectedOccasion) {
-            $query->whereHas('occasions', function ($q) {
-                $q->where('slug', $this->selectedOccasion);
-            });
-        }
+
 
         if ($this->sortBy === 'price_asc') {
             $query->orderBy('price', 'asc');
@@ -802,7 +792,7 @@ class Storefront extends Component
             $query->latest();
         }
 
-        $limit = ($this->selectedCategory === 'all' && empty($this->search) && !$this->selectedOccasion)
+        $limit = ($this->selectedCategory === 'all' && empty($this->search))
             ? max(18, $this->perPage)
             : $this->perPage;
 
@@ -839,11 +829,7 @@ class Storefront extends Component
                   ->orWhere('description', 'like', '%' . $this->search . '%');
             });
         }
-        if ($this->selectedOccasion) {
-            $totalCountQuery->whereHas('occasions', function ($q) {
-                $q->where('slug', $this->selectedOccasion);
-            });
-        }
+
         $totalCount = $totalCountQuery->count();
 
         $userOrders = collect();
@@ -876,7 +862,7 @@ class Storefront extends Component
             'cartItems'       => $cartItems,
             'cartTotal'       => $cartTotal,
             'cartCount'       => array_sum($this->cart),
-            'activeColor'     => $this->selectedOccasion ? $occasions->firstWhere('slug', $this->selectedOccasion)?->accent_color : '#E5E5E5',
+            'activeColor'     => '#E5E5E5',
             'userOrders'      => $userOrders,
             'hasMore'         => $products->count() < $totalCount,
         ])->layout('components.layouts.app');

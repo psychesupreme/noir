@@ -487,12 +487,11 @@
                                 </div>
                             </div>
                             
-                            <!-- Categories & Occasions -->
+                            <!-- Categories -->
                             @php
-                                $matchingOccasions = $occasions->filter(fn($o) => str_contains(strtolower($o->name), strtolower($search)));
                                 $matchingCategories = collect(['stems', 'bouquet', 'giftings', 'bundle'])->filter(fn($c) => str_contains($c, strtolower($search)));
                             @endphp
-                            @if($matchingOccasions->isNotEmpty() || $matchingCategories->isNotEmpty())
+                            @if($matchingCategories->isNotEmpty())
                                 <div class="p-3 space-y-2">
                                     <span class="text-[9px] font-mono uppercase tracking-wider text-neutral-500 block">Suggested Categories</span>
                                     <div class="flex flex-wrap gap-1.5">
@@ -504,16 +503,6 @@
                                                     class="px-3 py-1.5 border rounded-full text-[9px] font-mono uppercase tracking-wider cursor-pointer"
                                             >
                                                 Category: {{ $cat }}
-                                            </button>
-                                        @endforeach
-                                        @foreach($matchingOccasions as $occ)
-                                            <button type="button" 
-                                                    wire:click="filterByOccasion('{{ $occ->slug }}')"
-                                                    @click="focused = false; document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'});"
-                                                    :class="theme === 'light' ? 'border-neutral-250 bg-neutral-50 hover:bg-neutral-100 text-neutral-700' : 'border-neutral-800 bg-neutral-900/40 hover:bg-neutral-900 text-neutral-300'"
-                                                    class="px-3 py-1.5 border rounded-full text-[9px] font-mono uppercase tracking-wider cursor-pointer"
-                                            >
-                                                Mood: {{ $occ->name }}
                                             </button>
                                         @endforeach
                                     </div>
@@ -601,17 +590,6 @@
                                         <span class="text-[8px] text-neutral-500 font-light block mt-0.5">Creamy light mode with emerald highlights.</span>
                                     </div>
                                 </div>
-                            </button>
-                            <!-- Rose Option -->
-                            <button @click="changeTheme('light'); themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
-                                <div class="flex items-center space-x-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#B76E79]"></span>
-                                    <div>
-                                        <span class="font-bold font-mono tracking-wider block text-[10px] uppercase">Rose Theme</span>
-                                        <span class="text-[8px] text-neutral-500 font-light block mt-0.5">Blush floral style with rose-gold accents.</span>
-                                    </div>
-                                </div>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -958,134 +936,38 @@
 
             <!-- Right Column: Showroom Segment Selector & Product Grid -->
             <div class="flex-1 w-full space-y-6">
-                <!-- FNP-Style Circular Category Navigation Menu -->
-                <div class="w-full pb-4 overflow-x-auto scrollbar-none animate-layer-3">
-                    <div class="flex items-center justify-start gap-4 md:gap-8 py-2 px-1">
-                        <!-- Category: All -->
-                        <button wire:click="selectCategory('all')" class="flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
-                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
-                                 :class="{
-                                     'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === 'all',
-                                     'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== 'all' && theme === 'dark',
-                                     'border-neutral-250 hover:border-emerald-600 hover:scale-105': @js($selectedCategory) !== 'all' && theme === 'light'
-                                 }">
-                                <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=200" alt="All" class="w-full h-full object-cover">
-                            </div>
-                            <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
-                                  :class="{
-                                      'text-[#C5A880]': @js($selectedCategory) === 'all',
-                                      'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== 'all' && theme === 'dark',
-                                      'text-neutral-700 group-hover:text-emerald-800': @js($selectedCategory) !== 'all' && theme === 'light'
-                                  }">All</span>
-                        </button>
-                        
-                        <!-- Category: Flowers -->
-                        <button wire:click="selectCategory('bouquet')" class="flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
-                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
-                                 :class="{
-                                     'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === 'bouquet',
-                                     'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== 'bouquet' && theme === 'dark',
-                                     'border-neutral-250 hover:border-emerald-600 hover:scale-105': @js($selectedCategory) !== 'bouquet' && theme === 'light'
-                                 }">
-                                <img src="https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=200" alt="Flowers" class="w-full h-full object-cover">
-                            </div>
-                            <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
-                                  :class="{
-                                      'text-[#C5A880]': @js($selectedCategory) === 'bouquet',
-                                      'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== 'bouquet' && theme === 'dark',
-                                      'text-neutral-700 group-hover:text-emerald-800': @js($selectedCategory) !== 'bouquet' && theme === 'light'
-                                  }">Flowers</span>
-                        </button>
-                        
-                        <!-- Category: Cakes & Sweets -->
-                        <button wire:click="selectCategory('giftings')" class="flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
-                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
-                                 :class="{
-                                     'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === 'giftings',
-                                     'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== 'giftings' && theme === 'dark',
-                                     'border-neutral-250 hover:border-emerald-600 hover:scale-105': @js($selectedCategory) !== 'giftings' && theme === 'light'
-                                 }">
-                                <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=200" alt="Cakes & Sweets" class="w-full h-full object-cover">
-                            </div>
-                            <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
-                                  :class="{
-                                      'text-[#C5A880]': @js($selectedCategory) === 'giftings',
-                                      'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== 'giftings' && theme === 'dark',
-                                      'text-neutral-700 group-hover:text-emerald-800': @js($selectedCategory) !== 'giftings' && theme === 'light'
-                                  }">Cakes &amp; Sweets</span>
-                        </button>
-                        
-                        <!-- Category: Plants & Vases -->
-                        <button wire:click="selectCategory('bundle')" class="flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
-                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
-                                 :class="{
-                                     'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === 'bundle',
-                                     'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== 'bundle' && theme === 'dark',
-                                     'border-neutral-250 hover:border-emerald-600 hover:scale-105': @js($selectedCategory) !== 'bundle' && theme === 'light'
-                                 }">
-                                <img src="https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80&w=200" alt="Plants & Vases" class="w-full h-full object-cover">
-                            </div>
-                            <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
-                                  :class="{
-                                      'text-[#C5A880]': @js($selectedCategory) === 'bundle',
-                                      'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== 'bundle' && theme === 'dark',
-                                      'text-neutral-700 group-hover:text-emerald-800': @js($selectedCategory) !== 'bundle' && theme === 'light'
-                                  }">Plants &amp; Vases</span>
-                        </button>
-                        
-                        <!-- Category: Combos -->
-                        <button wire:click="selectCategory('giftings')" class="flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
-                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
-                                 :class="{
-                                     'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === 'giftings',
-                                     'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== 'giftings' && theme === 'dark',
-                                     'border-neutral-250 hover:border-emerald-600 hover:scale-105': @js($selectedCategory) !== 'giftings' && theme === 'light'
-                                 }">
-                                <img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=200" alt="Combos" class="w-full h-full object-cover">
-                            </div>
-                            <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
-                                  :class="{
-                                      'text-[#C5A880]': @js($selectedCategory) === 'giftings',
-                                      'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== 'giftings' && theme === 'dark',
-                                      'text-neutral-700 group-hover:text-emerald-800': @js($selectedCategory) !== 'giftings' && theme === 'light'
-                                  }">Combos</span>
-                        </button>
-                        
-                        <!-- Category: Hampers -->
-                        <button wire:click="selectCategory('giftings')" class="flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
-                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
-                                 :class="{
-                                     'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === 'giftings',
-                                     'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== 'giftings' && theme === 'dark',
-                                     'border-neutral-250 hover:border-emerald-600 hover:scale-105': @js($selectedCategory) !== 'giftings' && theme === 'light'
-                                 }">
-                                <img src="https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&q=80&w=200" alt="Hampers" class="w-full h-full object-cover">
-                            </div>
-                            <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
-                                  :class="{
-                                      'text-[#C5A880]': @js($selectedCategory) === 'giftings',
-                                      'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== 'giftings' && theme === 'dark',
-                                      'text-neutral-700 group-hover:text-emerald-800': @js($selectedCategory) !== 'giftings' && theme === 'light'
-                                  }">Hampers</span>
-                        </button>
-
-                        <!-- Category: Stems -->
-                        <button wire:click="selectCategory('stems')" class="flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
-                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
-                                 :class="{
-                                     'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === 'stems',
-                                     'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== 'stems' && theme === 'dark',
-                                     'border-neutral-250 hover:border-emerald-600 hover:scale-105': @js($selectedCategory) !== 'stems' && theme === 'light'
-                                 }">
-                                <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=200" alt="Stems" class="w-full h-full object-cover">
-                            </div>
-                            <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
-                                  :class="{
-                                      'text-[#C5A880]': @js($selectedCategory) === 'stems',
-                                      'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== 'stems' && theme === 'dark',
-                                      'text-neutral-700 group-hover:text-emerald-800': @js($selectedCategory) !== 'stems' && theme === 'light'
-                                  }">Stems</span>
-                        </button>
+                <!-- FNP-Style Circular Category Navigation Menu with Loop Marquee -->
+                <div class="w-full py-4 shrink-0 relative z-10 animate-layer-3 overflow-hidden border-y backdrop-blur-sm transition-colors duration-500 mb-6"
+                     :class="theme === 'light' ? 'bg-white/30 border-neutral-200/50' : 'bg-neutral-950/20 border-neutral-900/60'">
+                    <div class="flex whitespace-nowrap space-x-12 w-max animate-marquee py-2">
+                        @for($i = 0; $i < 4; $i++)
+                            @foreach([
+                                ['key' => 'all', 'label' => 'All', 'img' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=200'],
+                                ['key' => 'bouquet', 'label' => 'Flowers', 'img' => 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=200'],
+                                ['key' => 'giftings', 'label' => 'Cakes & Sweets', 'img' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=200'],
+                                ['key' => 'bundle', 'label' => 'Plants & Vases', 'img' => 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80&w=200'],
+                                ['key' => 'giftings', 'label' => 'Combos', 'img' => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=200'],
+                                ['key' => 'giftings', 'label' => 'Hampers', 'img' => 'https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&q=80&w=200'],
+                                ['key' => 'stems', 'label' => 'Stems', 'img' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=200']
+                            ] as $catItem)
+                                <button wire:click="selectCategory('{{ $catItem['key'] }}')" class="inline-flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
+                                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
+                                         :class="{
+                                             'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === '{{ $catItem['key'] }}',
+                                             'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'dark',
+                                             'border-neutral-250 hover:border-[#B59A7A] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'light'
+                                         }">
+                                        <img src="{{ $catItem['img'] }}" alt="{{ $catItem['label'] }}" class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
+                                          :class="{
+                                              'text-[#C5A880]': @js($selectedCategory) === '{{ $catItem['key'] }}',
+                                              'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'dark',
+                                              'text-neutral-750 group-hover:text-[#B59A7A]': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'light'
+                                          }">{{ $catItem['label'] }}</span>
+                                </button>
+                            @endforeach
+                        @endfor
                     </div>
                 </div>
 
@@ -1101,7 +983,7 @@
                         };
                     });
 
-                    $isBrowsingAll = ($selectedCategory === 'all' && empty($search) && !$selectedOccasion);
+                    $isBrowsingAll = ($selectedCategory === 'all' && empty($search));
                     
                     if ($isBrowsingAll) {
                         $sectionsToRender = [
@@ -1246,6 +1128,12 @@
                                             <a href="https://twitter.com/intent/tweet?text=Consulting+with+@NoirAndBloom+for+{{ urlencode($product->name) }}:&url={{ urlencode(url('/')) }}" target="_blank" rel="noopener" :class="theme === 'light' ? 'hover:text-black' : 'hover:text-white'" class="transition-colors" title="Share on X">
                                                 <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
                                                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                                </svg>
+                                            </a>
+                                            <!-- WhatsApp Icon -->
+                                            <a href="https://api.whatsapp.com/send?text={{ urlencode('Check out ' . $product->name . ' on Noir & Bloom: ' . url('/')) }}" target="_blank" rel="noopener" class="hover:text-emerald-500 transition-colors" title="Share on WhatsApp">
+                                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.456L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.115-2.89-6.984-1.866-1.868-4.348-2.899-6.977-2.9-5.447 0-9.873 4.426-9.877 9.874-.001 1.692.441 3.344 1.282 4.808l-.971 3.548 3.633-.953zm11.378-6.883c-.302-.15-1.785-.88-2.063-.982-.278-.1-.48-.15-.68.15-.2.3-.775.982-.95 1.183-.175.2-.35.225-.65.075-.3-.15-1.265-.467-2.41-1.485-.89-.795-1.49-1.777-1.665-2.078-.175-.3-.018-.462.13-.61.135-.133.303-.35.454-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.68-1.64-1.01-2.435-.226-.541-.453-.466-.62-.475-.164-.008-.352-.01-.54-.01-.19 0-.498.07-.76.357-.26.287-1.01.986-1.01 2.404s1.03 2.788 1.17 2.976c.14.187 2.022 3.088 4.9 4.327.685.295 1.22.472 1.637.604.688.219 1.314.188 1.808.114.55-.082 1.785-.73 2.038-1.436.253-.706.253-1.313.177-1.438-.076-.126-.277-.2-.58-.35z"/>
                                                 </svg>
                                             </a>
                                         </div>
@@ -1403,6 +1291,12 @@
                                                             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                                                         </svg>
                                                     </a>
+                                                    <!-- WhatsApp Icon -->
+                                                    <a href="https://api.whatsapp.com/send?text={{ urlencode('Check out ' . $product->name . ' on Noir & Bloom: ' . url('/')) }}" target="_blank" rel="noopener" class="hover:text-emerald-500 transition-colors" title="Share on WhatsApp">
+                                                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.456L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.115-2.89-6.984-1.866-1.868-4.348-2.899-6.977-2.9-5.447 0-9.873 4.426-9.877 9.874-.001 1.692.441 3.344 1.282 4.808l-.971 3.548 3.633-.953zm11.378-6.883c-.302-.15-1.785-.88-2.063-.982-.278-.1-.48-.15-.68.15-.2.3-.775.982-.95 1.183-.175.2-.35.225-.65.075-.3-.15-1.265-.467-2.41-1.485-.89-.795-1.49-1.777-1.665-2.078-.175-.3-.018-.462.13-.61.135-.133.303-.35.454-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.68-1.64-1.01-2.435-.226-.541-.453-.466-.62-.475-.164-.008-.352-.01-.54-.01-.19 0-.498.07-.76.357-.26.287-1.01.986-1.01 2.404s1.03 2.788 1.17 2.976c.14.187 2.022 3.088 4.9 4.327.685.295 1.22.472 1.637.604.688.219 1.314.188 1.808.114.55-.082 1.785-.73 2.038-1.436.253-.706.253-1.313.177-1.438-.076-.126-.277-.2-.58-.35z"/>
+                                                        </svg>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -1536,6 +1430,9 @@
                     <li>Sunday: 09:00 &mdash; 17:00</li>
                     <li class="pt-2"><span class="block text-neutral-500 font-mono text-[11px] uppercase tracking-wider">Hotline Direct</span> +254 (0) 712 345 678</li>
                     <li>concierge@noirbloom.co.ke</li>
+                    <li class="pt-2 border-t border-neutral-500/10"><span class="block text-neutral-500 font-mono text-[9px] uppercase tracking-wider">Administration</span>+254 (0) 712 345 679 &bull; admin@noirbloom.co.ke</li>
+                    <li><span class="block text-neutral-500 font-mono text-[9px] uppercase tracking-wider">Customer Relations</span>+254 (0) 712 345 680 &bull; support@noirbloom.co.ke</li>
+                    <li><span class="block text-neutral-500 font-mono text-[9px] uppercase tracking-wider">PR & Press</span>+254 (0) 712 345 681 &bull; pr@noirbloom.co.ke</li>
                 </ul>
             </div>
 
@@ -1661,15 +1558,15 @@
     </div> <!-- Close transformed layout transition container here to lift curation modal out of transformed context -->
     
     <!-- Backdrop for Curation Drawer -->
-    <div x-show="drawerOpen" @click="drawerOpen = false" class="fixed inset-0 z-45 bg-black/40 backdrop-blur-xl" style="display: none;"></div>
+    <div x-show="drawerOpen" @click="drawerOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
     
     <!-- Floating Cart Overlay Panel (Center Modal) -->
     <div 
         x-show="drawerOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'light' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[520px] max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
+        :class="(theme === 'light' ? 'bg-[#FAF7F0]/85 border-neutral-200 text-neutral-900 ' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white ') + ((checkoutMode || @json($orderSubmitted)) ? 'w-[calc(100vw-32px)] md:w-[950px] lg:w-[1050px]' : 'w-[calc(100vw-48px)] sm:w-[520px]')"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden shadow-2xl transition-all duration-300"
         style="display: none;"
     >
         <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
@@ -1677,7 +1574,7 @@
                 <h3 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Selected Curations</h3>
                 <span class="text-[9px] text-neutral-500 font-light">Bespoke Arrangement Hub</span>
             </div>
-            <button @click="drawerOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Drawer">
+            <button @click="drawerOpen = false" :class="theme === 'light' ? 'text-neutral-400 hover:text-neutral-800' : 'text-neutral-500 hover:text-[#C5A880]'" class="cursor-pointer select-none transition-colors" title="Close Drawer">
                 <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
                     <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -1690,13 +1587,13 @@
                 @forelse($cartItems as $item)
                     <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900/60'" class="flex items-center justify-between space-x-4 border-b pb-4 text-xs animate-hero-fade">
                         <div class="flex-1 space-y-0.5">
-                            <h4 :class="theme === 'light' ? 'text-neutral-855' : 'text-white'" class="font-normal">{{ $item['product']->name }}</h4>
+                            <h4 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="font-normal">{{ $item['product']->name }}</h4>
                             <p class="text-neutral-500 font-mono">{{ number_format($item['product']->price) }} KSH &bull; <span class="uppercase text-[10px]">Pack/{{ $item['product']->unit_type }}</span></p>
                         </div>
                         <div :class="theme === 'light' ? 'bg-[#FAF7F0]/40 border-neutral-200/50 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="flex items-center space-x-3 px-2.5 py-1.5 border rounded-full">
-                            <button wire:click="removeFromCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="text-neutral-400 font-bold font-mono cursor-pointer select-none">-</button>
+                            <button wire:click="removeFromCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" :class="theme === 'light' ? 'text-neutral-500 hover:text-black' : 'text-neutral-400 hover:text-[#C5A880]'" class="font-bold font-mono cursor-pointer select-none">-</button>
                             <span class="text-xs font-mono min-w-[15px] text-center">{{ $item['quantity'] }}</span>
-                            <button wire:click="addToCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" class="text-neutral-400 font-bold font-mono cursor-pointer select-none">+</button>
+                            <button wire:click="addToCuration({{ $item['original_id'] }}, '{{ $item['size'] }}')" :class="theme === 'light' ? 'text-neutral-500 hover:text-black' : 'text-neutral-400 hover:text-[#C5A880]'" class="font-bold font-mono cursor-pointer select-none">+</button>
                         </div>
                     </div>
                 @empty
@@ -1714,7 +1611,7 @@
                 <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-50/60' : 'border-neutral-900 bg-black/40'" class="p-5 border-t space-y-4 shrink-0">
                     <div class="flex justify-between items-baseline text-xs font-light">
                         <span class="text-neutral-500 tracking-wider">Estimated Subtotal</span>
-                        <span :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="text-base font-mono font-semibold">{{ number_format($cartTotal) }} KSH</span>
+                        <span :class="theme === 'light' ? 'text-neutral-900' : 'text-[#C5A880]'" class="text-base font-mono font-semibold">{{ number_format($cartTotal) }} KSH</span>
                     </div>
                     @auth
                         <button @click="checkoutMode = true" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-4 cursor-pointer rounded-full btn-curate">
@@ -1722,7 +1619,7 @@
                         </button>
                     @else
                         <!-- Guest authentication request block -->
-                        <div class="border border-dashed border-[#C5A880]/30 rounded-2xl p-4.5 bg-[#C5A880]/5 text-center space-y-3.5">
+                        <div :class="theme === 'light' ? 'border-[#B59A7A]/30 bg-[#FAF7F0]/40' : 'border-[#C5A880]/20 bg-[#C5A880]/5'" class="border border-dashed rounded-2xl p-4.5 text-center space-y-3.5">
                             <span class="text-[10px] font-sans uppercase tracking-[0.2em] text-[#C5A880] block font-semibold">✦ Authentication Required ✦</span>
                             <p class="text-neutral-400 font-light text-[11.5px] leading-relaxed font-sans">Please sign in or create an account to configure logistics details and checkout.</p>
                             <div class="grid grid-cols-2 gap-3 pt-1.5">
@@ -1739,488 +1636,497 @@
             @endif
         </div>
 
-        <!-- Checkout forms area -->
-        <div x-show="checkoutMode && !@json($orderSubmitted)" class="flex-1 flex flex-col justify-between overflow-hidden" style="display: none;">
-            <form wire:submit.prevent="submitCurationRequest" class="flex-1 flex flex-col justify-between overflow-hidden">
+        <!-- Split Pane Layout for Checkout or Submitted Order -->
+        <div x-show="checkoutMode || @json($orderSubmitted)" class="flex-1 flex flex-col md:flex-row overflow-hidden" style="display: none;">
+            
+            <!-- Left Pane (Form Inputs or Status/Mpesa flow) -->
+            <div class="flex-1 md:w-3/5 flex flex-col justify-between overflow-hidden border-r border-neutral-500/10 h-full">
                 
-                <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-210px)] scrollbar-none text-xs">
-                    <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="flex items-center justify-between pb-2 border-b">
-                        <span class="text-xs uppercase tracking-wider text-neutral-400">Atelier Delivery Profile</span>
-                        <button type="button" @click="checkoutMode = false" class="text-neutral-500 hover:text-neutral-400 text-xs font-mono cursor-pointer flex items-center space-x-1">
+                <!-- If in checkout mode (not submitted yet) -->
+                <div x-show="checkoutMode && !@json($orderSubmitted)" class="flex-1 flex flex-col justify-between overflow-hidden h-full">
+                    <form wire:submit.prevent="submitCurationRequest" class="flex-1 flex flex-col justify-between overflow-hidden h-full">
+                        
+                        <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-180px)] scrollbar-none text-xs">
+                            <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="flex items-center justify-between pb-2 border-b">
+                                <span class="text-xs uppercase tracking-wider text-neutral-400">Atelier Delivery Profile</span>
+                                <button type="button" @click="checkoutMode = false" class="text-neutral-500 hover:text-neutral-400 text-xs font-mono cursor-pointer flex items-center space-x-1">
+                                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <span>Back</span>
+                                </button>
+                            </div>
+
+                            <div :class="theme === 'light' ? 'bg-neutral-100 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-1 border rounded-full grid grid-cols-2 text-center text-[11px] font-mono uppercase tracking-wider shadow-inner">
+                                <button type="button" @click="$wire.set('checkoutType', 'standard')" :class="$wire.checkoutType === 'standard' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Personal Delivery</button>
+                                <button type="button" @click="$wire.set('checkoutType', 'corporate')" :class="$wire.checkoutType === 'corporate' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Corporate Billing</button>
+                            </div>
+
+                            @if($checkoutType === 'corporate')
+                                <div :class="theme === 'light' ? 'bg-[#FAF7F0]/40 border-neutral-200' : 'bg-black/25 border-[#C5A880]/15'" class="space-y-1.5 border p-3 rounded-2xl">
+                                    <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Remittance Protocol</label>
+                                    <div :class="theme === 'light' ? 'bg-neutral-100 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-1 border rounded-full grid grid-cols-2 text-center text-[11px] font-mono uppercase tracking-wider shadow-inner">
+                                        <button type="button" @click="$wire.set('paymentMethod', 'mpesa')" :class="$wire.paymentMethod === 'mpesa' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">M-Pesa Push</button>
+                                        <button type="button" @click="$wire.set('paymentMethod', 'net_30')" :class="$wire.paymentMethod === 'net_30' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Credit Invoice (Net 30)</button>
+                                    </div>
+                                    @error('paymentMethod')
+                                        <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            @endif
+
+                            <div :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-4 border rounded-xl">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <span :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="text-xs font-normal block">Send this order as a luxury gift delivery?</span>
+                                        <span class="text-xs text-neutral-500 font-light block mt-0.5">Recipient delivery parameters will cleanly isolate away from receipt parameters.</span>
+                                    </div>
+                                    <input type="checkbox" wire:model.live="is_gift" :class="theme === 'light' ? 'text-black border-neutral-350 focus:ring-black' : 'text-[#C5A880] border-[#C5A880]/30 bg-neutral-950 focus:ring-[#C5A880]/60'" class="w-3.5 h-3.5 rounded cursor-pointer">
+                                </div>
+                            </div>
+
+                            <div x-show="$wire.is_gift" :class="theme === 'light' ? 'border-[#B59A7A]/30 bg-[#FAF7F0]/40 text-neutral-800' : 'border-[#C5A880]/20 bg-[#C5A880]/5 text-[#C5A880]'" class="space-y-4 border border-dashed p-4 rounded-xl" style="display: none;" x-transition>
+                                <span class="text-[11px] font-mono uppercase tracking-wider block font-bold" :class="theme === 'light' ? 'text-[#B59A7A]' : 'text-[#C5A880]'">✦ Recipient Delivery Profile</span>
+                                <div class="space-y-1">
+                                    <label class="text-xs uppercase tracking-wider text-neutral-500">Recipient Full Name *</label>
+                                    <input type="text" placeholder="Enter recipient name" wire:model="recipient_name" :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-xs uppercase tracking-wider text-neutral-500">Recipient Contact Line *</label>
+                                    <input type="text" placeholder="e.g. 0712345678" wire:model="recipient_phone" :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
+                                </div>
+                            </div>
+
+                            <div x-show="!$wire.is_gift" x-transition>
+                                <div :class="theme === 'light' ? 'bg-neutral-100 text-black border-neutral-200' : 'bg-neutral-900/60 text-neutral-400 border-neutral-900'" class="p-3.5 border rounded-xl text-xs font-light space-y-1.5">
+                                    <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block pb-1 border-b border-neutral-500/10">Pre-authenticated Customer Ledger Record</span>
+                                    <div><span class="text-neutral-500">Contact Payer:</span> <span class="font-semibold text-neutral-800 dark:text-white">{{ $full_name }}</span></div>
+                                    <div><span class="text-neutral-500">Secure Comm:</span> <span class="font-mono">{{ $phone }} &bull; {{ $email }}</span></div>
+                                    @if($checkoutType === 'corporate')
+                                        <div><span class="text-neutral-500 font-mono">KRA PIN:</span> <span class="font-mono text-amber-500 font-semibold uppercase">{{ $kra_pin }}</span></div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-xs uppercase tracking-wider text-neutral-500 block">Presentation Customization Packages (Pure delivery is free of added cost)</label>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <button type="button" wire:click="$set('delivery_type', 'standard')" :class="$wire.delivery_type === 'standard' ? (theme === 'light' ? 'border-black bg-neutral-50 text-black font-semibold' : 'border-[#C5A880] bg-[#C5A880]/10 text-[#C5A880] font-semibold') : (theme === 'light' ? 'border-neutral-200 text-neutral-500 hover:border-neutral-350' : 'border-neutral-850 text-neutral-400 hover:border-neutral-700')" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
+                                        <div><span class="block">Standard Courier Dispatch</span><span class="text-[11px] text-neutral-500 block mt-0.5">Premium transport routing directly to your destination building coordinates.</span></div>
+                                        <span class="font-mono text-[11px]">+ 0 KSH</span>
+                                    </button>
+                                    <button type="button" wire:click="$set('delivery_type', 'secret')" :class="$wire.delivery_type === 'secret' ? (theme === 'light' ? 'border-[#B59A7A] bg-[#B59A7A]/5 text-[#B59A7A] font-semibold' : 'border-[#C5A880] bg-[#C5A880]/15 text-[#C5A880] font-semibold') : (theme === 'light' ? 'border-neutral-200 text-neutral-500 hover:border-neutral-350' : 'border-neutral-850 text-neutral-400 hover:border-neutral-700')" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
+                                        <div><span class="block">The Secret Admirer Protocol</span><span class="text-[11px] text-neutral-500 block mt-0.5">We will fully conceal your sender profile parameters behind wax-sealed card enclosures.</span></div>
+                                        <span class="font-mono text-[11px] text-[#B59A7A] font-semibold">+ 500 KSH</span>
+                                    </button>
+                                    <button type="button" wire:click="$set('delivery_type', 'concierge')" :class="$wire.delivery_type === 'concierge' ? (theme === 'light' ? 'border-[#B59A7A] bg-[#B59A7A]/15 text-[#B59A7A] font-semibold' : 'border-[#C5A880] bg-[#C5A880]/25 text-[#C5A880] font-semibold') : (theme === 'light' ? 'border-neutral-200 text-neutral-500 hover:border-neutral-350' : 'border-neutral-850 text-neutral-400 hover:border-neutral-700')" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
+                                        <div><span class="block">Uniformed Concierge Presentation</span><span class="text-[11px] text-neutral-500 block mt-0.5">Hand-delivered via sharp, uniformed couriers. Elite tier presentation statement.</span></div>
+                                        <span class="font-mono text-[11px] text-[#B59A7A] font-semibold">+ 1,500 KSH</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-1">
+                                    <label class="text-xs uppercase tracking-wider text-neutral-500">Distribution Node *</label>
+                                    <select wire:model.live="region" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
+                                        <option value="Nairobi">Nairobi Metropolitan</option>
+                                        <option value="Kiambu">Kiambu Ridge Hub</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-xs uppercase tracking-wider text-neutral-500">Landmarks Address *</label>
+                                    <input type="text" list="premium-address-nodes" placeholder="Type complex, street, or estate..." wire:model="delivery_address" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
+                                    <datalist id="premium-address-nodes">
+                                        @foreach($this->getAddressSuggestions() as $node) <option value="{{ $node }}"></option> @endforeach
+                                    </datalist>
+                                </div>
+                            </div>
+
+                            <!-- Delivery Date & Slot Picker in Logistics Spec -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Delivery Date *</label>
+                                    <input type="date" wire:model.live="deliveryDate" min="{{ date('Y-m-d') }}" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans">
+                                    @error('deliveryDate') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Delivery Time Slot *</label>
+                                    <select wire:model.live="deliverySlot" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans cursor-pointer">
+                                        <option value="standard">Standard (Free)</option>
+                                        <option value="midnight">Midnight (1,500 KSH)</option>
+                                    </select>
+                                    @error('deliverySlot') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Free OpenStreetMap Interactive Map Locator with Autocomplete Search -->
+                            <div class="space-y-2" wire:ignore>
+                                <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Interactive Curation Dispatch Map (Click/drag marker to pinpoint location for free)</label>
+                                
+                                <div 
+                                    x-data="{
+                                        map: null,
+                                        marker: null,
+                                        searchQuery: '',
+                                        searchResults: [],
+                                        isFullscreen: false,
+                                        initMap() {
+                                            let lat = -1.2921;
+                                            let lng = 36.8219;
+                                            
+                                            let match = $wire.delivery_address.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
+                                            if (match) {
+                                                lat = parseFloat(match[1]);
+                                                lng = parseFloat(match[2]);
+                                            }
+
+                                            setTimeout(() => {
+                                                this.map = L.map('checkout-map').setView([lat, lng], 13);
+                                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                                    attribution: '&copy; OpenStreetMap contributors'
+                                                }).addTo(this.map);
+                                                
+                                                this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
+                                                
+                                                this.marker.on('dragend', (e) => {
+                                                    let position = this.marker.getLatLng();
+                                                    this.updateCoords(position.lat, position.lng);
+                                                });
+                                                
+                                                this.map.on('click', (e) => {
+                                                    this.marker.setLatLng(e.latlng);
+                                                    this.updateCoords(e.latlng.lat, e.latlng.lng);
+                                                });
+
+                                                // ResizeObserver ensures Leaflet renders properly inside modal transitions
+                                                const observer = new ResizeObserver(() => {
+                                                    this.map.invalidateSize();
+                                                });
+                                                observer.observe(document.getElementById('checkout-map'));
+                                            }, 400);
+
+                                            $watch('$wire.region', (val) => {
+                                                let centerCoords = val === 'Kiambu' ? [-1.1578, 36.8407] : [-1.2921, 36.8219];
+                                                this.map.setView(centerCoords, 13);
+                                                this.marker.setLatLng(centerCoords);
+                                                this.updateCoords(centerCoords[0], centerCoords[1]);
+                                            });
+                                        },
+                                        searchQueryClean() {
+                                            return this.searchQuery.trim();
+                                        },
+                                        searchLocation() {
+                                            let q = this.searchQueryClean();
+                                            if (!q) return;
+                                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`)
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    this.searchResults = data;
+                                                })
+                                                .catch(() => {});
+                                        },
+                                        selectResult(res) {
+                                            let lat = parseFloat(res.lat);
+                                            let lng = parseFloat(res.lon);
+                                            this.map.setView([lat, lng], 14);
+                                            this.marker.setLatLng([lat, lng]);
+                                            this.updateCoords(lat, lng);
+                                            this.searchResults = [];
+                                            this.searchQuery = res.display_name.split(',').slice(0, 3).join(',').trim();
+                                        },
+                                        updateCoords(lat, lng) {
+                                            let coords = lat.toFixed(6) + ', ' + lng.toFixed(6);
+                                            $wire.delivery_address = coords;
+                                            
+                                            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    if (data && data.display_name) {
+                                                        let shortName = data.display_name.split(',').slice(0, 3).join(',').trim();
+                                                        $wire.delivery_address = coords + ' (' + shortName + ')';
+                                                    }
+                                                })
+                                                .catch(() => {});
+                                        }
+                                    }"
+                                    x-init="initMap()"
+                                    class="relative"
+                                >
+                                    <!-- Map Search Autocomplete Input -->
+                                    <div class="relative z-40 mb-2">
+                                        <div class="flex gap-2">
+                                            <input 
+                                                type="text" 
+                                                x-model="searchQuery" 
+                                                @keydown.enter.prevent="searchLocation()"
+                                                placeholder="Search delivery address..." 
+                                                :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black placeholder-neutral-400 focus:border-neutral-450' : 'bg-[#0A0908] border-[#C5A880]/20 text-white placeholder-neutral-600 focus:border-[#C5A880]/60'"
+                                                class="flex-1 border rounded-xl px-3 py-1.5 text-xs focus:outline-none font-sans"
+                                            >
+                                            <button 
+                                                type="button" 
+                                                @click="searchLocation()"
+                                                :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'"
+                                                class="px-3.5 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold transition-colors"
+                                            >
+                                                Find
+                                            </button>
+                                        </div>
+                                        <div 
+                                            x-show="searchResults.length > 0" 
+                                            @click.away="searchResults = []"
+                                            :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-200 text-neutral-900' : 'bg-[#0F0F12] border-neutral-900 text-white'"
+                                            class="absolute left-0 right-0 z-[1000] mt-1 max-h-48 overflow-y-auto border rounded-xl shadow-xl text-xs"
+                                            style="display: none;"
+                                        >
+                                            <template x-for="res in searchResults" :key="res.place_id">
+                                                <div 
+                                                    @click="selectResult(res)"
+                                                    :class="theme === 'light' ? 'hover:bg-neutral-100 text-black' : 'hover:bg-[#C5A880]/15 text-[#C5A880]'"
+                                                    class="px-3 py-2 cursor-pointer transition-colors border-b last:border-b-0 border-neutral-500/10 font-sans"
+                                                    x-text="res.display_name"
+                                                ></div>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <!-- Leaflet Map Container Wrapper -->
+                                    <div :class="isFullscreen ? 'fixed inset-0 w-screen h-screen z-[9999] bg-black/60 p-4 flex items-center justify-center' : 'relative w-full h-32 rounded-xl overflow-hidden border border-neutral-500/10 z-10'">
+                                        <div id="checkout-map" :class="isFullscreen ? 'w-full h-full rounded-2xl' : 'w-full h-full'"></div>
+                                        <button type="button" @click="isFullscreen = !isFullscreen; setTimeout(() => { map.invalidateSize() }, 100)" :class="theme === 'light' ? 'bg-black/80 hover:bg-black text-white' : 'bg-black/90 hover:bg-[#C5A880]/20 hover:text-[#C5A880] border border-[#C5A880]/20'" class="absolute top-2.5 right-2.5 z-[1000] px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider flex items-center space-x-1 shadow-md transition-all">
+                                            <span x-text="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Map'"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Left Pane Footer with Submit -->
+                        <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-50/60' : 'border-neutral-900 bg-black/40'" class="p-5 border-t shrink-0">
+                            <button 
+                                type="submit" wire:loading.attr="disabled" wire:target="submitCurationRequest"
+                                class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-4 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center space-x-2 rounded-full btn-curate"
+                            >
+                                <span wire:loading wire:target="submitCurationRequest" class="animate-spin rounded-full h-2.5 w-2.5 border border-neutral-450 border-t-transparent inline-block"></span>
+                                <span wire:loading.remove wire:target="submitCurationRequest">Request Atelier Dispatch</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- If order is submitted (payment phase) -->
+                <div x-show="@json($orderSubmitted)" class="flex-1 flex flex-col justify-between overflow-hidden h-full">
+                    <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-160px)] scrollbar-none w-full text-xs">
+                        <div class="space-y-6 max-w-sm mx-auto w-full pt-4">
+                            @if($paymentStatus === 'idle')
+                                {{-- State: IDLE - Prompt phone number --}}
+                                <div class="w-10 h-10 rounded-full border border-neutral-800 flex items-center justify-center bg-neutral-900/50 mx-auto">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10B981]"></span>
+                                </div>
+                                <div class="space-y-1 text-center">
+                                    <h4 :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="text-sm uppercase tracking-[0.2em] font-medium">Dispatch Mapped</h4>
+                                    <p class="text-xs text-neutral-500 font-light leading-relaxed">Your curation specs are locked. Dispatch Safaricom API prompts down below.</p>
+                                </div>
+
+                                <div :class="theme === 'light' ? 'bg-[#FAF7F0]/90 border-neutral-250 shadow-md' : 'bg-[#0A0908]/95 border-[#C5A880]/15 shadow-2xl backdrop-blur-md'" class="space-y-3 p-4 border rounded-2xl shadow-2xl">
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono">Safaricom Authorization Line</label>
+                                        <div class="relative flex items-center">
+                                            <span :class="theme === 'light' ? 'text-neutral-505' : 'text-neutral-400'" class="absolute left-3 text-xs font-mono">+254</span>
+                                            <input type="tel" wire:model="phone" placeholder="712345678" :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0F0F0F] border-neutral-800 text-white'" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl pl-14 pr-3 py-1.5 text-xs font-mono focus:outline-none">
+                                        </div>
+                                    </div>
+
+                                    @if($mpesaErrorMessage)
+                                        <div class="p-2 border border-dashed border-rose-900 bg-rose-950/20 text-[10px] font-mono text-rose-400 rounded-sm">{{ $mpesaErrorMessage }}</div>
+                                    @endif
+
+                                    <button type="button" wire:click="initiateMpesaPayment" wire:loading.attr="disabled" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-3 cursor-pointer rounded-full flex items-center justify-center space-x-2 btn-curate">
+                                        <span wire:loading wire:target="initiateMpesaPayment" class="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent inline-block"></span>
+                                        <span wire:loading.remove wire:target="initiateMpesaPayment">Authorize STK Push</span>
+                                    </button>
+                                </div>
+                            @elseif($paymentStatus === 'pending')
+                                {{-- State: PENDING - Polling state checking payment callbacks --}}
+                                <div wire:poll.3s="checkPaymentStatus" class="space-y-6 text-center py-8">
+                                    <div x-data="{ timer: 60 }" x-init="const interval = setInterval(() => { if(timer > 0) { timer--; } else { clearInterval(interval); } }, 1000)" class="space-y-6">
+                                        <div class="relative w-16 h-16 mx-auto flex items-center justify-center">
+                                            <span class="absolute inline-flex h-12 w-12 rounded-full bg-amber-500/20 animate-ping"></span>
+                                            <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/60' : 'border-[#C5A880]/15 bg-neutral-950/60'" class="w-12 h-12 rounded-full border flex items-center justify-center z-10">
+                                                <svg class="w-5 h-5 text-amber-500 animate-spin" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <h4 :class="theme === 'light' ? 'text-neutral-900 font-semibold' : 'text-white'" class="text-sm uppercase tracking-[0.2em] font-medium font-mono text-amber-500">Awaiting PIN Auth</h4>
+                                            <p class="text-xs text-neutral-500 font-light leading-relaxed">
+                                                An M-Pesa prompt has been dispatched to <span class="font-mono text-neutral-300 font-semibold">+254{{ $phone }}</span>.<br>Enter your Safaricom PIN to complete checkout.
+                                            </p>
+                                        </div>
+                                        <div :class="theme === 'light' ? 'bg-neutral-100 border-neutral-200 text-neutral-600' : 'bg-neutral-950/20 border-[#C5A880]/20 text-[#C5A880]/80'" class="text-[10px] font-mono uppercase tracking-widest py-2 max-w-[200px] mx-auto rounded-full border">
+                                            Expiry in <span class="font-bold text-white" x-text="timer"></span>s
+                                        </div>
+                                    </div>
+                                </div>
+                            @elseif($paymentStatus === 'completed')
+                                {{-- State: COMPLETED - Success state + Invoice retrieval --}}
+                                <div class="space-y-8 text-center py-6">
+                                    <div class="w-16 h-16 rounded-full border border-emerald-800 bg-emerald-950/20 flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                                        <svg class="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                        </svg>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <h4 class="text-sm uppercase tracking-[0.2em] font-semibold text-emerald-400 font-mono">Remittance Confirmed</h4>
+                                        <p class="text-xs text-neutral-500 font-light leading-relaxed">
+                                            Your payment has been cleared by Safaricom Daraja. Your order is now queued for design and atelier fulfillment.
+                                        </p>
+                                    </div>
+
+                                    <div class="space-y-3 max-w-sm mx-auto pt-4">
+                                        <a href="{{ URL::signedRoute('receipt.download', ['order' => $trackedOrderId]) }}" target="_blank" class="w-full bg-[#C5A880] hover:bg-[#B59A7A] text-black text-xs font-mono font-bold uppercase tracking-[0.2em] py-3 rounded-full flex items-center justify-center space-x-2 transition-all shadow-md transform hover:scale-[1.02]">
+                                            <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                                                <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                            <span>Download Proforma Invoice</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            @elseif($paymentStatus === 'failed')
+                                {{-- State: FAILED - Failure notification + retry option --}}
+                                <div class="space-y-8 text-center py-6">
+                                    <div class="w-16 h-16 rounded-full border border-rose-800 bg-rose-950/20 flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                                        <svg class="w-8 h-8 text-rose-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                        </svg>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <h4 class="text-sm uppercase tracking-[0.2em] font-semibold text-rose-500 font-mono">Remittance Failed</h4>
+                                        <p :class="theme === 'light' ? 'bg-rose-50 border-rose-200 text-rose-800' : 'bg-rose-950/25 border-rose-900/30 text-rose-400'" class="text-xs font-mono border p-3 rounded-xl max-w-sm mx-auto leading-relaxed">
+                                            {{ $mpesaErrorMessage }}
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="pt-4 max-w-sm mx-auto">
+                                        <button type="button" wire:click="$set('paymentStatus', 'idle')" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-3 cursor-pointer rounded-full btn-curate">
+                                            Retry M-Pesa Authorization
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="text-center p-4 border-t border-neutral-500/5 shrink-0 bg-black/10 flex justify-center">
+                        <button @click="drawerOpen = false; checkoutMode = false;" wire:click="returnToCollections" class="text-neutral-500 hover:text-neutral-450 text-xs font-mono tracking-widest uppercase cursor-pointer flex items-center space-x-1">
                             <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
                                 <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
-                            <span>Back</span>
+                            <span>Clear & Return to Showroom</span>
                         </button>
                     </div>
-
-                    <div :class="theme === 'light' ? 'bg-neutral-100 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-1 border rounded-full grid grid-cols-2 text-center text-[11px] font-mono uppercase tracking-wider shadow-inner">
-                        <button type="button" @click="$wire.set('checkoutType', 'standard')" :class="$wire.checkoutType === 'standard' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Personal Delivery</button>
-                        <button type="button" @click="$wire.set('checkoutType', 'corporate')" :class="$wire.checkoutType === 'corporate' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Corporate Billing</button>
-                    </div>
-
-                    @if($checkoutType === 'corporate')
-                        <div :class="theme === 'light' ? 'bg-[#FAF7F0]/40 border-neutral-200' : 'bg-black/25 border-[#C5A880]/15'" class="space-y-1.5 border p-3 rounded-2xl">
-                            <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Remittance Protocol</label>
-                            <div :class="theme === 'light' ? 'bg-neutral-100 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-1 border rounded-full grid grid-cols-2 text-center text-[11px] font-mono uppercase tracking-wider shadow-inner">
-                                <button type="button" @click="$wire.set('paymentMethod', 'mpesa')" :class="$wire.paymentMethod === 'mpesa' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">M-Pesa Push</button>
-                                <button type="button" @click="$wire.set('paymentMethod', 'net_30')" :class="$wire.paymentMethod === 'net_30' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Credit Invoice (Net 30)</button>
-                            </div>
-                            @error('paymentMethod')
-                                <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    @endif
-
-                    <div :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-4 border rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="text-xs font-normal block">Send this order as a luxury gift delivery?</span>
-                                <span class="text-xs text-neutral-500 font-light block mt-0.5">Recipient delivery parameters will cleanly isolate away from receipt parameters.</span>
-                            </div>
-                            <input type="checkbox" wire:model.live="is_gift" :class="theme === 'light' ? 'text-black border-neutral-350 focus:ring-black' : 'text-[#C5A880] border-[#C5A880]/30 bg-neutral-950 focus:ring-[#C5A880]/60'" class="w-3.5 h-3.5 rounded cursor-pointer">
-                        </div>
-                    </div>
-
-                    <div x-show="$wire.is_gift" :class="theme === 'light' ? 'border-[#B59A7A]/30 bg-[#FAF7F0]/40 text-neutral-800' : 'border-[#C5A880]/20 bg-[#C5A880]/5 text-[#C5A880]'" class="space-y-4 border border-dashed p-4 rounded-xl" style="display: none;" x-transition>
-                        <span class="text-[11px] font-mono uppercase tracking-wider block font-bold" :class="theme === 'light' ? 'text-[#B59A7A]' : 'text-[#C5A880]'">✦ Recipient Delivery Profile</span>
-                        <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-500">Recipient Full Name *</label>
-                            <input type="text" placeholder="Enter full recipient name" wire:model="recipient_name" :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-500">Recipient Contact Line *</label>
-                            <input type="text" placeholder="e.g. 0712345678 (Required for courier logistics)" wire:model="recipient_phone" :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
-                        </div>
-                    </div>
-
-                    <div x-show="!$wire.is_gift" x-transition>
-                        <div :class="theme === 'light' ? 'bg-neutral-100 text-black border-neutral-200' : 'bg-neutral-900/60 text-neutral-400 border-neutral-900'" class="p-3.5 border rounded-xl text-xs font-light space-y-1.5">
-                            <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block pb-1 border-b border-neutral-500/10">Pre-authenticated Customer Ledger Record</span>
-                            <div><span class="text-neutral-500">Contact Payer:</span> <span class="font-semibold text-neutral-800 dark:text-white">{{ $full_name }}</span></div>
-                            <div><span class="text-neutral-500">Secure Comm:</span> <span class="font-mono">{{ $phone }} &bull; {{ $email }}</span></div>
-                            @if($checkoutType === 'corporate')
-                                <div><span class="text-neutral-500 font-mono">KRA PIN:</span> <span class="font-mono text-amber-500 font-semibold uppercase">{{ $kra_pin }}</span></div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-xs uppercase tracking-wider text-neutral-500 block">Presentation Customization Packages (Pure delivery is free of added cost)</label>
-                        <div class="grid grid-cols-1 gap-2">
-                            <button type="button" wire:click="$set('delivery_type', 'standard')" :class="$wire.delivery_type === 'standard' ? (theme === 'light' ? 'border-black bg-neutral-50 text-black font-semibold' : 'border-[#C5A880] bg-[#C5A880]/10 text-[#C5A880] font-semibold') : (theme === 'light' ? 'border-neutral-200 text-neutral-500 hover:border-neutral-350' : 'border-neutral-850 text-neutral-400 hover:border-neutral-700')" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
-                                <div><span class="block">Standard Courier Dispatch</span><span class="text-[11px] text-neutral-500 block mt-0.5">Premium transport routing directly to your destination building coordinates.</span></div>
-                                <span class="font-mono text-[11px]">+ 0 KSH</span>
-                            </button>
-                            <button type="button" wire:click="$set('delivery_type', 'secret')" :class="$wire.delivery_type === 'secret' ? (theme === 'light' ? 'border-[#B59A7A] bg-[#B59A7A]/5 text-[#B59A7A] font-semibold' : 'border-[#C5A880] bg-[#C5A880]/15 text-[#C5A880] font-semibold') : (theme === 'light' ? 'border-neutral-200 text-neutral-500 hover:border-neutral-350' : 'border-neutral-850 text-neutral-400 hover:border-neutral-700')" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
-                                <div><span class="block">The Secret Admirer Protocol</span><span class="text-[11px] text-neutral-500 block mt-0.5">We will fully conceal your sender profile parameters behind wax-sealed card enclosures.</span></div>
-                                <span class="font-mono text-[11px] text-[#B59A7A] font-semibold">+ 500 KSH</span>
-                            </button>
-                            <button type="button" wire:click="$set('delivery_type', 'concierge')" :class="$wire.delivery_type === 'concierge' ? (theme === 'light' ? 'border-[#B59A7A] bg-[#B59A7A]/15 text-[#B59A7A] font-semibold' : 'border-[#C5A880] bg-[#C5A880]/25 text-[#C5A880] font-semibold') : (theme === 'light' ? 'border-neutral-200 text-neutral-500 hover:border-neutral-350' : 'border-neutral-850 text-neutral-400 hover:border-neutral-700')" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
-                                <div><span class="block">Uniformed Concierge Presentation</span><span class="text-[11px] text-neutral-500 block mt-0.5">Hand-delivered via sharp, uniformed corporate couriers. Elite tier presentation statement.</span></div>
-                                <span class="font-mono text-[11px] text-[#B59A7A] font-semibold">+ 1,500 KSH</span>
-                            </button>
-                        </div>
-                                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-500">Distribution Node *</label>
-                            <select wire:model.live="region" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
-                                <option value="Nairobi">Nairobi Metropolitan</option>
-                                <option value="Kiambu">Kiambu Ridge Hub</option>
-                            </select>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-500">Landmarks Address *</label>
-                            <input type="text" list="premium-address-nodes" placeholder="Type complex, street, or estate..." wire:model="delivery_address" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
-                            <datalist id="premium-address-nodes">
-                                @foreach($this->getAddressSuggestions() as $node) <option value="{{ $node }}"></option> @endforeach
-                            </datalist>
-                        </div>
-                    </div>
-
-                    <!-- Delivery Date & Slot Picker in Logistics Spec -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Delivery Date *</label>
-                            <input type="date" wire:model.live="deliveryDate" min="{{ date('Y-m-d') }}" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans">
-                            @error('deliveryDate') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Delivery Time Slot *</label>
-                            <select wire:model.live="deliverySlot" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans cursor-pointer">
-                                <option value="standard">Standard (Free)</option>
-                                <option value="midnight">Midnight (1,500 KSH)</option>
-                            </select>
-                            @error('deliverySlot') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-
-                    <!-- Free OpenStreetMap Interactive Map Locator with Autocomplete Search -->
-                    <div class="space-y-2" wire:ignore>
-                        <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Interactive Curation Dispatch Map (Click/drag marker to pinpoint location for free)</label>
-                        
-                        <div 
-                            x-data="{
-                                map: null,
-                                marker: null,
-                                searchQuery: '',
-                                searchResults: [],
-                                initMap() {
-                                    let lat = -1.2921;
-                                    let lng = 36.8219;
-                                    
-                                    let match = $wire.delivery_address.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
-                                    if (match) {
-                                        lat = parseFloat(match[1]);
-                                        lng = parseFloat(match[2]);
-                                    }
-
-                                    setTimeout(() => {
-                                        this.map = L.map('checkout-map').setView([lat, lng], 13);
-                                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                            attribution: '&copy; OpenStreetMap contributors'
-                                        }).addTo(this.map);
-                                        
-                                        this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
-                                        
-                                        this.marker.on('dragend', (e) => {
-                                            let position = this.marker.getLatLng();
-                                            this.updateCoords(position.lat, position.lng);
-                                        });
-                                        
-                                        this.map.on('click', (e) => {
-                                            this.marker.setLatLng(e.latlng);
-                                            this.updateCoords(e.latlng.lat, e.latlng.lng);
-                                        });
-
-                                        // ResizeObserver ensures Leaflet renders properly inside modal transitions
-                                        const observer = new ResizeObserver(() => {
-                                            this.map.invalidateSize();
-                                        });
-                                        observer.observe(document.getElementById('checkout-map'));
-                                    }, 400);
-
-                                    $watch('$wire.region', (val) => {
-                                        let centerCoords = val === 'Kiambu' ? [-1.1578, 36.8407] : [-1.2921, 36.8219];
-                                        this.map.setView(centerCoords, 13);
-                                        this.marker.setLatLng(centerCoords);
-                                        this.updateCoords(centerCoords[0], centerCoords[1]);
-                                    });
-                                },
-                                searchQueryClean() {
-                                    return this.searchQuery.trim();
-                                },
-                                searchLocation() {
-                                    let q = this.searchQueryClean();
-                                    if (!q) return;
-                                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`)
-                                        .then(res => res.json())
-                                        .then(data => {
-                                            this.searchResults = data;
-                                        })
-                                        .catch(() => {});
-                                },
-                                selectResult(res) {
-                                    let lat = parseFloat(res.lat);
-                                    let lng = parseFloat(res.lon);
-                                    this.map.setView([lat, lng], 14);
-                                    this.marker.setLatLng([lat, lng]);
-                                    this.updateCoords(lat, lng);
-                                    this.searchResults = [];
-                                    this.searchQuery = res.display_name.split(',').slice(0, 3).join(',').trim();
-                                },
-                                updateCoords(lat, lng) {
-                                    let coords = lat.toFixed(6) + ', ' + lng.toFixed(6);
-                                    $wire.delivery_address = coords;
-                                    
-                                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
-                                        .then(res => res.json())
-                                        .then(data => {
-                                            if (data && data.display_name) {
-                                                let shortName = data.display_name.split(',').slice(0, 3).join(',').trim();
-                                                $wire.delivery_address = coords + ' (' + shortName + ')';
-                                            }
-                                        })
-                                        .catch(() => {});
-                                }
-                            }"
-                            x-init="initMap()"
-                            class="relative"
-                        >
-                            <!-- Map Search Autocomplete Input -->
-                            <div class="relative z-40 mb-2">
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="text" 
-                                        x-model="searchQuery" 
-                                        @keydown.enter.prevent="searchLocation()"
-                                        placeholder="Search delivery address (e.g. Kilimani)..." 
-                                        :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black placeholder-neutral-400 focus:border-neutral-450' : 'bg-[#0A0908] border-[#C5A880]/20 text-white placeholder-neutral-600 focus:border-[#C5A880]/60'"
-                                        class="flex-1 border rounded-xl px-3 py-1.5 text-xs focus:outline-none font-sans"
-                                    >
-                                    <button 
-                                        type="button" 
-                                        @click="searchLocation()"
-                                        :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'"
-                                        class="px-3.5 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold transition-colors"
-                                    >
-                                        Find
-                                    </button>
-                                </div>
-                                <div 
-                                    x-show="searchResults.length > 0" 
-                                    @click.away="searchResults = []"
-                                    :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-200 text-neutral-900' : 'bg-[#0F0F12] border-neutral-900 text-white'"
-                                    class="absolute left-0 right-0 z-[1000] mt-1 max-h-48 overflow-y-auto border rounded-xl shadow-xl text-xs"
-                                    style="display: none;"
-                                >
-                                    <template x-for="res in searchResults" :key="res.place_id">
-                                        <div 
-                                            @click="selectResult(res)"
-                                            :class="theme === 'light' ? 'hover:bg-neutral-100 text-black' : 'hover:bg-[#C5A880]/15 text-[#C5A880]'"
-                                            class="px-3 py-2 cursor-pointer transition-colors border-b last:border-b-0 border-neutral-500/10 font-sans"
-                                            x-text="res.display_name"
-                                        ></div>
-                                    </template>
-                                </div>
-                            </div>
-
-                            <!-- Leaflet Map Container -->
-                            <div 
-                                id="checkout-map"
-                                class="w-full h-32 rounded-xl overflow-hidden border border-neutral-500/10 z-10"
-                            ></div>
-                        </div>
-                    </div>      </div>
                 </div>
 
-                <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-50/60' : 'border-neutral-900 bg-black/40'" class="p-5 border-t space-y-4 shrink-0 text-xs">
-                    <div class="space-y-3">
-                        <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block pb-1 border-b border-neutral-500/10">Itemized Pre-Payment Statement</span>
-                        
-                        <!-- Product Item list -->
-                        <div class="space-y-1.5 border-b border-neutral-500/5 pb-2 max-h-24 overflow-y-auto scrollbar-none">
-                            @foreach($cartItems as $item)
-                                <div class="flex justify-between text-neutral-400">
-                                    <span>{{ $item['product']->name }} ({{ strtoupper(substr($item['size'], 0, 3)) }} × {{ $item['quantity'] }})</span>
-                                    <span class="font-mono text-neutral-300">{{ number_format($item['subtotal']) }} KSH</span>
-                                </div>
-                            @endforeach
-                        </div>
+            </div>
 
-                        <!-- Financial/Tax Breakdown -->
-                        <div class="space-y-1 text-neutral-500 font-mono text-[11px]">
-                            <div class="flex justify-between">
-                                <span>Taxable Net Base (Excl. VAT):</span>
-                                <span>{{ number_format((int)round(($cartTotal + $service_fee) / 1.16)) }} KSH</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>VAT Compliance (16%):</span>
-                                <span>{{ number_format(($cartTotal + $service_fee) - (int)round(($cartTotal + $service_fee) / 1.16)) }} KSH</span>
-                            </div>
-                            @if($service_fee > 0)
-                                <div class="flex justify-between text-amber-500">
-                                    <span>Order Fulfillment (Upsell):</span>
-                                    <span>+ {{ number_format($service_fee) }} KSH</span>
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Total -->
-                        <div class="flex justify-between items-baseline text-sm font-normal pt-2 border-t border-neutral-500/10">
-                            <span class="text-neutral-400">Grand Dispatch Total:</span>
-                            <span :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="text-md font-mono font-bold tracking-tight">{{ number_format($cartTotal + $service_fee) }} KSH</span>
-                        </div>
-                    </div>
+            <!-- Right Pane (Persistent Statement Summary) -->
+            <div :class="theme === 'light' ? 'bg-[#FAF7F0]/40' : 'bg-black/25'" class="w-full md:w-2/5 flex flex-col justify-between overflow-hidden">
+                <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-100px)] scrollbar-none text-xs">
                     
-                    <button 
-                        type="submit" wire:loading.attr="disabled" wire:target="submitCurationRequest"
-                        class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-4 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center space-x-2 rounded-full btn-curate"
-                    >
-                        <span wire:loading wire:target="submitCurationRequest" class="animate-spin rounded-full h-2.5 w-2.5 border border-neutral-400 border-t-transparent inline-block"></span>
-                        <span wire:loading.remove wire:target="submitCurationRequest">Request Atelier Dispatch</span>
-                    </button>
-                </div>
-            </form>
-        </div>
+                    <!-- Title -->
+                    <div>
+                        <span class="text-[9px] uppercase tracking-wider text-neutral-500 block pb-1 border-b border-neutral-500/10 font-bold">Persistent Order Statement</span>
+                    </div>
 
-        <!-- Mpesa Payment Initiation Page (Visible once orderSubmitted is true) -->
-        @if($orderSubmitted)
-            <div class="flex-1 flex flex-col justify-between overflow-hidden shrink-0 h-full">
-                <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-200px)] scrollbar-none w-full text-xs">
-                    <div class="space-y-6 max-w-sm mx-auto w-full pt-4">
+                    <!-- Product Item list -->
+                    <div class="space-y-3 border-b border-neutral-500/5 pb-4 max-h-48 overflow-y-auto scrollbar-none">
+                        @foreach($cartItems as $item)
+                            <div class="flex items-center justify-between text-neutral-455">
+                                <div class="flex-1">
+                                    <span class="text-neutral-800 dark:text-neutral-200 font-medium">{{ $item['product']->name }}</span>
+                                    <span class="block text-[10px] text-neutral-500 font-mono uppercase mt-0.5">{{ $item['size'] }} &bull; Unit: {{ number_format($item['product']->price) }} KSH &bull; Qty: {{ $item['quantity'] }}</span>
+                                </div>
+                                <span class="font-mono text-neutral-350 dark:text-neutral-200 shrink-0">{{ number_format($item['subtotal']) }} KSH</span>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Real-time confirmations summary card -->
+                    <div :class="theme === 'light' ? 'bg-neutral-100 text-black border-neutral-200' : 'bg-neutral-900/60 text-neutral-400 border-neutral-900'" class="p-3.5 border rounded-xl text-xs font-light space-y-2">
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block pb-1 border-b border-neutral-500/10">Logistics Confirmation Recap</span>
                         
-                        @if($paymentStatus === 'idle')
-                            {{-- State: IDLE - Prompt phone number --}}
-                            <div class="w-10 h-10 rounded-full border border-neutral-800 flex items-center justify-center bg-neutral-900/50 mx-auto">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10B981]"></span>
+                        <div>
+                            <span class="text-neutral-500">Destination:</span> 
+                            <span class="font-semibold text-neutral-800 dark:text-white" x-text="$wire.delivery_address || 'Not specified yet'"></span>
+                        </div>
+                        <div>
+                            <span class="text-neutral-500">Distribution Node:</span> 
+                            <span class="font-semibold text-neutral-800 dark:text-white" x-text="$wire.region"></span>
+                        </div>
+                        <div>
+                            <span class="text-neutral-500">Client Contact:</span> 
+                            <span class="font-mono text-neutral-800 dark:text-white">{{ $phone ?: 'Not specified' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-neutral-500">Recipient Name:</span> 
+                            <span class="font-semibold text-neutral-800 dark:text-white" x-text="$wire.is_gift ? ($wire.recipient_name || 'Not specified') : '{{ $full_name }} (Self)'"></span>
+                        </div>
+                        <template x-if="$wire.is_gift">
+                            <div>
+                                <span class="text-amber-500">Recipient Contact:</span> 
+                                <span class="font-mono text-amber-500" x-text="$wire.recipient_phone || 'Not specified'"></span>
                             </div>
-                            <div class="space-y-1 text-center">
-                                <h4 :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="text-sm uppercase tracking-[0.2em] font-medium">Dispatch Mapped</h4>
-                                <p class="text-xs text-neutral-500 font-light leading-relaxed">Your curation specs are locked. Dispatch Safaricom API prompts down below.</p>
-                                <div :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A]/80 border-neutral-900 text-neutral-300'" class="p-4 border rounded-xl text-xs font-light space-y-2.5">
-                                 <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block pb-1 border-b border-neutral-500/10">Remittance Statement Summary</span>
-                                 
-                                 <!-- Itemized pricing lines -->
-                                 <div class="space-y-1.5 border-b border-neutral-500/5 pb-2 max-h-24 overflow-y-auto scrollbar-none">
-                                     @foreach($cartItems as $item)
-                                         <div class="flex justify-between text-neutral-400">
-                                             <span>{{ $item['product']->name }} ({{ strtoupper(substr($item['size'], 0, 3)) }} × {{ $item['quantity'] }})</span>
-                                             <span class="font-mono text-neutral-300">{{ number_format($item['product']->price * $item['quantity']) }} KSH</span>
-                                         </div>
-                                     @endforeach
-                                 </div>
+                        </template>
+                        <div>
+                            <span class="text-neutral-500">Delivery Date:</span> 
+                            <span class="font-semibold text-neutral-850 dark:text-white" x-text="$wire.deliveryDate || 'Not selected'"></span>
+                        </div>
+                        <div>
+                            <span class="text-neutral-500">Time Slot:</span> 
+                            <span class="font-semibold uppercase text-neutral-850 dark:text-white" x-text="$wire.deliverySlot"></span>
+                        </div>
+                        <div>
+                            <span class="text-neutral-500">Presentation Package:</span> 
+                            <span class="font-semibold text-neutral-850 dark:text-white" x-text="$wire.delivery_type.toUpperCase()"></span>
+                        </div>
+                    </div>
 
-                                 <!-- Client Billing Context -->
-                                 <div class="space-y-1 text-neutral-400 border-b border-neutral-500/5 pb-2">
-                                     <div><span class="text-neutral-500">Payer Account:</span> <span class="font-medium text-neutral-300">{{ $full_name }}</span></div>
-                                     @if($is_gift)
-                                         <div><span class="text-amber-500 font-medium">Gift Delivery For:</span> <span class="text-amber-500 font-medium">{{ $recipient_name }} ({{ $recipient_phone }})</span></div>
-                                     @endif
-                                     <div><span class="text-neutral-500">Destination:</span> <span>{{ $delivery_address }}, Node/{{ $region }}</span></div>
-                                 </div>
-
-                                 <!-- Financial and Tax Splits -->
-                                 <div class="space-y-1 text-neutral-400">
-                                     <div class="flex justify-between">
-                                         <span>Taxable Net Base:</span>
-                                         <span class="font-mono text-[11px]">{{ number_format((int)round(($cartTotal + $service_fee) / 1.16)) }} KSH</span>
-                                     </div>
-                                     <div class="flex justify-between">
-                                         <span>VAT (16% Rate Compliance):</span>
-                                         <span class="font-mono text-[11px]">{{ number_format(($cartTotal + $service_fee) - (int)round(($cartTotal + $service_fee) / 1.16)) }} KSH</span>
-                                     </div>
-                                     @if($service_fee > 0)
-                                         <div class="flex justify-between">
-                                             <span>Order Fulfillment (Concierge):</span>
-                                             <span class="font-mono text-[11px]">+ {{ number_format($service_fee) }} KSH</span>
-                                         </div>
-                                     @endif
-                                 </div>
-
-                                 <div class="flex justify-between pt-2 border-t border-neutral-500/10 text-emerald-400 font-semibold">
-                                     <span>Grand Total:</span>
-                                     <span class="font-mono text-sm text-emerald-400 font-bold">{{ number_format($cartTotal + $service_fee) }} KSH</span>
-                                 </div>
-                             </div>
-                            </div>
-
-                            <div :class="theme === 'light' ? 'bg-[#FAF7F0]/90 border-neutral-250 shadow-md' : 'bg-[#0A0908]/95 border-[#C5A880]/15 shadow-2xl backdrop-blur-md'" class="space-y-3 p-4 border rounded-2xl shadow-2xl">
-                                <div class="space-y-1">
-                                    <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono">Safaricom Authorization Line</label>
-                                    <div class="relative flex items-center">
-                                        <span :class="theme === 'light' ? 'text-neutral-505' : 'text-neutral-400'" class="absolute left-3 text-xs font-mono">+254</span>
-                                        <input type="tel" wire:model="phone" placeholder="712345678" :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0F0F0F] border-neutral-800 text-white'" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl pl-14 pr-3 py-1.5 text-xs font-mono focus:outline-none">
-                                    </div>
-                                </div>
-
-                                @if($mpesaErrorMessage)
-                                    <div class="p-2 border border-dashed border-rose-900 bg-rose-950/20 text-[10px] font-mono text-rose-400 rounded-sm">{{ $mpesaErrorMessage }}</div>
-                                @endif
-
-                                <button type="button" wire:click="initiateMpesaPayment" wire:loading.attr="disabled" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-3 cursor-pointer rounded-full flex items-center justify-center space-x-2 btn-curate">
-                                    <span wire:loading wire:target="initiateMpesaPayment" class="animate-spin rounded-full h-3 w-3 border border-current border-t-transparent inline-block"></span>
-                                    <span wire:loading.remove wire:target="initiateMpesaPayment">Authorize STK Push</span>
-                                </button>
-                            </div>
-                        @elseif($paymentStatus === 'pending')
-                            {{-- State: PENDING - Polling state checking payment callbacks --}}
-                            <div wire:poll.3s="checkPaymentStatus" class="space-y-6 text-center py-8">
-                                <div x-data="{ timer: 60 }" x-init="const interval = setInterval(() => { if(timer > 0) { timer--; } else { clearInterval(interval); } }, 1000)" class="space-y-6">
-                                    <div class="relative w-16 h-16 mx-auto flex items-center justify-center">
-                                        <span class="absolute inline-flex h-12 w-12 rounded-full bg-amber-500/20 animate-ping"></span>
-                                        <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/60' : 'border-[#C5A880]/15 bg-neutral-950/60'" class="w-12 h-12 rounded-full border flex items-center justify-center z-10">
-                                            <svg class="w-5 h-5 text-amber-500 animate-spin" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div class="space-y-2">
-                                        <h4 :class="theme === 'light' ? 'text-neutral-900 font-semibold' : 'text-white'" class="text-sm uppercase tracking-[0.2em] font-medium font-mono text-amber-500">Awaiting PIN Auth</h4>
-                                        <p class="text-xs text-neutral-500 font-light leading-relaxed">
-                                            An M-Pesa prompt has been dispatched to <span class="font-mono text-neutral-300 font-semibold">+254{{ $phone }}</span>.<br>Enter your Safaricom PIN to complete checkout.
-                                        </p>
-                                    </div>
-                                    <div :class="theme === 'light' ? 'bg-neutral-100 border-neutral-200 text-neutral-600' : 'bg-neutral-950/20 border-[#C5A880]/20 text-[#C5A880]/80'" class="text-[10px] font-mono uppercase tracking-widest py-2 max-w-[200px] mx-auto rounded-full border">
-                                        Expiry in <span class="font-bold text-white" x-text="timer"></span>s
-                                    </div>
-                                </div>
-                            </div>
-                        @elseif($paymentStatus === 'completed')
-                            {{-- State: COMPLETED - Success state + Invoice retrieval --}}
-                            <div class="space-y-8 text-center py-6">
-                                <div class="w-16 h-16 rounded-full border border-emerald-800 bg-emerald-950/20 flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                                    <svg class="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                    </svg>
-                                </div>
-                                <div class="space-y-2">
-                                    <h4 class="text-sm uppercase tracking-[0.2em] font-semibold text-emerald-400 font-mono">Remittance Confirmed</h4>
-                                    <p class="text-xs text-neutral-500 font-light leading-relaxed">
-                                        Your payment has been cleared by Safaricom Daraja. Your order is now queued for design and atelier fulfillment.
-                                    </p>
-                                    <div :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A]/60 border-neutral-900 text-neutral-300'" class="p-4 border rounded-xl text-[11px] font-mono text-left space-y-2 max-w-sm mx-auto">
-                                     <span class="text-[9px] uppercase tracking-wider text-neutral-500 block border-b border-neutral-500/10 pb-1.5 font-bold">Transaction Compliance Audit</span>
-                                     <div class="flex justify-between"><span>Atelier Order ID:</span><span class="text-white font-semibold">#NB-ORD-{{ str_pad($trackedOrderId, 4, '0', STR_PAD_LEFT) }}</span></div>
-                                     @if($mpesaReceiptNumber)
-                                         <div class="flex justify-between"><span>M-Pesa Receipt:</span><span class="text-amber-500 font-bold uppercase">{{ $mpesaReceiptNumber }}</span></div>
-                                     @else
-                                         <div class="flex justify-between"><span>Billing Terms:</span><span class="text-amber-500 font-bold uppercase">Net 30 Credit Invoice</span></div>
-                                     @endif
-                                     <div class="flex justify-between"><span>Proforma Invoice:</span><span class="text-emerald-400">DETAILED RECEIPT</span></div>
-                                 </div>
-                                </div>
-
-                                <div class="space-y-3 max-w-sm mx-auto pt-4">
-                                    <a href="{{ URL::signedRoute('receipt.download', ['order' => $trackedOrderId]) }}" target="_blank" class="w-full bg-[#C5A880] hover:bg-[#B59A7A] text-black text-xs font-mono font-bold uppercase tracking-[0.2em] py-3 rounded-full flex items-center justify-center space-x-2 transition-all shadow-md transform hover:scale-[1.02]">
-                                        <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
-                                            <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                        <span>Download Proforma Invoice</span>
-                                    </a>
-                                </div>
-                            </div>
-                        @elseif($paymentStatus === 'failed')
-                            {{-- State: FAILED - Failure notification + retry option --}}
-                            <div class="space-y-8 text-center py-6">
-                                <div class="w-16 h-16 rounded-full border border-rose-800 bg-rose-950/20 flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-                                    <svg class="w-8 h-8 text-rose-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                    </svg>
-                                </div>
-                                <div class="space-y-2">
-                                    <h4 class="text-sm uppercase tracking-[0.2em] font-semibold text-rose-500 font-mono">Remittance Failed</h4>
-                                    <p :class="theme === 'light' ? 'bg-rose-50 border-rose-200 text-rose-800' : 'bg-rose-950/25 border-rose-900/30 text-rose-400'" class="text-xs font-mono border p-3 rounded-xl max-w-sm mx-auto leading-relaxed">
-                                        {{ $mpesaErrorMessage }}
-                                    </p>
-                                </div>
-                                
-                                <div class="pt-4 max-w-sm mx-auto">
-                                    <button type="button" wire:click="$set('paymentStatus', 'idle')" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-3 cursor-pointer rounded-full btn-curate">
-                                        Retry M-Pesa Authorization
-                                    </button>
-                                </div>
+                    <!-- Financial/Tax Breakdown -->
+                    <div class="space-y-1.5 text-neutral-500 font-mono text-[11px] pt-2 border-t border-neutral-500/10">
+                        <div class="flex justify-between">
+                            <span>Taxable Net Base:</span>
+                            <span>{{ number_format((int)round(($cartTotal + $service_fee) / 1.16)) }} KSH</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>VAT Compliance (16%):</span>
+                            <span>{{ number_format(($cartTotal + $service_fee) - (int)round(($cartTotal + $service_fee) / 1.16)) }} KSH</span>
+                        </div>
+                        @if($service_fee > 0)
+                            <div class="flex justify-between text-amber-500">
+                                <span>Concierge/Presentation Fee:</span>
+                                <span>+ {{ number_format($service_fee) }} KSH</span>
                             </div>
                         @endif
+                    </div>
 
+                </div>
+
+                <!-- Persistent Footer summary showing Total -->
+                <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-50/80' : 'border-neutral-900 bg-black/40'" class="p-5 border-t space-y-4 shrink-0 text-xs mt-auto">
+                    <div class="flex justify-between items-baseline text-sm font-normal">
+                        <span class="text-neutral-450">Total Dispatch Due:</span>
+                        <span :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="text-md font-mono font-bold tracking-tight">{{ number_format($cartTotal + $service_fee) }} KSH</span>
                     </div>
                 </div>
-
-                <div class="text-center p-4 border-t border-neutral-500/5 shrink-0 bg-black/10 flex justify-center">
-                    <button @click="drawerOpen = false; checkoutMode = false;" wire:click="returnToCollections" class="text-neutral-500 hover:text-neutral-450 text-xs font-mono tracking-widest uppercase cursor-pointer flex items-center space-x-1">
-                        <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <span>Clear & Return to Showroom</span>
-                    </button>
-                </div>
-                </div>
-        @endif
+            </div>
+        </div>
     </div>
 
 
-    <!-- Floating Chat Widget -->
+<!-- Floating Chat Widget -->
     <div x-show="!drawerOpen" x-transition class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
         <!-- Jumping Animated Circular Icon Button -->
         <button 
@@ -2490,7 +2396,7 @@
         </div>
     </div>
 
-        <!-- Backdrop for Profile Modal -->
+                <!-- Backdrop for Profile Modal -->
     <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Profile Overlay Panel (Center Modal) -->
@@ -2692,7 +2598,11 @@
                                 default => 'text-neutral-400 bg-neutral-500/10 border-neutral-500/20'
                             };
                         @endphp
-                        <div x-data="{ expanded: false }" class="border p-4 rounded-2xl transition-all {{ $notifCls }} flex flex-col gap-2 relative group text-xs">
+                        <div 
+                            x-data="{ expanded: false }" 
+                            @mouseenter="if (!{{ $notif['is_read'] ? 'true' : 'false' }}) { $wire.markNotificationAsRead({{ $notif['id'] }}) }"
+                            class="border p-4 rounded-2xl transition-all {{ $notifCls }} flex flex-col gap-2 relative group text-xs"
+                        >
                             @if(!$notif['is_read'])
                                 <span class="absolute top-4 right-4 w-2 h-2 rounded-full"
                                       :class="{
@@ -2716,14 +2626,6 @@
                                     {{ $notif['message'] }}
                                 </p>
                             </div>
-
-                            <div class="flex items-center space-x-2 pt-2 border-t border-neutral-500/5 mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                                @if(!$notif['is_read'])
-                                    <button wire:click="markNotificationAsRead({{ $notif['id'] }})" :class="theme === 'light' ? 'text-black' : 'text-[#C5A880]'" class="text-[9px] font-mono uppercase tracking-widest hover:underline cursor-pointer">
-                                        [ Mark Read ]
-                                    </button>
-                                @endif
-                            </div>
                         </div>
                     @empty
                         <div class="text-center py-12 text-neutral-500 text-xs flex flex-col items-center justify-center space-y-2">
@@ -2742,11 +2644,21 @@
             
             @auth
                 @if(count($notificationsList) > 0)
-                    <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-4 border-t flex items-center justify-between shrink-0">
-                        <button wire:click="markAllAsSeen" :class="theme === 'light' ? 'text-neutral-500 hover:text-black' : 'text-neutral-500 hover:text-[#C5A880]'" class="text-[10px] font-mono uppercase tracking-widest cursor-pointer">
-                            [ Mark All as Read ]
+                    <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-4 flex items-center justify-between gap-4 shrink-0 border-t">
+                        <button 
+                            wire:click="markAllAsSeen" 
+                            :class="theme === 'light' 
+                                ? 'border-neutral-350 text-neutral-700 hover:bg-neutral-150 hover:text-black' 
+                                : 'border-[#C5A880]/30 text-[#C5A880] hover:bg-[#C5A880]/10'" 
+                            class="border font-mono font-bold uppercase tracking-wider py-2 px-4 rounded-full text-[9px] transition-all cursor-pointer bg-transparent"
+                        >
+                            Mark All as Read
                         </button>
-                        <button @click="notificationsOpen = false" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" class="text-[9px] font-mono font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all cursor-pointer">
+                        <button 
+                            @click="notificationsOpen = false" 
+                            :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" 
+                            class="font-mono font-bold uppercase tracking-wider px-5 py-2 rounded-full text-[9px] transition-all cursor-pointer shadow-md"
+                        >
                             Dismiss
                         </button>
                     </div>

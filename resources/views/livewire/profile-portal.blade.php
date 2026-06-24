@@ -890,12 +890,16 @@
                         <div class="space-y-4 text-xs font-mono">
                             <!-- Theme selector setting -->
                             <div class="space-y-2 border-b border-neutral-500/5 pb-4">
-                                <label class="text-neutral-400 uppercase font-semibold">Preferred Workspace Default Theme</label>
+                                <label :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-400'" class="uppercase font-semibold transition-colors">Preferred Workspace Default Theme</label>
                                 <div class="grid grid-cols-2 gap-4 pt-1 max-w-sm">
-                                    <button type="button" wire:click="$set('preferred_theme', 'dark')" :class="preferred_theme === 'dark' ? 'border-[#C5A880] bg-[#C5A880]/15 text-[#C5A880] font-bold' : 'border-neutral-500/20 text-neutral-500 hover:text-neutral-300'" class="p-3 border rounded-2xl cursor-pointer text-center transition-all">
+                                    <button type="button" wire:click="$set('preferred_theme', 'dark')" 
+                                            :class="preferred_theme === 'dark' ? (theme === 'light' ? 'border-[#C5A880] bg-[#C5A880]/15 text-[#8c7355] font-bold shadow-sm' : 'border-[#C5A880] bg-[#C5A880]/20 text-[#C5A880] font-bold') : (theme === 'light' ? 'border-neutral-300 text-neutral-500 hover:border-neutral-400 hover:text-neutral-800' : 'border-neutral-800 text-neutral-500 hover:text-neutral-300')" 
+                                            class="p-3 border rounded-2xl cursor-pointer text-center transition-all select-none">
                                         Onyx (Dark)
                                     </button>
-                                    <button type="button" wire:click="$set('preferred_theme', 'light')" :class="preferred_theme === 'light' ? 'border-[#B59A7A] bg-[#B59A7A]/15 text-[#B59A7A] font-bold' : 'border-neutral-500/20 text-neutral-500 hover:text-neutral-300'" class="p-3 border rounded-2xl cursor-pointer text-center transition-all">
+                                    <button type="button" wire:click="$set('preferred_theme', 'light')" 
+                                            :class="preferred_theme === 'light' ? (theme === 'light' ? 'border-emerald-700 bg-emerald-50/50 text-emerald-800 font-bold shadow-sm' : 'border-[#B59A7A] bg-[#B59A7A]/20 text-[#B59A7A] font-bold') : (theme === 'light' ? 'border-neutral-300 text-neutral-500 hover:border-neutral-400 hover:text-neutral-800' : 'border-neutral-800 text-neutral-500 hover:text-neutral-300')" 
+                                            class="p-3 border rounded-2xl cursor-pointer text-center transition-all select-none">
                                         Champagne (Light)
                                     </button>
                                 </div>
@@ -903,26 +907,34 @@
 
                             <!-- Notification Toggles -->
                             <div class="space-y-3.5">
-                                <label class="text-neutral-400 uppercase font-semibold block mb-1">Communication Toggles</label>
+                                <label :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-400'" class="uppercase font-semibold block mb-1 transition-colors">Communication Toggles</label>
                                 
                                 <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" wire:model="notification_email" class="w-4 h-4 rounded text-[#C5A880] focus:ring-0 bg-[#0F0F12] border-neutral-800 cursor-pointer">
-                                    <span class="text-neutral-450 group-hover:text-neutral-300 transition-colors">Deliver printable Proforma Invoices automatically via email</span>
+                                    <input type="checkbox" wire:model="notification_email" 
+                                           :class="theme === 'light' ? 'text-emerald-800 border-neutral-300 focus:ring-emerald-700 bg-white' : 'text-[#C5A880] border-neutral-800 bg-[#0F0F12] focus:ring-0'"
+                                           class="w-4 h-4 rounded cursor-pointer transition-all">
+                                    <span :class="theme === 'light' ? 'text-neutral-700 group-hover:text-black' : 'text-neutral-450 group-hover:text-neutral-300'" class="transition-colors">Deliver printable Proforma Invoices automatically via email</span>
                                 </label>
 
                                 <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" wire:model="notification_sms" class="w-4 h-4 rounded text-[#C5A880] focus:ring-0 bg-[#0F0F12] border-neutral-800 cursor-pointer">
-                                    <span class="text-neutral-450 group-hover:text-neutral-300 transition-colors">Receive live SMS alerts detailing concierge routing dispatch runs</span>
+                                    <input type="checkbox" wire:model="notification_sms" 
+                                           :class="theme === 'light' ? 'text-emerald-800 border-neutral-300 focus:ring-emerald-700 bg-white' : 'text-[#C5A880] border-neutral-800 bg-[#0F0F12] focus:ring-0'"
+                                           class="w-4 h-4 rounded cursor-pointer transition-all">
+                                    <span :class="theme === 'light' ? 'text-neutral-700 group-hover:text-black' : 'text-neutral-450 group-hover:text-neutral-300'" class="transition-colors">Receive live SMS alerts detailing concierge routing dispatch runs</span>
                                 </label>
 
                                 <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" wire:model="notification_concierge" class="w-4 h-4 rounded text-[#C5A880] focus:ring-0 bg-[#0F0F12] border-neutral-800 cursor-pointer">
-                                    <span class="text-neutral-450 group-hover:text-neutral-300 transition-colors">Grant early exclusive VIP access to concierge rosewood stem drops</span>
+                                    <input type="checkbox" wire:model="notification_concierge" 
+                                           :class="theme === 'light' ? 'text-emerald-800 border-neutral-300 focus:ring-emerald-700 bg-white' : 'text-[#C5A880] border-neutral-800 bg-[#0F0F12] focus:ring-0'"
+                                           class="w-4 h-4 rounded cursor-pointer transition-all">
+                                    <span :class="theme === 'light' ? 'text-neutral-700 group-hover:text-black' : 'text-neutral-450 group-hover:text-neutral-300'" class="transition-colors">Grant early exclusive VIP access to concierge rosewood stem drops</span>
                                 </label>
 
                                 <label class="flex items-center space-x-3 cursor-pointer group">
-                                    <input type="checkbox" wire:model="notification_newsletter" class="w-4 h-4 rounded text-[#C5A880] focus:ring-0 bg-[#0F0F12] border-neutral-800 cursor-pointer">
-                                    <span class="text-neutral-450 group-hover:text-neutral-300 transition-colors">Subscribe to the weekly Atelier Bulletin design digest</span>
+                                    <input type="checkbox" wire:model="notification_newsletter" 
+                                           :class="theme === 'light' ? 'text-emerald-800 border-neutral-300 focus:ring-emerald-700 bg-white' : 'text-[#C5A880] border-neutral-800 bg-[#0F0F12] focus:ring-0'"
+                                           class="w-4 h-4 rounded cursor-pointer transition-all">
+                                    <span :class="theme === 'light' ? 'text-neutral-700 group-hover:text-black' : 'text-neutral-450 group-hover:text-neutral-300'" class="transition-colors">Subscribe to the weekly Atelier Bulletin design digest</span>
                                 </label>
                             </div>
 
@@ -1104,7 +1116,7 @@
         </div>
     </footer>
 
-        <!-- Backdrop for Profile Modal -->
+                <!-- Backdrop for Profile Modal -->
     <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Profile Overlay Panel (Center Modal) -->
@@ -1306,7 +1318,11 @@
                                 default => 'text-neutral-400 bg-neutral-500/10 border-neutral-500/20'
                             };
                         @endphp
-                        <div x-data="{ expanded: false }" class="border p-4 rounded-2xl transition-all {{ $notifCls }} flex flex-col gap-2 relative group text-xs">
+                        <div 
+                            x-data="{ expanded: false }" 
+                            @mouseenter="if (!{{ $notif['is_read'] ? 'true' : 'false' }}) { $wire.markNotificationAsRead({{ $notif['id'] }}) }"
+                            class="border p-4 rounded-2xl transition-all {{ $notifCls }} flex flex-col gap-2 relative group text-xs"
+                        >
                             @if(!$notif['is_read'])
                                 <span class="absolute top-4 right-4 w-2 h-2 rounded-full"
                                       :class="{
@@ -1330,14 +1346,6 @@
                                     {{ $notif['message'] }}
                                 </p>
                             </div>
-
-                            <div class="flex items-center space-x-2 pt-2 border-t border-neutral-500/5 mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                                @if(!$notif['is_read'])
-                                    <button wire:click="markNotificationAsRead({{ $notif['id'] }})" :class="theme === 'light' ? 'text-black' : 'text-[#C5A880]'" class="text-[9px] font-mono uppercase tracking-widest hover:underline cursor-pointer">
-                                        [ Mark Read ]
-                                    </button>
-                                @endif
-                            </div>
                         </div>
                     @empty
                         <div class="text-center py-12 text-neutral-500 text-xs flex flex-col items-center justify-center space-y-2">
@@ -1356,11 +1364,21 @@
             
             @auth
                 @if(count($notificationsList) > 0)
-                    <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-4 border-t flex items-center justify-between shrink-0">
-                        <button wire:click="markAllAsSeen" :class="theme === 'light' ? 'text-neutral-500 hover:text-black' : 'text-neutral-500 hover:text-[#C5A880]'" class="text-[10px] font-mono uppercase tracking-widest cursor-pointer">
-                            [ Mark All as Read ]
+                    <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-4 flex items-center justify-between gap-4 shrink-0 border-t">
+                        <button 
+                            wire:click="markAllAsSeen" 
+                            :class="theme === 'light' 
+                                ? 'border-neutral-350 text-neutral-700 hover:bg-neutral-150 hover:text-black' 
+                                : 'border-[#C5A880]/30 text-[#C5A880] hover:bg-[#C5A880]/10'" 
+                            class="border font-mono font-bold uppercase tracking-wider py-2 px-4 rounded-full text-[9px] transition-all cursor-pointer bg-transparent"
+                        >
+                            Mark All as Read
                         </button>
-                        <button @click="notificationsOpen = false" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" class="text-[9px] font-mono font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all cursor-pointer">
+                        <button 
+                            @click="notificationsOpen = false" 
+                            :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" 
+                            class="font-mono font-bold uppercase tracking-wider px-5 py-2 rounded-full text-[9px] transition-all cursor-pointer shadow-md"
+                        >
                             Dismiss
                         </button>
                     </div>
@@ -1442,6 +1460,91 @@
                               :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-neutral-900 focus:border-emerald-600' : 'bg-neutral-900 border-neutral-800 text-white focus:border-[#C5A880]'"
                               class="w-full text-xs p-3 rounded-2xl border transition-colors focus:outline-none"></textarea>
                 </div>
+
+                <!-- Detailed Product Curation Ratings -->
+                @if(!empty($ratingProducts) && count($ratingProducts) > 0)
+                    <div class="space-y-4 pt-4 border-t border-neutral-500/10">
+                        <label class="text-[10px] font-mono uppercase tracking-widest text-[#C5A880] block font-bold">Product-Level Reviews</label>
+                        
+                        <div class="space-y-6">
+                            @foreach($ratingProducts as $product)
+                                @php
+                                    $pId = $product['id'];
+                                @endphp
+                                <div :class="theme === 'light' ? 'bg-white border-neutral-200 shadow-sm' : 'bg-black/45 border-neutral-900 shadow-inner'"
+                                     class="p-4 border rounded-2xl space-y-4">
+                                    <div class="flex items-center space-x-3">
+                                        @if(!empty($product['image_url']))
+                                            <img src="{{ $product['image_url'] }}" alt="" class="w-10 h-10 rounded-lg object-cover">
+                                        @elseif(!empty($product['backdrop_url']))
+                                            <img src="{{ $product['backdrop_url'] }}" alt="" class="w-10 h-10 rounded-lg object-cover">
+                                        @else
+                                            <div class="w-10 h-10 rounded-lg bg-neutral-800 flex items-center justify-center text-xs">❀</div>
+                                        @endif
+                                        <div>
+                                            <h4 class="text-xs font-semibold">{{ $product['name'] }}</h4>
+                                            <span class="text-[9px] text-[#C5A880] font-mono font-semibold">{{ number_format($product['price']) }} KSH</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                        <!-- Product Rating -->
+                                        <div class="space-y-1">
+                                            <span class="text-[9px] text-neutral-500 block uppercase font-mono">Overall Rating</span>
+                                            <div class="flex items-center space-x-1">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <button type="button" wire:click="$set('productReviews.{{ $pId }}.rating', {{ $i }})"
+                                                            class="text-lg transition-transform hover:scale-125 focus:outline-none cursor-pointer {{ ($productReviews[$pId]['rating'] ?? 5) >= $i ? 'text-[#C5A880]' : 'text-neutral-600' }}">★</button>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Quality Rating -->
+                                        <div class="space-y-1">
+                                            <span class="text-[9px] text-neutral-500 block uppercase font-mono">Artistry & Quality</span>
+                                            <div class="flex items-center space-x-1">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <button type="button" wire:click="$set('productReviews.{{ $pId }}.quality_rating', {{ $i }})"
+                                                            class="text-lg transition-transform hover:scale-125 focus:outline-none cursor-pointer {{ ($productReviews[$pId]['quality_rating'] ?? 5) >= $i ? 'text-[#C5A880]' : 'text-neutral-600' }}">★</button>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Freshness Rating -->
+                                        <div class="space-y-1">
+                                            <span class="text-[9px] text-neutral-500 block uppercase font-mono">Stem Freshness</span>
+                                            <div class="flex items-center space-x-1">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <button type="button" wire:click="$set('productReviews.{{ $pId }}.freshness_rating', {{ $i }})"
+                                                            class="text-lg transition-transform hover:scale-125 focus:outline-none cursor-pointer {{ ($productReviews[$pId]['freshness_rating'] ?? 5) >= $i ? 'text-[#C5A880]' : 'text-neutral-600' }}">★</button>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Value Rating -->
+                                        <div class="space-y-1">
+                                            <span class="text-[9px] text-neutral-500 block uppercase font-mono">Value for Money</span>
+                                            <div class="flex items-center space-x-1">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <button type="button" wire:click="$set('productReviews.{{ $pId }}.value_rating', {{ $i }})"
+                                                            class="text-lg transition-transform hover:scale-125 focus:outline-none cursor-pointer {{ ($productReviews[$pId]['value_rating'] ?? 5) >= $i ? 'text-[#C5A880]' : 'text-neutral-600' }}">★</button>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Product Comment -->
+                                    <div class="space-y-1">
+                                        <span class="text-[9px] text-neutral-500 block uppercase font-mono">Product Comment (Optional)</span>
+                                        <input type="text" wire:model="productReviews.{{ $pId }}.comment" placeholder="Any specific feedback about this item..."
+                                               :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-neutral-900 focus:border-emerald-600' : 'bg-neutral-900 border-neutral-800 text-white focus:border-[#C5A880]'"
+                                               class="w-full text-xs p-2.5 rounded-xl border focus:outline-none transition-colors">
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <!-- Modal Footer -->

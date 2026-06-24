@@ -124,10 +124,10 @@
                             </td>
                             <td class="py-3 px-4 text-right whitespace-nowrap">
                                 @if ($log->context)
-                                    <button 
-                                        @click="expanded = !expanded" 
-                                        class="px-2.5 py-1 bg-neutral-900 hover:bg-neutral-800 text-neutral-450 rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer border border-neutral-800"
-                                    >
+                                     <button 
+                                         @click="expanded = !expanded" 
+                                         class="px-2.5 py-1 border border-neutral-300 text-neutral-600 hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-white rounded text-[9px] font-mono uppercase tracking-wider cursor-pointer bg-transparent transition-all"
+                                     >
                                         <span x-text="expanded ? 'Hide' : 'Context'"></span>
                                     </button>
                                 @else

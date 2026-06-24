@@ -427,6 +427,7 @@
 
             .summary-wrapper {
                 margin-bottom: 15px !important;
+                gap: 15px !important;
             }
 
             .totals-row.grand-total {
@@ -435,8 +436,8 @@
             }
 
             .receipt-footer {
-                padding-top: 15px !important;
-                margin-top: 15px !important;
+                padding-top: 12px !important;
+                margin-top: 12px !important;
             }
 
             /* Enable direct ink-friendly colors */
@@ -447,7 +448,31 @@
 
             .etims-verification-block {
                 background: #ffffff !important;
-                border: 1px solid #111 !important;
+                border: 1px dashed #111 !important;
+                padding: 10px !important;
+                gap: 10px !important;
+            }
+
+            .qr-wrapper {
+                width: 65px !important;
+                height: 65px !important;
+                padding: 2px !important;
+            }
+
+            .etims-details {
+                font-size: 10px !important;
+                line-height: 1.4 !important;
+            }
+
+            .etims-title {
+                font-size: 10px !important;
+                margin-bottom: 3px !important;
+            }
+
+            /* Avoid page breaks inside layout components and force single-page fit */
+            tr, .receipt-header, .receipt-meta, .summary-wrapper, .receipt-footer {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
 
             .etims-code {

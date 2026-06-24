@@ -293,21 +293,19 @@ class ProfilePortal extends Component
 
                 // Save product-level reviews
                 foreach ($this->productReviews as $productId => $revData) {
-                    if (!empty(trim($revData['comment']))) {
-                        \App\Models\Review::updateOrCreate(
-                            [
-                                'user_id' => $user->id,
-                                'product_id' => $productId,
-                            ],
-                            [
-                                'rating' => $revData['rating'],
-                                'quality_rating' => $revData['quality_rating'],
-                                'freshness_rating' => $revData['freshness_rating'],
-                                'value_rating' => $revData['value_rating'],
-                                'comment' => trim($revData['comment']),
-                            ]
-                        );
-                    }
+                    \App\Models\Review::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'product_id' => $productId,
+                        ],
+                        [
+                            'rating' => $revData['rating'],
+                            'quality_rating' => $revData['quality_rating'],
+                            'freshness_rating' => $revData['freshness_rating'],
+                            'value_rating' => $revData['value_rating'],
+                            'comment' => !empty(trim($revData['comment'] ?? '')) ? trim($revData['comment']) : null,
+                        ]
+                    );
                 }
 
                 session()->flash('success_orders', 'Thank you for your feedback on order #NB-ORD-' . $this->ratingOrderId . '!');

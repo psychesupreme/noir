@@ -7,6 +7,7 @@
     class="min-h-screen font-sans antialiased relative text-left flex flex-col justify-between transition-colors duration-500 overflow-x-clip"
 >
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -224,13 +225,14 @@
                     <div class="flex bg-black/45 border border-neutral-800/50 p-1 rounded-full text-[9px] font-mono">
                         <button @click="viewMode = 'arrangement'" :class="viewMode === 'arrangement' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-3 py-1 rounded-full transition-all cursor-pointer">Flowers</button>
                         <button @click="viewMode = 'presentation'" :class="viewMode === 'presentation' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-3 py-1 rounded-full transition-all cursor-pointer">Wrapping</button>
+                        <button @click="viewMode = 'note'" :class="viewMode === 'note' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-3 py-1 rounded-full transition-all cursor-pointer">Note</button>
                     </div>
                 </div>
 
                 <!-- Preview Image Display -->
                 <div class="w-full h-[320px] rounded-2xl border border-neutral-800/10 overflow-hidden relative flex items-center justify-center bg-black/20 shadow-inner">
                     <!-- Empty Desk State -->
-                    <div x-show="isCurationEmpty() && !hoveredImage" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 transition-all duration-500">
+                    <div x-show="isCurationEmpty() && !hoveredImage && viewMode !== 'note'" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 transition-all duration-500">
                         <div class="w-12 h-12 rounded-full border border-neutral-850 flex items-center justify-center mb-4 bg-white/5 backdrop-blur-sm">
                             <span class="text-xl">✨</span>
                         </div>
@@ -239,16 +241,54 @@
                     </div>
 
                     <!-- Blurred Background Layer for Rich depth -->
-                    <div x-show="!isCurationEmpty() || hoveredImage" class="absolute inset-0 scale-110 blur-xl opacity-30 pointer-events-none transition-all duration-500">
+                    <div x-show="(!isCurationEmpty() || hoveredImage) && viewMode !== 'note'" class="absolute inset-0 scale-110 blur-xl opacity-30 pointer-events-none transition-all duration-500">
                         <img :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage())" alt="" class="w-full h-full object-cover">
                     </div>
                     
                     <!-- Centered Contained Image -->
-                    <img x-show="!isCurationEmpty() || hoveredImage" :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage())" alt="Preview" class="relative z-10 w-full h-full object-contain p-4 transition-all duration-500">
+                    <img x-show="(!isCurationEmpty() || hoveredImage) && viewMode !== 'note'" :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage())" alt="Preview" class="relative z-10 w-full h-full object-contain p-4 transition-all duration-500">
                     
                     <!-- Hovered Item Label Overlay -->
-                    <div x-show="hoveredName" x-transition class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-mono tracking-widest text-[#C5A880] uppercase z-20 border border-neutral-800/50">
+                    <div x-show="hoveredName && viewMode !== 'note'" x-transition class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-mono tracking-widest text-[#C5A880] uppercase z-20 border border-neutral-800/50">
                         Viewing: <span class="text-white" x-text="hoveredName"></span>
+                    </div>
+
+                    <!-- Note Preview Card -->
+                    <div x-show="viewMode === 'note'" x-transition.opacity class="absolute inset-0 z-20 flex items-center justify-center p-6 bg-[#070709]/80 backdrop-blur-md">
+                        <div class="w-full max-w-[260px] h-[190px] rounded-lg shadow-[0_15px_30px_rgba(0,0,0,0.5)] p-4 border flex flex-col justify-between transition-all duration-300"
+                             :class="{
+                                 'bg-[#FAF8F5] border-[#C5A880]/30 text-neutral-800': $wire.cardPrintPreference === 'handwritten',
+                                 'bg-white border-neutral-200 text-neutral-900': $wire.cardPrintPreference === 'typography'
+                             }">
+                            <div class="w-full h-full border border-dashed border-[#C5A880]/20 p-2 flex flex-col justify-between relative overflow-hidden">
+                                <!-- Card Header/Logo -->
+                                <div class="text-center">
+                                    <span class="text-[8px] font-mono tracking-[0.3em] uppercase text-[#C5A880]/80">Noir & Bloom</span>
+                                    <div class="w-8 h-[1px] bg-[#C5A880]/30 mx-auto mt-0.5"></div>
+                                </div>
+                                
+                                <!-- Card Message -->
+                                <div class="flex-1 flex items-center justify-center text-center px-1 overflow-y-auto min-h-0">
+                                    <template x-if="!hasCard">
+                                        <p class="text-[9px] text-neutral-400 font-mono uppercase tracking-wider">Greeting Card Disabled</p>
+                                    </template>
+                                    <template x-if="hasCard && (!cardMessage || cardMessage.trim() === '')">
+                                        <p class="text-[10px] text-neutral-400 italic">Write your premium message...</p>
+                                    </template>
+                                    <template x-if="hasCard && cardMessage && cardMessage.trim() !== ''">
+                                        <p class="text-sm leading-relaxed break-words max-h-full overflow-y-auto"
+                                           :style="$wire.cardPrintPreference === 'handwritten' ? 'font-family: \'Great Vibes\', \'Georgia\', cursive; font-size: 17px; color: #1c1917;' : 'font-family: \'Playfair Display\', \'Georgia\', serif; font-size: 11px; color: #1c1917;'">
+                                            <span x-text="cardMessage"></span>
+                                        </p>
+                                    </template>
+                                </div>
+
+                                <!-- Card Footer Decor -->
+                                <div class="text-center text-[7px] font-mono tracking-widest text-[#C5A880]/50 uppercase">
+                                    Bespoke Curation
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -478,14 +518,14 @@
                 </div>
                 <p class="text-xs text-neutral-450 font-light mt-1">Select the occasion for this bespoke curation to tailor the design philosophy and personalization.</p>
                 
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
                     <template x-for="occ in [
-                        { id: 'birthday', label: 'Birthday Celebration', desc: 'Festive & vibrant hues' },
-                        { id: 'anniversary', label: 'Anniversary & Love', desc: 'Romantic deep reds & pastels' },
-                        { id: 'graduation', label: 'Graduation & Success', desc: 'Bright, celebratory blends' },
-                        { id: 'romance', label: 'Romantic Gesture', desc: 'Classic expressions of passion' },
-                        { id: 'vase_bundle', label: 'Vase Bundle (Home/Office)', desc: 'Elegant, structural defaults' },
-                        { id: 'sympathy', label: 'Sympathy & Comfort', desc: 'Serene whites & soft tones' }
+                        { id: 'birthday', label: 'Birthday Celebration', desc: 'Festive & vibrant hues', img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&q=80&w=300' },
+                        { id: 'anniversary', label: 'Anniversary & Love', desc: 'Romantic deep reds & pastels', img: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&q=80&w=300' },
+                        { id: 'graduation', label: 'Graduation & Success', desc: 'Bright, celebratory blends', img: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=300' },
+                        { id: 'romance', label: 'Romantic Gesture', desc: 'Classic expressions of passion', img: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&q=80&w=300' },
+                        { id: 'vase_bundle', label: 'Vase Bundle (Home/Office)', desc: 'Elegant, structural defaults', img: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&q=80&w=300' },
+                        { id: 'sympathy', label: 'Sympathy & Comfort', desc: 'Serene whites & soft tones', img: 'https://images.unsplash.com/photo-1528255671579-01b9e182ed1d?auto=format&fit=crop&q=80&w=300' }
                     ]" :key="occ.id">
                         <button 
                             type="button"
@@ -496,8 +536,14 @@
                                 'bg-white/80': theme === 'light',
                                 'bg-[#09090D]/40': theme !== 'light'
                             }"
-                            class="flex flex-col text-left p-4 rounded-2xl border transition-all cursor-pointer group"
+                            class="flex flex-col text-left p-3.5 rounded-2xl border transition-all cursor-pointer group"
                         >
+                            <!-- Occasion Visual Preview Card -->
+                            <div class="w-full h-24 rounded-xl overflow-hidden mb-3 relative bg-neutral-900 shadow-inner">
+                                <img :src="occ.img" :alt="occ.label" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-90">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent"></div>
+                            </div>
+                            
                             <span class="text-xs font-semibold group-hover:text-[#C5A880] transition-colors" x-text="occ.label"></span>
                             <span class="text-[9px] text-neutral-455 mt-1 leading-normal" x-text="occ.desc"></span>
                         </button>
@@ -911,7 +957,6 @@
 
                 @if($cardProduct)
                     <div 
-                        @click="$wire.toggleCard()"
                         @mouseenter="hoveredImage = '{{ $cardProduct->image_url }}'; hoveredName = '{{ addslashes($cardProduct->name) }}';"
                         @mouseleave="hoveredImage = null; hoveredName = null;"
                         :class="{
@@ -920,42 +965,80 @@
                             'bg-white/80': theme === 'light',
                             'bg-[#09090D]/40': theme !== 'light'
                         }"
-                        class="flex items-center justify-between p-5 rounded-2xl border transition-all cursor-pointer group"
+                        class="p-5 rounded-2xl border transition-all duration-300 relative"
                     >
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full border border-neutral-800 flex items-center justify-center text-[#C5A880] bg-neutral-900/30 font-serif">✍</div>
-                            <div>
-                                <h4 class="text-xs font-semibold group-hover:text-[#C5A880] transition-colors">Include Luxury Handwritten Calligraphy Letter</h4>
-                                <p class="text-[10px] text-[#C5A880] font-mono mt-0.5 font-semibold">+{{ number_format($cardProduct->price) }} KSH</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full border border-neutral-800 flex items-center justify-center text-[#C5A880] bg-neutral-900/30 font-serif">✍</div>
+                                <div>
+                                    <h4 class="text-xs font-semibold">Include Luxury Greeting Card Note</h4>
+                                    <p class="text-[10px] text-[#C5A880] font-mono mt-0.5 font-semibold">+{{ number_format($cardProduct->price) }} KSH</p>
+                                </div>
                             </div>
+                            
+                                                  <button 
+                                type="button" 
+                                @click="$wire.toggleCard(); if(!hasCard) { viewMode = 'note'; }"
+                                :class="hasCard ? 'bg-[#C5A880]' : 'bg-neutral-800'" 
+                                class="relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                            >
+                                <span :class="hasCard ? 'translate-x-5' : 'translate-x-0'" class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-black shadow ring-0 transition duration-200 ease-in-out"></span>
+                            </button>
                         </div>
-                        <div class="w-5 h-5 rounded-full border border-neutral-600 flex items-center justify-center shrink-0" :class="hasCard ? 'bg-[#C5A880] border-transparent text-black' : ''">
-                            <span x-show="hasCard" class="text-[10px] font-bold">✓</span>
+
+                        <!-- Card Message & Options Editor box -->
+                        <div 
+                            x-show="hasCard" 
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 -translate-y-2"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            class="mt-6 pt-6 border-t border-neutral-500/10 space-y-5"
+                            style="display: none;"
+                        >
+                            <!-- Print Preference Selector -->
+                            <div class="space-y-2.5">
+                                <label class="text-[10px] uppercase tracking-widest font-mono text-neutral-450 block font-bold">Calligraphy or Printing Style</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <button 
+                                        type="button" 
+                                        @click="$wire.set('cardPrintPreference', 'handwritten'); viewMode = 'note';" 
+                                        :class="$wire.cardPrintPreference === 'handwritten' ? 'border-[#C5A880] bg-[#C5A880]/15 text-[#C5A880]' : 'border-neutral-800 text-neutral-450 hover:border-neutral-700'" 
+                                        class="p-4 border rounded-2xl text-left transition-all cursor-pointer group bg-transparent"
+                                    >
+                                        <span class="block text-xs font-semibold group-hover:text-[#C5A880] transition-colors">Handwritten Calligraphy</span>
+                                        <span class="block text-[9px] text-neutral-500 mt-1 leading-normal">Exquisitely written by hand in gold ink on cotton paper by our expert calligraphers.</span>
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        @click="$wire.set('cardPrintPreference', 'typography'); viewMode = 'note';" 
+                                        :class="$wire.cardPrintPreference === 'typography' ? 'border-[#C5A880] bg-[#C5A880]/15 text-[#C5A880]' : 'border-neutral-800 text-neutral-455 hover:border-neutral-700'" 
+                                        class="p-4 border rounded-2xl text-left transition-all cursor-pointer group bg-transparent"
+                                    >
+                                        <span class="block text-xs font-semibold group-hover:text-[#C5A880] transition-colors">Printed Typography</span>
+                                        <span class="block text-[9px] text-neutral-500 mt-1 leading-normal">Machine-printed in an elegant, classic serif typeface for neat and legible formatting.</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Message text area -->
+                            <div class="space-y-3">
+                                <label class="text-[10px] uppercase tracking-widest font-mono text-neutral-450 block font-bold">Write Your Greeting Message</label>
+                                <textarea 
+                                    wire:model.live="cardMessage"
+                                    @focus="viewMode = 'note'"
+                                    @input="viewMode = 'note'"
+                                    placeholder="Type your birthday greeting or special note here... e.g. happy birthday"
+                                    rows="4"
+                                    :class="{
+                                        'bg-black/35 border-neutral-800 focus:border-[#C5A880]': theme !== 'light',
+                                        'bg-white border-neutral-350 focus:border-[#C5A880]': theme === 'light'
+                                    }"
+                                    class="w-full rounded-2xl p-4 text-xs font-light tracking-wide outline-none transition-colors border shadow-inner placeholder-neutral-500 font-sans"
+                                ></textarea>
+                            </div>
                         </div>
                     </div>
                 @endif
-
-                <!-- Card Message Editor box -->
-                <div 
-                    x-show="hasCard" 
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 -translate-y-2"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    class="space-y-3 pt-2"
-                    style="display: none;"
-                >
-                    <label class="text-[10px] uppercase tracking-widest font-mono text-neutral-450 block font-bold">Write Your Calligraphy Message</label>
-                    <textarea 
-                        wire:model.live="cardMessage"
-                        placeholder="Type your birthday greeting or special note here... e.g. happy birthday"
-                        rows="4"
-                        :class="{
-                            'bg-black/35 border-neutral-800 focus:border-[#C5A880]': theme !== 'light',
-                            'bg-white border-neutral-350 focus:border-[#C5A880]': theme === 'light'
-                        }"
-                        class="w-full rounded-2xl p-4 text-xs font-light tracking-wide outline-none transition-colors border shadow-inner placeholder-neutral-500 font-sans"
-                    ></textarea>
-                </div>
             </section>
         </div>
     </main>
@@ -1556,7 +1639,7 @@
         });
     </script>
 
-        <!-- Backdrop for Profile Modal -->
+                <!-- Backdrop for Profile Modal -->
     <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Profile Overlay Panel (Center Modal) -->
@@ -1758,7 +1841,11 @@
                                 default => 'text-neutral-400 bg-neutral-500/10 border-neutral-500/20'
                             };
                         @endphp
-                        <div x-data="{ expanded: false }" class="border p-4 rounded-2xl transition-all {{ $notifCls }} flex flex-col gap-2 relative group text-xs">
+                        <div 
+                            x-data="{ expanded: false }" 
+                            @mouseenter="if (!{{ $notif['is_read'] ? 'true' : 'false' }}) { $wire.markNotificationAsRead({{ $notif['id'] }}) }"
+                            class="border p-4 rounded-2xl transition-all {{ $notifCls }} flex flex-col gap-2 relative group text-xs"
+                        >
                             @if(!$notif['is_read'])
                                 <span class="absolute top-4 right-4 w-2 h-2 rounded-full"
                                       :class="{
@@ -1782,14 +1869,6 @@
                                     {{ $notif['message'] }}
                                 </p>
                             </div>
-
-                            <div class="flex items-center space-x-2 pt-2 border-t border-neutral-500/5 mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                                @if(!$notif['is_read'])
-                                    <button wire:click="markNotificationAsRead({{ $notif['id'] }})" :class="theme === 'light' ? 'text-black' : 'text-[#C5A880]'" class="text-[9px] font-mono uppercase tracking-widest hover:underline cursor-pointer">
-                                        [ Mark Read ]
-                                    </button>
-                                @endif
-                            </div>
                         </div>
                     @empty
                         <div class="text-center py-12 text-neutral-500 text-xs flex flex-col items-center justify-center space-y-2">
@@ -1808,11 +1887,21 @@
             
             @auth
                 @if(count($notificationsList) > 0)
-                    <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-4 border-t flex items-center justify-between shrink-0">
-                        <button wire:click="markAllAsSeen" :class="theme === 'light' ? 'text-neutral-500 hover:text-black' : 'text-neutral-500 hover:text-[#C5A880]'" class="text-[10px] font-mono uppercase tracking-widest cursor-pointer">
-                            [ Mark All as Read ]
+                    <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-4 flex items-center justify-between gap-4 shrink-0 border-t">
+                        <button 
+                            wire:click="markAllAsSeen" 
+                            :class="theme === 'light' 
+                                ? 'border-neutral-350 text-neutral-700 hover:bg-neutral-150 hover:text-black' 
+                                : 'border-[#C5A880]/30 text-[#C5A880] hover:bg-[#C5A880]/10'" 
+                            class="border font-mono font-bold uppercase tracking-wider py-2 px-4 rounded-full text-[9px] transition-all cursor-pointer bg-transparent"
+                        >
+                            Mark All as Read
                         </button>
-                        <button @click="notificationsOpen = false" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" class="text-[9px] font-mono font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all cursor-pointer">
+                        <button 
+                            @click="notificationsOpen = false" 
+                            :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" 
+                            class="font-mono font-bold uppercase tracking-wider px-5 py-2 rounded-full text-[9px] transition-all cursor-pointer shadow-md"
+                        >
                             Dismiss
                         </button>
                     </div>

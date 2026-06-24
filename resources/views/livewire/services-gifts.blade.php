@@ -368,6 +368,100 @@
             </p>
         </div>
 
+        <!-- Bespoke Services Marketing Hero Slider (4 Ads) -->
+        <section class="mb-12 relative rounded-[32px] overflow-hidden shadow-2xl border transition-colors duration-500"
+                 :class="theme === 'light' ? 'border-neutral-200' : 'border-neutral-850'"
+                 x-data="{ 
+                     activeSlide: 0,
+                     slidesCount: 4,
+                     autoPlayInterval: null,
+                     startAutoPlay() {
+                         this.autoPlayInterval = setInterval(() => {
+                             this.activeSlide = (this.activeSlide + 1) % this.slidesCount;
+                         }, 6000);
+                     },
+                     stopAutoPlay() {
+                         if (this.autoPlayInterval) clearInterval(this.autoPlayInterval);
+                     }
+                 }"
+                 x-init="startAutoPlay()"
+                 @mouseenter="stopAutoPlay()"
+                 @mouseleave="startAutoPlay()"
+        >
+            <div class="relative w-full h-[360px] md:h-[420px] overflow-hidden bg-black">
+                <!-- Slide 1 -->
+                <div x-show="activeSlide === 0" x-transition:enter="transition ease-out duration-700" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" x-transition:leave="transition ease-in duration-500" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute inset-0 w-full h-full">
+                    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200" alt="Bespoke Weddings & Galas" class="absolute inset-0 w-full h-full object-cover brightness-[0.6] hover:brightness-[0.75] transition-all duration-500 scale-105" :class="activeSlide === 0 ? 'scale-100' : 'scale-105'">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 flex flex-col justify-end p-8 md:p-12 text-left space-y-3.5">
+                        <span class="text-[10px] font-mono uppercase tracking-[0.3em] text-[#C5A880] font-bold">✦ Signature Event Design</span>
+                        <h2 class="text-2xl md:text-4xl font-serif italic text-white tracking-wide leading-tight max-w-2xl">Bespoke Weddings &amp; Immersive Galas</h2>
+                        <p class="text-xs md:text-sm font-light text-neutral-350 max-w-xl leading-relaxed">Uncompromising floral architecture and bespoke botanical landscaping designed to tell your custom love story.</p>
+                        <div class="pt-2">
+                            <a href="/profile-portal" class="inline-block bg-[#C5A880] hover:bg-[#B59A7A] text-black font-mono text-[10px] font-bold uppercase tracking-widest px-6 py-3 rounded-full transition-all shadow-lg">Schedule Consult</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div x-show="activeSlide === 1" x-transition:enter="transition ease-out duration-700" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" x-transition:leave="transition ease-in duration-500" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute inset-0 w-full h-full" style="display: none;">
+                    <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200" alt="Corporate Subscriptions" class="absolute inset-0 w-full h-full object-cover brightness-[0.6] hover:brightness-[0.75] transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 flex flex-col justify-end p-8 md:p-12 text-left space-y-3.5">
+                        <span class="text-[10px] font-mono uppercase tracking-[0.3em] text-[#C5A880] font-bold">✦ B2B Workspace Rotations</span>
+                        <h2 class="text-2xl md:text-4xl font-serif italic text-white tracking-wide leading-tight max-w-2xl">Corporate Office &amp; Showroom Subscriptions</h2>
+                        <p class="text-xs md:text-sm font-light text-neutral-350 max-w-xl leading-relaxed">Weekly curated design statements that elevate corporate workspace psychology and leave lasting brand impressions.</p>
+                        <div class="pt-2">
+                            <a href="/profile-portal" class="inline-block bg-[#C5A880] hover:bg-[#B59A7A] text-black font-mono text-[10px] font-bold uppercase tracking-widest px-6 py-3 rounded-full transition-all shadow-lg">Request Subscription</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div x-show="activeSlide === 2" x-transition:enter="transition ease-out duration-700" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" x-transition:leave="transition ease-in duration-500" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute inset-0 w-full h-full" style="display: none;">
+                    <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1200" alt="Private Home Rotations" class="absolute inset-0 w-full h-full object-cover brightness-[0.6] hover:brightness-[0.75] transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 flex flex-col justify-end p-8 md:p-12 text-left space-y-3.5">
+                        <span class="text-[10px] font-mono uppercase tracking-[0.3em] text-[#C5A880] font-bold">✦ Residential Curation</span>
+                        <h2 class="text-2xl md:text-4xl font-serif italic text-white tracking-wide leading-tight max-w-2xl">Bespoke Home Rotations &amp; Decor</h2>
+                        <p class="text-xs md:text-sm font-light text-neutral-350 max-w-xl leading-relaxed">Fresh, custom-curated designer arrays delivered directly to your residence on a flexible repeating calendar.</p>
+                        <div class="pt-2">
+                            <a href="/profile-portal" class="inline-block bg-[#C5A880] hover:bg-[#B59A7A] text-black font-mono text-[10px] font-bold uppercase tracking-widest px-6 py-3 rounded-full transition-all shadow-lg">Inquire Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4 -->
+                <div x-show="activeSlide === 3" x-transition:enter="transition ease-out duration-700" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" x-transition:leave="transition ease-in duration-500" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute inset-0 w-full h-full" style="display: none;">
+                    <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1200" alt="Luxury Hampers" class="absolute inset-0 w-full h-full object-cover brightness-[0.6] hover:brightness-[0.75] transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 flex flex-col justify-end p-8 md:p-12 text-left space-y-3.5">
+                        <span class="text-[10px] font-mono uppercase tracking-[0.3em] text-[#C5A880] font-bold">✦ Premium Gifting Suites</span>
+                        <h2 class="text-2xl md:text-4xl font-serif italic text-white tracking-wide leading-tight max-w-2xl">Curated Gift Hampers &amp; Treats</h2>
+                        <p class="text-xs md:text-sm font-light text-neutral-350 max-w-xl leading-relaxed">Tailored luxury gift bundles pairing fine wine, select chocolates, custom scent mists, and fresh stems.</p>
+                        <div class="pt-2">
+                            <a href="/profile-portal" class="inline-block bg-[#C5A880] hover:bg-[#B59A7A] text-black font-mono text-[10px] font-bold uppercase tracking-widest px-6 py-3 rounded-full transition-all shadow-lg">Order Custom Hamper</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide Indicators (Dots) -->
+            <div class="absolute bottom-5 right-8 z-30 flex items-center space-x-2">
+                <template x-for="(s, idx) in Array.from({length: slidesCount})" :key="idx">
+                    <button @click="activeSlide = idx" class="w-2.5 h-2.5 rounded-full transition-all duration-300 cursor-pointer" :class="activeSlide === idx ? 'bg-[#C5A880] w-6' : 'bg-white/40 hover:bg-white/80'"></button>
+                </template>
+            </div>
+
+            <!-- Navigation Arrows -->
+            <button @click="activeSlide = (activeSlide - 1 + slidesCount) % slidesCount" class="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/30 hover:bg-black/60 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer">
+                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+            <button @click="activeSlide = (activeSlide + 1) % slidesCount" class="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/30 hover:bg-black/60 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer">
+                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+        </section>
+
         @if(session('success_wishlist'))
             <div class="mb-6 p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl">
                 {{ session('success_wishlist') }}
@@ -586,6 +680,9 @@
                     <li>Sunday: 09:00 &mdash; 17:00</li>
                     <li class="pt-2"><span class="block text-neutral-500 font-mono text-[11px] uppercase tracking-wider">Hotline Direct</span> +254 (0) 712 345 678</li>
                     <li>concierge@noirbloom.co.ke</li>
+                    <li class="pt-2 border-t border-neutral-500/10"><span class="block text-neutral-500 font-mono text-[9px] uppercase tracking-wider">Administration</span>+254 (0) 712 345 679 &bull; admin@noirbloom.co.ke</li>
+                    <li><span class="block text-neutral-500 font-mono text-[9px] uppercase tracking-wider">Customer Relations</span>+254 (0) 712 345 680 &bull; support@noirbloom.co.ke</li>
+                    <li><span class="block text-neutral-500 font-mono text-[9px] uppercase tracking-wider">PR & Press</span>+254 (0) 712 345 681 &bull; pr@noirbloom.co.ke</li>
                 </ul>
             </div>
 
@@ -854,7 +951,7 @@
         </div>
     </div>
 
-        <!-- Backdrop for Profile Modal -->
+                <!-- Backdrop for Profile Modal -->
     <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Profile Overlay Panel (Center Modal) -->
@@ -1056,7 +1153,11 @@
                                 default => 'text-neutral-400 bg-neutral-500/10 border-neutral-500/20'
                             };
                         @endphp
-                        <div x-data="{ expanded: false }" class="border p-4 rounded-2xl transition-all {{ $notifCls }} flex flex-col gap-2 relative group text-xs">
+                        <div 
+                            x-data="{ expanded: false }" 
+                            @mouseenter="if (!{{ $notif['is_read'] ? 'true' : 'false' }}) { $wire.markNotificationAsRead({{ $notif['id'] }}) }"
+                            class="border p-4 rounded-2xl transition-all {{ $notifCls }} flex flex-col gap-2 relative group text-xs"
+                        >
                             @if(!$notif['is_read'])
                                 <span class="absolute top-4 right-4 w-2 h-2 rounded-full"
                                       :class="{
@@ -1080,14 +1181,6 @@
                                     {{ $notif['message'] }}
                                 </p>
                             </div>
-
-                            <div class="flex items-center space-x-2 pt-2 border-t border-neutral-500/5 mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                                @if(!$notif['is_read'])
-                                    <button wire:click="markNotificationAsRead({{ $notif['id'] }})" :class="theme === 'light' ? 'text-black' : 'text-[#C5A880]'" class="text-[9px] font-mono uppercase tracking-widest hover:underline cursor-pointer">
-                                        [ Mark Read ]
-                                    </button>
-                                @endif
-                            </div>
                         </div>
                     @empty
                         <div class="text-center py-12 text-neutral-500 text-xs flex flex-col items-center justify-center space-y-2">
@@ -1106,11 +1199,21 @@
             
             @auth
                 @if(count($notificationsList) > 0)
-                    <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-4 border-t flex items-center justify-between shrink-0">
-                        <button wire:click="markAllAsSeen" :class="theme === 'light' ? 'text-neutral-500 hover:text-black' : 'text-neutral-500 hover:text-[#C5A880]'" class="text-[10px] font-mono uppercase tracking-widest cursor-pointer">
-                            [ Mark All as Read ]
+                    <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-4 flex items-center justify-between gap-4 shrink-0 border-t">
+                        <button 
+                            wire:click="markAllAsSeen" 
+                            :class="theme === 'light' 
+                                ? 'border-neutral-350 text-neutral-700 hover:bg-neutral-150 hover:text-black' 
+                                : 'border-[#C5A880]/30 text-[#C5A880] hover:bg-[#C5A880]/10'" 
+                            class="border font-mono font-bold uppercase tracking-wider py-2 px-4 rounded-full text-[9px] transition-all cursor-pointer bg-transparent"
+                        >
+                            Mark All as Read
                         </button>
-                        <button @click="notificationsOpen = false" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" class="text-[9px] font-mono font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all cursor-pointer">
+                        <button 
+                            @click="notificationsOpen = false" 
+                            :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" 
+                            class="font-mono font-bold uppercase tracking-wider px-5 py-2 rounded-full text-[9px] transition-all cursor-pointer shadow-md"
+                        >
                             Dismiss
                         </button>
                     </div>

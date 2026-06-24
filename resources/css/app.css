@@ -324,6 +324,26 @@ html { scroll-behavior: smooth; }
   color: #1C1917 !important;
 }
 
+/* Ensure buttons with white/light text and dark backgrounds retain legibility in light theme */
+.champagne button.text-white,
+.champagne button [class*="text-white"],
+.champagne button.bg-emerald-850,
+.champagne button.bg-emerald-850 *,
+.champagne button.bg-emerald-800,
+.champagne button.bg-emerald-800 *,
+.champagne button[class*="bg-emerald-"],
+.champagne button[class*="bg-emerald-"] *,
+.champagne button.bg-neutral-950,
+.champagne button.bg-neutral-950 *,
+.champagne button.bg-neutral-900,
+.champagne button.bg-neutral-900 *,
+.champagne button.bg-black,
+.champagne button.bg-black *,
+.champagne a.bg-emerald-800,
+.champagne a.bg-emerald-800 * {
+  color: #FFFFFF !important;
+}
+
 /* Make highlighted texts/indicators legible on light bg */
 .champagne [class*="text-amber-500"],
 .champagne [class*="text-amber-400"] {
@@ -661,3 +681,31 @@ body.bg-scroll-locked .main-content-wrapper {
 .dark .border-neutral-700 {
   border-color: var(--border-base) !important;
 }
+
+/* Custom utility mappings for non-standard neutral shades to prevent browser rendering fallbacks */
+.text-neutral-350 { color: #d4d4d4 !important; }
+.text-neutral-450 { color: #a3a3a3 !important; }
+.text-neutral-550 { color: #737373 !important; }
+.text-neutral-850 { color: #262626 !important; }
+
+.bg-neutral-350 { background-color: #d4d4d4 !important; }
+.bg-neutral-450 { background-color: #a3a3a3 !important; }
+.bg-neutral-850 { background-color: #262626 !important; }
+
+.border-neutral-350 { border-color: #d4d4d4 !important; }
+.border-neutral-450 { border-color: #a3a3a3 !important; }
+.border-neutral-850 { border-color: #262626 !important; }
+
+.light .text-neutral-350 { color: #78716c !important; }
+.light .text-neutral-450 { color: #57534e !important; }
+.light .text-neutral-850 { color: #1c1917 !important; }
+.light .border-neutral-350 { border-color: #e8e2d5 !important; }
+.light .border-neutral-450 { border-color: #e8e2d5 !important; }
+.light .border-neutral-850 { border-color: #e8e2d5 !important; }
+
+.dark .text-neutral-350 { color: #a3a3a3 !important; }
+.dark .text-neutral-450 { color: #737373 !important; }
+.dark .text-neutral-850 { color: #e5e5e5 !important; }
+.dark .border-neutral-350 { border-color: #262626 !important; }
+.dark .border-neutral-450 { border-color: #262626 !important; }
+.dark .border-neutral-850 { border-color: #262626 !important; }

@@ -33,7 +33,7 @@
         <div class="mb-8 flex items-center justify-between">
             <button 
                 wire:click="closeView" 
-                class="bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-white text-xs font-mono uppercase tracking-wider px-4 py-2 rounded-sm border border-neutral-800 transition-all cursor-pointer"
+                class="border border-neutral-300 text-neutral-600 hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-white px-4 py-2 rounded-sm text-xs font-mono uppercase tracking-wider transition-all cursor-pointer bg-transparent"
             >
                 ← Back to Vendor List
             </button>
@@ -345,7 +345,7 @@
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
                 {{-- Modal Panel --}}
-                <div class="inline-block align-middle bg-[#0B0B0E] border border-neutral-900 rounded-sm text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="inline-block align-middle bg-[#0B0B0E] relative z-10 border border-neutral-900 rounded-sm text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                     <div class="px-6 py-6">
                         <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-white mb-6">
                             {{ $isEditMode ? 'Edit Vendor Details' : 'Register New Vendor' }}
@@ -459,7 +459,7 @@
                                 <button 
                                     type="button" 
                                     wire:click="$set('showModal', false)"
-                                    class="bg-neutral-900 hover:bg-neutral-800 text-neutral-400 text-xs font-mono uppercase tracking-wider px-4 py-2 rounded-sm transition-colors"
+                                    class="border border-neutral-300 text-neutral-600 hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-white px-4 py-2 rounded-sm text-xs font-mono uppercase tracking-wider transition-all bg-transparent cursor-pointer"
                                 >
                                     Cancel
                                 </button>

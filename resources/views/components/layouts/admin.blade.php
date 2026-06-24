@@ -53,7 +53,7 @@
         {{-- ─── Sidebar ─── --}}
         <aside
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-            class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border-base bg-bg-card transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto"
+            class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-border-base bg-bg-card transition-transform duration-300 ease-in-out lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:z-auto lg:self-start"
         >
             {{-- Brand Mark --}}
             <div class="px-6 pt-8 pb-6 border-b border-border-base/50">
