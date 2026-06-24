@@ -88,6 +88,9 @@ class MpesaService
     {
         $cleaned = preg_replace('/[^0-9]/', '', $phone);
         
+        if (str_starts_with($cleaned, '2540')) {
+            return '254' . substr($cleaned, 4);
+        }
         if (str_starts_with($cleaned, '0')) {
             return '254' . substr($cleaned, 1);
         }

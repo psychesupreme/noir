@@ -1,5 +1,11 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+@php
+    $initialTheme = 'light';
+    if (auth()->check()) {
+        $pref = auth()->user()->settings['preferred_theme'] ?? 'light';
+        $initialTheme = ($pref === 'onyx' || $pref === 'dark') ? 'dark' : 'light';
+    }
+@endphp
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ $initialTheme }}" data-theme="{{ $initialTheme }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +17,17 @@
     <!-- Persistent Theme Bootstrap -->
     <script>
         (function() {
-            const theme = localStorage.getItem('nb_theme') || 'onyx';
+            @auth
+                const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
+                let theme = (pref === 'onyx' || pref === 'dark') ? 'dark' : 'light';
+            @else
+                let theme = localStorage.getItem('nb_theme') || 'light';
+                if (theme === 'onyx' || theme === 'dark') {
+                    theme = 'dark';
+                } else {
+                    theme = 'light';
+                }
+            @endauth
             document.documentElement.className = theme;
             document.documentElement.setAttribute('data-theme', theme);
         })();
@@ -83,8 +99,8 @@
                             @click="sidebarOpen = false"
                             class="flex items-center space-x-3 px-4 py-2.5 text-xs tracking-wider rounded-sm transition-colors
                                 {{ $item['active']
-                                    ? 'bg-neutral-900/60 text-white border-l-2 border-amber-500'
-                                    : 'text-neutral-500 hover:text-neutral-300 hover:bg-neutral-900/30' }}"
+                                    ? 'bg-neutral-100 dark:bg-neutral-900/60 text-text-primary border-l-2 border-brand-accent font-semibold'
+                                    : 'text-text-secondary hover:text-text-primary hover:bg-neutral-100/50 dark:hover:bg-neutral-900/30' }}"
                         >
                             <span class="w-5 text-center">{{ $item['icon'] }}</span>
                             <span class="uppercase">{{ $item['label'] }}</span>
@@ -97,10 +113,10 @@
             <div class="border-t border-border-base px-5 py-5">
                 @auth
                     <div class="mb-3">
-                        <p class="text-xs font-medium text-neutral-200 truncate">{{ auth()->user()->name }}</p>
-                        <p class="text-[10px] text-neutral-600 truncate mt-0.5" style="font-family: ui-monospace, SFMono-Regular, monospace;">{{ auth()->user()->email }}</p>
+                        <p class="text-xs font-medium text-text-primary truncate">{{ auth()->user()->name }}</p>
+                        <p class="text-[10px] text-text-secondary truncate mt-0.5" style="font-family: ui-monospace, SFMono-Regular, monospace;">{{ auth()->user()->email }}</p>
                         @if (auth()->user()->account_tier)
-                            <span class="mt-2 inline-block text-[9px] tracking-[0.2em] uppercase px-2 py-0.5 rounded-sm bg-amber-950/40 text-amber-400 border border-amber-900/30">
+                            <span class="mt-2 inline-block text-[9px] tracking-[0.2em] uppercase px-2 py-0.5 rounded-sm bg-brand-accent/10 text-brand-accent border border-brand-accent/20">
                                 {{ auth()->user()->account_tier->value ?? 'Standard' }}
                             </span>
                         @endif
@@ -111,7 +127,7 @@
                     @csrf
                     <button
                         type="submit"
-                        class="w-full flex items-center justify-center space-x-2 px-3 py-2 text-[10px] tracking-[0.2em] uppercase text-neutral-500 hover:text-rose-400 hover:bg-neutral-900/30 rounded-sm transition-colors"
+                        class="w-full flex items-center justify-center space-x-2 px-3 py-2 text-[10px] tracking-[0.2em] uppercase text-text-secondary hover:text-rose-500 hover:bg-neutral-100 dark:hover:bg-neutral-900/30 rounded-sm transition-colors"
                     >
                         <span>↗</span>
                         <span>Sign Out</span>
@@ -129,7 +145,7 @@
                 <div class="flex items-center space-x-4">
                     <button
                         @click="sidebarOpen = !sidebarOpen"
-                        class="lg:hidden text-neutral-500 hover:text-neutral-200 transition-colors"
+                        class="lg:hidden text-text-secondary hover:text-text-primary transition-colors"
                         aria-label="Toggle sidebar"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -138,8 +154,8 @@
                     </button>
 
                     <div>
-                        <p class="text-[10px] tracking-[0.25em] uppercase text-neutral-600" style="font-family: ui-monospace, SFMono-Regular, monospace;">Administration</p>
-                        <h2 class="text-sm font-medium text-neutral-200 tracking-wide">{{ $title ?? 'Dashboard' }}</h2>
+                        <p class="text-[10px] tracking-[0.25em] uppercase text-text-secondary" style="font-family: ui-monospace, SFMono-Regular, monospace;">Administration</p>
+                        <h2 class="text-sm font-medium text-text-primary tracking-wide">{{ $title ?? 'Dashboard' }}</h2>
                     </div>
                 </div>
 
@@ -147,13 +163,13 @@
                 <div class="flex items-center space-x-4">
                     <a
                         href="/"
-                        class="text-[10px] tracking-[0.2em] uppercase text-neutral-600 hover:text-amber-400 transition-colors"
+                        class="text-[10px] tracking-[0.2em] uppercase text-text-secondary hover:text-brand-accent transition-colors"
                     >
                         ← Storefront
                     </a>
 
-                    <div class="h-8 w-8 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center">
-                        <span class="text-[10px] font-medium text-neutral-400">
+                    <div class="h-8 w-8 rounded-full bg-bg-card border border-border-base flex items-center justify-center">
+                        <span class="text-[10px] font-medium text-text-secondary">
                             @auth
                                 {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                             @else

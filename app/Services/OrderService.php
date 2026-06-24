@@ -36,7 +36,35 @@ class OrderService
             foreach ($order->products as $product) {
                 $product->adjustment_reason = "Fulfillment of Order #NB-ORD-" . str_pad($order->id, 4, '0', STR_PAD_LEFT);
                 $product->adjustment_branch_id = $order->branch_id;
-                $product->stock = max(0, $product->stock - $product->pivot->quantity);
+                $size = $product->pivot->size ?? 'standard';
+                
+                if ($product->sizes && is_array($product->sizes)) {
+                    $sizes = $product->sizes;
+                    $updated = false;
+                    foreach ($sizes as $idx => $s) {
+                        if (strtolower($s['name']) === strtolower($size)) {
+                            $sizes[$idx]['stock'] = max(0, $sizes[$idx]['stock'] - $product->pivot->quantity);
+                            $updated = true;
+                            break;
+                        }
+                    }
+                    if ($updated) {
+                        $product->sizes = $sizes;
+                        $totalStock = 0;
+                        foreach ($sizes as $s) {
+                            $totalStock += (int)$s['stock'];
+                        }
+                        $product->stock = $totalStock;
+                    }
+                } else {
+                    $multiplier = match($size) {
+                        'deluxe' => 2,
+                        'grand' => 3,
+                        default => 1,
+                    };
+                    $stockDelta = $product->pivot->quantity * $multiplier;
+                    $product->stock = max(0, $product->stock - $stockDelta);
+                }
                 $product->save();
             }
 
@@ -92,7 +120,35 @@ class OrderService
                 foreach ($order->products as $product) {
                     $product->adjustment_reason = "Requisition cancellation of Order #NB-ORD-" . str_pad($order->id, 4, '0', STR_PAD_LEFT);
                     $product->adjustment_branch_id = $order->branch_id;
-                    $product->stock = $product->stock + $product->pivot->quantity;
+                    $size = $product->pivot->size ?? 'standard';
+                    
+                    if ($product->sizes && is_array($product->sizes)) {
+                        $sizes = $product->sizes;
+                        $updated = false;
+                        foreach ($sizes as $idx => $s) {
+                            if (strtolower($s['name']) === strtolower($size)) {
+                                $sizes[$idx]['stock'] = $sizes[$idx]['stock'] + $product->pivot->quantity;
+                                $updated = true;
+                                break;
+                            }
+                        }
+                        if ($updated) {
+                            $product->sizes = $sizes;
+                            $totalStock = 0;
+                            foreach ($sizes as $s) {
+                                $totalStock += (int)$s['stock'];
+                            }
+                            $product->stock = $totalStock;
+                        }
+                    } else {
+                        $multiplier = match($size) {
+                            'deluxe' => 2,
+                            'grand' => 3,
+                            default => 1,
+                        };
+                        $stockDelta = $product->pivot->quantity * $multiplier;
+                        $product->stock = $product->stock + $stockDelta;
+                    }
                     $product->save();
                 }
 

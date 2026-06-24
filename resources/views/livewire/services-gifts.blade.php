@@ -854,24 +854,24 @@
         </div>
     </div>
 
-    <!-- Backdrop for Profile Modal -->
-    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/40 backdrop-blur-xl" style="display: none;"></div>
+        <!-- Backdrop for Profile Modal -->
+    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Profile Overlay Panel (Center Modal) -->
     <div 
         x-show="profileOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'light' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
+        :class="theme === 'light' ? 'bg-[#FAF7F0]/95 border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#121110]/95 border border-[#C5A880]/20 text-white shadow-2xl'"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden transition-all duration-300"
         style="display: none;"
     >
-        <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
+        <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-5 border-b flex items-center justify-between shrink-0">
             <div>
                 <h3 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Profile Portal</h3>
                 <span class="text-[9px] text-neutral-500 font-light">Atelier Customer Account</span>
             </div>
-            <button @click="profileOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Modal">
+            <button @click="profileOpen = false" :class="theme === 'light' ? 'text-neutral-400 hover:text-neutral-800' : 'text-neutral-500 hover:text-[#C5A880]'" class="cursor-pointer select-none transition-colors" title="Close Modal">
                 <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
                     <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -887,15 +887,15 @@
                 @endphp
                 <!-- Profile Header Segment -->
                 <div class="flex items-center space-x-4 pb-4 border-b border-neutral-500/10">
-                    <div class="w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-tr from-neutral-955 via-neutral-900 to-neutral-955 border-2 shadow-md shrink-0"
+                    <div class="w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-tr from-neutral-950 via-neutral-900 to-neutral-955 border-2 shadow-md shrink-0"
                          :class="{
                              'border-[#C5A880]/40': theme === 'dark',
-                             'border-emerald-600/40': theme === 'light',
+                             'border-[#B59A7A]/40': theme === 'light',
                          }">
                         <span class="text-base font-mono font-bold tracking-wider"
                               :class="{
                                   'text-[#C5A880]': theme === 'dark',
-                                  'text-emerald-800': theme === 'light',
+                                  'text-[#B59A7A]': theme === 'light',
                               }">
                             {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
                         </span>
@@ -906,40 +906,40 @@
                             <span class="text-[8px] font-mono uppercase tracking-widest px-2 py-0.5 border rounded-full shrink-0"
                                   :class="{
                                       'border-[#C5A880]/30 bg-[#C5A880]/5 text-[#C5A880]': theme === 'dark',
-                                      'border-emerald-600/30 bg-emerald-50 text-emerald-800': theme === 'light',
+                                      'border-[#B59A7A]/30 bg-[#B59A7A]/5 text-[#B59A7A]': theme === 'light',
                                   }">
                                 {{ auth()->user()->loyalty_tier }}
                             </span>
                         </div>
-                        <span class="text-[10px] text-neutral-450 block font-mono tracking-tight">{{ auth()->user()->email }}</span>
+                        <span class="text-[10px] text-neutral-500 block font-mono tracking-tight">{{ auth()->user()->email }}</span>
                     </div>
                 </div>
 
                 <!-- Account Stats Grid -->
                 <div class="grid grid-cols-3 gap-2.5 text-center py-2">
-                    <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
-                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Client Since</span>
+                    <div :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-200 text-neutral-800' : 'bg-neutral-950/40 border-[#C5A880]/10 text-neutral-350'" class="p-3 border rounded-2xl">
+                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-555 block">Client Since</span>
                         <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ auth()->user()->created_at->format('M Y') }}</span>
                     </div>
-                    <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
-                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Total Curations</span>
+                    <div :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-200 text-neutral-800' : 'bg-neutral-950/40 border-[#C5A880]/10 text-neutral-350'" class="p-3 border rounded-2xl">
+                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-555 block">Total Curations</span>
                         <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ $totalOrdersCount }}</span>
                     </div>
-                    <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
-                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Active dispatches</span>
+                    <div :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-200 text-neutral-800' : 'bg-neutral-950/40 border-[#C5A880]/10 text-neutral-350'" class="p-3 border rounded-2xl">
+                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-555 block">Active dispatches</span>
                         <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ $activeOrdersCount }}</span>
                     </div>
                 </div>
 
                 <!-- Info Segment -->
                 <div class="space-y-3 font-sans py-1 text-xs">
-                    <div class="flex items-center space-x-2 text-neutral-400">
-                        <span class="font-bold text-[9px] uppercase tracking-wider text-[#C5A880]/80">Phone:</span>
+                    <div class="flex items-center space-x-2">
+                        <span :class="theme === 'light' ? 'text-[#B59A7A]' : 'text-[#C5A880]'" class="font-bold text-[9px] uppercase tracking-wider">Phone:</span>
                         <span class="font-mono" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->phone_number ?: 'Not Provided' }}</span>
                     </div>
 
                     <div class="leading-relaxed">
-                        <span class="font-bold text-[9px] uppercase tracking-wider text-[#C5A880]/80 block">Main Address</span>
+                        <span :class="theme === 'light' ? 'text-[#B59A7A]' : 'text-[#C5A880]'" class="font-bold text-[9px] uppercase tracking-wider block">Main Address</span>
                         <span class="block truncate" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" title="{{ auth()->user()->default_delivery_address }}">{{ auth()->user()->default_delivery_address ?: 'No Address Set' }}</span>
                         @if(auth()->user()->default_region)
                             <span class="text-[9px] font-mono text-neutral-500 uppercase tracking-wider block mt-0.5">{{ auth()->user()->default_region }}</span>
@@ -960,7 +960,7 @@
                                 <span class="loyalty-shimmer-text tracking-wide font-black">{{ number_format(auth()->user()->loyalty_points) }} PTS</span>
                             </span>
                         @else
-                            <span class="text-neutral-450 font-bold">{{ number_format(auth()->user()->loyalty_points) }} PTS</span>
+                            <span :class="theme === 'light' ? 'text-neutral-850' : 'text-white'" class="font-bold">{{ number_format(auth()->user()->loyalty_points) }} PTS</span>
                         @endif
                     </div>
                 </div>
@@ -968,10 +968,7 @@
                 <!-- Action Buttons -->
                 <div class="space-y-2.5 pt-4">
                     <a href="/profile-portal" 
-                       :class="{
-                           'bg-[#C5A880] hover:bg-[#B59A7A] text-black': theme === 'dark',
-                           'bg-emerald-800 hover:bg-emerald-950 text-white': theme === 'light',
-                       }"
+                       :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'"
                        class="w-full text-center font-mono font-bold uppercase tracking-wider py-3 rounded-full text-[10px] flex items-center justify-center space-x-2 transition-all transform hover:scale-[1.01] shadow-md cursor-pointer"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -983,10 +980,7 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" 
-                                :class="{
-                                    'border-neutral-800 text-neutral-400 hover:text-rose-500 hover:border-rose-950': theme === 'dark',
-                                    'border-neutral-200 text-neutral-500 hover:text-rose-600 hover:border-rose-250': theme === 'light',
-                                }"
+                                :class="theme === 'light' ? 'border-neutral-250 text-neutral-550 hover:text-rose-600 hover:border-rose-300' : 'border-neutral-850 text-neutral-400 hover:text-rose-450 hover:border-rose-900/50'"
                                 class="w-full border font-mono font-bold uppercase tracking-wider py-2.5 rounded-full text-[9px] flex items-center justify-center space-x-2 transition-all cursor-pointer bg-transparent"
                         >
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -999,7 +993,7 @@
             @else
                 <div class="text-center py-2.5 space-y-4">
                     <span class="font-serif text-xl italic block" :class="theme === 'light' ? 'text-[#B59A7A]' : 'text-[#C5A880]'">Atelier Loyalty Circle</span>
-                    <p class="text-neutral-450 font-light text-[11px] leading-relaxed">Sign in to track orders, manage billing profiles, and earn loyalty rewards.</p>
+                    <p class="text-neutral-500 font-light text-[11px] leading-relaxed">Sign in to track orders, manage billing profiles, and earn loyalty rewards.</p>
                     <div class="flex flex-col gap-2.5 pt-1">
                         <a href="/login" 
                            :class="theme === 'light' ? 'bg-[#B59A7A] text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'"
@@ -1008,7 +1002,7 @@
                             Sign In
                         </a>
                         <a href="/register" 
-                           :class="theme === 'light' ? 'border-neutral-250 text-neutral-600 hover:text-[#B59A7A]' : 'border-neutral-800 text-neutral-450 hover:text-[#C5A880]'"
+                           :class="theme === 'light' ? 'border-neutral-250 text-neutral-600 hover:text-[#B59A7A]' : 'border-neutral-850 text-neutral-400 hover:text-[#C5A880]'"
                            class="border font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] text-center block"
                         >
                             Create Account
@@ -1019,24 +1013,25 @@
         </div>
     </div>
 
-    <!-- Backdrop for Notifications Modal -->
-    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-45 bg-black/40 backdrop-blur-xl" style="display: none;"></div>
+
+        <!-- Backdrop for Notifications Modal -->
+    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Notifications Overlay Panel (Center Modal) -->
     <div 
         x-show="notificationsOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'light' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[80vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
+        :class="theme === 'light' ? 'bg-[#FAF7F0]/95 border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#121110]/95 border border-[#C5A880]/20 text-white shadow-2xl'"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[80vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden transition-all duration-300"
         style="display: none;"
     >
-        <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
+        <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-5 border-b flex items-center justify-between shrink-0">
             <div>
                 <h3 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Notification Log</h3>
                 <span class="text-[9px] text-neutral-500 font-light">Inbox logs & system alerts</span>
             </div>
-            <button @click="notificationsOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Modal">
+            <button @click="notificationsOpen = false" :class="theme === 'light' ? 'text-neutral-400 hover:text-neutral-800' : 'text-neutral-500 hover:text-[#C5A880]'" class="cursor-pointer select-none transition-colors" title="Close Modal">
                 <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
                     <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -1080,21 +1075,18 @@
                             </div>
 
                             <div>
-                                <h4 class="font-serif italic text-xs tracking-wide font-semibold text-text-primary">{{ $notif['title'] }}</h4>
-                                <p @click="expanded = !expanded" class="text-[11px] text-neutral-450 leading-relaxed font-light mt-1 cursor-pointer" :class="{ 'line-clamp-2': !expanded }">
+                                <h4 :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="font-serif italic text-xs tracking-wide font-semibold">{{ $notif['title'] }}</h4>
+                                <p @click="expanded = !expanded" :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-400'" class="text-[11px] leading-relaxed font-light mt-1 cursor-pointer" :class="{ 'line-clamp-2': !expanded }">
                                     {{ $notif['message'] }}
                                 </p>
                             </div>
 
                             <div class="flex items-center space-x-2 pt-2 border-t border-neutral-500/5 mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
                                 @if(!$notif['is_read'])
-                                    <button wire:click="markNotificationAsRead({{ $notif['id'] }})" class="text-[9px] font-mono uppercase tracking-widest text-[#C5A880] hover:underline cursor-pointer">
+                                    <button wire:click="markNotificationAsRead({{ $notif['id'] }})" :class="theme === 'light' ? 'text-black' : 'text-[#C5A880]'" class="text-[9px] font-mono uppercase tracking-widest hover:underline cursor-pointer">
                                         [ Mark Read ]
                                     </button>
                                 @endif
-                                <button wire:click="deleteNotification({{ $notif['id'] }})" class="text-[9px] font-mono uppercase tracking-widest text-neutral-500 hover:text-red-400 hover:underline cursor-pointer">
-                                    [ Delete ]
-                                </button>
                             </div>
                         </div>
                     @empty
@@ -1114,11 +1106,11 @@
             
             @auth
                 @if(count($notificationsList) > 0)
-                    <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-4 border-t bg-neutral-500/5 flex items-center justify-between shrink-0">
-                        <button wire:click="clearAllNotifications" class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 hover:text-red-400 cursor-pointer">
-                            [ Clear All ]
+                    <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-4 border-t flex items-center justify-between shrink-0">
+                        <button wire:click="markAllAsSeen" :class="theme === 'light' ? 'text-neutral-500 hover:text-black' : 'text-neutral-500 hover:text-[#C5A880]'" class="text-[10px] font-mono uppercase tracking-widest cursor-pointer">
+                            [ Mark All as Read ]
                         </button>
-                        <button @click="notificationsOpen = false" class="bg-[#C5A880] hover:bg-[#B59A7A] text-black text-[9px] font-mono font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all cursor-pointer">
+                        <button @click="notificationsOpen = false" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" class="text-[9px] font-mono font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all cursor-pointer">
                             Dismiss
                         </button>
                     </div>
@@ -1126,5 +1118,6 @@
             @endauth
         </div>
     </div>
+
 
 </div>

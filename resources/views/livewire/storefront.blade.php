@@ -1221,7 +1221,7 @@
                                         <h3 :class="theme === 'light' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-sm font-serif italic tracking-wide leading-tight truncate">
                                             {{ $product->name }}
                                         </h3>
-                                        <p class="text-neutral-550 font-light text-[11px] leading-snug line-clamp-2">
+                                        <p class="text-neutral-500 font-light text-[11px] leading-snug line-clamp-2">
                                             {{ $product->description }}
                                         </p>
                                     </div>
@@ -1755,16 +1755,16 @@
                     </div>
 
                     <div :class="theme === 'light' ? 'bg-neutral-100 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-1 border rounded-full grid grid-cols-2 text-center text-[11px] font-mono uppercase tracking-wider shadow-inner">
-                        <button type="button" @click="$wire.set('checkoutType', 'standard')" :class="$wire.checkoutType === 'standard' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Personal Delivery</button>
-                        <button type="button" @click="$wire.set('checkoutType', 'corporate')" :class="$wire.checkoutType === 'corporate' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Corporate Billing</button>
+                        <button type="button" @click="$wire.set('checkoutType', 'standard')" :class="$wire.checkoutType === 'standard' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Personal Delivery</button>
+                        <button type="button" @click="$wire.set('checkoutType', 'corporate')" :class="$wire.checkoutType === 'corporate' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Corporate Billing</button>
                     </div>
 
                     @if($checkoutType === 'corporate')
-                        <div class="space-y-1.5 bg-black/10 border border-neutral-900 p-3 rounded-2xl">
+                        <div :class="theme === 'light' ? 'bg-[#FAF7F0]/40 border-neutral-200' : 'bg-black/25 border-[#C5A880]/15'" class="space-y-1.5 border p-3 rounded-2xl">
                             <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Remittance Protocol</label>
                             <div :class="theme === 'light' ? 'bg-neutral-100 border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="p-1 border rounded-full grid grid-cols-2 text-center text-[11px] font-mono uppercase tracking-wider shadow-inner">
-                                <button type="button" @click="$wire.set('paymentMethod', 'mpesa')" :class="$wire.paymentMethod === 'mpesa' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">M-Pesa Push</button>
-                                <button type="button" @click="$wire.set('paymentMethod', 'net_30')" :class="$wire.paymentMethod === 'net_30' ? 'bg-black text-white dark:bg-white dark:text-black font-bold' : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Credit Invoice (Net 30)</button>
+                                <button type="button" @click="$wire.set('paymentMethod', 'mpesa')" :class="$wire.paymentMethod === 'mpesa' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">M-Pesa Push</button>
+                                <button type="button" @click="$wire.set('paymentMethod', 'net_30')" :class="$wire.paymentMethod === 'net_30' ? (theme === 'light' ? 'bg-black text-white font-bold' : 'bg-[#C5A880] text-black font-bold shadow-md') : 'text-neutral-500'" class="py-1.5 rounded-full cursor-pointer transition-all">Credit Invoice (Net 30)</button>
                             </div>
                             @error('paymentMethod')
                                 <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span>
@@ -1778,12 +1778,12 @@
                                 <span :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="text-xs font-normal block">Send this order as a luxury gift delivery?</span>
                                 <span class="text-xs text-neutral-500 font-light block mt-0.5">Recipient delivery parameters will cleanly isolate away from receipt parameters.</span>
                             </div>
-                            <input type="checkbox" wire:model.live="is_gift" class="w-3.5 h-3.5 rounded text-black border-neutral-800 focus:ring-0 cursor-pointer">
+                            <input type="checkbox" wire:model.live="is_gift" :class="theme === 'light' ? 'text-black border-neutral-350 focus:ring-black' : 'text-[#C5A880] border-[#C5A880]/30 bg-neutral-950 focus:ring-[#C5A880]/60'" class="w-3.5 h-3.5 rounded cursor-pointer">
                         </div>
                     </div>
 
-                    <div x-show="$wire.is_gift" class="space-y-4 border border-dashed border-neutral-800 p-4 rounded-xl bg-black/5" style="display: none;" x-transition>
-                        <span class="text-[11px] font-mono uppercase text-amber-500 tracking-wider block font-bold">&bull; Recipient Delivery Profile</span>
+                    <div x-show="$wire.is_gift" :class="theme === 'light' ? 'border-[#B59A7A]/30 bg-[#FAF7F0]/40 text-neutral-800' : 'border-[#C5A880]/20 bg-[#C5A880]/5 text-[#C5A880]'" class="space-y-4 border border-dashed p-4 rounded-xl" style="display: none;" x-transition>
+                        <span class="text-[11px] font-mono uppercase tracking-wider block font-bold" :class="theme === 'light' ? 'text-[#B59A7A]' : 'text-[#C5A880]'">✦ Recipient Delivery Profile</span>
                         <div class="space-y-1">
                             <label class="text-xs uppercase tracking-wider text-neutral-500">Recipient Full Name *</label>
                             <input type="text" placeholder="Enter full recipient name" wire:model="recipient_name" :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
@@ -1797,7 +1797,7 @@
                     <div x-show="!$wire.is_gift" x-transition>
                         <div :class="theme === 'light' ? 'bg-neutral-100 text-black border-neutral-200' : 'bg-neutral-900/60 text-neutral-400 border-neutral-900'" class="p-3.5 border rounded-xl text-xs font-light space-y-1.5">
                             <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block pb-1 border-b border-neutral-500/10">Pre-authenticated Customer Ledger Record</span>
-                            <div><span class="text-neutral-500">Contact Payer:</span> <span class="font-semibold text-neutral-300 dark:text-white">{{ $full_name }}</span></div>
+                            <div><span class="text-neutral-500">Contact Payer:</span> <span class="font-semibold text-neutral-800 dark:text-white">{{ $full_name }}</span></div>
                             <div><span class="text-neutral-500">Secure Comm:</span> <span class="font-mono">{{ $phone }} &bull; {{ $email }}</span></div>
                             @if($checkoutType === 'corporate')
                                 <div><span class="text-neutral-500 font-mono">KRA PIN:</span> <span class="font-mono text-amber-500 font-semibold uppercase">{{ $kra_pin }}</span></div>
@@ -1808,30 +1808,30 @@
                     <div class="space-y-2">
                         <label class="text-xs uppercase tracking-wider text-neutral-500 block">Presentation Customization Packages (Pure delivery is free of added cost)</label>
                         <div class="grid grid-cols-1 gap-2">
-                            <button type="button" wire:click="$set('delivery_type', 'standard')" :class="$wire.delivery_type === 'standard' ? 'border-black dark:border-white bg-neutral-500/5 font-medium shadow-sm' : 'border-neutral-800 text-neutral-400'" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
+                            <button type="button" wire:click="$set('delivery_type', 'standard')" :class="$wire.delivery_type === 'standard' ? (theme === 'light' ? 'border-black bg-neutral-50 text-black font-semibold' : 'border-[#C5A880] bg-[#C5A880]/10 text-[#C5A880] font-semibold') : (theme === 'light' ? 'border-neutral-200 text-neutral-500 hover:border-neutral-350' : 'border-neutral-850 text-neutral-400 hover:border-neutral-700')" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
                                 <div><span class="block">Standard Courier Dispatch</span><span class="text-[11px] text-neutral-500 block mt-0.5">Premium transport routing directly to your destination building coordinates.</span></div>
                                 <span class="font-mono text-[11px]">+ 0 KSH</span>
                             </button>
-                            <button type="button" wire:click="$set('delivery_type', 'secret')" :class="$wire.delivery_type === 'secret' ? 'border-amber-600 bg-amber-950/10 text-amber-500 font-medium' : 'border-neutral-800 text-neutral-400'" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
+                            <button type="button" wire:click="$set('delivery_type', 'secret')" :class="$wire.delivery_type === 'secret' ? (theme === 'light' ? 'border-[#B59A7A] bg-[#B59A7A]/5 text-[#B59A7A] font-semibold' : 'border-[#C5A880] bg-[#C5A880]/15 text-[#C5A880] font-semibold') : (theme === 'light' ? 'border-neutral-200 text-neutral-500 hover:border-neutral-350' : 'border-neutral-850 text-neutral-400 hover:border-neutral-700')" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
                                 <div><span class="block">The Secret Admirer Protocol</span><span class="text-[11px] text-neutral-500 block mt-0.5">We will fully conceal your sender profile parameters behind wax-sealed card enclosures.</span></div>
-                                <span class="font-mono text-[11px] text-amber-500 font-semibold">+ 500 KSH</span>
+                                <span class="font-mono text-[11px] text-[#B59A7A] font-semibold">+ 500 KSH</span>
                             </button>
-                            <button type="button" wire:click="$set('delivery_type', 'concierge')" :class="$wire.delivery_type === 'concierge' ? 'border-emerald-600 bg-emerald-950/10 text-emerald-500 font-medium' : 'border-neutral-800 text-neutral-400'" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
+                            <button type="button" wire:click="$set('delivery_type', 'concierge')" :class="$wire.delivery_type === 'concierge' ? (theme === 'light' ? 'border-[#B59A7A] bg-[#B59A7A]/15 text-[#B59A7A] font-semibold' : 'border-[#C5A880] bg-[#C5A880]/25 text-[#C5A880] font-semibold') : (theme === 'light' ? 'border-neutral-200 text-neutral-500 hover:border-neutral-350' : 'border-neutral-850 text-neutral-400 hover:border-neutral-700')" class="p-3 border rounded-xl text-left flex justify-between items-center transition-all cursor-pointer">
                                 <div><span class="block">Uniformed Concierge Presentation</span><span class="text-[11px] text-neutral-500 block mt-0.5">Hand-delivered via sharp, uniformed corporate couriers. Elite tier presentation statement.</span></div>
-                                <span class="font-mono text-[11px] text-emerald-500 font-semibold">+ 1,500 KSH</span>
+                                <span class="font-mono text-[11px] text-[#B59A7A] font-semibold">+ 1,500 KSH</span>
                             </button>
                         </div>
                                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-550">Distribution Node *</label>
-                            <select wire:model.live="region" :class="theme === 'light' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
+                            <label class="text-xs uppercase tracking-wider text-neutral-500">Distribution Node *</label>
+                            <select wire:model.live="region" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
                                 <option value="Nairobi">Nairobi Metropolitan</option>
                                 <option value="Kiambu">Kiambu Ridge Hub</option>
                             </select>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-xs uppercase tracking-wider text-neutral-550">Landmarks Address *</label>
-                            <input type="text" list="premium-address-nodes" placeholder="Type complex, street, or estate..." wire:model="delivery_address" :class="theme === 'light' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
+                            <label class="text-xs uppercase tracking-wider text-neutral-500">Landmarks Address *</label>
+                            <input type="text" list="premium-address-nodes" placeholder="Type complex, street, or estate..." wire:model="delivery_address" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light">
                             <datalist id="premium-address-nodes">
                                 @foreach($this->getAddressSuggestions() as $node) <option value="{{ $node }}"></option> @endforeach
                             </datalist>
@@ -1841,13 +1841,13 @@
                     <!-- Delivery Date & Slot Picker in Logistics Spec -->
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1">
-                            <label class="text-[10px] uppercase tracking-wider text-neutral-555 font-mono block">Delivery Date *</label>
-                            <input type="date" wire:model.live="deliveryDate" min="{{ date('Y-m-d') }}" :class="theme === 'light' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans">
+                            <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Delivery Date *</label>
+                            <input type="date" wire:model.live="deliveryDate" min="{{ date('Y-m-d') }}" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans">
                             @error('deliveryDate') <span class="text-[10px] text-rose-500 font-mono block mt-1">{{ $message }}</span> @enderror
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[10px] uppercase tracking-wider text-neutral-555 font-mono block">Delivery Time Slot *</label>
-                            <select wire:model.live="deliverySlot" :class="theme === 'light' ? 'bg-neutral-50/50 border-neutral-200 text-black' : 'bg-[#0A0A0A] border-neutral-900 text-white'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans cursor-pointer">
+                            <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Delivery Time Slot *</label>
+                            <select wire:model.live="deliverySlot" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-neutral-400 font-light font-sans cursor-pointer">
                                 <option value="standard">Standard (Free)</option>
                                 <option value="midnight">Midnight (1,500 KSH)</option>
                             </select>
@@ -1857,7 +1857,7 @@
 
                     <!-- Free OpenStreetMap Interactive Map Locator with Autocomplete Search -->
                     <div class="space-y-2" wire:ignore>
-                        <label class="text-[10px] uppercase tracking-wider text-neutral-555 font-mono block">Interactive Curation Dispatch Map (Click/drag marker to pinpoint location for free)</label>
+                        <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Interactive Curation Dispatch Map (Click/drag marker to pinpoint location for free)</label>
                         
                         <div 
                             x-data="{
@@ -1955,14 +1955,14 @@
                                         x-model="searchQuery" 
                                         @keydown.enter.prevent="searchLocation()"
                                         placeholder="Search delivery address (e.g. Kilimani)..." 
-                                        :class="theme === 'light' ? 'bg-white border-neutral-200 text-black placeholder-neutral-400' : 'bg-[#0A0A0A] border-neutral-800 text-white placeholder-neutral-600'"
-                                        class="flex-1 border rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-neutral-400 font-sans"
+                                        :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black placeholder-neutral-400 focus:border-neutral-450' : 'bg-[#0A0908] border-[#C5A880]/20 text-white placeholder-neutral-600 focus:border-[#C5A880]/60'"
+                                        class="flex-1 border rounded-xl px-3 py-1.5 text-xs focus:outline-none font-sans"
                                     >
                                     <button 
                                         type="button" 
                                         @click="searchLocation()"
-                                        :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'"
-                                        class="px-3.5 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold"
+                                        :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'"
+                                        class="px-3.5 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold transition-colors"
                                     >
                                         Find
                                     </button>
@@ -1977,7 +1977,7 @@
                                     <template x-for="res in searchResults" :key="res.place_id">
                                         <div 
                                             @click="selectResult(res)"
-                                            :class="theme === 'light' ? 'hover:bg-neutral-200/50' : 'hover:bg-white/10'"
+                                            :class="theme === 'light' ? 'hover:bg-neutral-100 text-black' : 'hover:bg-[#C5A880]/15 text-[#C5A880]'"
                                             class="px-3 py-2 cursor-pointer transition-colors border-b last:border-b-0 border-neutral-500/10 font-sans"
                                             x-text="res.display_name"
                                         ></div>
@@ -2105,12 +2105,12 @@
                              </div>
                             </div>
 
-                            <div :class="theme === 'light' ? 'bg-white border-neutral-200' : 'bg-[#0A0A0A] border-neutral-900'" class="space-y-3 p-4 border rounded-2xl shadow-2xl">
+                            <div :class="theme === 'light' ? 'bg-[#FAF7F0]/90 border-neutral-250 shadow-md' : 'bg-[#0A0908]/95 border-[#C5A880]/15 shadow-2xl backdrop-blur-md'" class="space-y-3 p-4 border rounded-2xl shadow-2xl">
                                 <div class="space-y-1">
                                     <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono">Safaricom Authorization Line</label>
                                     <div class="relative flex items-center">
-                                        <span class="absolute left-3 text-xs font-mono text-neutral-600">+254</span>
-                                        <input type="tel" wire:model="phone" placeholder="712345678" :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0F0F0F] border-neutral-800 text-white'" class="w-full border rounded-xl pl-14 pr-3 py-1.5 text-xs font-mono focus:outline-none focus:border-neutral-400">
+                                        <span :class="theme === 'light' ? 'text-neutral-505' : 'text-neutral-400'" class="absolute left-3 text-xs font-mono">+254</span>
+                                        <input type="tel" wire:model="phone" placeholder="712345678" :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0F0F0F] border-neutral-800 text-white'" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl pl-14 pr-3 py-1.5 text-xs font-mono focus:outline-none">
                                     </div>
                                 </div>
 
@@ -2129,7 +2129,7 @@
                                 <div x-data="{ timer: 60 }" x-init="const interval = setInterval(() => { if(timer > 0) { timer--; } else { clearInterval(interval); } }, 1000)" class="space-y-6">
                                     <div class="relative w-16 h-16 mx-auto flex items-center justify-center">
                                         <span class="absolute inline-flex h-12 w-12 rounded-full bg-amber-500/20 animate-ping"></span>
-                                        <div class="w-12 h-12 rounded-full border border-neutral-800 flex items-center justify-center bg-neutral-900/60 z-10">
+                                        <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/60' : 'border-[#C5A880]/15 bg-neutral-950/60'" class="w-12 h-12 rounded-full border flex items-center justify-center z-10">
                                             <svg class="w-5 h-5 text-amber-500 animate-spin" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
                                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -2142,7 +2142,7 @@
                                             An M-Pesa prompt has been dispatched to <span class="font-mono text-neutral-300 font-semibold">+254{{ $phone }}</span>.<br>Enter your Safaricom PIN to complete checkout.
                                         </p>
                                     </div>
-                                    <div class="text-[10px] font-mono text-neutral-600 uppercase tracking-widest bg-neutral-950/20 py-2 border border-neutral-900/50 max-w-[200px] mx-auto rounded-full">
+                                    <div :class="theme === 'light' ? 'bg-neutral-100 border-neutral-200 text-neutral-600' : 'bg-neutral-950/20 border-[#C5A880]/20 text-[#C5A880]/80'" class="text-[10px] font-mono uppercase tracking-widest py-2 max-w-[200px] mx-auto rounded-full border">
                                         Expiry in <span class="font-bold text-white" x-text="timer"></span>s
                                     </div>
                                 </div>
@@ -2191,7 +2191,7 @@
                                 </div>
                                 <div class="space-y-2">
                                     <h4 class="text-sm uppercase tracking-[0.2em] font-semibold text-rose-500 font-mono">Remittance Failed</h4>
-                                    <p class="text-xs text-rose-400 font-mono bg-rose-950/25 border border-rose-900/30 p-3 rounded-xl max-w-sm mx-auto leading-relaxed">
+                                    <p :class="theme === 'light' ? 'bg-rose-50 border-rose-200 text-rose-800' : 'bg-rose-950/25 border-rose-900/30 text-rose-400'" class="text-xs font-mono border p-3 rounded-xl max-w-sm mx-auto leading-relaxed">
                                         {{ $mpesaErrorMessage }}
                                     </p>
                                 </div>
@@ -2248,21 +2248,26 @@
             </span>
         </button>
  
-        <div x-show="chatOpen" style="display: none;" x-transition class="mt-3 w-80 md:w-96 h-[420px] bg-[#0F0F0F]/90 border border-neutral-800 rounded-3xl shadow-2xl flex flex-col justify-between overflow-hidden backdrop-blur-xl">
-            <div class="p-4 border-b border-neutral-800 bg-[#0A0A0A]/90 flex items-center justify-between text-left">
+        <div x-show="chatOpen" style="display: none;" x-transition :class="theme === 'light' ? 'bg-[#FAF7F0]/95 border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#121110]/95 border border-[#C5A880]/20 text-white shadow-[0_30px_100px_rgba(0,0,0,0.65)]'" class="mt-3 w-80 md:w-96 h-[420px] rounded-3xl flex flex-col justify-between overflow-hidden backdrop-blur-xl">
+            <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/50 text-neutral-900' : 'border-neutral-850 bg-[#0A0908]/90 text-white'" class="p-4 border-b flex items-center justify-between text-left">
                 <div>
-                    <span class="text-xs uppercase font-mono text-neutral-300 tracking-wider font-semibold">Aura Concierge AI</span>
-                    <span class="block text-[11px] text-emerald-400 font-mono mt-0.5">&bull; Active Curation Companion</span>
+                    <span :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-300'" class="text-xs uppercase font-mono tracking-wider font-semibold">Aura Concierge AI</span>
+                    <span :class="theme === 'light' ? 'text-neutral-600' : 'text-[#C5A880]'" class="block text-[11px] font-mono mt-0.5">&bull; Active Curation Companion</span>
                 </div>
             </div>
             <div class="flex-1 p-4 overflow-y-auto space-y-4 text-xs font-light scrollbar-none flex flex-col text-left">
                 @foreach($chatHistory as $msg)
-                    <div class="max-w-[85%] rounded px-3 py-2.5 leading-relaxed {{ $msg['sender'] === 'bot' ? 'bg-neutral-900/80 text-neutral-300 self-start border border-neutral-800/40' : 'bg-white/90 text-black font-normal self-end shadow-md' }}">{{ $msg['text'] }}</div>
+                    <div class="max-w-[85%] rounded-[18px] px-3.5 py-2.5 leading-relaxed {{ $msg['sender'] === 'bot' ? 'self-start' : 'self-end shadow-md' }}"
+                         :class="theme === 'light' 
+                             ? ({{ $msg['sender'] === 'bot' ? 'true' : 'false' }} ? 'bg-neutral-150 text-neutral-855 border border-neutral-200/60' : 'bg-black text-white font-normal') 
+                             : ({{ $msg['sender'] === 'bot' ? 'true' : 'false' }} ? 'bg-neutral-900/80 text-neutral-300 border border-neutral-850/60' : 'bg-[#C5A880] text-black font-semibold')">
+                        {{ $msg['text'] }}
+                    </div>
                 @endforeach
             </div>
-            <form wire:submit.prevent="sendChatMessage" class="p-3 border-t border-neutral-800 bg-[#0A0A0A]/90 flex items-center gap-2">
-                <input type="text" wire:model="chatMessage" placeholder="Ask Aura about arrangements, branches, points..." class="flex-1 bg-[#141414]/90 border border-neutral-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-700 font-light font-sans">
-                <button type="submit" class="bg-white text-black font-mono text-[11px] uppercase font-bold px-3.5 py-2 rounded-full cursor-pointer hover:bg-neutral-200 transition-colors">Ask</button>
+            <form wire:submit.prevent="sendChatMessage" :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/50' : 'border-neutral-850 bg-[#0A0908]/90'" class="p-3 border-t flex items-center gap-2">
+                <input type="text" wire:model="chatMessage" placeholder="Ask Aura about arrangements, branches, points..." :class="theme === 'light' ? 'bg-white border-neutral-250 text-black placeholder-neutral-400 focus:border-neutral-400' : 'bg-[#141413] border-neutral-850 text-white placeholder-neutral-600 focus:border-neutral-750'" class="flex-1 rounded-xl px-3 py-2 text-xs focus:outline-none font-light font-sans">
+                <button type="submit" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" class="font-mono text-[10px] uppercase font-bold px-4 py-2 rounded-full cursor-pointer transition-colors">Ask</button>
             </form>
         </div>
     </div>
@@ -2274,15 +2279,15 @@
         x-show="quickViewOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-32px)] sm:w-[640px] max-h-[90vh] z-50 bg-white/90 border border-neutral-200/80 text-neutral-900 shadow-2xl flex flex-col justify-between text-left rounded-[28px] overflow-hidden font-sans backdrop-blur-xl"
+        :class="theme === 'light' ? 'bg-[#FAF7F0]/95 border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#121110]/95 border border-[#C5A880]/20 text-white shadow-[0_30px_100px_rgba(0,0,0,0.65)]'" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-32px)] sm:w-[640px] max-h-[90vh] z-50 flex flex-col justify-between text-left rounded-[28px] overflow-hidden font-sans backdrop-blur-xl transition-all duration-300"
         style="display: none;"
     >
-        <div class="p-5 border-b border-neutral-100 flex items-center justify-between shrink-0">
+        <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-5 border-b flex items-center justify-between shrink-0">
             <div>
-                <span class="text-[9px] uppercase tracking-widest text-emerald-800 font-bold block" x-text="quickViewProduct ? quickViewProduct.category.replace('_', ' ') : ''"></span>
-                <h3 class="text-lg font-serif italic text-neutral-800" x-text="quickViewProduct ? quickViewProduct.name : ''"></h3>
+                <span :class="theme === 'light' ? 'text-emerald-800' : 'text-[#C5A880]'" class="text-[9px] uppercase tracking-widest font-bold block" x-text="quickViewProduct ? quickViewProduct.category.replace('_', ' ') : ''"></span>
+                <h3 :class="theme === 'light' ? 'text-neutral-850' : 'text-white'" class="text-lg font-serif italic" x-text="quickViewProduct ? quickViewProduct.name : ''"></h3>
             </div>
-            <button @click="quickViewOpen = false" class="text-neutral-450 hover:text-neutral-800 cursor-pointer select-none transition-colors" title="Close Details">
+            <button @click="quickViewOpen = false" :class="theme === 'light' ? 'text-neutral-400 hover:text-neutral-800' : 'text-neutral-500 hover:text-[#C5A880]'" class="cursor-pointer select-none transition-colors" title="Close Details">
                 <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
                     <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -2296,17 +2301,17 @@
                     <div class="w-full h-48 md:h-64 rounded-2xl overflow-hidden bg-neutral-150 relative">
                         <img :src="quickViewProduct ? quickViewProduct.image : ''" :alt="quickViewProduct ? quickViewProduct.name : ''" class="w-full h-full object-cover">
                     </div>
-                    <p class="text-xs text-neutral-500 font-light mt-3 leading-relaxed" x-text="quickViewProduct ? quickViewProduct.description : ''"></p>
+                    <p :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-400'" class="text-xs font-light mt-3 leading-relaxed" x-text="quickViewProduct ? quickViewProduct.description : ''"></p>
                 </div>
                 <!-- Config column -->
                 <div class="flex-1 flex flex-col gap-4">
                     <!-- Size Selector -->
                     <div>
-                        <span class="text-xs font-bold text-neutral-700 block mb-2">Select Sizing & Volume</span>
+                        <span :class="theme === 'light' ? 'text-neutral-750' : 'text-neutral-350'" class="text-xs font-bold block mb-2">Select Sizing & Volume</span>
                         <div class="flex flex-wrap gap-2">
                             <!-- Standard -->
                             <button type="button" @click="quickViewSize = 'standard'"
-                                :class="quickViewSize === 'standard' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
+                                :class="quickViewSize === 'standard' ? (theme === 'light' ? 'border-[#B59A7A] bg-[#B59A7A]/10 text-[#B59A7A] font-semibold' : 'border-[#C5A880] bg-[#C5A880]/15 text-[#C5A880] font-semibold shadow-md') : (theme === 'light' ? 'border-neutral-200 text-neutral-600 hover:text-neutral-800' : 'border-neutral-850 text-neutral-450 hover:text-white hover:border-neutral-700')"
                                 class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
                                 :disabled="quickViewProduct && quickViewProduct.stock_standard <= 0"
                             >
@@ -2316,7 +2321,7 @@
                             </button>
                             <!-- Deluxe -->
                             <button type="button" @click="quickViewSize = 'deluxe'"
-                                :class="quickViewSize === 'deluxe' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
+                                :class="quickViewSize === 'deluxe' ? (theme === 'light' ? 'border-[#B59A7A] bg-[#B59A7A]/10 text-[#B59A7A] font-semibold' : 'border-[#C5A880] bg-[#C5A880]/15 text-[#C5A880] font-semibold shadow-md') : (theme === 'light' ? 'border-neutral-200 text-neutral-600 hover:text-neutral-800' : 'border-neutral-850 text-neutral-450 hover:text-white hover:border-neutral-700')"
                                 class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
                                 :disabled="quickViewProduct && quickViewProduct.stock_deluxe <= 0"
                             >
@@ -2326,7 +2331,7 @@
                             </button>
                             <!-- Grand -->
                             <button type="button" @click="quickViewSize = 'grand'"
-                                :class="quickViewSize === 'grand' ? 'border-emerald-800 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 text-neutral-600 hover:text-neutral-800'"
+                                :class="quickViewSize === 'grand' ? (theme === 'light' ? 'border-[#B59A7A] bg-[#B59A7A]/10 text-[#B59A7A] font-semibold' : 'border-[#C5A880] bg-[#C5A880]/15 text-[#C5A880] font-semibold shadow-md') : (theme === 'light' ? 'border-neutral-200 text-neutral-600 hover:text-neutral-800' : 'border-neutral-850 text-neutral-450 hover:text-white hover:border-neutral-700')"
                                 class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
                                 :disabled="quickViewProduct && quickViewProduct.stock_grand <= 0"
                             >
@@ -2354,27 +2359,27 @@
             </div>
 
             <!-- Reviews Tab/Section -->
-            <div class="border-t border-neutral-200 pt-6 space-y-4">
+            <div :class="theme === 'light' ? 'border-neutral-200' : 'border-[#C5A880]/15'" class="border-t pt-6 space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <h4 class="text-sm font-serif italic text-neutral-800">Reviews &amp; Client Feedback</h4>
+                    <h4 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-sm font-serif italic">Reviews &amp; Client Feedback</h4>
                     <template x-if="quickViewProduct && quickViewProduct.average_rating > 0">
-                        <div class="flex flex-wrap gap-2 text-[9px] font-mono uppercase bg-neutral-50 px-3 py-1.5 rounded-xl border border-neutral-100">
+                        <div :class="theme === 'light' ? 'bg-neutral-50 border-neutral-150 text-neutral-600' : 'bg-neutral-950/40 border-[#C5A880]/15 text-neutral-350'" class="flex flex-wrap gap-2 text-[9px] font-mono uppercase px-3 py-1.5 rounded-xl border">
                             <span class="text-neutral-500">Avg Ratings:</span>
                             <span class="text-amber-500 font-bold">Overall: <span x-text="quickViewProduct.average_rating"></span>★</span>
-                            <span class="text-emerald-700 font-bold">Quality: <span x-text="quickViewProduct.average_quality_rating"></span>★</span>
-                            <span class="text-emerald-700 font-bold">Freshness: <span x-text="quickViewProduct.average_freshness_rating"></span>★</span>
-                            <span class="text-emerald-700 font-bold">Value: <span x-text="quickViewProduct.average_value_rating"></span>★</span>
+                            <span :class="theme === 'light' ? 'text-emerald-800' : 'text-[#C5A880]'" class="font-bold">Quality: <span x-text="quickViewProduct.average_quality_rating"></span>★</span>
+                            <span :class="theme === 'light' ? 'text-emerald-800' : 'text-[#C5A880]'" class="font-bold">Freshness: <span x-text="quickViewProduct.average_freshness_rating"></span>★</span>
+                            <span :class="theme === 'light' ? 'text-emerald-800' : 'text-[#C5A880]'" class="font-bold">Value: <span x-text="quickViewProduct.average_value_rating"></span>★</span>
                         </div>
                     </template>
                 </div>
                 
                 @if(session('success_review'))
-                    <div class="p-2.5 bg-emerald-50 border border-dashed border-emerald-300 text-emerald-800 text-[11px] font-mono rounded-xl">
+                    <div class="p-2.5 bg-emerald-500/10 border border-dashed border-emerald-500/25 text-emerald-500 text-[11px] font-mono rounded-xl">
                         {{ session('success_review') }}
                     </div>
                 @endif
                 @if(session('error_review'))
-                    <div class="p-2.5 bg-rose-50 border border-dashed border-rose-300 text-rose-800 text-[11px] font-mono rounded-xl">
+                    <div class="p-2.5 bg-rose-500/10 border border-dashed border-rose-500/25 text-rose-500 text-[11px] font-mono rounded-xl">
                         {{ session('error_review') }}
                     </div>
                 @endif
@@ -2386,16 +2391,16 @@
 
                 <div class="space-y-3 max-h-48 overflow-y-auto pr-1">
                     @forelse($reviews as $rev)
-                        <div class="p-3 bg-neutral-50 rounded-2xl border border-neutral-100 space-y-1">
+                        <div :class="theme === 'light' ? 'bg-neutral-50 border-neutral-150 text-neutral-800' : 'bg-neutral-950/40 border-[#C5A880]/10 text-neutral-300'" class="p-3 rounded-2xl border space-y-1">
                             <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-semibold text-neutral-700">{{ $rev->user ? $rev->user->name : 'Anonymous Client' }}</span>
+                                <span :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-200'" class="text-[10px] font-semibold">{{ $rev->user ? $rev->user->name : 'Anonymous Client' }}</span>
                                 <div class="flex items-center space-x-0.5">
                                     @for($i = 1; $i <= 5; $i++)
-                                        <span class="text-[10px] {{ $i <= $rev->rating ? 'text-amber-500' : 'text-neutral-200' }}">★</span>
+                                        <span class="text-[10px] {{ $i <= $rev->rating ? 'text-amber-500' : 'text-neutral-700' }}">★</span>
                                     @endfor
                                 </div>
                             </div>
-                            <p class="text-[11px] text-neutral-600 font-light leading-relaxed">{{ $rev->comment }}</p>
+                            <p :class="theme === 'light' ? 'text-neutral-700' : 'text-neutral-400'" class="text-[11px] font-light leading-relaxed">{{ $rev->comment }}</p>
                             <span class="text-[8px] text-neutral-400 block font-mono">{{ $rev->created_at->format('d M Y') }}</span>
                         </div>
                     @empty
@@ -2466,10 +2471,10 @@
             </div>
         </div>
 
-        <div class="p-5 border-t border-neutral-100 bg-neutral-50/80 backdrop-blur-md shrink-0 flex items-center justify-between">
+        <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-50/80' : 'border-[#C5A880]/15 bg-neutral-950/40'" class="p-5 border-t backdrop-blur-md shrink-0 flex items-center justify-between">
             <div>
                 <span class="text-[10px] text-neutral-500 uppercase tracking-wider block">Price</span>
-                <span class="text-base font-bold text-neutral-850 font-mono">
+                <span :class="theme === 'light' ? 'text-neutral-850' : 'text-[#C5A880]'" class="text-base font-bold font-mono">
                     <span x-text="quickViewProduct ? numberFormat(quickViewSize === 'standard' ? quickViewProduct.price : (quickViewSize === 'deluxe' ? Math.round(quickViewProduct.price * 1.5) : Math.round(quickViewProduct.price * 2.2))) : ''"></span> KSH
                 </span>
             </div>
@@ -2478,31 +2483,31 @@
                 type="button"
                 :disabled="(quickViewSize === 'standard' && quickViewProduct && quickViewProduct.stock_standard <= 0) || (quickViewSize === 'deluxe' && quickViewProduct && quickViewProduct.stock_deluxe <= 0) || (quickViewSize === 'grand' && quickViewProduct && quickViewProduct.stock_grand <= 0)"
                 @click="$wire.addToCuration(quickViewProduct.id, quickViewSize); quickViewOpen = false; drawerOpen = true; checkoutMode = false;"
-                class="px-6 py-2.5 bg-emerald-800 hover:bg-emerald-950 text-white rounded-xl text-xs uppercase tracking-wider font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" class="px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-md"
             >
                 Add to Curation
             </button>
         </div>
     </div>
 
-    <!-- Backdrop for Profile Modal -->
-    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/40 backdrop-blur-xl" style="display: none;"></div>
+        <!-- Backdrop for Profile Modal -->
+    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Profile Overlay Panel (Center Modal) -->
     <div 
         x-show="profileOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'light' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
+        :class="theme === 'light' ? 'bg-[#FAF7F0]/95 border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#121110]/95 border border-[#C5A880]/20 text-white shadow-2xl'"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden transition-all duration-300"
         style="display: none;"
     >
-        <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
+        <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-5 border-b flex items-center justify-between shrink-0">
             <div>
                 <h3 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Profile Portal</h3>
                 <span class="text-[9px] text-neutral-500 font-light">Atelier Customer Account</span>
             </div>
-            <button @click="profileOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Modal">
+            <button @click="profileOpen = false" :class="theme === 'light' ? 'text-neutral-400 hover:text-neutral-800' : 'text-neutral-500 hover:text-[#C5A880]'" class="cursor-pointer select-none transition-colors" title="Close Modal">
                 <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
                     <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -2521,12 +2526,12 @@
                     <div class="w-14 h-14 flex items-center justify-center rounded-full bg-gradient-to-tr from-neutral-950 via-neutral-900 to-neutral-955 border-2 shadow-md shrink-0"
                          :class="{
                              'border-[#C5A880]/40': theme === 'dark',
-                             'border-emerald-600/40': theme === 'light',
+                             'border-[#B59A7A]/40': theme === 'light',
                          }">
                         <span class="text-base font-mono font-bold tracking-wider"
                               :class="{
                                   'text-[#C5A880]': theme === 'dark',
-                                  'text-emerald-800': theme === 'light',
+                                  'text-[#B59A7A]': theme === 'light',
                               }">
                             {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
                         </span>
@@ -2537,40 +2542,40 @@
                             <span class="text-[8px] font-mono uppercase tracking-widest px-2 py-0.5 border rounded-full shrink-0"
                                   :class="{
                                       'border-[#C5A880]/30 bg-[#C5A880]/5 text-[#C5A880]': theme === 'dark',
-                                      'border-emerald-600/30 bg-emerald-50 text-emerald-800': theme === 'light',
+                                      'border-[#B59A7A]/30 bg-[#B59A7A]/5 text-[#B59A7A]': theme === 'light',
                                   }">
                                 {{ auth()->user()->loyalty_tier }}
                             </span>
                         </div>
-                        <span class="text-[10px] text-neutral-450 block font-mono tracking-tight">{{ auth()->user()->email }}</span>
+                        <span class="text-[10px] text-neutral-500 block font-mono tracking-tight">{{ auth()->user()->email }}</span>
                     </div>
                 </div>
 
                 <!-- Account Stats Grid -->
                 <div class="grid grid-cols-3 gap-2.5 text-center py-2">
-                    <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
-                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Client Since</span>
+                    <div :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-200 text-neutral-800' : 'bg-neutral-950/40 border-[#C5A880]/10 text-neutral-350'" class="p-3 border rounded-2xl">
+                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-555 block">Client Since</span>
                         <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ auth()->user()->created_at->format('M Y') }}</span>
                     </div>
-                    <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
-                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Total Curations</span>
+                    <div :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-200 text-neutral-800' : 'bg-neutral-950/40 border-[#C5A880]/10 text-neutral-350'" class="p-3 border rounded-2xl">
+                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-555 block">Total Curations</span>
                         <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ $totalOrdersCount }}</span>
                     </div>
-                    <div class="p-3 border border-neutral-500/5 rounded-2xl bg-neutral-500/5">
-                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-500 block">Active dispatches</span>
+                    <div :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-200 text-neutral-800' : 'bg-neutral-950/40 border-[#C5A880]/10 text-neutral-350'" class="p-3 border rounded-2xl">
+                        <span class="text-[8px] font-mono uppercase tracking-widest text-neutral-555 block">Active dispatches</span>
                         <span class="text-xs font-mono font-bold block mt-1" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ $activeOrdersCount }}</span>
                     </div>
                 </div>
 
                 <!-- Info Segment -->
                 <div class="space-y-3 font-sans py-1 text-xs">
-                    <div class="flex items-center space-x-2 text-neutral-400">
-                        <span class="font-bold text-[9px] uppercase tracking-wider text-[#C5A880]/80">Phone:</span>
+                    <div class="flex items-center space-x-2">
+                        <span :class="theme === 'light' ? 'text-[#B59A7A]' : 'text-[#C5A880]'" class="font-bold text-[9px] uppercase tracking-wider">Phone:</span>
                         <span class="font-mono" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'">{{ auth()->user()->phone_number ?: 'Not Provided' }}</span>
                     </div>
 
                     <div class="leading-relaxed">
-                        <span class="font-bold text-[9px] uppercase tracking-wider text-[#C5A880]/80 block">Main Address</span>
+                        <span :class="theme === 'light' ? 'text-[#B59A7A]' : 'text-[#C5A880]'" class="font-bold text-[9px] uppercase tracking-wider block">Main Address</span>
                         <span class="block truncate" :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" title="{{ auth()->user()->default_delivery_address }}">{{ auth()->user()->default_delivery_address ?: 'No Address Set' }}</span>
                         @if(auth()->user()->default_region)
                             <span class="text-[9px] font-mono text-neutral-500 uppercase tracking-wider block mt-0.5">{{ auth()->user()->default_region }}</span>
@@ -2591,7 +2596,7 @@
                                 <span class="loyalty-shimmer-text tracking-wide font-black">{{ number_format(auth()->user()->loyalty_points) }} PTS</span>
                             </span>
                         @else
-                            <span class="text-neutral-450 font-bold">{{ number_format(auth()->user()->loyalty_points) }} PTS</span>
+                            <span :class="theme === 'light' ? 'text-neutral-850' : 'text-white'" class="font-bold">{{ number_format(auth()->user()->loyalty_points) }} PTS</span>
                         @endif
                     </div>
                 </div>
@@ -2599,10 +2604,7 @@
                 <!-- Action Buttons -->
                 <div class="space-y-2.5 pt-4">
                     <a href="/profile-portal" 
-                       :class="{
-                           'bg-[#C5A880] hover:bg-[#B59A7A] text-black': theme === 'dark',
-                           'bg-emerald-800 hover:bg-emerald-950 text-white': theme === 'light',
-                       }"
+                       :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'"
                        class="w-full text-center font-mono font-bold uppercase tracking-wider py-3 rounded-full text-[10px] flex items-center justify-center space-x-2 transition-all transform hover:scale-[1.01] shadow-md cursor-pointer"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -2614,10 +2616,7 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" 
-                                :class="{
-                                    'border-neutral-800 text-neutral-400 hover:text-rose-500 hover:border-rose-950': theme === 'dark',
-                                    'border-neutral-200 text-neutral-500 hover:text-rose-600 hover:border-rose-250': theme === 'light',
-                                }"
+                                :class="theme === 'light' ? 'border-neutral-250 text-neutral-550 hover:text-rose-600 hover:border-rose-300' : 'border-neutral-850 text-neutral-400 hover:text-rose-450 hover:border-rose-900/50'"
                                 class="w-full border font-mono font-bold uppercase tracking-wider py-2.5 rounded-full text-[9px] flex items-center justify-center space-x-2 transition-all cursor-pointer bg-transparent"
                         >
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -2630,7 +2629,7 @@
             @else
                 <div class="text-center py-2.5 space-y-4">
                     <span class="font-serif text-xl italic block" :class="theme === 'light' ? 'text-[#B59A7A]' : 'text-[#C5A880]'">Atelier Loyalty Circle</span>
-                    <p class="text-neutral-450 font-light text-[11px] leading-relaxed">Sign in to track orders, manage billing profiles, and earn loyalty rewards.</p>
+                    <p class="text-neutral-500 font-light text-[11px] leading-relaxed">Sign in to track orders, manage billing profiles, and earn loyalty rewards.</p>
                     <div class="flex flex-col gap-2.5 pt-1">
                         <a href="/login" 
                            :class="theme === 'light' ? 'bg-[#B59A7A] text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'"
@@ -2639,7 +2638,7 @@
                             Sign In
                         </a>
                         <a href="/register" 
-                           :class="theme === 'light' ? 'border-neutral-250 text-neutral-600 hover:text-[#B59A7A]' : 'border-neutral-800 text-neutral-450 hover:text-[#C5A880]'"
+                           :class="theme === 'light' ? 'border-neutral-250 text-neutral-600 hover:text-[#B59A7A]' : 'border-neutral-850 text-neutral-400 hover:text-[#C5A880]'"
                            class="border font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] text-center block"
                         >
                             Create Account
@@ -2650,24 +2649,25 @@
         </div>
     </div>
 
-    <!-- Backdrop for Notifications Modal -->
-    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-45 bg-black/40 backdrop-blur-xl" style="display: none;"></div>
+
+        <!-- Backdrop for Notifications Modal -->
+    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Notifications Overlay Panel (Center Modal) -->
     <div 
         x-show="notificationsOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="theme === 'light' ? 'bg-[#FAF7F0]/80 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white shadow-2xl'"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[80vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden"
+        :class="theme === 'light' ? 'bg-[#FAF7F0]/95 border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#121110]/95 border border-[#C5A880]/20 text-white shadow-2xl'"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-48px)] sm:w-[500px] max-h-[80vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden transition-all duration-300"
         style="display: none;"
     >
-        <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
+        <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-5 border-b flex items-center justify-between shrink-0">
             <div>
                 <h3 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em]">Notification Log</h3>
                 <span class="text-[9px] text-neutral-500 font-light">Inbox logs & system alerts</span>
             </div>
-            <button @click="notificationsOpen = false" class="text-neutral-500 hover:text-white cursor-pointer select-none transition-colors" title="Close Modal">
+            <button @click="notificationsOpen = false" :class="theme === 'light' ? 'text-neutral-400 hover:text-neutral-800' : 'text-neutral-500 hover:text-[#C5A880]'" class="cursor-pointer select-none transition-colors" title="Close Modal">
                 <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
                     <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
@@ -2711,21 +2711,18 @@
                             </div>
 
                             <div>
-                                <h4 class="font-serif italic text-xs tracking-wide font-semibold text-text-primary">{{ $notif['title'] }}</h4>
-                                <p @click="expanded = !expanded" class="text-[11px] text-neutral-450 leading-relaxed font-light mt-1 cursor-pointer" :class="{ 'line-clamp-2': !expanded }">
+                                <h4 :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="font-serif italic text-xs tracking-wide font-semibold">{{ $notif['title'] }}</h4>
+                                <p @click="expanded = !expanded" :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-400'" class="text-[11px] leading-relaxed font-light mt-1 cursor-pointer" :class="{ 'line-clamp-2': !expanded }">
                                     {{ $notif['message'] }}
                                 </p>
                             </div>
 
                             <div class="flex items-center space-x-2 pt-2 border-t border-neutral-500/5 mt-1 opacity-80 group-hover:opacity-100 transition-opacity">
                                 @if(!$notif['is_read'])
-                                    <button wire:click="markNotificationAsRead({{ $notif['id'] }})" class="text-[9px] font-mono uppercase tracking-widest text-[#C5A880] hover:underline cursor-pointer">
+                                    <button wire:click="markNotificationAsRead({{ $notif['id'] }})" :class="theme === 'light' ? 'text-black' : 'text-[#C5A880]'" class="text-[9px] font-mono uppercase tracking-widest hover:underline cursor-pointer">
                                         [ Mark Read ]
                                     </button>
                                 @endif
-                                <button wire:click="deleteNotification({{ $notif['id'] }})" class="text-[9px] font-mono uppercase tracking-widest text-neutral-500 hover:text-red-400 hover:underline cursor-pointer">
-                                    [ Delete ]
-                                </button>
                             </div>
                         </div>
                     @empty
@@ -2745,11 +2742,11 @@
             
             @auth
                 @if(count($notificationsList) > 0)
-                    <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-4 border-t bg-neutral-500/5 flex items-center justify-between shrink-0">
-                        <button wire:click="clearAllNotifications" class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 hover:text-red-400 cursor-pointer">
-                            [ Clear All ]
+                    <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/30' : 'border-[#C5A880]/15 bg-neutral-950/20'" class="p-4 border-t flex items-center justify-between shrink-0">
+                        <button wire:click="markAllAsSeen" :class="theme === 'light' ? 'text-neutral-500 hover:text-black' : 'text-neutral-500 hover:text-[#C5A880]'" class="text-[10px] font-mono uppercase tracking-widest cursor-pointer">
+                            [ Mark All as Read ]
                         </button>
-                        <button @click="notificationsOpen = false" class="bg-[#C5A880] hover:bg-[#B59A7A] text-black text-[9px] font-mono font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all cursor-pointer">
+                        <button @click="notificationsOpen = false" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" class="text-[9px] font-mono font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all cursor-pointer">
                             Dismiss
                         </button>
                     </div>
@@ -2757,5 +2754,6 @@
             @endauth
         </div>
     </div>
+
 
 </div>

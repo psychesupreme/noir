@@ -214,8 +214,8 @@ document.addEventListener('alpine:init', () => {
             window.addEventListener('mouseleave', handleMouseLeave);
 
             const getPetalColors = () => {
-                const activeTheme = localStorage.getItem('nb_theme') || 'onyx';
-                if (activeTheme === 'champagne') {
+                const activeTheme = localStorage.getItem('nb_theme') || 'light';
+                if (activeTheme === 'light' || activeTheme === 'champagne') {
                     return ['#B59A7A', '#D4AF37', '#E5C1CD', '#FFFFFF', '#D48EA1'];
                 } else {
                     return ['#C5A880', '#A78BFA', '#8B5CF6', '#4B5563', '#B76E79'];

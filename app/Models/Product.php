@@ -32,6 +32,7 @@ class Product extends Model
         'unit_type',
         'grade',
         'image_url',
+        'sizes',
     ];
 
     /**
@@ -44,6 +45,7 @@ class Product extends Model
         'price' => 'integer',
         'cost_price' => 'integer',
         'stock' => 'integer',
+        'sizes' => 'array',
     ];
 
     // ── Relationships ────────────────────────────────────────────────────
@@ -62,7 +64,7 @@ class Product extends Model
      */
     public function orders(): BelongsToMany
     {
-        return $this->belongsToMany(Order::class)->withPivot('quantity', 'price_at_sale')->withTimestamps();
+        return $this->belongsToMany(Order::class)->withPivot('quantity', 'price_at_sale', 'cost_price_at_sale', 'size')->withTimestamps();
     }
 
 

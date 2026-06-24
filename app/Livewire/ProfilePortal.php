@@ -51,6 +51,8 @@ class ProfilePortal extends Component
     public int $ratingPackaging = 0;
     public int $ratingDelivery = 0;
     public string $ratingComments = '';
+    public array $ratingProducts = [];
+    public array $productReviews = [];
 
     protected $rules = [
         'name' => 'required|string|min:3',
@@ -242,6 +244,24 @@ class ProfilePortal extends Component
         $this->ratingPackaging = 0;
         $this->ratingDelivery = 0;
         $this->ratingComments = '';
+
+        $order = Order::with('products')->find($orderId);
+        if ($order) {
+            $this->ratingProducts = $order->products->toArray();
+            $this->productReviews = [];
+            foreach ($order->products as $p) {
+                $this->productReviews[$p->id] = [
+                    'rating' => 5,
+                    'quality_rating' => 5,
+                    'freshness_rating' => 5,
+                    'value_rating' => 5,
+                    'comment' => '',
+                ];
+            }
+        } else {
+            $this->ratingProducts = [];
+            $this->productReviews = [];
+        }
     }
 
     public function submitDetailedRating(): void
@@ -252,6 +272,11 @@ class ProfilePortal extends Component
             'ratingPackaging' => 'required|integer|min:1|max:5',
             'ratingDelivery' => 'required|integer|min:1|max:5',
             'ratingComments' => 'nullable|string',
+            'productReviews.*.rating' => 'required|integer|min:1|max:5',
+            'productReviews.*.quality_rating' => 'required|integer|min:1|max:5',
+            'productReviews.*.freshness_rating' => 'required|integer|min:1|max:5',
+            'productReviews.*.value_rating' => 'required|integer|min:1|max:5',
+            'productReviews.*.comment' => 'nullable|string',
         ]);
 
         $order = Order::find($this->ratingOrderId);
@@ -265,6 +290,25 @@ class ProfilePortal extends Component
                     'packaging_rating' => $this->ratingPackaging,
                     'delivery_rating' => $this->ratingDelivery,
                 ]);
+
+                // Save product-level reviews
+                foreach ($this->productReviews as $productId => $revData) {
+                    if (!empty(trim($revData['comment']))) {
+                        \App\Models\Review::updateOrCreate(
+                            [
+                                'user_id' => $user->id,
+                                'product_id' => $productId,
+                            ],
+                            [
+                                'rating' => $revData['rating'],
+                                'quality_rating' => $revData['quality_rating'],
+                                'freshness_rating' => $revData['freshness_rating'],
+                                'value_rating' => $revData['value_rating'],
+                                'comment' => trim($revData['comment']),
+                            ]
+                        );
+                    }
+                }
 
                 session()->flash('success_orders', 'Thank you for your feedback on order #NB-ORD-' . $this->ratingOrderId . '!');
                 $this->ratingOrderId = null;

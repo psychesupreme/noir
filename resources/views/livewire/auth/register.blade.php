@@ -36,27 +36,27 @@
     </style>
 
     {{-- Header --}}
-    <div class="space-y-3">
-        <div class="flex items-baseline gap-2">
-            <span class="text-[8px] font-mono tracking-[0.4em] text-[#D4AF37]/50 uppercase">Atelier</span>
+    <div class="space-y-4">
+        <div class="flex items-baseline gap-2.5">
+            <span class="text-[10px] font-mono tracking-[0.4em] text-[#D4AF37] uppercase">Atelier</span>
             <span 
-                :class="theme === 'light' ? 'text-neutral-800/80' : 'text-white/80'"
-                class="text-[10px] font-semibold uppercase tracking-[0.3em] transition-colors"
-            >Noir & Bloom</span>
+                :class="theme === 'light' ? 'text-neutral-900' : 'text-white'"
+                class="text-xs font-serif font-bold uppercase tracking-[0.3em] transition-colors"
+            >Noir &amp; Bloom</span>
         </div>
 
-        <div class="space-y-1">
+        <div class="space-y-2">
             <h2 
                 :class="theme === 'light' ? 'text-neutral-900' : 'text-white'"
-                class="text-[24px] font-[Instrument_Serif] font-normal leading-tight transition-colors"
+                class="text-3xl font-serif italic font-normal leading-tight transition-colors"
             >
-                Create your account
+                Create Account
             </h2>
-            <p class="text-[11px] font-light text-neutral-500 tracking-wide">
+            <p class="text-xs font-light text-neutral-500 tracking-wide">
                 Join our exclusive floral &amp; gifting concierge.
             </p>
         </div>
-        <div :class="theme === 'light' ? 'bg-neutral-200' : 'bg-neutral-800'" class="w-10 h-px transition-colors"></div>
+        <div :class="theme === 'light' ? 'bg-neutral-350' : 'bg-neutral-850'" class="w-12 h-[1px] transition-colors"></div>
     </div>
 
     {{-- Main registration card with glassmorphism, texture, and edges --}}

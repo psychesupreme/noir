@@ -1,5 +1,11 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="champagne">
+@php
+    $initialTheme = 'light';
+    if (auth()->check()) {
+        $pref = auth()->user()->settings['preferred_theme'] ?? 'light';
+        $initialTheme = ($pref === 'onyx' || $pref === 'dark') ? 'dark' : 'light';
+    }
+@endphp
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ $initialTheme }}" data-theme="{{ $initialTheme }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -87,10 +93,19 @@
     <!-- Persistent Theme Bootstrap -->
     <script>
         (function() {
-            const storedTheme = localStorage.getItem('nb_theme');
-            const theme = (storedTheme === 'onyx' || storedTheme === 'champagne') ? storedTheme : 'champagne';
+            @auth
+                const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
+                const theme = (pref === 'onyx' || pref === 'dark') ? 'dark' : 'light';
+            @else
+                const storedTheme = localStorage.getItem('nb_theme');
+                const theme = (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'onyx') ? (storedTheme === 'onyx' ? 'dark' : storedTheme) : 'light';
+            @endauth
             document.documentElement.className = theme;
             document.documentElement.setAttribute('data-theme', theme);
+            const bgColors = { 'dark': '#0A0908', 'light': '#FAF7F0' };
+            const textColors = { 'dark': '#E4E4E7', 'light': '#1C1C20' };
+            if (bgColors[theme]) document.documentElement.style.backgroundColor = bgColors[theme];
+            if (textColors[theme]) document.documentElement.style.color = textColors[theme];
         })();
     </script>
 </head>

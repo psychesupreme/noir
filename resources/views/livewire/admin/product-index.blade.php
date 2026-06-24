@@ -526,6 +526,86 @@
                         @error('description') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
+                    {{-- Size Variations Editor --}}
+                    <div class="border-t border-neutral-900 pt-4 mt-2">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-xs uppercase tracking-[0.2em] font-mono text-neutral-400 font-semibold">Size Variations</h4>
+                            <button
+                                type="button"
+                                wire:click="addSizeVariation"
+                                class="px-3 py-1 bg-neutral-900 border border-neutral-800 text-[10px] font-mono uppercase tracking-wider text-[#C5A880] hover:bg-neutral-800 rounded-sm transition-colors cursor-pointer"
+                            >
+                                + Add Size
+                            </button>
+                        </div>
+
+                        @if(empty($sizesList))
+                            <p class="text-[11px] font-mono text-neutral-600 italic">No custom size variations defined. (Will default to standard/deluxe/grand models or static pricing).</p>
+                        @else
+                            <div class="space-y-3">
+                                @foreach($sizesList as $idx => $size)
+                                    <div class="grid grid-cols-1 md:grid-cols-5 gap-2 items-end bg-[#0A0A0A] p-2 border border-neutral-900 rounded-sm">
+                                        <div class="md:col-span-2">
+                                            <label class="text-[9px] uppercase tracking-wider font-mono text-neutral-500 block mb-1">Size Name (e.g. 750ml, Size 8)</label>
+                                            <input
+                                                wire:model="sizesList.{{ $idx }}.name"
+                                                type="text"
+                                                class="w-full bg-black border border-neutral-800 rounded-sm px-2 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 transition-colors"
+                                                placeholder="750ml"
+                                            >
+                                            @error("sizesList.{$idx}.name") <span class="text-rose-400 text-[9px] font-mono mt-0.5 block">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div>
+                                            <label class="text-[9px] uppercase tracking-wider font-mono text-neutral-500 block mb-1">Price (Ksh)</label>
+                                            <input
+                                                wire:model="sizesList.{{ $idx }}.price"
+                                                type="number"
+                                                min="0"
+                                                class="w-full bg-black border border-neutral-800 rounded-sm px-2 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 transition-colors font-mono"
+                                                placeholder="3000"
+                                            >
+                                            @error("sizesList.{$idx}.price") <span class="text-rose-400 text-[9px] font-mono mt-0.5 block">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div>
+                                            <label class="text-[9px] uppercase tracking-wider font-mono text-neutral-500 block mb-1">Cost (Ksh)</label>
+                                            <input
+                                                wire:model="sizesList.{{ $idx }}.cost_price"
+                                                type="number"
+                                                min="0"
+                                                class="w-full bg-black border border-neutral-800 rounded-sm px-2 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 transition-colors font-mono"
+                                                placeholder="1500"
+                                            >
+                                            @error("sizesList.{$idx}.cost_price") <span class="text-rose-400 text-[9px] font-mono mt-0.5 block">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <div class="flex-1">
+                                                <label class="text-[9px] uppercase tracking-wider font-mono text-neutral-500 block mb-1">Stock</label>
+                                                <input
+                                                    wire:model="sizesList.{{ $idx }}.stock"
+                                                    type="number"
+                                                    min="0"
+                                                    class="w-full bg-black border border-neutral-800 rounded-sm px-2 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 transition-colors font-mono"
+                                                    placeholder="50"
+                                                >
+                                                @error("sizesList.{$idx}.stock") <span class="text-rose-400 text-[9px] font-mono mt-0.5 block">{{ $message }}</span> @enderror
+                                            </div>
+                                            <button
+                                                type="button"
+                                                wire:click="removeSizeVariation({{ $idx }})"
+                                                class="p-1.5 border border-neutral-800 text-rose-500 hover:bg-neutral-900 rounded-sm transition-colors mt-4 shrink-0 cursor-pointer"
+                                                title="Remove Size"
+                                            >
+                                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
 
 
                     {{-- Action Buttons --}}

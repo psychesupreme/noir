@@ -131,4 +131,57 @@ class OrderRoutingAndReviewTest extends TestCase
         $this->assertEquals(5.0, $product->averageRating);
         $this->assertEquals('This is a premium, gorgeous bouquet!', $product->reviews->first()->comment);
     }
+
+    public function test_order_sizing_stock_constraints_on_approval_and_cancellation()
+    {
+        $user = User::factory()->create();
+        $client = Client::create([
+            'user_id' => $user->id,
+            'contact_name' => 'Jane Doe',
+            'email' => 'jane@example.com',
+            'phone' => '0712345678',
+            'region' => 'Nairobi',
+            'delivery_address' => '-1.292100, 36.821900',
+        ]);
+
+        $product1 = Product::create([
+            'name' => 'Rose Bouquet',
+            'sku' => 'NB-ROS-W1',
+            'price' => 2000,
+            'stock' => 20,
+            'category' => 'bouquets',
+        ]);
+
+        $order = Order::create([
+            'client_id' => $client->id,
+            'total_amount' => 5000,
+            'status' => 'pending',
+        ]);
+
+        $order->products()->attach($product1->id, [
+            'quantity' => 1,
+            'price_at_sale' => 3000,
+            'size' => 'deluxe',
+        ]);
+
+        $invoice = new \App\Models\EtimsInvoice();
+        $invoice->order_id = $order->id;
+        $invoice->internal_invoice_number = 'INV-2026-0001';
+        $invoice->gross_amount = 5000;
+        $invoice->taxable_amount = 4310;
+        $invoice->vat_amount = 690;
+        $invoice->status = 'transmitted';
+        $invoice->save();
+
+        $orderService = app(\App\Services\OrderService::class);
+        $orderService->approve($order);
+
+        $product1->refresh();
+        $this->assertEquals(18, $product1->stock);
+
+        $orderService->cancel($order);
+
+        $product1->refresh();
+        $this->assertEquals(20, $product1->stock);
+    }
 }

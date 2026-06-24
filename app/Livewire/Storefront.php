@@ -250,20 +250,57 @@ class Storefront extends Component
         $product = Product::find($productId);
         if (!$product) return;
 
-        $stock = match($size) {
-            'deluxe' => (int) floor($product->stock * 0.7),
-            'grand' => (int) floor($product->stock * 0.4),
-            default => $product->stock,
-        };
+        // If product has custom sizes
+        if ($product->sizes && is_array($product->sizes)) {
+            $sizeInfo = null;
+            foreach ($product->sizes as $s) {
+                if (strtolower($s['name']) === strtolower($size)) {
+                    $sizeInfo = $s;
+                    break;
+                }
+            }
+            if ($sizeInfo) {
+                $currentQty = 0;
+                $key = $productId . '-' . $size;
+                if (isset($this->cart[$key])) {
+                    $currentQty = $this->cart[$key];
+                }
+                if ($currentQty + 1 > $sizeInfo['stock']) {
+                    session()->flash('error', "Cannot add '{$size}' size. Out of stock (only {$sizeInfo['stock']} items available).");
+                    return;
+                }
+            }
+        } else {
+            // Size stock consumption multipliers: Standard = 1, Deluxe = 2, Grand = 3
+            $sizeMultiplier = match($size) {
+                'deluxe' => 2,
+                'grand' => 3,
+                default => 1,
+            };
 
-        $key = $productId . '-' . $size;
-        $currentQty = $this->cart[$key] ?? 0;
+            // Calculate baseline units currently in cart for this product
+            $consumedUnits = 0;
+            foreach ($this->cart as $cartKey => $qty) {
+                $parts = explode('-', $cartKey);
+                if ((int)$parts[0] === $productId) {
+                    $itemSize = $parts[1] ?? 'standard';
+                    $multiplier = match($itemSize) {
+                        'deluxe' => 2,
+                        'grand' => 3,
+                        default => 1,
+                    };
+                    $consumedUnits += $qty * $multiplier;
+                }
+            }
 
-        if ($currentQty >= $stock) {
-            session()->flash('error', 'Cannot add more of this size due to stock limits.');
-            return;
+            // Validate physical stock constraints
+            if ($consumedUnits + $sizeMultiplier > $product->stock) {
+                session()->flash('error', "Cannot add '{$size}' size. Out of stock (requires {$sizeMultiplier} units, only " . ($product->stock - $consumedUnits) . " units left).");
+                return;
+            }
         }
 
+        $key = $productId . '-' . $size;
         if (isset($this->cart[$key])) {
             $this->cart[$key]++;
         } else {
@@ -322,11 +359,11 @@ class Storefront extends Component
         } elseif (str_contains($lowerQuery, 'curat') || str_contains($lowerQuery, 'studio') || str_contains($lowerQuery, 'builder') || str_contains($lowerQuery, 'custom') || str_contains($lowerQuery, 'desk') || str_contains($lowerQuery, 'bouquet') || str_contains($lowerQuery, 'make') || str_contains($lowerQuery, 'design')) {
             $reply = "Our Curation Studio is a bespoke luxury design desk. You can customize every aspect:\n1. Occasion (00 Occasion) to set the design philosophy (e.g. Birthday, Anniversary, Sympathy).\n2. Blooms (01 Blooms) to select fresh export-grade stems.\n3. Wrapping & Accents (02 Wrapping) to select premium packaging, satin ribbons, and glitter dust.\n4. Fragrance Mist (03 Scent) to mist the petals with custom scent.\n5. Treats (04 Treats) to pair with fine wine, jewelry, or chocolate.\n6. Handwritten Letter (05 Note) for calligraphy personalization.\nClick 'Curate Selection' in the top menu to start your creation!";
         } elseif (str_contains($lowerQuery, 'theme') || str_contains($lowerQuery, 'color') || str_contains($lowerQuery, 'style') || str_contains($lowerQuery, 'onyx') || str_contains($lowerQuery, 'champagne') || str_contains($lowerQuery, 'rose')) {
-            $reply = "Atelier Noir & Bloom features three beautiful visual themes tailored to your aesthetic:\n• Onyx: A dark, gold-accented high-fashion mode.\n• Champagne: A clean, minimal, warm cream design system.\n• Rose: A romantic pink-blush luxury mode.\nYou can instantly change themes via the selector buttons in the top navigation header.";
+            $reply = "Atelier Noir & Bloom features two beautiful visual themes tailored to your aesthetic:\n• Dark: A dark, gold-accented high-fashion mode.\n• Light: A clean, minimal, warm cream design system.\nYou can instantly change themes via the selector buttons in the top navigation header.";
         } elseif (str_contains($lowerQuery, 'service') || str_contains($lowerQuery, 'subscription') || str_contains($lowerQuery, 'event') || str_contains($lowerQuery, 'wedding') || str_contains($lowerQuery, 'corp')) {
             $reply = "Beyond retail arrangements, we offer premium bespoke services:\n• Corporate Subscriptions: Weekly fresh rotations for hotels, offices, and showrooms.\n• Event Curation: Visual design, setups, and floral structures for weddings, private dinners, and galas.\n• Custom Hampers: Tailored luxury gifting suites and treat baskets.\nContact our events concierge at concierge@noirbloom.co.ke for details.";
         } elseif (str_contains($lowerQuery, 'contact') || str_contains($lowerQuery, 'phone') || str_contains($lowerQuery, 'email') || str_contains($lowerQuery, 'support') || str_contains($lowerQuery, 'concierge') || str_contains($lowerQuery, 'call') || str_contains($lowerQuery, 'number')) {
-            $reply = "Our concierge team is at your disposal:\n• Hotline Direct: +254 (0) 712 345 678\n• Email Dispatch: concierge@noirbloom.co.ke\nOperating Hours:\n• Mon - Sat: 07:00 - 20:00\n• Sunday: 09:00 - 17:00";
+            $reply = "Our concierge team is at your disposal:\n• Hotline Direct: +254140244330\n• Email Dispatch: concierge@noirbloom.co.ke\nOperating Hours:\n• Mon - Sat: 07:00 - 20:00\n• Sunday: 09:00 - 17:00";
         } elseif (str_contains($lowerQuery, 'tims') || str_contains($lowerQuery, 'vat') || str_contains($lowerQuery, 'tax')) {
             $reply = "Noir & Bloom is fully eTIMS compliant. Simply choose 'Corporate eTIMS' during checkout to input your KRA PIN and automatically generate a tax-compliant invoice.";
         } elseif (str_contains($lowerQuery, 'grade') || str_contains($lowerQuery, 'wholesale')) {
@@ -417,24 +454,87 @@ class Storefront extends Component
         $totalAmount = 0;
         $itemsToAttach = [];
 
+        // Final inventory reservation check
         foreach ($this->cart as $key => $quantity) {
             $parts = explode('-', $key);
             $productId = $parts[0];
             $size = $parts[1] ?? 'standard';
             $product = $products->firstWhere('id', $productId);
             if ($product) {
-                $priceMultiplier = match($size) {
-                    'deluxe' => 1.5,
-                    'grand' => 2.2,
-                    default => 1.0
-                };
-                $finalPrice = (int) round($product->price * $priceMultiplier);
+                if ($product->sizes && is_array($product->sizes)) {
+                    $sizeInfo = null;
+                    foreach ($product->sizes as $s) {
+                        if (strtolower($s['name']) === strtolower($size)) {
+                            $sizeInfo = $s;
+                            break;
+                        }
+                    }
+                    if ($sizeInfo) {
+                        if ($quantity > $sizeInfo['stock']) {
+                            $this->addError('paymentMethod', "Order contains items that exceed physical stock parameters. '{$product->name}' ({$size}) has only {$sizeInfo['stock']} units available, but your selection requires {$quantity} units.");
+                            return;
+                        }
+                    }
+                } else {
+                    $requiredUnits = 0;
+                    foreach ($this->cart as $k => $q) {
+                        $p = explode('-', $k);
+                        if ($p[0] === $productId) {
+                            $s = $p[1] ?? 'standard';
+                            $mult = match($s) {
+                                'deluxe' => 2,
+                                'grand' => 3,
+                                default => 1,
+                            };
+                            $requiredUnits += $q * $mult;
+                        }
+                    }
+                    
+                    if ($requiredUnits > $product->stock) {
+                        $this->addError('paymentMethod', "Order contains items that exceed physical stock parameters. '{$product->name}' has only {$product->stock} stock units available, but your selection requires {$requiredUnits} units.");
+                        return;
+                    }
+                }
+            }
+        }
+
+        foreach ($this->cart as $key => $quantity) {
+            $parts = explode('-', $key);
+            $productId = $parts[0];
+            $size = $parts[1] ?? 'standard';
+            $product = $products->firstWhere('id', $productId);
+            if ($product) {
+                $finalPrice = null;
+                $costPriceAtSale = 0;
+                
+                if ($product->sizes && is_array($product->sizes)) {
+                    foreach ($product->sizes as $s) {
+                        if (strtolower($s['name']) === strtolower($size)) {
+                            $finalPrice = (int)$s['price'];
+                            $costPriceAtSale = (int)($s['cost_price'] ?? 0);
+                            break;
+                        }
+                    }
+                }
+                
+                if ($finalPrice === null) {
+                    $priceMultiplier = match($size) {
+                        'deluxe' => 1.5,
+                        'grand' => 2.2,
+                        default => 1.0
+                    };
+                    $finalPrice = (int) round($product->price * $priceMultiplier);
+                    $costPriceAtSale = (int) round($product->cost_price * $priceMultiplier);
+                }
+                
                 $totalAmount += ($finalPrice * $quantity);
                 
                 $itemsToAttach[] = [
                     'product_id' => $productId,
                     'quantity' => $quantity,
-                    'price_at_sale' => $finalPrice
+                    'price_at_sale' => $finalPrice,
+                    'cost_price_at_sale' => $costPriceAtSale,
+                    'size' => $size,
                 ];
             }
         }
@@ -478,6 +578,7 @@ class Storefront extends Component
 
             $customizations = session()->get('noir_bloom_customizations', []);
             $customMsg = $customizations['card_message'] ?? null;
+            $printPref = $customizations['card_print_preference'] ?? 'handwritten';
             $ribbonColor = $customizations['ribbon_color'] ?? null;
             $glitter = $customizations['glitter'] ?? 'No';
             $curationOccasion = $customizations['curation_occasion'] ?? null;
@@ -487,7 +588,8 @@ class Storefront extends Component
                 $specialInstructions .= ' | Curation Occasion: ' . strtoupper($curationOccasion);
             }
             if ($customMsg) {
-                $specialInstructions .= ' | Handwritten Note: ' . $customMsg;
+                $noteLabel = ($printPref === 'typography' || $printPref === 'printed') ? 'Printed Note' : 'Handwritten Note';
+                $specialInstructions .= ' | ' . $noteLabel . ': ' . $customMsg;
             }
             if ($ribbonColor && $ribbonColor !== 'None') {
                 $specialInstructions .= ' | Ribbon Accent: ' . $ribbonColor;
@@ -511,7 +613,9 @@ class Storefront extends Component
             foreach ($itemsToAttach as $item) {
                 $order->products()->attach($item['product_id'], [
                     'quantity' => $item['quantity'],
-                    'price_at_sale' => $item['price_at_sale']
+                    'price_at_sale' => $item['price_at_sale'],
+                    'cost_price_at_sale' => $item['cost_price_at_sale'],
+                    'size' => $item['size'],
                 ]);
             }
 
@@ -544,6 +648,8 @@ class Storefront extends Component
             $this->cart = [];
             session()->forget('noir_bloom_cart');
             session()->forget('noir_bloom_customizations');
+        } elseif ($this->paymentMethod === 'mpesa') {
+            $this->initiateMpesaPayment(app(MpesaService::class));
         }
     }
 
@@ -797,12 +903,24 @@ class Storefront extends Component
             $size = $parts[1] ?? 'standard';
             $product = $products->get($id);
             if ($product) {
-                $priceMultiplier = match($size) {
-                    'deluxe' => 1.5,
-                    'grand' => 2.2,
-                    default => 1.0
-                };
-                $finalPrice = (int) round($product->price * $priceMultiplier);
+                $finalPrice = null;
+                if ($product->sizes && is_array($product->sizes)) {
+                    foreach ($product->sizes as $s) {
+                        if (strtolower($s['name']) === strtolower($size)) {
+                            $finalPrice = (int)$s['price'];
+                            break;
+                        }
+                    }
+                }
+
+                if ($finalPrice === null) {
+                    $priceMultiplier = match($size) {
+                        'deluxe' => 1.5,
+                        'grand' => 2.2,
+                        default => 1.0
+                    };
+                    $finalPrice = (int) round($product->price * $priceMultiplier);
+                }
 
                 $clonedProduct = clone $product;
                 $clonedProduct->price = $finalPrice;

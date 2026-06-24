@@ -36,7 +36,7 @@ class ReportIndex extends Component
             ->join('products', 'order_product.product_id', '=', 'products.id')
             ->where('orders.status', '!=', 'cancelled')
             ->whereBetween('orders.created_at', [$start, $end])
-            ->sum(DB::raw('order_product.quantity * products.cost_price'));
+            ->sum(DB::raw("order_product.quantity * COALESCE(NULLIF(order_product.cost_price_at_sale, 0), products.cost_price * (CASE WHEN order_product.size = 'deluxe' THEN 2 WHEN order_product.size = 'grand' THEN 3 ELSE 1 END))"));
 
         $wastage = (int) \App\Models\WastageLog::whereBetween('created_at', [$start, $end])->sum('cost_estimate');
         $netProfit = $revenue - $cogs - $wastage;
@@ -129,7 +129,7 @@ class ReportIndex extends Component
             ->join('products', 'order_product.product_id', '=', 'products.id')
             ->where('orders.status', '!=', 'cancelled')
             ->whereBetween('orders.created_at', [$start, $end])
-            ->sum(DB::raw('order_product.quantity * products.cost_price'));
+            ->sum(DB::raw("order_product.quantity * COALESCE(NULLIF(order_product.cost_price_at_sale, 0), products.cost_price * (CASE WHEN order_product.size = 'deluxe' THEN 2 WHEN order_product.size = 'grand' THEN 3 ELSE 1 END))"));
 
         $wastage = (int) \App\Models\WastageLog::whereBetween('created_at', [$start, $end])->sum('cost_estimate');
         $netProfit = $totalSales - $cogs - $wastage;

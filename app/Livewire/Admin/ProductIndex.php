@@ -46,6 +46,7 @@ class ProductIndex extends Component
     public ?string $image_url = null;
     public $image_file = null;
     public ?int $selectedBranchId = null;
+    public array $sizesList = [];
 
     // Delete confirmation
     public bool $showDeleteModal = false;
@@ -73,7 +74,28 @@ class ProductIndex extends Component
             'image_url' => 'nullable|string|max:500',
             'image_file' => 'nullable|image|max:2048',
             'selectedBranchId' => 'nullable|exists:branches,id',
+            'sizesList' => 'nullable|array',
+            'sizesList.*.name' => 'required|string|min:1|max:50',
+            'sizesList.*.price' => 'required|integer|min:0',
+            'sizesList.*.cost_price' => 'required|integer|min:0',
+            'sizesList.*.stock' => 'required|integer|min:0',
         ];
+    }
+
+    public function addSizeVariation(): void
+    {
+        $this->sizesList[] = [
+            'name' => '',
+            'price' => 0,
+            'cost_price' => 0,
+            'stock' => 0,
+        ];
+    }
+
+    public function removeSizeVariation(int $index): void
+    {
+        unset($this->sizesList[$index]);
+        $this->sizesList = array_values($this->sizesList);
     }
 
     public function updatingSearch(): void
@@ -118,6 +140,7 @@ class ProductIndex extends Component
         $this->unit_type = $product->unit_type ?? 'arrangement';
         $this->grade = $product->grade;
         $this->image_url = $product->image_url;
+        $this->sizesList = $product->sizes ?? [];
         $this->isEditing = true;
         $this->showModal = true;
     }
@@ -135,6 +158,23 @@ class ProductIndex extends Component
 
         $selectedBranch = $validated['selectedBranchId'] ?? null;
         unset($validated['selectedBranchId']);
+
+        $sizes = $this->sizesList ?: null;
+        if ($sizes) {
+            $totalStock = 0;
+            foreach ($sizes as $idx => $size) {
+                $sizes[$idx]['price'] = (int)$size['price'];
+                $sizes[$idx]['cost_price'] = (int)$size['cost_price'];
+                $sizes[$idx]['stock'] = (int)$size['stock'];
+                $totalStock += $sizes[$idx]['stock'];
+            }
+            $validated['sizes'] = $sizes;
+            $validated['stock'] = $totalStock;
+            $this->stock = $totalStock;
+        } else {
+            $validated['sizes'] = null;
+        }
+        unset($validated['sizesList']);
 
         if ($this->isEditing && $this->editingProductId) {
             $product = Product::findOrFail($this->editingProductId);
@@ -199,13 +239,14 @@ class ProductIndex extends Component
         $this->reset([
             'editingProductId', 'name', 'sku', 'description',
             'price', 'cost_price', 'stock', 'category', 'unit_type', 'grade',
-            'image_url', 'image_file', 'isEditing', 'selectedBranchId'
+            'image_url', 'image_file', 'isEditing', 'selectedBranchId', 'sizesList'
         ]);
         $this->price = 0;
         $this->cost_price = 0;
         $this->stock = 0;
         $this->category = 'stems';
         $this->unit_type = 'arrangement';
+        $this->sizesList = [];
     }
 
     public function openStockLogModal(): void

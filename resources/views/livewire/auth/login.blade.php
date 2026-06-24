@@ -3,27 +3,27 @@
 
         {{-- Header --}}
         <div class="space-y-4">
-            <div class="flex items-baseline gap-2">
-                <span class="text-[8px] font-mono tracking-[0.4em] text-[#D4AF37]/50 uppercase">Atelier</span>
+            <div class="flex items-baseline gap-2.5">
+                <span class="text-[10px] font-mono tracking-[0.4em] text-[#D4AF37] uppercase">Atelier</span>
                 <span 
-                    :class="theme === 'light' ? 'text-neutral-800/80' : 'text-white/80'"
-                    class="text-[10px] font-semibold uppercase tracking-[0.3em] transition-colors"
-                >Noir & Bloom</span>
+                    :class="theme === 'light' ? 'text-neutral-900' : 'text-white'"
+                    class="text-xs font-serif font-bold uppercase tracking-[0.3em] transition-colors"
+                >Noir &amp; Bloom</span>
             </div>
 
             <div class="space-y-2">
                 <h2 
                     :class="theme === 'light' ? 'text-neutral-900' : 'text-white'"
-                    class="text-[22px] font-[Instrument_Serif] font-normal leading-tight transition-colors"
+                    class="text-3xl font-serif italic font-normal leading-tight transition-colors"
                 >
-                    Welcome back
+                    Welcome Back
                 </h2>
-                <p class="text-[11px] font-light text-neutral-500 tracking-wide">
-                    Sign in to your atelier account to continue.
+                <p class="text-xs font-light text-neutral-500 tracking-wide">
+                    Sign in to your luxury atelier dashboard.
                 </p>
             </div>
 
-            <div :class="theme === 'light' ? 'bg-neutral-200' : 'bg-neutral-800'" class="w-10 h-px transition-colors"></div>
+            <div :class="theme === 'light' ? 'bg-neutral-350' : 'bg-neutral-850'" class="w-12 h-[1px] transition-colors"></div>
         </div>
 
         {{-- Session expired notification --}}
@@ -71,31 +71,41 @@
 
             {{-- Password --}}
             <div class="space-y-2" x-data="{ showPassword: false }">
-                <div class="flex items-center justify-between">
-                    <label 
-                        for="password" 
-                        :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-500'"
-                        class="text-[10px] uppercase tracking-[0.2em] font-mono block transition-colors"
+                <label 
+                    for="password" 
+                    :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-500'"
+                    class="text-[10px] uppercase tracking-[0.2em] font-mono block transition-colors"
+                >
+                    Password
+                </label>
+                <div class="relative flex items-center">
+                    <input
+                        id="password"
+                        :type="showPassword ? 'text' : 'password'"
+                        wire:model="password"
+                        placeholder="••••••••••"
+                        autocomplete="current-password"
+                        :class="theme === 'light' ? 'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500' : 'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600'"
+                        class="border rounded-sm pl-4 pr-11 py-3 text-sm focus:outline-none transition-all w-full font-light"
                     >
-                        Password
-                    </label>
                     <button
                         type="button"
                         @click="showPassword = !showPassword"
-                        :class="theme === 'light' ? 'text-neutral-500 hover:text-neutral-800' : 'text-neutral-600 hover:text-neutral-400'"
-                        class="text-[9px] font-mono tracking-wider transition-colors cursor-pointer uppercase"
-                        x-text="showPassword ? 'Hide' : 'Show'"
-                    ></button>
+                        :class="theme === 'light' ? 'text-neutral-500 hover:text-neutral-800' : 'text-neutral-500 hover:text-neutral-300'"
+                        class="absolute right-3.5 focus:outline-none transition-colors cursor-pointer select-none"
+                        title="Toggle Password Visibility"
+                    >
+                        {{-- Eye Open SVG --}}
+                        <svg x-show="!showPassword" class="w-4 h-4 fill-none stroke-current" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {{-- Eye Closed SVG --}}
+                        <svg x-show="showPassword" class="w-4 h-4 fill-none stroke-current" stroke-width="1.5" viewBox="0 0 24 24" style="display:none;">
+                            <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 12s4-8 11-8c2.12 0 3.89.69 5.3 1.76M3 3l18 18" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
                 </div>
-                <input
-                    id="password"
-                    :type="showPassword ? 'text' : 'password'"
-                    wire:model="password"
-                    placeholder="••••••••••"
-                    autocomplete="current-password"
-                    :class="theme === 'light' ? 'bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500' : 'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600 focus:border-neutral-600'"
-                    class="border rounded-sm px-4 py-3 text-sm focus:outline-none transition-all w-full font-light"
-                >
                 @error('password')
                     <p class="text-[10px] font-mono text-rose-400 mt-1">{{ $message }}</p>
                 @enderror

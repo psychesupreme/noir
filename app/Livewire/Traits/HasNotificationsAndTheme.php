@@ -63,14 +63,16 @@ trait HasNotificationsAndTheme
         }
     }
 
-    public function clearAllNotifications(): void
+    public function markAllAsSeen(): void
     {
         $user = auth()->user();
         if ($user) {
-            Notification::where('user_id', $user->id)->delete();
+            Notification::where('user_id', $user->id)
+                ->where('is_read', false)
+                ->update(['is_read' => true]);
             
             // Log to system logs
-            \App\Models\SystemLog::write('info', 'system', "User cleared all notifications.", [
+            \App\Models\SystemLog::write('info', 'system', "User marked all notifications as read.", [
                 'user_id' => $user->id
             ]);
 
@@ -78,10 +80,15 @@ trait HasNotificationsAndTheme
         }
     }
 
-    public function updatePreferredTheme(string $theme): void
+    public function updatePreferredTheme(string|array $theme): void
     {
         $user = auth()->user();
         if ($user) {
+            if (is_array($theme)) {
+                $theme = isset($theme[0]) ? (string)$theme[0] : (isset($theme['theme']) ? (string)$theme['theme'] : 'light');
+            }
+            $theme = ($theme === 'dark' || $theme === 'onyx') ? 'dark' : 'light';
+
             $settings = $user->settings ?? [];
             $settings['preferred_theme'] = $theme;
             $user->update(['settings' => $settings]);

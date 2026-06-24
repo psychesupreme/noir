@@ -343,4 +343,23 @@ class PaymentPollingAndTaxReceiptTest extends TestCase
 
         $this->assertEquals('ws_CO_123', $payment->fresh()->checkout_request_id);
     }
+
+    /**
+     * Test formatPhoneNumber helper in MpesaService.
+     */
+    public function test_mpesa_phone_number_formatting_cleans_various_inputs(): void
+    {
+        $mpesa = new \App\Services\MpesaService();
+        
+        $reflection = new \ReflectionClass(\App\Services\MpesaService::class);
+        $method = $reflection->getMethod('formatPhoneNumber');
+        $method->setAccessible(true);
+
+        $this->assertEquals('254712345678', $method->invoke($mpesa, '0712345678'));
+        $this->assertEquals('254712345678', $method->invoke($mpesa, '712345678'));
+        $this->assertEquals('254712345678', $method->invoke($mpesa, '+254712345678'));
+        $this->assertEquals('254712345678', $method->invoke($mpesa, '+254 (0) 712 345 678'));
+        $this->assertEquals('254112345678', $method->invoke($mpesa, '0112345678'));
+        $this->assertEquals('254712345678', $method->invoke($mpesa, '2540712345678'));
+    }
 }

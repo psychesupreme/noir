@@ -32,12 +32,13 @@ class CurationBuilder extends Component
     public string $cardMessage = '';
     public int $activeStep = 1;
     public string $curationOccasion = 'birthday';
+    public string $cardPrintPreference = 'handwritten';
 
     // Calculated fields
     public $subtotal = 0;
 
     // Theme variable synchronized with site
-    public $theme = 'onyx';
+    public $theme = 'light';
 
     public function mount()
     {
@@ -343,6 +344,7 @@ class CurationBuilder extends Component
 
         session()->put('noir_bloom_customizations', [
             'card_message' => $this->hasCard ? $this->cardMessage : null,
+            'card_print_preference' => $this->hasCard ? $this->cardPrintPreference : null,
             'ribbon_color' => $ribbonName !== 'None' ? $ribbonName : null,
             'glitter' => $this->hasGlitter ? 'Yes' : 'No',
             'curation_occasion' => $this->curationOccasion

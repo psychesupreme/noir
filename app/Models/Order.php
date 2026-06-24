@@ -95,7 +95,7 @@ class Order extends Model
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class)->withPivot('quantity', 'price_at_sale')->withTimestamps();
+        return $this->belongsToMany(Product::class)->withPivot('quantity', 'price_at_sale', 'cost_price_at_sale', 'size')->withTimestamps();
     }
     /**
      * Get all payment records and STK push requests logged against this order.

@@ -208,4 +208,19 @@ class CurationBuilderTest extends TestCase
             ->set('activeStep', 5)
             ->assertSet('activeStep', 5);
     }
+
+    public function test_card_message_with_print_preference_customizations(): void
+    {
+        Livewire::test(\App\Livewire\CurationBuilder::class)
+            ->set('hasCard', true)
+            ->set('cardMessage', 'With love and best wishes!')
+            ->set('cardPrintPreference', 'typography')
+            ->call('addToCart')
+            ->assertRedirect(route('storefront'));
+
+        $customizations = session()->get('noir_bloom_customizations');
+        $this->assertNotNull($customizations);
+        $this->assertEquals('With love and best wishes!', $customizations['card_message']);
+        $this->assertEquals('typography', $customizations['card_print_preference']);
+    }
 }
