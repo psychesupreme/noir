@@ -15,7 +15,7 @@
     <script>
         (function() {
             const storedTheme = localStorage.getItem('nb_theme');
-            const theme = (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'onyx') ? (storedTheme === 'onyx' ? 'dark' : storedTheme) : 'light';
+            const theme = (storedTheme === 'onyx' || storedTheme === 'dark') ? 'dark' : 'light';
             document.documentElement.className = theme;
             document.documentElement.setAttribute('data-theme', theme);
         })();

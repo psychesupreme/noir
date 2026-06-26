@@ -259,8 +259,8 @@ html { scroll-behavior: smooth; }
    ADMIN SYSTEM THEMING OVERRIDES — Theme-aware ERP Styles
    ═══════════════════════════════════════════════════════════ */
 
-/* Champagne (light theme) overrides */
-.champagne {
+/* Light theme overrides */
+.light {
   --bg-base: #FAF7F0;
   --bg-card: #FFFFFF;
   --border-base: #E8E2D5;
@@ -268,89 +268,101 @@ html { scroll-behavior: smooth; }
   --text-secondary: #78716C;
 }
 
-.champagne aside,
-.champagne header,
-.champagne [class*="bg-[#0F0F12]"],
-.champagne [class*="bg-[#0A0A0A]"],
-.champagne [class*="bg-[#0C0C0E]"],
-.champagne [class*="bg-[#070709]"],
-.champagne [class*="bg-[#050507]"],
-.champagne [class*="bg-black"],
-.champagne [class*="bg-neutral-900"],
-.champagne [class*="bg-neutral-950"] {
+.light aside,
+.light header,
+.light [class*="bg-[#0F0F12]"]:not(button):not(a):not([role="button"]),
+.light [class*="bg-[#0A0A0A]"]:not(button):not(a):not([role="button"]),
+.light [class*="bg-[#0C0C0E]"]:not(button):not(a):not([role="button"]),
+.light [class*="bg-[#070709]"]:not(button):not(a):not([role="button"]),
+.light [class*="bg-[#050507]"]:not(button):not(a):not([role="button"]),
+.light [class*="bg-black"]:not(button):not(a):not([role="button"]),
+.light [class*="bg-neutral-900"]:not(button):not(a):not([role="button"]),
+.light [class*="bg-neutral-950"]:not(button):not(a):not([role="button"]) {
   background-color: #FFFFFF !important;
   color: #1C1917 !important;
 }
 
 /* Specific contrast for inputs and textareas in light mode */
-.champagne input,
-.champagne select,
-.champagne textarea,
-.champagne [class*="bg-[#0A0A0A]"] input,
-.champagne [class*="bg-[#0A0A0A]"] select,
-.champagne [class*="bg-[#0A0A0A]"] textarea {
+.light input,
+.light select,
+.light textarea,
+.light [class*="bg-[#0A0A0A]"] input,
+.light [class*="bg-[#0A0A0A]"] select,
+.light [class*="bg-[#0A0A0A]"] textarea {
   background-color: #F5EFE4 !important;
   color: #1C1917 !important;
   border-color: #D3C9B9 !important;
 }
 
 /* Mute background pulse / warning blocks in light mode */
-.champagne [class*="bg-amber-950/40"],
-.champagne [class*="bg-blue-950/50"],
-.champagne [class*="bg-violet-950/50"],
-.champagne [class*="bg-emerald-950/50"],
-.champagne [class*="bg-rose-950/50"],
-.champagne [class*="bg-rose-950/20"],
-.champagne [class*="bg-amber-950/20"] {
+.light [class*="bg-amber-950/40"],
+.light [class*="bg-blue-950/50"],
+.light [class*="bg-violet-950/50"],
+.light [class*="bg-emerald-950/50"],
+.light [class*="bg-rose-950/50"],
+.light [class*="bg-rose-950/20"],
+.light [class*="bg-amber-950/20"] {
   background-color: #F2EDE2 !important;
 }
 
-.champagne [class*="border-neutral-900"],
-.champagne [class*="border-neutral-800"],
-.champagne [class*="border-neutral-700"],
-.champagne [class*="border-border-base"] {
+.light [class*="border-neutral-900"],
+.light [class*="border-neutral-800"],
+.light [class*="border-neutral-700"],
+.light [class*="border-border-base"] {
   border-color: #E8E2D5 !important;
 }
 
-.champagne h1,
-.champagne h2,
-.champagne h3,
-.champagne h4,
-.champagne h5,
-.champagne [class*="text-white"],
-.champagne [class*="text-neutral-200"],
-.champagne [class*="text-neutral-300"],
-.champagne [class*="text-neutral-400"] {
+.light h1,
+.light h2,
+.light h3,
+.light h4,
+.light h5,
+.light [class*="text-white"]:not(button):not(a):not([role="button"]):not(button *):not(a *):not([role="button"] *),
+.light [class*="text-neutral-50"]:not(button):not(a):not([role="button"]):not(button *):not(a *):not([role="button"] *),
+.light [class*="text-neutral-100"]:not(button):not(a):not([role="button"]):not(button *):not(a *):not([role="button"] *),
+.light [class*="text-neutral-200"]:not(button):not(a):not([role="button"]):not(button *):not(a *):not([role="button"] *),
+.light [class*="text-neutral-300"]:not(button):not(a):not([role="button"]):not(button *):not(a *):not([role="button"] *),
+.light [class*="text-neutral-400"]:not(button):not(a):not([role="button"]):not(button *):not(a *):not([role="button"] *) {
   color: #1C1917 !important;
 }
 
 /* Ensure buttons with white/light text and dark backgrounds retain legibility in light theme */
-.champagne button.text-white,
-.champagne button [class*="text-white"],
-.champagne button.bg-emerald-850,
-.champagne button.bg-emerald-850 *,
-.champagne button.bg-emerald-800,
-.champagne button.bg-emerald-800 *,
-.champagne button[class*="bg-emerald-"],
-.champagne button[class*="bg-emerald-"] *,
-.champagne button.bg-neutral-950,
-.champagne button.bg-neutral-950 *,
-.champagne button.bg-neutral-900,
-.champagne button.bg-neutral-900 *,
-.champagne button.bg-black,
-.champagne button.bg-black *,
-.champagne a.bg-emerald-800,
-.champagne a.bg-emerald-800 * {
+.light button.text-white,
+.light button [class*="text-white"],
+.light button.bg-emerald-850,
+.light button.bg-emerald-850 *,
+.light button.bg-emerald-800,
+.light button.bg-emerald-800 *,
+.light button[class*="bg-emerald-"],
+.light button[class*="bg-emerald-"] *,
+.light button.bg-neutral-950,
+.light button.bg-neutral-950 *,
+.light button.bg-neutral-900,
+.light button.bg-neutral-900 *,
+.light button.bg-neutral-800,
+.light button.bg-neutral-800 *,
+.light button.bg-black,
+.light button.bg-black *,
+.light a.bg-emerald-800,
+.light a.bg-emerald-800 *,
+.light a.bg-neutral-950,
+.light a.bg-neutral-950 *,
+.light a.bg-black,
+.light a.bg-black *,
+.light [role="button"].bg-neutral-950,
+.light [role="button"].bg-neutral-950 *,
+.light [role="button"].bg-black,
+.light [role="button"].bg-black * {
   color: #FFFFFF !important;
 }
 
 /* Make highlighted texts/indicators legible on light bg */
-.champagne [class*="text-amber-500"],
-.champagne [class*="text-amber-400"] {
+.light [class*="text-amber-500"],
+.light [class*="text-amber-400"] {
   color: #B59A7A !important;
 }
-.champagne [class*="text-emerald-500"],
-.champagne [class*="text-emerald-400"] {
+.light [class*="text-emerald-500"],
+.light [class*="text-emerald-400"] {
   color: #047857 !important;
 }
 .light [class*="text-rose-500"],

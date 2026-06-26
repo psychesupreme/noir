@@ -58,7 +58,7 @@
         'bg-[#050507] text-[#E4E4E7]': theme === 'dark',
         'bg-[#FAF7F0] text-[#1C1C20]': theme === 'light',
     }"
-    class="min-h-screen font-sans antialiased relative text-left flex flex-col justify-between transition-colors duration-500 overflow-x-hidden storefront-grain"
+    class="min-h-screen font-sans antialiased relative text-left flex flex-col justify-between transition-colors duration-500 overflow-x-clip storefront-grain"
 >
     <!-- Interactive SVG ambient floral background overlay -->
     <svg id="flower-ambient-svg" class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-15 overflow-hidden" style="perspective: 800px; transform-style: preserve-3d;"></svg>
@@ -1051,10 +1051,10 @@
             'border-neutral-900 bg-[#070709] text-neutral-400': theme === 'dark',
             'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'light'
         }"
-        class="border-t mt-20 py-10 px-6 transition-colors duration-500 z-10 relative theme-section"
+        class="border-t mt-12 py-6 px-6 transition-colors duration-500 z-10 relative theme-section"
     >
-        <div class="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
-            <div class="space-y-4">
+        <div class="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+            <div class="space-y-2.5">
                 <div class="flex items-baseline space-x-2">
                     <span class="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
                     <h4 :class="theme === 'light' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">Noir & Bloom</h4>
@@ -1064,27 +1064,27 @@
                 </p>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-2.5">
                 <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Showroom</h5>
                 <ul class="space-y-2 text-xs font-light">
-                    <li><a href="/?collection=retail" class="hover:underline">Bespoke Retail Arrays</a></li>
-                    <li><a href="/?collection=wholesale" class="hover:underline">Wholesale Graded Stems</a></li>
-                    <li><a href="/?collection=giftings" class="hover:underline">Luxury Giftings</a></li>
+                    <li><a href="/?tier=bouquet" class="hover:underline">Bespoke Retail Arrays</a></li>
+                    <li><a href="/?tier=stems" class="hover:underline">Wholesale Graded Stems</a></li>
+                    <li><a href="/?tier=giftings" class="hover:underline">Luxury Giftings</a></li>
                     <li><a href="/profile-portal" class="hover:underline">Atelier Loyalty Circle</a></li>
                 </ul>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-2.5">
                 <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">Concierge Dispatch</h5>
                 <ul class="space-y-2 text-xs font-light">
                     <li><span class="block text-neutral-500">Operating Hours</span> Mon &mdash; Sat: 07:00 &mdash; 20:00</li>
                     <li>Sunday: 09:00 &mdash; 17:00</li>
-                    <li class="pt-2"><span class="block text-neutral-500 font-mono text-[11px] uppercase tracking-wider">Hotline Direct</span> +254 (0) 712 345 678</li>
+                    <li class="pt-2"><span class="block text-neutral-500 font-mono text-[11px] uppercase tracking-wider">Hotline Direct</span> +254 (0) 712354697</li>
                     <li>concierge@noirbloom.co.ke</li>
                 </ul>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-2.5">
                 <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Atelier Bulletin</h5>
                 <p class="text-xs font-light leading-relaxed">
                     Subscribe for seasonal curation updates, wholesale catalog changes, and exclusive releases.

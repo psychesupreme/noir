@@ -1049,11 +1049,11 @@
             'border-neutral-900 bg-[#070709] text-neutral-400': theme === 'dark',
             'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'light',
         }"
-        class="border-t mt-20 py-10 px-6 transition-colors duration-500 z-10 relative theme-section"
+        class="border-t mt-12 py-6 px-6 transition-colors duration-500 z-10 relative theme-section"
     >
-        <div class="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
+        <div class="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
             <!-- Col 1: Brand & Info -->
-            <div class="space-y-4">
+            <div class="space-y-2.5">
                 <div class="flex items-baseline space-x-2">
                     <span class="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
                     <h4 :class="theme === 'light' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">Noir & Bloom</h4>
@@ -1064,29 +1064,29 @@
             </div>
 
             <!-- Col 2: Showroom Catalog Links -->
-            <div class="space-y-4">
+            <div class="space-y-2.5">
                 <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Showroom</h5>
                 <ul class="space-y-2 text-xs font-light">
-                    <li><a href="/?collection=retail" class="hover:underline">Bespoke Retail Arrays</a></li>
-                    <li><a href="/?collection=wholesale" class="hover:underline">Wholesale Graded Stems</a></li>
-                    <li><a href="/?collection=giftings" class="hover:underline">Luxury Giftings</a></li>
+                    <li><a href="/?tier=bouquet" class="hover:underline">Bespoke Retail Arrays</a></li>
+                    <li><a href="/?tier=stems" class="hover:underline">Wholesale Graded Stems</a></li>
+                    <li><a href="/?tier=giftings" class="hover:underline">Luxury Giftings</a></li>
                     <li><a href="/profile-portal" class="hover:underline">Atelier Loyalty Circle</a></li>
                 </ul>
             </div>
 
             <!-- Col 3: Hours & Support -->
-            <div class="space-y-4">
+            <div class="space-y-2.5">
                 <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">Concierge Dispatch</h5>
                 <ul class="space-y-2 text-xs font-light">
                     <li><span class="block text-neutral-500">Operating Hours</span> Mon &mdash; Sat: 07:00 &mdash; 20:00</li>
                     <li>Sunday: 09:00 &mdash; 17:00</li>
-                    <li class="pt-2"><span class="block text-neutral-500 font-mono text-[11px] uppercase tracking-wider">Hotline Direct</span> +254 (0) 712 345 678</li>
+                    <li class="pt-2"><span class="block text-neutral-500 font-mono text-[11px] uppercase tracking-wider">Hotline Direct</span> +254 (0) 712354697</li>
                     <li>concierge@noirbloom.co.ke</li>
                 </ul>
             </div>
 
             <!-- Col 4: Newsletter -->
-            <div class="space-y-4">
+            <div class="space-y-2.5">
                 <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Atelier Bulletin</h5>
                 <p class="text-xs font-light leading-relaxed">
                     Subscribe for seasonal curation updates, wholesale catalog changes, and exclusive releases.
@@ -1145,7 +1145,7 @@
                        'border-neutral-200 text-neutral-400 hover:text-black hover:border-black hover:shadow-[0_0_15px_rgba(0,0,0,0.15)]': theme === 'light',
                    }"
                    title="Follow us on X (Twitter)">
-                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                     </svg>
                 </a>
@@ -1162,7 +1162,7 @@
                     </svg>
                 </a>
                 {{-- WhatsApp --}}
-                <a href="https://wa.me/254712345678" target="_blank" rel="noopener"
+                <a href="https://wa.me/254712354697" target="_blank" rel="noopener"
                    class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
                    :class="{
                        'border-neutral-800 text-neutral-500 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.3)]': theme === 'dark',
@@ -1393,10 +1393,10 @@
                         try {
                             @auth
                                 const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
-                                if (pref) return pref;
+                                if (pref) return (pref === 'onyx' || pref === 'dark') ? 'dark' : 'light';
                             @endauth
                             const stored = localStorage.getItem('nb_theme');
-                            return (stored === 'dark' || stored === 'light') ? stored : 'dark';
+                            return (stored === 'onyx' || stored === 'dark') ? 'dark' : 'light';
                         } catch (e) {
                             return 'light';
                         }
@@ -1452,9 +1452,9 @@
                         var storedTheme = localStorage.getItem('nb_theme');
                         @auth
                             const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
-                            this.theme = pref || (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'light' ? storedTheme : 'light');
+                            this.theme = (pref === 'onyx' || pref === 'dark') ? 'dark' : ((pref === 'light') ? 'light' : ((storedTheme === 'onyx' || storedTheme === 'dark') ? 'dark' : 'light'));
                         @else
-                            this.theme = (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'light') ? storedTheme : 'light';
+                            this.theme = (storedTheme === 'onyx' || storedTheme === 'dark') ? 'dark' : 'light';
                         @endauth
                         var self = this;
 

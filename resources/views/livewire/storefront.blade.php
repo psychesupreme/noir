@@ -67,10 +67,10 @@
             try {
                 @auth
                     const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
-                    if (pref) return pref;
+                    if (pref) return (pref === 'onyx' || pref === 'dark') ? 'dark' : 'light';
                 @endauth
                 const stored = localStorage.getItem('nb_theme');
-                return (stored === 'dark' || stored === 'light') ? stored : 'dark';
+                return (stored === 'onyx' || stored === 'dark') ? 'dark' : 'light';
             } catch (e) {
                 return 'light';
             }
@@ -590,6 +590,7 @@
                                         <span class="text-[8px] text-neutral-500 font-light block mt-0.5">Creamy light mode with emerald highlights.</span>
                                     </div>
                                 </div>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -821,37 +822,36 @@
     @endphp
 
     @if($offerProducts->count() > 0)
-        <div class="w-full pb-2 pt-0 shrink-0 mt-0 z-10 relative animate-layer-3">
-            <div class="relative w-full overflow-hidden py-2 border-y backdrop-blur-sm transition-colors duration-500"
+        <div class="w-full pb-6 pt-2 shrink-0 mt-0 z-10 relative animate-layer-3">
+            <div class="w-full py-4 border-y backdrop-blur-sm transition-colors duration-500 px-4 md:px-6 animate-layer-3"
                  :class="theme === 'light' ? 'bg-white/30 border-neutral-200/50' : 'bg-neutral-950/20 border-neutral-900/60'">
-                <div class="flex whitespace-nowrap space-x-4 w-max animate-marquee">
-                    @for($i = 0; $i < 4; $i++)
-                        @foreach($offerProducts as $product)
-                            @php
-                                $originalPrice = (int) round($product->price * 1.18);
-                                $discountPercent = 15;
-                            @endphp
-                            <div :class="theme === 'light' ? 'bg-white/80 border-neutral-200/50 text-neutral-900' : 'bg-[#0F0F12]/80 border-neutral-900/60 text-white'"
-                                 class="inline-flex items-center space-x-3 p-2 rounded-xl border w-[250px] transition-all duration-300 hover:border-[#C5A880] cursor-pointer theme-section"
-                                 @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
-                            >
-                                <div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-950/5 relative">
-                                    <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
-                                    <div class="absolute top-0.5 left-0.5 bg-red-500 text-white text-[6px] font-bold px-1 py-0.5 rounded-sm">
-                                        -{{ $discountPercent }}%
-                                    </div>
-                                </div>
-                                <div class="flex-1 min-w-0 text-left">
-                                    <span class="text-[8px] uppercase tracking-widest text-[#C5A880] font-outfit block font-bold">{{ str_replace('_', ' ', $product->category) }}</span>
-                                    <h4 class="font-serif italic text-[11px] tracking-wide truncate mt-0.5">{{ $product->name }}</h4>
-                                    <div class="flex items-center space-x-2 mt-0.5 font-mono text-[8px]">
-                                        <span class="text-neutral-500 line-through">{{ number_format($originalPrice) }} KSH</span>
-                                        <span class="text-amber-500 font-bold">{{ number_format($product->price) }} KSH</span>
-                                    </div>
+                <div class="text-[9px] uppercase tracking-wider text-neutral-450 font-mono mb-3 block font-bold pl-2">Deals, Discounts &amp; Sales</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    @foreach($offerProducts as $product)
+                        @php
+                            $originalPrice = (int) round($product->price * 1.18);
+                            $discountPercent = 15;
+                        @endphp
+                        <div :class="theme === 'light' ? 'bg-white/80 border-neutral-200/50 text-neutral-900 shadow-sm' : 'bg-[#0F0F12]/80 border-neutral-900/60 text-white'"
+                             class="flex items-center space-x-3 p-3 rounded-xl border transition-all duration-300 hover:border-[#C5A880] cursor-pointer theme-section hover:-translate-y-0.5 hover:shadow-md w-full select-none"
+                             @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                        >
+                            <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-950/5 relative">
+                                <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                <div class="absolute top-0.5 left-0.5 bg-red-500 text-white text-[7px] font-bold px-1 py-0.5 rounded-sm">
+                                    -{{ $discountPercent }}%
                                 </div>
                             </div>
-                        @endforeach
-                    @endfor
+                            <div class="flex-1 min-w-0 text-left whitespace-normal font-sans">
+                                <span class="text-[8px] uppercase tracking-widest text-[#C5A880] font-outfit block font-bold">{{ str_replace('_', ' ', $product->category) }}</span>
+                                <h4 class="font-serif italic text-xs tracking-wide truncate mt-0.5">{{ $product->name }}</h4>
+                                <div class="flex items-center space-x-2 mt-0.5 font-mono text-[9px]">
+                                    <span class="text-neutral-505 line-through">{{ number_format($originalPrice) }} KSH</span>
+                                    <span class="text-amber-500 font-bold">{{ number_format($product->price) }} KSH</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -929,7 +929,7 @@
                 <div class="border-t border-neutral-500/10 pt-3 space-y-1">
                     <span class="text-[9px] font-sans uppercase tracking-[0.12em] text-neutral-500 block"> Concierge Dispatch</span>
                     <p class="text-[10px] text-neutral-500 leading-relaxed font-light font-sans">
-                        Operating: Mon - Sat 07:00 - 20:00. Call <span class="font-mono text-neutral-400 font-semibold">+254 712 345 678</span> for custom events.
+                        Operating: Mon - Sat 07:00 - 20:00. Call <span class="font-mono text-neutral-400 font-semibold">+254 (0) 712354697</span> for custom events.
                     </p>
                 </div>
             </aside>
@@ -937,37 +937,60 @@
             <!-- Right Column: Showroom Segment Selector & Product Grid -->
             <div class="flex-1 w-full space-y-6">
                 <!-- FNP-Style Circular Category Navigation Menu with Loop Marquee -->
-                <div class="w-full py-4 shrink-0 relative z-10 animate-layer-3 overflow-hidden border-y backdrop-blur-sm transition-colors duration-500 mb-6"
+                <div class="w-full py-4 shrink-0 relative z-10 animate-layer-3 overflow-hidden border-y backdrop-blur-sm transition-colors duration-500 mb-6 flex items-center"
                      :class="theme === 'light' ? 'bg-white/30 border-neutral-200/50' : 'bg-neutral-950/20 border-neutral-900/60'">
-                    <div class="flex whitespace-nowrap space-x-12 w-max animate-marquee py-2">
-                        @for($i = 0; $i < 4; $i++)
-                            @foreach([
-                                ['key' => 'all', 'label' => 'All', 'img' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=200'],
-                                ['key' => 'bouquet', 'label' => 'Flowers', 'img' => 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=200'],
-                                ['key' => 'giftings', 'label' => 'Cakes & Sweets', 'img' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=200'],
-                                ['key' => 'bundle', 'label' => 'Plants & Vases', 'img' => 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80&w=200'],
-                                ['key' => 'giftings', 'label' => 'Combos', 'img' => 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=200'],
-                                ['key' => 'giftings', 'label' => 'Hampers', 'img' => 'https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&q=80&w=200'],
-                                ['key' => 'stems', 'label' => 'Stems', 'img' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=200']
-                            ] as $catItem)
-                                <button wire:click="selectCategory('{{ $catItem['key'] }}')" class="inline-flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
-                                    <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
-                                         :class="{
-                                             'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === '{{ $catItem['key'] }}',
-                                             'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'dark',
-                                             'border-neutral-250 hover:border-[#B59A7A] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'light'
-                                         }">
-                                        <img src="{{ $catItem['img'] }}" alt="{{ $catItem['label'] }}" class="w-full h-full object-cover">
-                                    </div>
-                                    <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
-                                          :class="{
-                                              'text-[#C5A880]': @js($selectedCategory) === '{{ $catItem['key'] }}',
-                                              'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'dark',
-                                              'text-neutral-750 group-hover:text-[#B59A7A]': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'light'
-                                          }">{{ $catItem['label'] }}</span>
-                                </button>
-                            @endforeach
-                        @endfor
+                    
+                    <!-- Sticky "All" Category Circle -->
+                    <div class="sticky left-0 z-20 shrink-0 pr-6 pl-4 flex items-center border-r border-neutral-500/10 transition-colors duration-500"
+                         :class="theme === 'light' ? 'bg-[#FAF7F0]' : 'bg-[#050507]'">
+                        <button wire:click="selectCategory('all')" class="inline-flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
+                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
+                                 :class="{
+                                     'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === 'all',
+                                     'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== 'all' && theme === 'dark',
+                                     'border-neutral-250 hover:border-[#B59A7A] hover:scale-105': @js($selectedCategory) !== 'all' && theme === 'light'
+                                 }">
+                                <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=200" alt="All" class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
+                                  :class="{
+                                      'text-[#C5A880]': @js($selectedCategory) === 'all',
+                                      'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== 'all' && theme === 'dark',
+                                      'text-neutral-750 group-hover:text-[#B59A7A]': @js($selectedCategory) !== 'all' && theme === 'light'
+                                  }">All</span>
+                        </button>
+                    </div>
+
+                    <!-- Scrolling/Sliding Marquee container for other categories -->
+                    <div class="flex-1 overflow-hidden relative">
+                        <div class="flex whitespace-nowrap space-x-12 w-max animate-marquee py-2 pl-6">
+                            @for($i = 0; $i < 4; $i++)
+                                @foreach([
+                                    ['key' => 'bouquet', 'label' => 'Flowers', 'img' => 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=200'],
+                                    ['key' => 'giftings', 'label' => 'Cakes & Sweets', 'img' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=200'],
+                                    ['key' => 'bundle', 'label' => 'Plants & Vases', 'img' => 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80&w=200'],
+                                    ['key' => 'stems', 'label' => 'Stems', 'img' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=200'],
+                                    ['key' => 'specialization', 'label' => 'Bespoke Services', 'img' => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=200']
+                                ] as $catItem)
+                                    <button wire:click="selectCategory('{{ $catItem['key'] }}')" class="inline-flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
+                                        <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
+                                             :class="{
+                                                 'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === '{{ $catItem['key'] }}',
+                                                 'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'dark',
+                                                 'border-neutral-250 hover:border-[#B59A7A] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'light'
+                                             }">
+                                            <img src="{{ $catItem['img'] }}" alt="{{ $catItem['label'] }}" class="w-full h-full object-cover">
+                                        </div>
+                                        <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
+                                              :class="{
+                                                  'text-[#C5A880]': @js($selectedCategory) === '{{ $catItem['key'] }}',
+                                                  'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'dark',
+                                                  'text-neutral-750 group-hover:text-[#B59A7A]': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'light'
+                                              }">{{ $catItem['label'] }}</span>
+                                    </button>
+                                @endforeach
+                            @endfor
+                        </div>
                     </div>
                 </div>
 
@@ -1397,11 +1420,11 @@
             'border-neutral-900 bg-[#070709] text-neutral-400': theme === 'dark',
             'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'light',
         }"
-        class="border-t mt-20 py-10 px-6 transition-colors duration-500 z-10 relative theme-section"
+        class="border-t mt-12 py-6 px-6 transition-colors duration-500 z-10 relative theme-section"
     >
-        <div class="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
+        <div class="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
             <!-- Col 1: Brand & Info -->
-            <div class="space-y-4">
+            <div class="space-y-2.5">
                 <div class="flex items-baseline space-x-2">
                     <span class="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
                     <h4 :class="theme === 'light' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">Noir & Bloom</h4>
@@ -1412,32 +1435,29 @@
             </div>
 
             <!-- Col 2: Showroom & Catalog -->
-            <div class="space-y-4">
+            <div class="space-y-2.5">
                 <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Showroom</h5>
                 <ul class="space-y-2 text-xs font-light">
-                    <li><button wire:click="selectCategory('retail')" class="hover:underline cursor-pointer">Bespoke Retail Arrays</button></li>
-                    <li><button wire:click="selectCategory('wholesale')" class="hover:underline cursor-pointer">Wholesale Graded Stems</button></li>
-                    <li><button wire:click="selectCategory('gifting')" class="hover:underline cursor-pointer">Luxury Giftings</button></li>
-                    <li><button @click="accountPanelOpen = true" class="hover:underline cursor-pointer">Atelier Loyalty Circle</button></li>
+                    <li><button wire:click="selectCategory('bouquet')" class="hover:underline cursor-pointer">Bespoke Retail Arrays</button></li>
+                    <li><button wire:click="selectCategory('stems')" class="hover:underline cursor-pointer">Wholesale Graded Stems</button></li>
+                    <li><button wire:click="selectCategory('giftings')" class="hover:underline cursor-pointer">Luxury Giftings</button></li>
+                    <li><button @click="profileOpen = true" class="hover:underline cursor-pointer">Atelier Loyalty Circle</button></li>
                 </ul>
             </div>
 
             <!-- Col 3: Hours & Support -->
-            <div class="space-y-4">
+            <div class="space-y-2.5">
                 <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">Concierge Dispatch</h5>
                 <ul class="space-y-2 text-xs font-light">
                     <li><span class="block text-neutral-500">Operating Hours</span> Mon &mdash; Sat: 07:00 &mdash; 20:00</li>
                     <li>Sunday: 09:00 &mdash; 17:00</li>
-                    <li class="pt-2"><span class="block text-neutral-500 font-mono text-[11px] uppercase tracking-wider">Hotline Direct</span> +254 (0) 712 345 678</li>
+                    <li class="pt-2"><span class="block text-neutral-500 font-mono text-[11px] uppercase tracking-wider">Hotline Direct</span> +254 (0) 712354697</li>
                     <li>concierge@noirbloom.co.ke</li>
-                    <li class="pt-2 border-t border-neutral-500/10"><span class="block text-neutral-500 font-mono text-[9px] uppercase tracking-wider">Administration</span>+254 (0) 712 345 679 &bull; admin@noirbloom.co.ke</li>
-                    <li><span class="block text-neutral-500 font-mono text-[9px] uppercase tracking-wider">Customer Relations</span>+254 (0) 712 345 680 &bull; support@noirbloom.co.ke</li>
-                    <li><span class="block text-neutral-500 font-mono text-[9px] uppercase tracking-wider">PR & Press</span>+254 (0) 712 345 681 &bull; pr@noirbloom.co.ke</li>
                 </ul>
             </div>
 
             <!-- Col 4: Newsletter & Dispatch Bulletin -->
-            <div class="space-y-4">
+            <div class="space-y-2.5">
                 <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Atelier Bulletin</h5>
                 <p class="text-xs font-light leading-relaxed">
                     Subscribe for seasonal curation updates, wholesale catalog changes, and exclusive releases.
@@ -1513,7 +1533,7 @@
                     </svg>
                 </a>
                 {{-- WhatsApp --}}
-                <a href="https://wa.me/254712345678" target="_blank" rel="noopener"
+                <a href="https://wa.me/254712354697" target="_blank" rel="noopener"
                    class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
                    :class="{
                        'border-neutral-800 text-neutral-500 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.3)]': theme === 'dark',
@@ -1565,7 +1585,7 @@
         x-show="drawerOpen"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-        :class="(theme === 'light' ? 'bg-[#FAF7F0]/85 border-neutral-200 text-neutral-900 ' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white ') + ((checkoutMode || @json($orderSubmitted)) ? 'w-[calc(100vw-32px)] md:w-[950px] lg:w-[1050px]' : 'w-[calc(100vw-48px)] sm:w-[520px]')"
+        :class="(theme === 'light' ? 'bg-[#FAF7F0]/85 border-neutral-200 text-neutral-900 ' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white ') + ((checkoutMode || $wire.orderSubmitted) ? 'w-[calc(100vw-32px)] md:w-[950px] lg:w-[1050px]' : 'w-[calc(100vw-48px)] sm:w-[520px]')"
         class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden shadow-2xl transition-all duration-300"
         style="display: none;"
     >
@@ -1582,7 +1602,7 @@
         </div>
 
         <!-- Cart items list (visible if not checking out) -->
-        <div x-show="!checkoutMode && !@json($orderSubmitted)" class="flex-1 flex flex-col justify-between overflow-hidden">
+        <div x-show="!checkoutMode && !$wire.orderSubmitted" class="flex-1 flex flex-col justify-between overflow-hidden">
             <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-220px)] scrollbar-none">
                 @forelse($cartItems as $item)
                     <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900/60'" class="flex items-center justify-between space-x-4 border-b pb-4 text-xs animate-hero-fade">
@@ -1637,13 +1657,13 @@
         </div>
 
         <!-- Split Pane Layout for Checkout or Submitted Order -->
-        <div x-show="checkoutMode || @json($orderSubmitted)" class="flex-1 flex flex-col md:flex-row overflow-hidden" style="display: none;">
+        <div x-show="checkoutMode || $wire.orderSubmitted" class="flex-1 flex flex-col md:flex-row overflow-hidden" style="display: none;">
             
             <!-- Left Pane (Form Inputs or Status/Mpesa flow) -->
             <div class="flex-1 md:w-3/5 flex flex-col justify-between overflow-hidden border-r border-neutral-500/10 h-full">
                 
                 <!-- If in checkout mode (not submitted yet) -->
-                <div x-show="checkoutMode && !@json($orderSubmitted)" class="flex-1 flex flex-col justify-between overflow-hidden h-full">
+                <div x-show="checkoutMode && !$wire.orderSubmitted" class="flex-1 flex flex-col justify-between overflow-hidden h-full">
                     <form wire:submit.prevent="submitCurationRequest" class="flex-1 flex flex-col justify-between overflow-hidden h-full">
                         
                         <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-180px)] scrollbar-none text-xs">
@@ -1762,7 +1782,7 @@
 
                             <!-- Free OpenStreetMap Interactive Map Locator with Autocomplete Search -->
                             <div class="space-y-2" wire:ignore>
-                                <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Interactive Curation Dispatch Map (Click/drag marker to pinpoint location for free)</label>
+                                <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono block">Interactive Curation Dispatch Map (Click/drag marker to pinpoint location)</label>
                                 
                                 <div 
                                     x-data="{
@@ -1890,14 +1910,78 @@
                                             </template>
                                         </div>
                                     </div>
-
                                     <!-- Leaflet Map Container Wrapper -->
-                                    <div :class="isFullscreen ? 'fixed inset-0 w-screen h-screen z-[9999] bg-black/60 p-4 flex items-center justify-center' : 'relative w-full h-32 rounded-xl overflow-hidden border border-neutral-500/10 z-10'">
-                                        <div id="checkout-map" :class="isFullscreen ? 'w-full h-full rounded-2xl' : 'w-full h-full'"></div>
-                                        <button type="button" @click="isFullscreen = !isFullscreen; setTimeout(() => { map.invalidateSize() }, 100)" :class="theme === 'light' ? 'bg-black/80 hover:bg-black text-white' : 'bg-black/90 hover:bg-[#C5A880]/20 hover:text-[#C5A880] border border-[#C5A880]/20'" class="absolute top-2.5 right-2.5 z-[1000] px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider flex items-center space-x-1 shadow-md transition-all">
-                                            <span x-text="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Map'"></span>
-                                        </button>
-                                    </div>
+                                     <div :class="isFullscreen ? 'fixed inset-0 w-screen h-screen z-[9999] bg-black/60 p-4 flex flex-col items-center justify-center' : 'relative w-full h-32 rounded-xl overflow-hidden border border-neutral-500/10 z-10'">
+                                                                              <!-- Fullscreen Controls Header Overlay -->
+                                        <div x-show="isFullscreen" 
+                                             :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-250' : 'bg-[#0F0F12] border-neutral-800'"
+                                             class="w-full max-w-xl p-3.5 mb-3 border rounded-xl flex flex-col items-center justify-center gap-3 z-[1010] shadow-2xl relative mx-auto"
+                                        >
+                                            <!-- Address Search Input Block -->
+                                            <div class="w-full max-w-md relative">
+                                                <div class="flex items-center space-x-1.5 w-full justify-center">
+                                                    <input 
+                                                        type="text" 
+                                                        x-model="searchQuery" 
+                                                        @keydown.enter.prevent="searchLocation()"
+                                                        placeholder="Search delivery address..." 
+                                                        :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black placeholder-neutral-400 focus:border-neutral-450' : 'bg-[#0A0908] border-[#C5A880]/20 text-white placeholder-neutral-600 focus:border-[#C5A880]/60'"
+                                                        class="flex-1 border rounded-xl px-3 py-2 text-xs focus:outline-none font-sans"
+                                                    >
+                                                    <button 
+                                                        type="button" 
+                                                        @click="searchLocation()"
+                                                        :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'"
+                                                        class="px-4 py-2 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold transition-colors"
+                                                    >
+                                                        Find
+                                                    </button>
+                                                </div>
+                                                <!-- Search Results -->
+                                                <div 
+                                                    x-show="searchResults.length > 0" 
+                                                    @click.away="searchResults = []"
+                                                    :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-200 text-neutral-900' : 'bg-[#0F0F12] border-neutral-900 text-white'"
+                                                    class="absolute left-0 right-0 z-[1020] mt-1 max-h-48 overflow-y-auto border rounded-xl shadow-2xl text-xs"
+                                                    style="display: none;"
+                                                >
+                                                    <template x-for="res in searchResults" :key="res.place_id">
+                                                        <div 
+                                                            @click="selectResult(res)"
+                                                            :class="theme === 'light' ? 'hover:bg-neutral-100 text-black' : 'hover:bg-[#C5A880]/15 text-[#C5A880]'"
+                                                            class="px-3 py-2 cursor-pointer transition-colors border-b last:border-b-0 border-neutral-500/10 font-sans"
+                                                            x-text="res.display_name"
+                                                        ></div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            <!-- Actions Block -->
+                                            <div class="flex items-center space-x-2.5 shrink-0 justify-center w-full mt-0.5">
+                                                <button 
+                                                    type="button" 
+                                                    @click="isFullscreen = false; setTimeout(() => { map.invalidateSize() }, 100)"
+                                                    :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-emerald-600 text-white hover:bg-emerald-700'"
+                                                    class="px-4 py-2 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold transition-colors shadow-md"
+                                                >
+                                                    Confirm Location
+                                                </button>
+                                                <button 
+                                                    type="button" 
+                                                    @click="isFullscreen = false; setTimeout(() => { map.invalidateSize() }, 100)"
+                                                    :class="theme === 'light' ? 'bg-neutral-200 text-neutral-800 hover:bg-neutral-300' : 'bg-neutral-800 text-white hover:bg-neutral-700 border border-neutral-700'"
+                                                    class="px-4 py-2 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold transition-colors shadow-md"
+                                                >
+                                                    Minimize Map
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                         <div id="checkout-map" :class="isFullscreen ? 'w-full flex-1 rounded-2xl' : 'w-full h-full'"></div>
+                                         
+                                         <button x-show="!isFullscreen" type="button" @click="isFullscreen = !isFullscreen; setTimeout(() => { map.invalidateSize() }, 100)" :class="theme === 'light' ? 'bg-black/80 hover:bg-black text-white' : 'bg-black/90 hover:bg-[#C5A880]/20 hover:text-[#C5A880] border border-[#C5A880]/20'" class="absolute top-2.5 right-2.5 z-[1000] px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider flex items-center space-x-1 shadow-md transition-all">
+                                             <span x-text="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Map'"></span>
+                                         </button>
+                                     </div>
                                 </div>
                             </div>
                         </div>
@@ -1916,7 +2000,7 @@
                 </div>
 
                 <!-- If order is submitted (payment phase) -->
-                <div x-show="@json($orderSubmitted)" class="flex-1 flex flex-col justify-between overflow-hidden h-full">
+                <div x-show="$wire.orderSubmitted" class="flex-1 flex flex-col justify-between overflow-hidden h-full">
                     <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-160px)] scrollbar-none w-full text-xs">
                         <div class="space-y-6 max-w-sm mx-auto w-full pt-4">
                             @if($paymentStatus === 'idle')
@@ -1934,7 +2018,7 @@
                                         <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono">Safaricom Authorization Line</label>
                                         <div class="relative flex items-center">
                                             <span :class="theme === 'light' ? 'text-neutral-505' : 'text-neutral-400'" class="absolute left-3 text-xs font-mono">+254</span>
-                                            <input type="tel" wire:model="phone" placeholder="712345678" :class="theme === 'light' ? 'bg-neutral-50 border-neutral-200 text-black' : 'bg-[#0F0F0F] border-neutral-800 text-white'" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl pl-14 pr-3 py-1.5 text-xs font-mono focus:outline-none">
+                                            <input type="tel" wire:model="phone" placeholder="712345678" :class="theme === 'light' ? 'bg-neutral-100/60 border-neutral-250 text-black focus:border-neutral-400' : 'bg-[#0A0908] border-[#C5A880]/20 text-white focus:border-[#C5A880]/60'" class="w-full border rounded-xl pl-14 pr-3 py-1.5 text-xs font-mono focus:outline-none">
                                         </div>
                                     </div>
 
@@ -2056,41 +2140,41 @@
 
                     <!-- Real-time confirmations summary card -->
                     <div :class="theme === 'light' ? 'bg-neutral-100 text-black border-neutral-200' : 'bg-neutral-900/60 text-neutral-400 border-neutral-900'" class="p-3.5 border rounded-xl text-xs font-light space-y-2">
-                        <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-500 block pb-1 border-b border-neutral-500/10">Logistics Confirmation Recap</span>
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400 block pb-1 border-b border-neutral-500/10">Logistics Confirmation Recap</span>
                         
                         <div>
-                            <span class="text-neutral-500">Destination:</span> 
-                            <span class="font-semibold text-neutral-800 dark:text-white" x-text="$wire.delivery_address || 'Not specified yet'"></span>
+                            <span class="text-neutral-700 dark:text-neutral-400">Destination:</span> 
+                            <span class="font-semibold text-neutral-950 dark:text-white" x-text="$wire.delivery_address || 'Not specified yet'"></span>
                         </div>
                         <div>
-                            <span class="text-neutral-500">Distribution Node:</span> 
-                            <span class="font-semibold text-neutral-800 dark:text-white" x-text="$wire.region"></span>
+                            <span class="text-neutral-700 dark:text-neutral-400">Distribution Node:</span> 
+                            <span class="font-semibold text-neutral-950 dark:text-white" x-text="$wire.region"></span>
                         </div>
                         <div>
-                            <span class="text-neutral-500">Client Contact:</span> 
-                            <span class="font-mono text-neutral-800 dark:text-white">{{ $phone ?: 'Not specified' }}</span>
+                            <span class="text-neutral-700 dark:text-neutral-400">Client Contact:</span> 
+                            <span class="font-mono text-neutral-950 dark:text-white">{{ $phone ?: 'Not specified' }}</span>
                         </div>
                         <div>
-                            <span class="text-neutral-500">Recipient Name:</span> 
-                            <span class="font-semibold text-neutral-800 dark:text-white" x-text="$wire.is_gift ? ($wire.recipient_name || 'Not specified') : '{{ $full_name }} (Self)'"></span>
+                            <span class="text-neutral-700 dark:text-neutral-400">Recipient Name:</span> 
+                            <span class="font-semibold text-neutral-950 dark:text-white" x-text="$wire.is_gift ? ($wire.recipient_name || 'Not specified') : '{{ $full_name }} (Self)'"></span>
                         </div>
                         <template x-if="$wire.is_gift">
                             <div>
-                                <span class="text-amber-500">Recipient Contact:</span> 
-                                <span class="font-mono text-amber-500" x-text="$wire.recipient_phone || 'Not specified'"></span>
+                                <span class="text-amber-600 dark:text-amber-400">Recipient Contact:</span> 
+                                <span class="font-mono text-amber-600 dark:text-amber-400" x-text="$wire.recipient_phone || 'Not specified'"></span>
                             </div>
                         </template>
                         <div>
-                            <span class="text-neutral-500">Delivery Date:</span> 
-                            <span class="font-semibold text-neutral-850 dark:text-white" x-text="$wire.deliveryDate || 'Not selected'"></span>
+                            <span class="text-neutral-700 dark:text-neutral-400">Delivery Date:</span> 
+                            <span class="font-semibold text-neutral-950 dark:text-white" x-text="$wire.deliveryDate || 'Not selected'"></span>
                         </div>
                         <div>
-                            <span class="text-neutral-500">Time Slot:</span> 
-                            <span class="font-semibold uppercase text-neutral-850 dark:text-white" x-text="$wire.deliverySlot"></span>
+                            <span class="text-neutral-700 dark:text-neutral-400">Time Slot:</span> 
+                            <span class="font-semibold uppercase text-neutral-950 dark:text-white" x-text="$wire.deliverySlot"></span>
                         </div>
                         <div>
-                            <span class="text-neutral-500">Presentation Package:</span> 
-                            <span class="font-semibold text-neutral-850 dark:text-white" x-text="$wire.delivery_type.toUpperCase()"></span>
+                            <span class="text-neutral-700 dark:text-neutral-400">Presentation Package:</span> 
+                            <span class="font-semibold text-neutral-950 dark:text-white" x-text="$wire.delivery_type.toUpperCase()"></span>
                         </div>
                     </div>
 
@@ -2115,10 +2199,10 @@
                 </div>
 
                 <!-- Persistent Footer summary showing Total -->
-                <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-50/80' : 'border-neutral-900 bg-black/40'" class="p-5 border-t space-y-4 shrink-0 text-xs mt-auto">
-                    <div class="flex justify-between items-baseline text-sm font-normal">
-                        <span class="text-neutral-450">Total Dispatch Due:</span>
-                        <span :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="text-md font-mono font-bold tracking-tight">{{ number_format($cartTotal + $service_fee) }} KSH</span>
+                <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-50/80' : 'border-neutral-900 bg-black/40'" class="p-5 border-t space-y-4 shrink-0 mt-auto">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs uppercase tracking-wider text-neutral-450 font-semibold font-mono">Total Dispatch Due:</span>
+                        <span :class="theme === 'light' ? 'text-black' : 'text-amber-500'" class="text-2xl font-mono font-bold tracking-tight">{{ number_format($cartTotal + $service_fee) }} KSH</span>
                     </div>
                 </div>
             </div>
