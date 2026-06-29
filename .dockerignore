@@ -1,0 +1,45 @@
+# Dependencies (rebuilt inside container)
+/node_modules
+/vendor
+
+# Build artifacts
+/public/build
+/public/hot
+
+# Environment files (secrets set via fly secrets)
+.env
+.env.backup
+.env.production
+
+# Development files
+.git
+.gitattributes
+.gitignore
+.editorconfig
+.cursorrules
+.phpunit.result.cache
+phpunit.xml
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Docker
+docker-compose.yml
+
+# Documentation
+*.md
+!README.md
+
+# Temp files
+temp_*
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+
+# OS files
+Thumbs.db
+.DS_Store

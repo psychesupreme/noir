@@ -29,10 +29,11 @@ RUN apk add --no-cache \
     unzip \
     git \
     bash \
+    sqlite-dev \
     mysql-client
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd pdo_mysql zip opcache
+    && docker-php-ext-install -j$(nproc) gd pdo_mysql pdo_sqlite zip opcache
 
 # Setup working directory
 WORKDIR /var/www/html

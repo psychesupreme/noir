@@ -935,7 +935,7 @@
             </aside>
 
             <!-- Right Column: Showroom Segment Selector & Product Grid -->
-            <div class="flex-1 w-full space-y-6">
+            <div class="flex-1 w-full min-w-0 space-y-6">
                 <!-- FNP-Style Circular Category Navigation Menu with Loop Marquee -->
                 <div class="w-full py-4 shrink-0 relative z-10 animate-layer-3 overflow-hidden border-y backdrop-blur-sm transition-colors duration-500 mb-6 flex items-center"
                      :class="theme === 'light' ? 'bg-white/30 border-neutral-200/50' : 'bg-neutral-950/20 border-neutral-900/60'">

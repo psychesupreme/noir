@@ -1,5 +1,5 @@
 app = "noir-bloom-erp"
-primary_region = "ams"
+primary_region = "jnb"
 
 [build]
   dockerfile = "Dockerfile"
@@ -7,26 +7,27 @@ primary_region = "ams"
 [env]
   APP_ENV = "production"
   APP_DEBUG = "false"
+  APP_URL = "https://noir-bloom-erp.fly.dev"
   RUN_MIGRATIONS = "true"
   LOG_CHANNEL = "stderr"
+  DB_CONNECTION = "sqlite"
+  DB_DATABASE = "/var/www/html/storage/database/database.sqlite"
+  SESSION_DRIVER = "database"
+  CACHE_STORE = "database"
+  QUEUE_CONNECTION = "sync"
+  FILESYSTEM_DISK = "local"
 
-[[services]]
-  http_service = true
+[http_service]
   internal_port = 80
   force_https = true
   auto_start_machines = true
-  auto_stop_machines = true
+  auto_stop_machines = "stop"
   min_machines_running = 1
 
-  [[services.ports]]
-    handlers = ["http"]
-    port = 80
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
 
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = 443
-
-  [services.concurrency]
-    type = "connections"
-    hard_limit = 250
-    soft_limit = 200
+[mounts]
+  source = "noir_storage"
+  destination = "/var/www/html/storage"
