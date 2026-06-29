@@ -24,7 +24,7 @@ class SecureHeaders
 
         // Apply a strict Content Security Policy in production (relax in dev to allow Vite HMR WebSocket connections)
         if (config('app.env') === 'production') {
-            $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.qrserver.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://api.qrserver.com; connect-src 'self'; frame-ancestors 'none';");
+            $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.qrserver.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://api.qrserver.com https://unpkg.com https://*.tile.openstreetmap.org; connect-src 'self' https://nominatim.openstreetmap.org; frame-ancestors 'none';");
         }
 
         return $response;

@@ -68,3 +68,9 @@ Route::middleware(['auth', 'role:admin,staff'])->prefix('admin')->group(function
 // ── M-Pesa Webhook (CSRF exempt — configured in bootstrap/app.php) ───────
 Route::post('/api/v1/mpesa/callback', [MpesaCallbackController::class, 'handleCallback'])
     ->name('mpesa.callback');
+
+// ── Social OAuth Routes ───────
+Route::get('/auth/social/{provider}', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])
+    ->name('social.redirect');
+Route::get('/auth/social/{provider}/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'callback'])
+    ->name('social.callback');

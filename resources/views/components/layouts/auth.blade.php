@@ -71,7 +71,7 @@
         }
     </style>
 </head>
-<body x-data="{ theme: (localStorage.getItem('nb_theme') === 'dark' || localStorage.getItem('nb_theme') === 'light') ? localStorage.getItem('nb_theme') : 'light' }" class="bg-bg-base text-text-primary antialiased font-sans transition-colors duration-500 selection:bg-[#C5A880]/30 selection:text-neutral-200 min-h-screen">
+<body x-data="{ theme: (localStorage.getItem('nb_theme') === 'onyx' || localStorage.getItem('nb_theme') === 'dark') ? 'dark' : 'light' }" class="bg-bg-base text-text-primary antialiased font-sans transition-colors duration-500 selection:bg-[#C5A880]/30 selection:text-neutral-200 min-h-screen">
 
     <div class="min-h-screen flex flex-col lg:flex-row">
 

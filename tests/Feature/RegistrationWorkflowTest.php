@@ -83,13 +83,20 @@ class RegistrationWorkflowTest extends TestCase
 
     public function test_social_login_workflow(): void
     {
-        Livewire::test(\App\Livewire\Auth\Register::class)
-            ->call('socialLogin', 'google')
-            ->assertHasNoErrors()
-            ->assertRedirect('/');
+        // 1. Test redirect endpoint returns the approval view (sandbox mock mode)
+        $response = $this->get(route('social.redirect', ['provider' => 'google']));
+        $response->assertStatus(200);
+        $response->assertViewIs('auth.social.approval');
+
+        // 2. Test callback endpoint registers and logs in the mock user
+        $callbackResponse = $this->get(route('social.callback', ['provider' => 'google', 'simulated' => '1']));
+        $callbackResponse->assertRedirect('/');
 
         $this->assertDatabaseHas('users', [
-            'name' => 'Google Curation Member'
+            'name' => 'Google Curation Member',
+            'email' => 'google.user@noirbloom.com'
         ]);
+        
+        $this->assertAuthenticated();
     }
 }

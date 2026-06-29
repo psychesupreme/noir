@@ -5,6 +5,7 @@
 # Build artifacts
 /public/build
 /public/hot
+/public/storage
 
 # Environment files (secrets set via fly secrets)
 .env

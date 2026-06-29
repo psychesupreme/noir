@@ -929,7 +929,7 @@
                 <div class="border-t border-neutral-500/10 pt-3 space-y-1">
                     <span class="text-[9px] font-sans uppercase tracking-[0.12em] text-neutral-500 block"> Concierge Dispatch</span>
                     <p class="text-[10px] text-neutral-500 leading-relaxed font-light font-sans">
-                        Operating: Mon - Sat 07:00 - 20:00. Call <span class="font-mono text-neutral-400 font-semibold">+254 (0) 712354697</span> for custom events.
+                        Operating: Mon - Sat 07:00 - 20:00.<br>Call <span class="font-mono text-neutral-400 font-semibold">+254 (0) 712354697</span> for custom events.
                     </p>
                 </div>
             </aside>
@@ -1586,7 +1586,7 @@
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
         :class="(theme === 'light' ? 'bg-[#FAF7F0]/85 border-neutral-200 text-neutral-900 ' : 'bg-[#0F0F12]/90 border border-neutral-900 text-white ') + ((checkoutMode || $wire.orderSubmitted) ? 'w-[calc(100vw-32px)] md:w-[950px] lg:w-[1050px]' : 'w-[calc(100vw-48px)] sm:w-[520px]')"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-hidden shadow-2xl transition-all duration-300"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-h-[92vh] md:max-h-[85vh] z-50 flex flex-col justify-between text-left backdrop-blur-xl rounded-[32px] overflow-y-auto md:overflow-hidden shadow-2xl transition-all duration-300"
         style="display: none;"
     >
         <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
@@ -1657,16 +1657,16 @@
         </div>
 
         <!-- Split Pane Layout for Checkout or Submitted Order -->
-        <div x-show="checkoutMode || $wire.orderSubmitted" class="flex-1 flex flex-col md:flex-row overflow-hidden" style="display: none;">
+        <div x-show="checkoutMode || $wire.orderSubmitted" class="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden" style="display: none;">
             
             <!-- Left Pane (Form Inputs or Status/Mpesa flow) -->
-            <div class="flex-1 md:w-3/5 flex flex-col justify-between overflow-hidden border-r border-neutral-500/10 h-full">
+            <div class="flex-1 md:w-3/5 flex flex-col justify-between overflow-y-auto md:overflow-hidden border-r border-neutral-500/10 h-auto md:h-full">
                 
                 <!-- If in checkout mode (not submitted yet) -->
-                <div x-show="checkoutMode && !$wire.orderSubmitted" class="flex-1 flex flex-col justify-between overflow-hidden h-full">
-                    <form wire:submit.prevent="submitCurationRequest" class="flex-1 flex flex-col justify-between overflow-hidden h-full">
+                <div x-show="checkoutMode && !$wire.orderSubmitted" class="flex-1 flex flex-col justify-between overflow-y-auto md:overflow-hidden h-auto md:h-full">
+                    <form wire:submit.prevent="submitCurationRequest" class="flex-1 flex flex-col justify-between overflow-y-auto md:overflow-hidden h-auto md:h-full">
                         
-                        <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-180px)] scrollbar-none text-xs">
+                        <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-none md:max-h-[calc(85vh-180px)] scrollbar-none text-xs">
                             <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="flex items-center justify-between pb-2 border-b">
                                 <span class="text-xs uppercase tracking-wider text-neutral-400">Atelier Delivery Profile</span>
                                 <button type="button" @click="checkoutMode = false" class="text-neutral-500 hover:text-neutral-400 text-xs font-mono cursor-pointer flex items-center space-x-1">
@@ -1795,13 +1795,22 @@
                                             let lat = -1.2921;
                                             let lng = 36.8219;
                                             
-                                            let match = $wire.delivery_address.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
+                                            let match = ($wire.delivery_address || '').match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
                                             if (match) {
                                                 lat = parseFloat(match[1]);
                                                 lng = parseFloat(match[2]);
                                             }
 
-                                            setTimeout(() => {
+                                            let retries = 0;
+                                            const setup = () => {
+                                                if (typeof L === 'undefined') {
+                                                    if (retries < 30) {
+                                                        retries++;
+                                                        setTimeout(setup, 100);
+                                                    }
+                                                    return;
+                                                }
+                                                
                                                 this.map = L.map('checkout-map').setView([lat, lng], 13);
                                                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                                                     attribution: '&copy; OpenStreetMap contributors'
@@ -1821,12 +1830,15 @@
 
                                                 // ResizeObserver ensures Leaflet renders properly inside modal transitions
                                                 const observer = new ResizeObserver(() => {
-                                                    this.map.invalidateSize();
+                                                    if (this.map) this.map.invalidateSize();
                                                 });
                                                 observer.observe(document.getElementById('checkout-map'));
-                                            }, 400);
+                                            };
+
+                                            setTimeout(setup, 200);
 
                                             $watch('$wire.region', (val) => {
+                                                if (!this.map || !this.marker) return;
                                                 let centerCoords = val === 'Kiambu' ? [-1.1578, 36.8407] : [-1.2921, 36.8219];
                                                 this.map.setView(centerCoords, 13);
                                                 this.marker.setLatLng(centerCoords);
@@ -1911,7 +1923,7 @@
                                         </div>
                                     </div>
                                     <!-- Leaflet Map Container Wrapper -->
-                                     <div :class="isFullscreen ? 'fixed inset-0 w-screen h-screen z-[9999] bg-black/60 p-4 flex flex-col items-center justify-center' : 'relative w-full h-32 rounded-xl overflow-hidden border border-neutral-500/10 z-10'">
+                                     <div :class="isFullscreen ? 'fixed inset-0 w-screen h-screen z-[9999] bg-black/60 p-4 flex flex-col items-center justify-center' : 'relative w-full h-64 rounded-xl overflow-hidden border border-neutral-500/10 z-10'">
                                                                               <!-- Fullscreen Controls Header Overlay -->
                                         <div x-show="isFullscreen" 
                                              :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-250' : 'bg-[#0F0F12] border-neutral-800'"
@@ -1976,7 +1988,7 @@
                                             </div>
                                         </div>
 
-                                         <div id="checkout-map" :class="isFullscreen ? 'w-full flex-1 rounded-2xl' : 'w-full h-full'"></div>
+                                         <div id="checkout-map" style="min-height: 240px; width: 100%;" :class="isFullscreen ? 'w-full flex-1 rounded-2xl' : 'w-full h-full'"></div>
                                          
                                          <button x-show="!isFullscreen" type="button" @click="isFullscreen = !isFullscreen; setTimeout(() => { map.invalidateSize() }, 100)" :class="theme === 'light' ? 'bg-black/80 hover:bg-black text-white' : 'bg-black/90 hover:bg-[#C5A880]/20 hover:text-[#C5A880] border border-[#C5A880]/20'" class="absolute top-2.5 right-2.5 z-[1000] px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider flex items-center space-x-1 shadow-md transition-all">
                                              <span x-text="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Map'"></span>
@@ -2117,8 +2129,8 @@
             </div>
 
             <!-- Right Pane (Persistent Statement Summary) -->
-            <div :class="theme === 'light' ? 'bg-[#FAF7F0]/40' : 'bg-black/25'" class="w-full md:w-2/5 flex flex-col justify-between overflow-hidden">
-                <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-100px)] scrollbar-none text-xs">
+            <div :class="theme === 'light' ? 'bg-[#FAF7F0]/40' : 'bg-black/25'" class="w-full md:w-2/5 flex flex-col justify-between overflow-y-auto md:overflow-hidden h-auto md:h-full">
+                <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-none md:max-h-[calc(85vh-100px)] scrollbar-none text-xs">
                     
                     <!-- Title -->
                     <div>

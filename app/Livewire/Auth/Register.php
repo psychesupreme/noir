@@ -88,47 +88,6 @@ class Register extends Component
         $this->redirect('/', navigate: true);
     }
 
-    /**
-     * Simulate a social login/registration.
-     */
-    public function socialLogin(string $provider): void
-    {
-        if (!in_array($provider, ['google', 'apple', 'microsoft'])) {
-            return;
-        }
-
-        $randomId = rand(1000, 9999);
-        $name = ucfirst($provider) . ' Curation Member';
-        $email = $provider . '.' . $randomId . '@noirbloom.co.ke';
-        $phone = '7' . rand(10000000, 99999999);
-
-        // Find or create user
-        $user = User::where('email', $email)->first();
-        if (!$user) {
-            $user = User::create([
-                'name' => $name,
-                'email' => $email,
-                'phone_number' => $phone,
-                'password' => Hash::make(bin2hex(random_bytes(10))),
-                'account_tier' => 'retail',
-                'default_region' => 'Nairobi',
-            ]);
-
-            \App\Models\Client::create([
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'contact_name' => $user->name,
-                'phone' => $user->phone_number,
-                'region' => 'Nairobi',
-                'delivery_address' => 'Auto-signed in via ' . ucfirst($provider),
-            ]);
-        }
-
-        Auth::login($user);
-        session()->regenerate();
-
-        $this->redirect('/', navigate: true);
-    }
 
     public function render()
     {
