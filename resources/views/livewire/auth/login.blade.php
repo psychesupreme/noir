@@ -185,7 +185,8 @@
                 type="submit"
                 wire:loading.attr="disabled"
                 wire:target="authenticate"
-                :class="theme === 'light' ? 'bg-neutral-950 text-white hover:bg-black' : 'bg-white text-black hover:bg-neutral-200'"
+                :class="theme === 'light' ? 'bg-neutral-950 hover:bg-black' : 'bg-white hover:bg-neutral-200'"
+                :style="theme === 'light' ? 'color: white !important;' : 'color: black !important;'"
                 class="w-full font-semibold text-[10px] uppercase tracking-[0.2em] py-4 transition-all cursor-pointer rounded-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
                 <span wire:loading wire:target="authenticate" class="animate-spin rounded-full h-3 w-3 border-2 border-neutral-400 border-t-transparent inline-block"></span>

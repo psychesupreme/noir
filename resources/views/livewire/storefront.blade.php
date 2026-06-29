@@ -77,6 +77,8 @@
         })(),
         profileOpen: false,
         notificationsOpen: false,
+        wishlistOpen: false,
+        mobileMenuOpen: false,
         chatOpen: false,
         quickViewOpen: false,
         quickViewProduct: null,
@@ -408,7 +410,21 @@
                  'via-[#C5A880]/30': theme === 'dark',
                  'via-emerald-600/30': theme === 'light',
              }"></div>
-        <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-6">
+        <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-4 sm:gap-6">
+            {{-- Mobile Menu Hamburger --}}
+            <button @click="mobileMenuOpen = true" 
+                    class="lg:hidden transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center rounded-full shadow-sm shrink-0" 
+                    :class="{
+                        'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
+                        'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
+                    }"
+                    title="Menu"
+            >
+                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+
             <a href="/" class="shrink-0 flex items-center select-none cursor-pointer group/brand transition-transform duration-300 hover:scale-[1.02]">
                 <div class="flex flex-col text-left leading-none">
                     <span class="text-[10px] font-mono tracking-[0.35em] uppercase font-bold brand-title-atelier transition-colors duration-500"
@@ -533,7 +549,7 @@
                 </a>
 
                 {{-- Theme Switcher Dropdown (Header) --}}
-                <div x-data="{ themeMenuOpen: false }" class="relative inline-block text-left select-none animate-nav-item">
+                <div x-data="{ themeMenuOpen: false }" class="hidden md:inline-block relative text-left select-none animate-nav-item">
                     <button @click="themeMenuOpen = !themeMenuOpen" 
                             class="px-4 py-2 border rounded-full text-xs font-medium tracking-[0.1em] transition-all flex items-center space-x-2 cursor-pointer"
                             :class="{
@@ -597,7 +613,7 @@
 
                 {{-- Notification Bell button --}}
                 <button @click="notificationsOpen = true" 
-                        class="transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center rounded-full shadow-sm" 
+                        class="hidden md:flex transition-colors cursor-pointer select-none relative w-9 h-9 items-center justify-center rounded-full shadow-sm" 
                         :class="{
                             'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
                             'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
@@ -616,6 +632,33 @@
                             {{ $unreadNotificationsCount }}
                         </span>
                     @endif
+                </button>
+
+                {{-- Wishlist Button --}}
+                <button @click="wishlistOpen = true" 
+                        class="hidden md:flex transition-colors cursor-pointer select-none relative w-9 h-9 items-center justify-center rounded-full shadow-sm" 
+                        :class="{
+                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
+                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
+                        }"
+                        title="View Wishlist"
+                >
+                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    @auth
+                        @php
+                            $wCount = count(auth()->user()->settings['wishlist'] ?? []);
+                        @endphp
+                        @if($wCount > 0)
+                            <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-white text-[9px] font-bold font-sans shadow-md"
+                                  :class="{
+                                      'bg-rose-500': true
+                                  }">
+                                {{ $wCount }}
+                            </span>
+                        @endif
+                    @endauth
                 </button>
 
                 {{-- Shopping Bag button --}}
@@ -1076,7 +1119,8 @@
                                  style="animation-delay: {{ ($index % 6) * 100 }}ms;"
                             >
                                 <!-- Left side: Squared Image Frame -->
-                                <div class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center">
+                                <div @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                                     class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center cursor-pointer select-none">
                                     <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
                                          class="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-all duration-700 z-0">
                                     
@@ -1104,11 +1148,12 @@
                                     <!-- Wishlist Button -->
                                     <button 
                                         type="button" 
+                                        @click.stop=""
                                         wire:click="toggleWishlist({{ $product->id }})" 
                                         class="absolute top-2 right-2 z-20 w-6 h-6 rounded-full flex items-center justify-center bg-[#0B0B0D]/60 border border-white/5 text-[#C5A880] hover:scale-110 hover:bg-neutral-900 transition-all cursor-pointer shadow-md"
                                         title="{{ $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
                                     >
-                                        <svg class="w-3.5 h-3.5 fill-current {{ $inWishlist ? 'text-rose-500' : 'text-neutral-400 fill-none stroke-current' }}" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <svg class="w-3.5 h-3.5 {{ $inWishlist ? 'fill-current text-rose-500' : 'fill-none stroke-current text-[#C5A880]' }}" viewBox="0 0 24 24" stroke-width="1.5">
                                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                         </svg>
                                     </button>
@@ -1121,7 +1166,8 @@
                                 </div>
                                 <!-- Right side: Details -->
                                 <div class="flex-1 pl-3 flex flex-col justify-between overflow-hidden">
-                                    <div class="space-y-1 overflow-hidden">
+                                    <div @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                                         class="space-y-1 overflow-hidden cursor-pointer select-none">
                                         <span class="text-[9px] uppercase tracking-[0.2em] text-[#C5A880] font-outfit block font-bold truncate">Specialization</span>
                                         <h3 :class="theme === 'light' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-sm font-serif italic tracking-wide leading-tight truncate">
                                             {{ $product->name }}
@@ -1188,7 +1234,8 @@
                                  style="animation-delay: {{ ($index % 6) * 100 }}ms;"
                             >
                                 <!-- Product Image Frame -->
-                                <div class="p-1 border border-neutral-500/10 rounded-t-[190px] rounded-b-[28px] overflow-hidden relative">
+                                <div @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                                     class="p-1 border border-neutral-500/10 rounded-t-[190px] rounded-b-[28px] overflow-hidden relative cursor-pointer select-none">
                                     <div class="aspect-[4/5] rounded-t-[180px] rounded-b-[24px] relative overflow-hidden bg-neutral-950/5">
                                         <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
                                              class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 z-0">
@@ -1213,15 +1260,16 @@
                                                 $inWishlist = false;
                                             @endphp
                                         @endauth
-
+ 
                                         <!-- Wishlist Button -->
                                         <button 
                                             type="button" 
+                                            @click.stop=""
                                             wire:click="toggleWishlist({{ $product->id }})" 
                                             class="absolute top-3 right-3 z-20 w-8 h-8 rounded-full flex items-center justify-center bg-[#0B0B0D]/60 border border-white/5 text-[#C5A880] hover:scale-110 hover:bg-neutral-900 transition-all cursor-pointer shadow-md"
                                             title="{{ $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
                                         >
-                                            <svg class="w-4 h-4 fill-current {{ $inWishlist ? 'text-rose-500' : 'text-neutral-400 fill-none stroke-current' }}" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <svg class="w-4 h-4 {{ $inWishlist ? 'fill-current text-rose-500' : 'fill-none stroke-current text-[#C5A880]' }}" viewBox="0 0 24 24" stroke-width="1.5">
                                                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                             </svg>
                                         </button>
@@ -1238,10 +1286,11 @@
                                         </div>
                                     </div>
                                 </div>
-
+ 
                                 <!-- Details Section -->
                                 <div class="px-2 pt-4 pb-2 flex-1 flex flex-col justify-between">
-                                    <div class="space-y-1.5">
+                                    <div @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                                         class="space-y-1.5 cursor-pointer select-none">
                                         <span class="text-[12px] uppercase tracking-[0.3em] text-neutral-400 font-outfit block font-light">Atelier Noir & Bloom</span>
                                         <h3 :class="theme === 'light' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-xl font-serif italic tracking-wider leading-snug">
                                             {{ $product->name }}
@@ -1259,7 +1308,7 @@
                                             </span>
                                         </div>
 
-                                        <div class="max-h-0 opacity-0 group-hover:max-h-64 group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden space-y-3">
+                                        <div class="max-h-none opacity-100 lg:max-h-0 lg:opacity-0 lg:group-hover:max-h-64 lg:group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden space-y-3">
                                             @if($product->category !== 'stems')
                                                 <div class="space-y-1">
                                                     <span class="text-[12px] uppercase tracking-wider text-neutral-500 font-outfit">Curated Size</span>
@@ -1923,12 +1972,12 @@
                                         </div>
                                     </div>
                                     <!-- Leaflet Map Container Wrapper -->
-                                     <div :class="isFullscreen ? 'fixed inset-0 w-screen h-screen z-[9999] bg-black/60 p-4 flex flex-col items-center justify-center' : 'relative w-full h-64 rounded-xl overflow-hidden border border-neutral-500/10 z-10'">
+                                    <div :class="isFullscreen ? 'fixed inset-0 w-screen h-screen z-[9999] bg-black/60 flex items-center justify-center' : 'relative w-full h-64 rounded-xl overflow-hidden border border-neutral-500/10 z-10'">
                                                                               <!-- Fullscreen Controls Header Overlay -->
                                         <div x-show="isFullscreen" 
-                                             :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-250' : 'bg-[#0F0F12] border-neutral-800'"
-                                             class="w-full max-w-xl p-3.5 mb-3 border rounded-xl flex flex-col items-center justify-center gap-3 z-[1010] shadow-2xl relative mx-auto"
-                                        >
+                                             :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-250 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12] border-neutral-800 text-white shadow-[0_20px_50px_rgba(0,0,0,0.8)]'"
+                                             class="absolute top-6 left-1/2 -translate-x-1/2 w-[calc(100vw-32px)] sm:w-[480px] p-4 border rounded-2xl flex flex-col items-center justify-center gap-3 z-[1010]"
+                                         >
                                             <!-- Address Search Input Block -->
                                             <div class="w-full max-w-md relative">
                                                 <div class="flex items-center space-x-1.5 w-full justify-center">
@@ -1988,7 +2037,7 @@
                                             </div>
                                         </div>
 
-                                         <div id="checkout-map" style="min-height: 240px; width: 100%;" :class="isFullscreen ? 'w-full flex-1 rounded-2xl' : 'w-full h-full'"></div>
+                                         <div id="checkout-map" style="min-height: 240px; width: 100%;" :class="isFullscreen ? 'absolute inset-0 w-full h-full z-0' : 'w-full h-full'"></div>
                                          
                                          <button x-show="!isFullscreen" type="button" @click="isFullscreen = !isFullscreen; setTimeout(() => { map.invalidateSize() }, 100)" :class="theme === 'light' ? 'bg-black/80 hover:bg-black text-white' : 'bg-black/90 hover:bg-[#C5A880]/20 hover:text-[#C5A880] border border-[#C5A880]/20'" class="absolute top-2.5 right-2.5 z-[1000] px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider flex items-center space-x-1 shadow-md transition-all">
                                              <span x-text="isFullscreen ? 'Exit Fullscreen' : 'Fullscreen Map'"></span>
@@ -2760,6 +2809,187 @@
                     </div>
                 @endif
             @endauth
+        </div>
+    </div>
+
+
+    <!-- Backdrop for Wishlist Drawer -->
+    <div x-show="wishlistOpen" @click="wishlistOpen = false" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md" style="display: none;" x-transition></div>
+    
+    <!-- Floating Wishlist Overlay Panel (Center Modal) -->
+    <div 
+        x-show="wishlistOpen"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+        :class="theme === 'light' ? 'bg-[#FAF7F0]/95 border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12]/95 border border-neutral-900 text-white shadow-[0_30px_100px_rgba(0,0,0,0.65)]'"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-32px)] sm:w-[500px] max-h-[85vh] z-[101] flex flex-col justify-between text-left rounded-[32px] overflow-hidden font-sans backdrop-blur-xl transition-all duration-300"
+        style="display: none;"
+    >
+        <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900'" class="p-5 border-b flex items-center justify-between shrink-0">
+            <div>
+                <h3 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs uppercase tracking-[0.2em] font-bold">Your Wishlist</h3>
+                <span class="text-[9px] text-neutral-500 font-light">Saved Premium Curations</span>
+            </div>
+            <button @click="wishlistOpen = false" :class="theme === 'light' ? 'text-neutral-400 hover:text-neutral-800' : 'text-neutral-500 hover:text-[#C5A880]'" class="cursor-pointer select-none transition-colors" title="Close Drawer">
+                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-[calc(85vh-150px)] scrollbar-none">
+            @auth
+                @php
+                    $wishlistIds = auth()->user()->settings['wishlist'] ?? [];
+                    $wishlistProducts = \App\Models\Product::whereIn('id', $wishlistIds)->get();
+                @endphp
+                @forelse($wishlistProducts as $wProd)
+                    <div :class="theme === 'light' ? 'border-neutral-100' : 'border-neutral-900/60'" class="flex items-center justify-between space-x-4 border-b pb-4 text-xs">
+                        <div class="flex items-center space-x-3 truncate">
+                            <div class="w-12 h-12 rounded-lg overflow-hidden bg-neutral-950/5 shrink-0">
+                                <img src="{{ $wProd->image_url }}" alt="" class="w-full h-full object-cover">
+                            </div>
+                            <div class="truncate">
+                                <h4 :class="theme === 'light' ? 'text-neutral-850 font-semibold' : 'text-white'" class="truncate">{{ $wProd->name }}</h4>
+                                <p class="text-amber-500 font-bold font-mono text-[10px]">{{ number_format($wProd->price) }} KSH</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 shrink-0">
+                            <button 
+                                type="button"
+                                @click="quickViewProduct = { id: {{ $wProd->id }}, name: {{ \Illuminate\Support\Js::from($wProd->name) }}, price: {{ $wProd->price }}, description: {{ \Illuminate\Support\Js::from($wProd->description) }}, image: {{ \Illuminate\Support\Js::from($wProd->image_url ?: '/media/default.jpg') }}, category: {{ \Illuminate\Support\Js::from($wProd->category) }}, stock_standard: {{ $wProd->stock }}, stock_deluxe: Math.floor({{ $wProd->stock }} * 0.7), stock_grand: Math.floor({{ $wProd->stock }} * 0.4), average_rating: {{ $wProd->average_rating }}, average_quality_rating: {{ $wProd->average_quality_rating }}, average_freshness_rating: {{ $wProd->average_freshness_rating }}, average_value_rating: {{ $wProd->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true; wishlistOpen = false;"
+                                :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'"
+                                class="px-3.5 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-wider font-bold cursor-pointer transition-colors shadow-sm"
+                            >
+                                View
+                            </button>
+                            <button 
+                                type="button"
+                                wire:click="toggleWishlist({{ $wProd->id }})"
+                                class="text-rose-500 hover:text-rose-600 cursor-pointer font-bold font-mono text-[10px]"
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                @empty
+                    <div class="h-full flex flex-col items-center justify-center text-center space-y-3 pt-24 text-neutral-500">
+                        <svg class="w-10 h-10 text-neutral-500 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                        </svg>
+                        <span class="text-[10px] font-mono uppercase tracking-[0.2em] font-bold">Wishlist Empty</span>
+                        <p class="text-[11px] font-light max-w-[220px] leading-relaxed">Save premium floral arrangements to your wishlist to access them later.</p>
+                    </div>
+                @endforelse
+            @else
+                <div class="h-full flex flex-col items-center justify-center text-center space-y-4 pt-24 text-neutral-500">
+                    <svg class="w-10 h-10 text-neutral-500 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                    <span class="text-[10px] font-mono uppercase tracking-[0.2em] font-bold">Authentication Required</span>
+                    <p class="text-[11.5px] font-light max-w-[240px] leading-relaxed">Please sign in or create an account to curate and manage your wishlist.</p>
+                    <div class="grid grid-cols-2 gap-3 w-full max-w-xs pt-2">
+                        <a href="/login" class="bg-[#C5A880] text-black font-mono font-bold text-center uppercase tracking-wider py-2.5 rounded-xl text-[10px] hover:bg-[#B59A7A] transition-all cursor-pointer shadow-md block">
+                            Sign In
+                        </a>
+                        <a href="/register" class="border border-neutral-800 text-neutral-450 text-center hover:text-white hover:border-neutral-600 font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] transition-all cursor-pointer block">
+                            Register
+                        </a>
+                    </div>
+                </div>
+            @endauth
+        </div>
+    </div>
+
+    <!-- Backdrop for Mobile Menu -->
+    <div x-show="mobileMenuOpen" @click="mobileMenuOpen = false" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md lg:hidden" style="display: none;" x-transition></div>
+    
+    <!-- Floating Mobile Menu Panel (Left Drawer) -->
+    <div 
+        x-show="mobileMenuOpen"
+        x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
+        :class="theme === 'light' ? 'bg-[#FAF7F0] border-r border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12] border-r border-neutral-900 text-white shadow-2xl'"
+        class="fixed top-0 bottom-0 left-0 w-72 z-[101] flex flex-col justify-between text-left backdrop-blur-xl transition-all duration-300 lg:hidden"
+        style="display: none;"
+    >
+        <div class="p-6 space-y-8 flex flex-col h-full justify-between">
+            <div class="space-y-6">
+                {{-- Header --}}
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col text-left leading-none">
+                        <span class="text-[9px] font-mono tracking-[0.3em] uppercase font-bold text-[#C5A880]">Atelier</span>
+                        <span class="text-sm font-extrabold uppercase tracking-[0.15em] font-outfit mt-0.5">Noir & Bloom</span>
+                    </div>
+                    <button @click="mobileMenuOpen = false" :class="theme === 'light' ? 'text-neutral-400 hover:text-neutral-800' : 'text-neutral-500 hover:text-[#C5A880]'" class="cursor-pointer select-none transition-colors">
+                        <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div :class="theme === 'light' ? 'bg-neutral-200' : 'bg-neutral-850'" class="w-full h-px"></div>
+
+                {{-- Mobile Search Input --}}
+                <div class="relative w-full">
+                    <input 
+                        type="text" 
+                        wire:model.live.debounce.200ms="search"
+                        placeholder="Search items..."
+                        :class="theme === 'light' ? 'bg-neutral-100 border-neutral-300 text-neutral-900 placeholder-neutral-500 focus:border-emerald-600 focus:ring-emerald-600/10' : 'bg-neutral-900/40 border-neutral-800 text-white placeholder-neutral-500 focus:border-[#C5A880] focus:ring-[#C5A880]/10'"
+                        class="w-full pl-9 pr-4 py-2 border rounded-full text-xs font-sans focus:outline-none focus:ring-2 transition-all duration-300"
+                    >
+                    <svg class="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+
+                {{-- Navigation Links --}}
+                <nav class="space-y-4 text-xs font-mono uppercase tracking-widest font-semibold">
+                    <a href="/" class="block py-2 hover:text-[#C5A880] transition-colors">Home Showroom</a>
+                    <a href="{{ route('services-gifts') }}" class="block py-2 hover:text-[#C5A880] transition-colors">Services &amp; Gifts</a>
+                    <a href="{{ route('curate') }}" class="block py-2 hover:text-[#C5A880] transition-colors">Curation Studio</a>
+                    <button @click="mobileMenuOpen = false; wishlistOpen = true;" class="w-full text-left block py-2 hover:text-[#C5A880] transition-colors font-mono uppercase tracking-widest font-semibold cursor-pointer">
+                        Your Wishlist
+                    </button>
+                    <button @click="mobileMenuOpen = false; notificationsOpen = true;" class="w-full text-left block py-2 hover:text-[#C5A880] transition-colors font-mono uppercase tracking-widest font-semibold cursor-pointer">
+                        Notifications
+                    </button>
+                    <button @click="changeTheme(theme === 'light' ? 'dark' : 'light')" class="w-full text-left flex items-center justify-between py-2 hover:text-[#C5A880] transition-colors font-mono uppercase tracking-widest font-semibold cursor-pointer">
+                        <span>Theme: <span x-text="theme"></span></span>
+                        <span class="w-3 h-3 rounded-full" :class="theme === 'light' ? 'bg-emerald-600' : 'bg-[#C5A880]'"></span>
+                    </button>
+                </nav>
+            </div>
+
+            {{-- Bottom Profile section --}}
+            <div class="space-y-4">
+                <div :class="theme === 'light' ? 'bg-neutral-200' : 'bg-neutral-850'" class="w-full h-px"></div>
+                
+                @auth
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-[#C5A880]/15 flex items-center justify-center text-[#C5A880] font-bold font-mono">
+                            {{ substr(auth()->user()->name, 0, 1) }}
+                        </div>
+                        <div class="truncate">
+                            <span class="block text-xs font-semibold truncate">{{ auth()->user()->name }}</span>
+                            <span class="block text-[9px] text-[#C5A880] uppercase tracking-wider font-mono">{{ auth()->user()->account_tier }} member</span>
+                        </div>
+                    </div>
+                    <button @click="mobileMenuOpen = false; profileOpen = true;" class="w-full text-center py-2.5 bg-[#C5A880]/10 hover:bg-[#C5A880]/20 text-[#C5A880] text-[10px] font-mono uppercase tracking-widest rounded-xl transition-all cursor-pointer font-bold">
+                        Member Portal
+                    </button>
+                @else
+                    <div class="grid grid-cols-2 gap-3 w-full">
+                        <a href="/login" class="bg-[#C5A880] text-black font-mono font-bold text-center uppercase tracking-wider py-2.5 rounded-xl text-[10px] hover:bg-[#B59A7A] transition-all cursor-pointer shadow-md block">
+                            Sign In
+                        </a>
+                        <a href="/register" class="border border-neutral-800 text-neutral-400 text-center hover:text-white hover:border-neutral-600 font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] transition-all cursor-pointer block">
+                            Register
+                        </a>
+                    </div>
+                @endauth
+            </div>
         </div>
     </div>
 

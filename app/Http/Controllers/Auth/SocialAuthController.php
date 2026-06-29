@@ -26,8 +26,8 @@ class SocialAuthController extends Controller
         $clientId = config("services.{$provider}.client_id");
         $clientSecret = config("services.{$provider}.client_secret");
 
-        // If keys are not set, or driver is Microsoft (not built-in to Socialite core)
-        if (empty($clientId) || empty($clientSecret) || $provider === 'microsoft') {
+        // If keys are not set
+        if (empty($clientId) || empty($clientSecret)) {
             return view('auth.social.approval', [
                 'provider' => $provider,
                 'name' => ucfirst($provider),

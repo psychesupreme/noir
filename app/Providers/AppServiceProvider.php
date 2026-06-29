@@ -22,5 +22,19 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') === 'production') {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
+
+        // Register custom Microsoft Socialite driver
+        try {
+            $socialite = $this->app->make(\Laravel\Socialite\Contracts\Factory::class);
+            $socialite->extend('microsoft', function ($app) use ($socialite) {
+                $config = $app['config']['services.microsoft'];
+                return $socialite->buildProvider(
+                    \App\Services\Socialite\MicrosoftProvider::class,
+                    $config
+                );
+            });
+        } catch (\Exception $e) {
+            // Silence if socialite factory is not registerable in console/tests
+        }
     }
 }

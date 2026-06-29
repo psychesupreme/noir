@@ -86,9 +86,22 @@
                 <p>
                     Add the following credentials to your server environment or Fly secrets:
                 </p>
-                <div class="bg-black/10 dark:bg-black/45 p-3 rounded-lg font-mono text-[10px] space-y-1 select-all overflow-x-auto text-[#D4AF37]">
-                    <div>{{ strtoupper($provider) }}_CLIENT_ID="your_client_id"</div>
-                    <div>{{ strtoupper($provider) }}_CLIENT_SECRET="your_client_secret"</div>
+                <div class="bg-black/10 dark:bg-black/45 p-3 rounded-lg font-mono text-[10px] space-y-3 select-all overflow-x-auto text-[#D4AF37]">
+                    <div>
+                        <span class="text-neutral-500 font-bold block text-[8px] uppercase tracking-wider mb-0.5">Google OAuth:</span>
+                        <div>GOOGLE_CLIENT_ID="your_google_id"</div>
+                        <div>GOOGLE_CLIENT_SECRET="your_google_secret"</div>
+                    </div>
+                    <div class="border-t border-neutral-500/10 pt-2">
+                        <span class="text-neutral-500 font-bold block text-[8px] uppercase tracking-wider mb-0.5">Apple OAuth:</span>
+                        <div>APPLE_CLIENT_ID="your_apple_id"</div>
+                        <div>APPLE_CLIENT_SECRET="your_apple_secret"</div>
+                    </div>
+                    <div class="border-t border-neutral-500/10 pt-2">
+                        <span class="text-neutral-500 font-bold block text-[8px] uppercase tracking-wider mb-0.5">Microsoft OAuth:</span>
+                        <div>MICROSOFT_CLIENT_ID="your_microsoft_id"</div>
+                        <div>MICROSOFT_CLIENT_SECRET="your_microsoft_secret"</div>
+                    </div>
                 </div>
             </div>
         </div>
