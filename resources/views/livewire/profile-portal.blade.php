@@ -20,6 +20,7 @@
         selectedOrder: null,
         profileOpen: false,
         notificationsOpen: false,
+        mobileMenuOpen: false,
         changeTheme(targetTheme) {
             if (this.theme === targetTheme) return;
             this.theme = targetTheme;
@@ -81,6 +82,20 @@
                  'via-emerald-600/30': theme === 'light',
              }"></div>
         <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-8">
+            {{-- Mobile Menu Hamburger --}}
+            <button @click="mobileMenuOpen = true" 
+                    class="md:hidden transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center rounded-full shadow-sm shrink-0" 
+                    :class="{
+                        'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
+                        'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
+                    }"
+                    title="Menu"
+            >
+                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+
             <a href="/" class="shrink-0 flex items-center select-none cursor-pointer group/brand transition-transform duration-300 hover:scale-[1.02]">
                 <div class="flex flex-col text-left leading-none">
                     <span class="text-[12px] font-mono tracking-[0.35em] uppercase font-bold brand-title-atelier transition-colors duration-500"
@@ -108,7 +123,7 @@
                 </a>
 
                 {{-- Theme Switcher Dropdown (Header) --}}
-                <div x-data="{ themeMenuOpen: false }" class="relative inline-block text-left select-none animate-nav-item">
+                <div x-data="{ themeMenuOpen: false }" class="hidden md:inline-block relative text-left select-none animate-nav-item">
                     <button @click="themeMenuOpen = !themeMenuOpen" 
                             class="px-5 py-2.5 border rounded-full text-xs font-semibold tracking-[0.1em] transition-all flex items-center space-x-2 cursor-pointer"
                             :class="{
@@ -1558,4 +1573,94 @@
             </div>
         </div>
     @endif
+    <!-- Mobile Menu Overlay -->
+    <div x-show="mobileMenuOpen" @click="mobileMenuOpen = false" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md md:hidden" style="display: none;" x-transition></div>
+    
+    <!-- Floating Mobile Menu Panel (Left Drawer) -->
+    <div 
+        x-show="mobileMenuOpen"
+        x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
+        :class="theme === 'light' ? 'bg-[#FAF7F0] border-r border-neutral-200 text-neutral-900 shadow-2xl' : 'bg-[#0F0F12] border-r border-neutral-900 text-white shadow-2xl'"
+        class="fixed top-0 bottom-0 left-0 w-72 z-[101] flex flex-col justify-between text-left backdrop-blur-xl transition-all duration-300 md:hidden"
+        style="display: none;"
+    >
+        <div class="p-6 space-y-8 flex flex-col h-full justify-between">
+            <div class="space-y-6">
+                {{-- Header --}}
+                <div class="flex items-center justify-between">
+                    <div class="flex flex-col text-left leading-none">
+                        <span class="text-[9px] font-mono tracking-[0.3em] uppercase font-bold text-[#C5A880]">Atelier</span>
+                        <span class="text-sm font-extrabold uppercase tracking-[0.15em] font-outfit mt-0.5">Noir & Bloom</span>
+                    </div>
+                    <button @click="mobileMenuOpen = false" :class="theme === 'light' ? 'text-neutral-400 hover:text-neutral-800' : 'text-neutral-500 hover:text-[#C5A880]'" class="cursor-pointer select-none transition-colors">
+                        <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div :class="theme === 'light' ? 'bg-neutral-200' : 'bg-neutral-850'" class="w-full h-px"></div>
+
+                {{-- Mobile Search Input (Standard Redirect) --}}
+                <form action="/" method="GET" class="relative w-full">
+                    <input 
+                        type="text" 
+                        name="find"
+                        placeholder="Search items..."
+                        :class="theme === 'light' ? 'bg-neutral-100 border-neutral-300 text-neutral-900 placeholder-neutral-500 focus:border-emerald-600 focus:ring-emerald-600/10' : 'bg-neutral-900/40 border-neutral-800 text-white placeholder-neutral-500 focus:border-[#C5A880] focus:ring-[#C5A880]/10'"
+                        class="w-full pl-9 pr-4 py-2 border rounded-full text-xs font-sans focus:outline-none focus:ring-2 transition-all duration-300"
+                    >
+                    <button type="submit" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </form>
+
+                {{-- Navigation Links --}}
+                <nav class="space-y-4 text-xs font-mono uppercase tracking-widest font-semibold">
+                    <a href="/" class="block py-2 hover:text-[#C5A880] transition-colors">Home Showroom</a>
+                    <a href="{{ route('services-gifts') }}" class="block py-2 hover:text-[#C5A880] transition-colors">Services &amp; Gifts</a>
+                    <a href="{{ route('curate') }}" class="block py-2 hover:text-[#C5A880] transition-colors">Curation Studio</a>
+                    <button @click="mobileMenuOpen = false; notificationsOpen = true;" class="w-full text-left block py-2 hover:text-[#C5A880] transition-colors font-mono uppercase tracking-widest font-semibold cursor-pointer">
+                        Notifications
+                    </button>
+                    <button @click="changeTheme(theme === 'light' ? 'dark' : 'light')" class="w-full text-left flex items-center justify-between py-2 hover:text-[#C5A880] transition-colors font-mono uppercase tracking-widest font-semibold cursor-pointer">
+                        <span>Theme: <span x-text="theme"></span></span>
+                        <span class="w-3 h-3 rounded-full" :class="theme === 'light' ? 'bg-emerald-600' : 'bg-[#C5A880]'"></span>
+                    </button>
+                </nav>
+            </div>
+
+            {{-- Bottom Profile section --}}
+            <div class="space-y-4">
+                <div :class="theme === 'light' ? 'bg-neutral-200' : 'bg-neutral-850'" class="w-full h-px"></div>
+                
+                @auth
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-[#C5A880]/15 flex items-center justify-center text-[#C5A880] font-bold font-mono">
+                            {{ substr(auth()->user()->name, 0, 1) }}
+                        </div>
+                        <div class="truncate">
+                            <span class="block text-xs font-semibold truncate">{{ auth()->user()->name }}</span>
+                            <span class="block text-[9px] text-[#C5A880] uppercase tracking-wider font-mono">{{ auth()->user()->account_tier }} member</span>
+                        </div>
+                    </div>
+                    <button @click="mobileMenuOpen = false; profileOpen = true;" class="w-full text-center py-2.5 bg-[#C5A880]/10 hover:bg-[#C5A880]/20 text-[#C5A880] text-[10px] font-mono uppercase tracking-widest rounded-xl transition-all cursor-pointer font-bold">
+                        Member Portal
+                    </button>
+                @else
+                    <div class="grid grid-cols-2 gap-3 w-full">
+                        <a href="/login" class="bg-[#C5A880] text-black font-mono font-bold text-center uppercase tracking-wider py-2.5 rounded-xl text-[10px] hover:bg-[#B59A7A] transition-all cursor-pointer shadow-md block">
+                            Sign In
+                        </a>
+                        <a href="/register" class="border border-neutral-800 text-neutral-400 text-center hover:text-white hover:border-neutral-600 font-mono font-bold uppercase tracking-wider py-2.5 rounded-xl text-[10px] transition-all cursor-pointer block">
+                            Register
+                        </a>
+                    </div>
+                @endauth
+            </div>
+        </div>
+    </div>
 </div>
