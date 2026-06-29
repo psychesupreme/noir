@@ -1,33 +1,38 @@
-app = "noir-bloom-erp"
-primary_region = "jnb"
+# fly.toml app configuration file generated for noir-bloom on 2026-06-29T07:51:19Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'noir-bloom'
+primary_region = 'fra'
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = 'Dockerfile'
 
 [env]
-  APP_ENV = "production"
-  APP_DEBUG = "false"
-  APP_URL = "https://noir-bloom-erp.fly.dev"
-  RUN_MIGRATIONS = "true"
-  LOG_CHANNEL = "stderr"
-  DB_CONNECTION = "sqlite"
-  DB_DATABASE = "/var/www/html/storage/database/database.sqlite"
-  SESSION_DRIVER = "database"
-  CACHE_STORE = "database"
-  QUEUE_CONNECTION = "sync"
-  FILESYSTEM_DISK = "local"
+  APP_DEBUG = 'false'
+  APP_ENV = 'production'
+  APP_URL = 'https://noir-bloom-erp.fly.dev'
+  CACHE_STORE = 'database'
+  DB_CONNECTION = 'sqlite'
+  DB_DATABASE = '/var/www/html/storage/database/database.sqlite'
+  FILESYSTEM_DISK = 'local'
+  LOG_CHANNEL = 'stderr'
+  QUEUE_CONNECTION = 'sync'
+  RUN_MIGRATIONS = 'true'
+  SESSION_DRIVER = 'database'
+
+[[mounts]]
+  source = 'noir_storage'
+  destination = '/var/www/html/storage'
 
 [http_service]
   internal_port = 80
   force_https = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
-  auto_stop_machines = "stop"
   min_machines_running = 1
 
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = "512mb"
-
-[mounts]
-  source = "noir_storage"
-  destination = "/var/www/html/storage"
+  size = 'shared-cpu-1x'
+  memory = '512mb'
