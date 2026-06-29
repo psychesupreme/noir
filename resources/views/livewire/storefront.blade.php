@@ -78,6 +78,7 @@
         profileOpen: false,
         notificationsOpen: false,
         wishlistOpen: false,
+        wishlistIds: @js(auth()->check() ? (auth()->user()->settings['wishlist'] ?? []) : []),
         mobileMenuOpen: false,
         chatOpen: false,
         quickViewOpen: false,
@@ -1150,10 +1151,10 @@
                                         type="button" 
                                         @click.stop=""
                                         wire:click="toggleWishlist({{ $product->id }})" 
-                                        class="absolute top-2 right-2 z-20 w-6 h-6 rounded-full flex items-center justify-center bg-[#0B0B0D]/60 border border-white/5 text-[#C5A880] hover:scale-110 hover:bg-neutral-900 transition-all cursor-pointer shadow-md"
+                                        class="absolute top-2 right-2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[#0B0B0D]/65 border border-white/10 text-[#C5A880] hover:scale-110 hover:bg-neutral-900 transition-all cursor-pointer shadow-md"
                                         title="{{ $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
                                     >
-                                        <svg class="w-3.5 h-3.5 {{ $inWishlist ? 'fill-current text-rose-500' : 'fill-none stroke-current text-[#C5A880]' }}" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <svg class="w-4.5 h-4.5 {{ $inWishlist ? 'fill-current text-rose-500' : 'fill-none stroke-current text-[#C5A880]' }}" viewBox="0 0 24 24" stroke-width="1.5">
                                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                         </svg>
                                     </button>
@@ -1266,10 +1267,10 @@
                                             type="button" 
                                             @click.stop=""
                                             wire:click="toggleWishlist({{ $product->id }})" 
-                                            class="absolute top-3 right-3 z-20 w-8 h-8 rounded-full flex items-center justify-center bg-[#0B0B0D]/60 border border-white/5 text-[#C5A880] hover:scale-110 hover:bg-neutral-900 transition-all cursor-pointer shadow-md"
+                                            class="absolute top-3 right-3 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[#0B0B0D]/60 border border-white/5 text-[#C5A880] hover:scale-110 hover:bg-neutral-900 transition-all cursor-pointer shadow-md"
                                             title="{{ $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}"
                                         >
-                                            <svg class="w-4 h-4 {{ $inWishlist ? 'fill-current text-rose-500' : 'fill-none stroke-current text-[#C5A880]' }}" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <svg class="w-4.5 h-4.5 {{ $inWishlist ? 'fill-current text-rose-500' : 'fill-none stroke-current text-[#C5A880]' }}" viewBox="0 0 24 24" stroke-width="1.5">
                                                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                             </svg>
                                         </button>
@@ -2530,14 +2531,30 @@
                 </span>
             </div>
             
-            <button
-                type="button"
-                :disabled="(quickViewSize === 'standard' && quickViewProduct && quickViewProduct.stock_standard <= 0) || (quickViewSize === 'deluxe' && quickViewProduct && quickViewProduct.stock_deluxe <= 0) || (quickViewSize === 'grand' && quickViewProduct && quickViewProduct.stock_grand <= 0)"
-                @click="$wire.addToCuration(quickViewProduct.id, quickViewSize); quickViewOpen = false; drawerOpen = true; checkoutMode = false;"
-                :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" class="px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-md"
-            >
-                Add to Curation
-            </button>
+            <div class="flex items-center space-x-2">
+                <!-- Wishlist Toggle inside Details Modal -->
+                <button
+                    type="button"
+                    @click="$wire.toggleWishlist(quickViewProduct.id)"
+                    :class="theme === 'light' ? 'border-neutral-300 text-neutral-600 hover:text-rose-500 bg-white' : 'border-neutral-800 text-[#C5A880]/70 hover:text-rose-500 bg-neutral-900/40'"
+                    class="w-10 h-10 rounded-xl border flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0"
+                    :title="wishlistIds.includes(quickViewProduct.id) ? 'Remove from Wishlist' : 'Add to Wishlist'"
+                    x-show="quickViewProduct"
+                >
+                    <svg class="w-4.5 h-4.5 transition-transform duration-300 hover:scale-110" :class="wishlistIds.includes(quickViewProduct.id) ? 'fill-current text-rose-500' : 'fill-none stroke-current'" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </button>
+
+                <button
+                    type="button"
+                    :disabled="(quickViewSize === 'standard' && quickViewProduct && quickViewProduct.stock_standard <= 0) || (quickViewSize === 'deluxe' && quickViewProduct && quickViewProduct.stock_deluxe <= 0) || (quickViewSize === 'grand' && quickViewProduct && quickViewProduct.stock_grand <= 0)"
+                    @click="$wire.addToCuration(quickViewProduct.id, quickViewSize); quickViewOpen = false; drawerOpen = true; checkoutMode = false;"
+                    :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-[#C5A880] text-black hover:bg-[#B59A7A]'" class="px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-md"
+                >
+                    Add to Curation
+                </button>
+            </div>
         </div>
     </div>
 
