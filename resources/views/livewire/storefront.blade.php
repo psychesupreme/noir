@@ -2075,6 +2075,41 @@
                                     <p class="text-xs text-neutral-500 font-light leading-relaxed">Your curation specs are locked. Dispatch Safaricom API prompts down below.</p>
                                 </div>
 
+                                {{-- Mobile-only Order Recap --}}
+                                <div class="block md:hidden space-y-3 p-4 border rounded-2xl shadow-sm text-left transition-all duration-300 animate-hero-fade"
+                                     :class="theme === 'light' ? 'bg-[#FAF7F0]/90 border-neutral-250 text-neutral-800' : 'bg-[#0C0C0E]/50 border-neutral-900/60 text-neutral-300'">
+                                    <div class="flex items-center justify-between pb-2 border-b border-neutral-500/10">
+                                        <span class="text-[9px] uppercase tracking-wider font-bold text-neutral-500 font-mono">Order Statement Recap</span>
+                                        <span class="font-mono text-xs font-bold" :class="theme === 'light' ? 'text-neutral-900' : 'text-[#C5A880]'">{{ number_format($cartTotal + $service_fee) }} KSH</span>
+                                    </div>
+                                    
+                                    {{-- Mini item list --}}
+                                    <div class="space-y-2 max-h-28 overflow-y-auto scrollbar-none text-[11px]">
+                                        @foreach($cartItems as $item)
+                                            <div class="flex justify-between items-baseline gap-4">
+                                                <span class="truncate pr-2 text-neutral-700 dark:text-neutral-350 font-medium">{{ $item['product']->name }}</span>
+                                                <span class="font-mono text-[10px] text-neutral-455 dark:text-neutral-500 shrink-0">x{{ $item['quantity'] }} ({{ $item['size'] }})</span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    {{-- Logistics recap --}}
+                                    <div class="pt-2 border-t border-neutral-500/10 text-[10px] space-y-1.5 font-sans">
+                                        <div class="flex justify-between">
+                                            <span class="text-neutral-500">Destination:</span>
+                                            <span class="font-semibold text-right max-w-[180px] truncate text-neutral-800 dark:text-neutral-200" x-text="$wire.delivery_address || 'Not specified'"></span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-neutral-500">Delivery Date:</span>
+                                            <span class="font-semibold text-neutral-800 dark:text-neutral-200" x-text="$wire.deliveryDate || 'Not specified'"></span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-neutral-500">Client Contact:</span>
+                                            <span class="font-mono font-semibold text-neutral-800 dark:text-neutral-200">{{ $phone ?: 'Not specified' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div :class="theme === 'light' ? 'bg-[#FAF7F0]/90 border-neutral-250 shadow-md' : 'bg-[#0A0908]/95 border-[#C5A880]/15 shadow-2xl backdrop-blur-md'" class="space-y-3 p-4 border rounded-2xl shadow-2xl">
                                     <div class="space-y-1">
                                         <label class="text-[10px] uppercase tracking-wider text-neutral-500 font-mono">Safaricom Authorization Line</label>
@@ -2182,7 +2217,7 @@
             </div>
 
             <!-- Right Pane (Persistent Statement Summary) -->
-            <div :class="theme === 'light' ? 'bg-[#FAF7F0]/40' : 'bg-black/25'" class="w-full md:w-2/5 flex flex-col justify-between overflow-y-auto md:overflow-hidden h-auto md:h-full">
+            <div :class="theme === 'light' ? 'bg-[#FAF7F0]/40' : 'bg-black/25'" class="hidden md:flex w-full md:w-2/5 flex flex-col justify-between overflow-y-auto md:overflow-hidden h-auto md:h-full">
                 <div class="flex-1 overflow-y-auto p-5 space-y-5 max-h-none md:max-h-[calc(85vh-100px)] scrollbar-none text-xs">
                     
                     <!-- Title -->
