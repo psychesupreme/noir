@@ -643,7 +643,7 @@ class Storefront extends Component
             session()->forget('noir_bloom_cart');
             session()->forget('noir_bloom_customizations');
         } elseif ($this->paymentMethod === 'mpesa') {
-            $this->initiateMpesaPayment(app(MpesaService::class));
+            $this->paymentStatus = 'idle';
         }
     }
 
@@ -751,6 +751,25 @@ class Storefront extends Component
             'is_gift', 'recipient_name', 'recipient_phone', 'delivery_type', 'service_fee', 
             'orderSubmitted', 'trackedOrderId', 'mpesaErrorMessage',
             'activePaymentId', 'paymentStatus', 'mpesaReceiptNumber'
+        ]);
+    }
+
+    public function cancelPayment(): void
+    {
+        if ($this->trackedOrderId) {
+            $order = Order::find($this->trackedOrderId);
+            if ($order) {
+                $order->update(['status' => 'cancelled']);
+            }
+        }
+
+        $this->reset([
+            'orderSubmitted',
+            'paymentStatus',
+            'activePaymentId',
+            'trackedOrderId',
+            'mpesaErrorMessage',
+            'mpesaReceiptNumber'
         ]);
     }
 

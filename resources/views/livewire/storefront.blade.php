@@ -2156,9 +2156,12 @@
                                         </p>
                                     </div>
                                     
-                                    <div class="pt-4 max-w-sm mx-auto">
+                                    <div class="pt-4 max-w-sm mx-auto space-y-2.5">
                                         <button type="button" wire:click="$set('paymentStatus', 'idle')" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-3 cursor-pointer rounded-full btn-curate">
                                             Retry M-Pesa Authorization
+                                        </button>
+                                        <button type="button" wire:click="cancelPayment" :class="theme === 'light' ? 'border-neutral-300 hover:border-neutral-500 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50/50' : 'border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-white hover:bg-white/5'" class="w-full text-xs font-semibold tracking-[0.2em] uppercase py-3 cursor-pointer rounded-full border transition-all duration-300 bg-transparent">
+                                            Cancel Checkout & Edit
                                         </button>
                                     </div>
                                 </div>
