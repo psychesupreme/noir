@@ -21,6 +21,7 @@
         profileOpen: false,
         notificationsOpen: false,
         mobileMenuOpen: false,
+        mobileShowMenu: true,
         changeTheme(targetTheme) {
             if (this.theme === targetTheme) return;
             this.theme = targetTheme;
@@ -254,8 +255,8 @@
         
         <!-- Left Sidebar Navigation -->
         <aside 
-            :class="theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" 
-            class="w-full lg:w-64 shrink-0 sticky top-28 p-6 border rounded-[32px] backdrop-blur-xl space-y-6 text-left transition-all duration-500 self-start h-auto"
+            :class="(theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl') + (mobileShowMenu ? ' block' : ' hidden lg:block')" 
+            class="w-full lg:w-64 shrink-0 lg:sticky lg:top-28 p-6 border rounded-[32px] backdrop-blur-xl space-y-6 text-left transition-all duration-500 self-start h-auto"
         >
             <div class="border-b border-neutral-500/10 pb-4">
                 <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-neutral-500 block">Atelier Personal Portal</span>
@@ -267,7 +268,7 @@
                 <span class="text-[11px] font-mono uppercase tracking-widest text-neutral-500 block mb-2">Workspace Controls</span>
                 
                 <!-- Details -->
-                <button wire:click="setTab('details')" 
+                <button wire:click="setTab('details')" @click="mobileShowMenu = false"
                         :class="activeTab === 'details' ? 'bg-[#C5A880]/15 text-[#C5A880] font-semibold border-l-2 border-[#C5A880]' : 'text-neutral-450 hover:text-neutral-250 hover:bg-neutral-500/5'"
                         class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left">
                     <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
@@ -277,7 +278,7 @@
                 </button>
 
                 <!-- Security -->
-                <button wire:click="setTab('security')" 
+                <button wire:click="setTab('security')" @click="mobileShowMenu = false"
                         :class="activeTab === 'security' ? 'bg-[#C5A880]/15 text-[#C5A880] font-semibold border-l-2 border-[#C5A880]' : 'text-neutral-450 hover:text-neutral-250 hover:bg-neutral-500/5'"
                         class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left">
                     <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
@@ -287,7 +288,7 @@
                 </button>
 
                 <!-- Orders -->
-                <button wire:click="setTab('orders')" 
+                <button wire:click="setTab('orders')" @click="mobileShowMenu = false"
                         :class="activeTab === 'orders' ? 'bg-[#C5A880]/15 text-[#C5A880] font-semibold border-l-2 border-[#C5A880]' : 'text-neutral-450 hover:text-neutral-250 hover:bg-neutral-500/5'"
                         class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left">
                     <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
@@ -297,7 +298,7 @@
                 </button>
 
                 <!-- Wishlist -->
-                <button wire:click="setTab('wishlist')" 
+                <button wire:click="setTab('wishlist')" @click="mobileShowMenu = false"
                         :class="activeTab === 'wishlist' ? 'bg-[#C5A880]/15 text-[#C5A880] font-semibold border-l-2 border-[#C5A880]' : 'text-neutral-450 hover:text-neutral-250 hover:bg-neutral-500/5'"
                         class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left">
                     <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
@@ -307,7 +308,7 @@
                 </button>
 
                 <!-- Settings -->
-                <button wire:click="setTab('settings')" 
+                <button wire:click="setTab('settings')" @click="mobileShowMenu = false"
                         :class="activeTab === 'settings' ? 'bg-[#C5A880]/15 text-[#C5A880] font-semibold border-l-2 border-[#C5A880]' : 'text-neutral-450 hover:text-neutral-250 hover:bg-neutral-500/5'"
                         class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left">
                     <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
@@ -319,7 +320,7 @@
                 <!-- Logistics tab (only visible for Drivers/Staff) -->
                 @if(auth()->user()->isStaff())
                     <span class="text-[10px] font-mono uppercase tracking-widest text-[#C5A880] block pt-3 mb-1">Staff Section</span>
-                    <button wire:click="setTab('logistics')" 
+                    <button wire:click="setTab('logistics')" @click="mobileShowMenu = false"
                             :class="activeTab === 'logistics' ? 'bg-[#C5A880]/15 text-[#C5A880] font-semibold border-l-2 border-[#C5A880]' : 'text-neutral-450 hover:text-[#C5A880] hover:bg-neutral-500/5'"
                             class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left">
                         <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
@@ -331,6 +332,32 @@
                         Admin Dashboard
                     </a>
                 @endif
+
+                <!-- Quick Links Section -->
+                <div class="border-t border-neutral-500/10 pt-4 mt-4 space-y-1.5">
+                    <span class="text-[10px] font-mono uppercase tracking-widest text-neutral-500 block mb-1">Quick Links</span>
+                    
+                    <!-- Home Showroom -->
+                    <a href="/" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left text-neutral-450 hover:text-white hover:bg-neutral-500/5">
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                        <span>Home Showroom</span>
+                    </a>
+
+                    <!-- Toggle Theme -->
+                    <button @click="changeTheme(theme === 'light' ? 'dark' : 'light')" 
+                            :class="theme === 'light' ? 'text-neutral-600 hover:bg-neutral-500/5' : 'text-neutral-450 hover:text-white hover:bg-neutral-500/5'"
+                            class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[12px] font-mono uppercase tracking-wider transition-all sidebar-nav-item cursor-pointer text-left">
+                        <div class="flex items-center space-x-3">
+                            <svg viewBox="0 0 24 24" class="w-4 h-4 stroke-current fill-none" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                            </svg>
+                            <span>Toggle Theme</span>
+                        </div>
+                        <span class="w-2.5 h-2.5 rounded-full" :class="theme === 'light' ? 'bg-emerald-600' : 'bg-[#C5A880]'"></span>
+                    </button>
+                </div>
             </div>
 
             <!-- Sign Out -->
@@ -348,7 +375,17 @@
         </aside>
 
         <!-- Right Content Area -->
-        <div class="flex-1 w-full space-y-8 mb-20 text-left">
+        <div :class="!mobileShowMenu ? 'block' : 'hidden lg:block'" class="flex-1 w-full space-y-8 mb-20 text-left">
+            
+            <!-- Mobile back to listings menu button -->
+            <div class="lg:hidden mb-6" x-show="!mobileShowMenu">
+                <button @click="mobileShowMenu = true" :class="theme === 'light' ? 'bg-neutral-100 text-neutral-800 border-neutral-250 hover:bg-neutral-200' : 'bg-neutral-900 text-neutral-300 border-neutral-850 hover:bg-neutral-850'" class="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border font-mono text-[10px] uppercase tracking-widest transition-all cursor-pointer font-bold shadow-md">
+                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                        <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Show Portal Navigation Menu</span>
+                </button>
+            </div>
             
             <!-- DETAILS TAB -->
             @if($activeTab === 'details')

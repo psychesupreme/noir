@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 @theme {
   --color-bg-base: var(--bg-base);
   --color-bg-card: var(--bg-card);

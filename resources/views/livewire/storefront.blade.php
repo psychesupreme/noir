@@ -881,7 +881,7 @@
                              @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
                         >
                             <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-950/5 relative">
-                                <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover" loading="lazy">
                                 <div class="absolute top-0.5 left-0.5 bg-red-500 text-white text-[7px] font-bold px-1 py-0.5 rounded-sm">
                                     -{{ $discountPercent }}%
                                 </div>
@@ -994,7 +994,7 @@
                                      'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== 'all' && theme === 'dark',
                                      'border-neutral-250 hover:border-[#B59A7A] hover:scale-105': @js($selectedCategory) !== 'all' && theme === 'light'
                                  }">
-                                <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=200" alt="All" class="w-full h-full object-cover">
+                                <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=200" alt="All" class="w-full h-full object-cover" loading="lazy">
                             </div>
                             <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
                                   :class="{
@@ -1023,7 +1023,7 @@
                                                  'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'dark',
                                                  'border-neutral-250 hover:border-[#B59A7A] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'light'
                                              }">
-                                            <img src="{{ $catItem['img'] }}" alt="{{ $catItem['label'] }}" class="w-full h-full object-cover">
+                                            <img src="{{ $catItem['img'] }}" alt="{{ $catItem['label'] }}" class="w-full h-full object-cover" loading="lazy">
                                         </div>
                                         <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
                                               :class="{
@@ -1091,7 +1091,7 @@
                     }
                 @endphp
 
-                <div class="w-full space-y-16 animate-hero-fade" wire:loading.class="opacity-40" wire:target="search, selectedCategory, filterByOccasion">
+                <div class="w-full space-y-16 animate-hero-fade transition-all duration-500 ease-in-out" wire:loading.class="opacity-40" wire:target="search, selectedCategory, filterByOccasion">
                     @foreach($sectionsToRender as $section)
                         @if($section['items']->count() > 0)
                             <div class="space-y-6">
@@ -1123,7 +1123,7 @@
                                 <div @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
                                      class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center cursor-pointer select-none">
                                     <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
-                                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-all duration-700 z-0">
+                                         class="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-all duration-700 z-0" loading="lazy">
                                     
                                     <!-- Stock Status Overlay -->
                                     @if($product->stock <= 0)
@@ -1239,7 +1239,7 @@
                                      class="p-1 border border-neutral-500/10 rounded-t-[190px] rounded-b-[28px] overflow-hidden relative cursor-pointer select-none">
                                     <div class="aspect-[4/5] rounded-t-[180px] rounded-b-[24px] relative overflow-hidden bg-neutral-950/5">
                                         <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
-                                             class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 z-0">
+                                             class="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-all duration-700 z-0" loading="lazy">
                                         
                                         <!-- Stock Status Overlay -->
                                         @if($product->stock <= 0)

@@ -230,9 +230,30 @@
     <main class="flex-1 pt-28 pb-32 px-4 md:px-6 z-10 flex flex-col lg:flex-row lg:items-start gap-6 max-w-7xl mx-auto w-full">
         
         <!-- Left Panel: Fixed Visual Anchor & Invoice Summary (Locked on Desktop) -->
-        <div class="w-full lg:w-5/12 lg:sticky lg:top-28 lg:h-[calc(100vh-8rem)] lg:max-h-[760px] lg:min-h-[580px] lg:overflow-y-auto scrollbar-none rounded-3xl border border-neutral-800/20 relative flex flex-col justify-between p-6 bg-black/10 backdrop-blur-md shadow-2xl">
+        <div x-data="{ showTopPreviewMobile: false }"
+             :class="showTopPreviewMobile ? 'h-auto' : 'h-auto lg:h-[calc(100vh-8rem)]'"
+             class="w-full lg:w-5/12 lg:sticky lg:top-28 lg:max-h-[760px] lg:min-h-[580px] lg:overflow-y-auto scrollbar-none rounded-3xl border border-neutral-800/20 relative flex flex-col justify-between p-4 sm:p-6 bg-black/10 backdrop-blur-md shadow-2xl transition-all duration-300">
             
-            <div class="space-y-4">
+            <!-- Mobile Toggle Header (Visible only on Mobile) -->
+            <div class="lg:hidden flex items-center justify-between cursor-pointer select-none py-1" @click="showTopPreviewMobile = !showTopPreviewMobile">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl overflow-hidden bg-black/40 border border-neutral-800/40 flex items-center justify-center shrink-0">
+                        <img :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage()) || 'data:image/svg+xml;charset=utf-8,%3Csvg xmlns%3D%27http%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%27 width%3D%27256%27 height%3D%27256%27 viewBox%3D%270 0 256 256%27%3E%3Crect width%3D%27100%25%27 height%3D%27100%25%27 fill%3D%27%230E0E12%27%2F%3E%3Ctext x%3D%2750%25%27 y%3D%2750%25%27 dominant-baseline%3D%27middle%27 text-anchor%3D%27middle%27 fill%3D%27%23C5A880%27 font-size%3D%2724%27%3E%E2%9C%A8%3C%2Ftext%3E%3C%2Fsvg%3E'" 
+                             class="w-full h-full object-cover">
+                    </div>
+                    <div class="text-left">
+                        <span class="text-[9px] font-mono text-[#C5A880] uppercase tracking-widest block font-bold">Curation Desk</span>
+                        <span class="text-xs font-bold text-white font-mono" x-text="subtotal.toLocaleString() + ' KSH'"></span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-[9px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-[#C5A880]" x-text="showTopPreviewMobile ? 'Hide Preview' : 'Show Preview'"></span>
+                </div>
+            </div>
+
+            <!-- Content Container (Always visible on desktop, toggleable on mobile) -->
+            <div :class="showTopPreviewMobile ? 'block' : 'hidden lg:block'" class="mt-4 lg:mt-0 space-y-4 flex-grow flex flex-col justify-between">
+                <div class="space-y-4">
                 <!-- Visual Preview Header -->
                 <div class="z-20 flex justify-between items-center w-full">
                     <span class="text-[10px] font-mono tracking-widest text-[#C5A880] uppercase">Visual Preview</span>
@@ -452,6 +473,7 @@
                         Add to Cart
                     </button>
                 </div>
+            </div>
             </div>
         </div>
 
@@ -1215,7 +1237,7 @@
                 @click="showMobileLedger = !showMobileLedger"
                 class="px-3.5 py-2.5 rounded-full border border-neutral-800/60 text-[9px] font-mono uppercase tracking-wider text-neutral-450 hover:text-white"
             >
-                <span x-text="showMobileLedger ? 'Hide details' : 'View details'"></span>
+                <span x-text="showMobileLedger ? 'Hide details' : 'View Design & Ledger'"></span>
             </button>
             <button 
                 type="button"
@@ -1257,6 +1279,60 @@
             <div class="flex items-center justify-between border-b border-neutral-800/10 pb-4 mb-4">
                 <span class="text-xs font-mono tracking-widest text-[#C5A880] uppercase font-bold">Atelier Curation Ledger</span>
                 <button type="button" @click="showMobileLedger = false" class="text-neutral-500 hover:text-white text-xs p-1">✕ Close</button>
+            </div>
+
+            <!-- Unified Visual Preview inside Mobile Drawer -->
+            <div class="mb-5 space-y-3 pb-4 border-b border-neutral-800/10">
+                <div class="flex justify-between items-center w-full">
+                    <span class="text-[9px] font-mono tracking-widest text-[#C5A880] uppercase">Visual Preview</span>
+                    <div class="flex bg-black/45 border border-neutral-800/50 p-0.5 rounded-full text-[8px] font-mono">
+                        <button @click="viewMode = 'arrangement'" :class="viewMode === 'arrangement' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-2 py-0.5 rounded-full transition-all cursor-pointer">Flowers</button>
+                        <button @click="viewMode = 'presentation'" :class="viewMode === 'presentation' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-2 py-0.5 rounded-full transition-all cursor-pointer">Wrapping</button>
+                        <button @click="viewMode = 'note'" :class="viewMode === 'note' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-2 py-0.5 rounded-full transition-all cursor-pointer">Note</button>
+                    </div>
+                </div>
+
+                <div class="w-full h-[200px] rounded-2xl border border-neutral-800/10 overflow-hidden relative flex items-center justify-center bg-black/20 shadow-inner">
+                    <!-- Empty Desk State -->
+                    <div x-show="isCurationEmpty() && !hoveredImage && viewMode !== 'note'" class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 z-10">
+                        <span class="text-[10px] font-mono tracking-widest text-[#C5A880] uppercase font-bold">Curation Desk Empty</span>
+                    </div>
+
+                    <!-- Blurred Background Layer -->
+                    <div x-show="(!isCurationEmpty() || hoveredImage) && viewMode !== 'note'" class="absolute inset-0 scale-110 blur-xl opacity-30 pointer-events-none">
+                        <img :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage())" alt="" class="w-full h-full object-cover">
+                    </div>
+                    
+                    <!-- Centered Contained Image -->
+                    <img x-show="(!isCurationEmpty() || hoveredImage) && viewMode !== 'note'" :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage())" alt="Preview" class="relative z-10 w-full h-full object-contain p-2">
+                    
+                    <!-- Note Preview Card inside Drawer -->
+                    <div x-show="viewMode === 'note'" x-transition.opacity class="absolute inset-0 z-20 flex items-center justify-center p-4 bg-[#070709]/80 backdrop-blur-md">
+                        <div class="w-full max-w-[200px] h-[140px] rounded-lg shadow-lg p-3 border flex flex-col justify-between transition-all duration-300"
+                             :class="{
+                                 'bg-[#FAF8F5] border-[#C5A880]/30 text-neutral-800': $wire.cardPrintPreference === 'handwritten',
+                                 'bg-white border-neutral-200 text-neutral-900': $wire.cardPrintPreference === 'typography'
+                             }">
+                            <div class="w-full h-full border border-dashed border-[#C5A880]/20 p-1 flex flex-col justify-between relative overflow-hidden">
+                                <div class="text-center">
+                                    <span class="text-[7px] font-mono tracking-[0.3em] uppercase text-[#C5A880]/80">Noir & Bloom</span>
+                                </div>
+                                <div class="flex-1 flex items-center justify-center text-center px-1 overflow-y-auto min-h-0">
+                                    <template x-if="!hasCard">
+                                        <p class="text-[8px] text-neutral-400 font-mono uppercase tracking-wider">Greeting Card Disabled</p>
+                                    </template>
+                                    <template x-if="hasCard && (!cardMessage || cardMessage.trim() === '')">
+                                        <p class="text-[9px] text-neutral-400 italic">Write your message...</p>
+                                    </template>
+                                    <template x-if="hasCard && cardMessage && cardMessage.trim() !== ''">
+                                        <p class="text-[10px] font-serif leading-snug break-words" x-text="cardMessage"></p>
+                                    </template>
+                                </div>
+                                <div class="text-center text-[6px] font-mono tracking-widest text-[#C5A880]/50 uppercase">Bespoke Curation</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Ledger list items -->
