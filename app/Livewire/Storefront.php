@@ -165,7 +165,7 @@ class Storefront extends Component
             $user = auth()->user();
             $this->full_name = $user->name;
             $this->email = $user->email;
-            $this->phone = $user->phone_number ?? '';
+            $this->phone = $this->cleanLocalPhone($user->phone_number ?? '');
             $this->kra_pin = $user->kra_pin ?? '';
             $this->delivery_address = $user->default_delivery_address ?? '';
             $this->region = $user->default_region ?? 'Nairobi';
@@ -654,12 +654,16 @@ class Storefront extends Component
     {
         $this->mpesaErrorMessage = null;
 
+        $this->phone = $this->cleanLocalPhone($this->phone);
+
         $this->validate([
-            'phone' => 'required|string|min:9',
+            'phone' => 'required|string|regex:/^(7|1)[0-9]{8}$/',
+        ], [
+            'phone.regex' => 'Please enter a valid 9-digit Kenyan phone number (e.g. 712345678).',
         ]);
 
         $ipKey = 'stk-push-ip:' . request()->ip();
-        $phoneKey = 'stk-push-phone:' . preg_replace('/\D/', '', $this->phone);
+        $phoneKey = 'stk-push-phone:' . $this->phone;
         
         if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($ipKey, 3) || \Illuminate\Support\Facades\RateLimiter::tooManyAttempts($phoneKey, 3)) {
             $seconds = max(
@@ -1029,5 +1033,22 @@ class Storefront extends Component
     {
         $this->cart = [];
         session()->forget('noir_bloom_cart');
+    }
+
+    protected function cleanLocalPhone(string $phone): string
+    {
+        $cleaned = preg_replace('/\D/', '', $phone);
+        
+        // Strip country code if present
+        if (str_starts_with($cleaned, '254')) {
+            $cleaned = substr($cleaned, 3);
+        }
+        
+        // Strip leading 0 if present (e.g. 0734... -> 734...)
+        if (str_starts_with($cleaned, '0')) {
+            $cleaned = substr($cleaned, 1);
+        }
+        
+        return $cleaned;
     }
 }
