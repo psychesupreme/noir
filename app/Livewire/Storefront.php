@@ -657,7 +657,7 @@ class Storefront extends Component
         $this->phone = $this->cleanLocalPhone($this->phone);
 
         $this->validate([
-            'phone' => 'required|string|regex:/^(7|1)[0-9]{8}$/',
+            'phone' => ['required', 'string', 'regex:/^(7|1)[0-9]{8}$/'],
         ], [
             'phone.regex' => 'Please enter a valid 9-digit Kenyan phone number (e.g. 712345678).',
         ]);

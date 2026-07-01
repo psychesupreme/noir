@@ -57,7 +57,7 @@ class ProfilePortal extends Component
     protected $rules = [
         'name' => 'required|string|min:3',
         'email' => 'required|email',
-        'phone_number' => 'nullable|string|regex:/^(7|1)[0-9]{8}$/',
+        'phone_number' => ['nullable', 'string', 'regex:/^(7|1)[0-9]{8}$/'],
         'gender' => 'nullable|string|in:male,female,trans,other',
         'dob' => 'nullable|date',
         'kra_pin' => 'nullable|string|min:11|max:15',
