@@ -60,6 +60,7 @@
 @endsection
 
 <div class="relative min-h-screen flex flex-col justify-between" 
+    @wishlist-updated.window="wishlistIds = $event.detail.wishlistIds || []"
     x-data="{ 
         drawerOpen: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
         checkoutMode: {{ $autoOpenDrawer ? 'true' : 'false' }}, 

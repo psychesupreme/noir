@@ -72,5 +72,5 @@ Route::post('/api/v1/mpesa/callback', [MpesaCallbackController::class, 'handleCa
 // ── Social OAuth Routes ───────
 Route::get('/auth/social/{provider}', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])
     ->name('social.redirect');
-Route::get('/auth/social/{provider}/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'callback'])
+Route::match(['get', 'post'], '/auth/social/{provider}/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'callback'])
     ->name('social.callback');

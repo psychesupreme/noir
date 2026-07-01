@@ -185,6 +185,7 @@ class ProfilePortal extends Component
                 'settings' => $settings
             ]);
 
+            $this->dispatch('wishlist-updated', wishlistIds: $wishlist);
             session()->flash('success_wishlist', 'Item removed from your wishlist.');
         }
     }

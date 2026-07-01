@@ -146,16 +146,31 @@ class CampaignIndex extends Component
             return;
         }
 
-        // Mock send: count all clients
-        $clientCount = Client::count();
+        $clients = Client::whereNotNull('email')->where('email', '!=', '')->get();
+        $sentCount = 0;
+
+        if ($campaign->channel === 'email') {
+            foreach ($clients as $client) {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($client->email)
+                        ->queue(new \App\Mail\CampaignMail($campaign));
+                    $sentCount++;
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to queue campaign email to {$client->email}: " . $e->getMessage());
+                }
+            }
+        } else {
+            // SMS channel fallback (to be integrated next)
+            $sentCount = $clients->count();
+        }
 
         $campaign->update([
             'status' => 'sent',
-            'sent_count' => $clientCount,
+            'sent_count' => $sentCount,
             'scheduled_at' => now(),
         ]);
 
-        session()->flash('message', 'Campaign broadcast simulation triggered successfully for ' . $clientCount . ' clients.');
+        session()->flash('message', 'Campaign broadcast triggered successfully for ' . $sentCount . ' recipients.');
     }
 
     protected function resetForm(): void

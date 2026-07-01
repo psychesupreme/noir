@@ -14,7 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
     
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
-            'api/v1/mpesa/callback' // <-- Whitelist the Daraja webhook route
+            'api/v1/mpesa/callback', // <-- Whitelist the Daraja webhook route
+            'auth/social/*/callback', // <-- Whitelist social login POST callbacks (like Apple)
         ]);
 
         $middleware->alias([

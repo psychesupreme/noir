@@ -97,6 +97,7 @@
 @endsection
 
 <div 
+    @wishlist-updated.window="wishlistIds = $event.detail.wishlistIds || []"
     x-data="{ 
         theme: (() => {
             try {

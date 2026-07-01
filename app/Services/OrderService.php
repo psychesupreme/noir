@@ -91,7 +91,17 @@ class OrderService
                 TransmitEtimsInvoiceJob::dispatch($invoice)->afterCommit();
             }
 
-            // 5. Invalidate dashboard stats cache
+            // 5. Send Transactional Email Receipt
+            if ($order->client && !empty($order->client->email)) {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($order->client->email)
+                        ->queue(new \App\Mail\OrderReceiptMail($order));
+                } catch (\Exception $e) {
+                    Log::error("Failed to queue order receipt email for order #{$order->id}: " . $e->getMessage());
+                }
+            }
+
+            // 6. Invalidate dashboard stats cache
             Cache::forget('dashboard_stats');
 
             Log::info("Order approved successfully through OrderService: Order ID: {$order->id}");

@@ -974,6 +974,7 @@ class Storefront extends Component
         $settings['wishlist'] = $wishlist;
         $user->update(['settings' => $settings]);
 
+        $this->dispatch('wishlist-updated', wishlistIds: $wishlist);
         session()->flash('success', $msg);
     }
 
