@@ -93,13 +93,18 @@
     <!-- Persistent Theme Bootstrap -->
     <script>
         (function() {
-            @auth
-                const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
-                const theme = (pref === 'onyx' || pref === 'dark') ? 'dark' : 'light';
-            @else
-                const storedTheme = localStorage.getItem('nb_theme');
-                const theme = (storedTheme === 'onyx' || storedTheme === 'dark') ? 'dark' : 'light';
-            @endauth
+            let theme = 'light';
+            const storedTheme = localStorage.getItem('nb_theme');
+            if (storedTheme === 'dark' || storedTheme === 'light') {
+                theme = storedTheme;
+            } else {
+                @auth
+                    const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
+                    theme = (pref === 'onyx' || pref === 'dark') ? 'dark' : 'light';
+                @else
+                    theme = 'light';
+                @endauth
+            }
             document.documentElement.className = theme;
             document.documentElement.setAttribute('data-theme', theme);
             const bgColors = { 'dark': '#0A0908', 'light': '#FAF7F0' };

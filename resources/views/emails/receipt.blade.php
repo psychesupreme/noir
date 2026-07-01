@@ -234,6 +234,11 @@
                     <p class="subtitle">Order Confirmed</p>
                 </div>
 
+                <p style="font-size: 13px; font-weight: 300; line-height: 1.6; color: #D4D4D8; text-align: center; margin-bottom: 30px;">
+                    Dear {{ $order->client?->contact_name ?: 'Valued Client' }},<br><br>
+                    Thank you for your patronage at Atelier Noir &amp; Bloom. We are pleased to confirm that your payment has been successfully approved. Our master designers are handcrafting your floral curation with the finest fresh Rift Valley stems. Below is the summary of your transaction and KRA eTIMS tax invoice details.
+                </p>
+
                 <div class="invoice-details">
                     <table>
                         <tr>

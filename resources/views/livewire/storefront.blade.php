@@ -1597,25 +1597,6 @@
                 </a>
             </div>
 
-            {{-- Theme Switcher Pill --}}
-            <div class="flex items-center space-x-1 border rounded-full p-1 select-none transition-colors duration-500"
-                 :class="{
-                     'border-neutral-800 bg-neutral-900/40': theme === 'dark',
-                     'border-neutral-200 bg-neutral-50': theme === 'light'
-                 }">
-                <button @click="changeTheme('dark')" 
-                        :class="theme === 'dark' ? 'bg-[#C5A880] text-black shadow-sm font-semibold' : 'text-neutral-500 hover:text-[#C5A880]'" 
-                        class="w-6 h-6 rounded-full text-[8px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center justify-center cursor-pointer"
-                        title="Onyx Theme">
-                    <span class="w-2 h-2 rounded-full" :class="theme === 'dark' ? 'bg-black' : 'bg-neutral-600'"></span>
-                </button>
-                <button @click="changeTheme('light')" 
-                        :class="theme === 'light' ? 'bg-[#B59A7A] text-black shadow-sm font-semibold' : 'text-neutral-500 hover:text-[#B59A7A]'" 
-                        class="w-6 h-6 rounded-full text-[8px] font-mono uppercase tracking-wider transition-all duration-300 flex items-center justify-center cursor-pointer"
-                        title="Champagne Theme">
-                    <span class="w-2 h-2 rounded-full" :class="theme === 'light' ? 'bg-white' : 'bg-neutral-400'"></span>
-                </button>
-            </div>
 
             <div class="flex space-x-6">
                 <a href="#" :class="theme === 'light' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Terms of Curation</a>
@@ -2798,6 +2779,10 @@
                                 'order' => 'text-teal-500 bg-teal-500/10 border-teal-500/20',
                                 default => 'text-neutral-400 bg-neutral-500/10 border-neutral-500/20'
                             };
+                            $orderId = null;
+                            if (preg_match('/#NB-ORD-(\d+)/', $notif['message'], $matches)) {
+                                $orderId = (int)$matches[1];
+                            }
                         @endphp
                         <div 
                             x-data="{ expanded: false }" 
@@ -2820,13 +2805,36 @@
                                     {{ \Carbon\Carbon::parse($notif['created_at'])->diffForHumans() }}
                                 </span>
                             </div>
-
+ 
                             <div>
                                 <h4 :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="font-serif italic text-xs tracking-wide font-semibold">{{ $notif['title'] }}</h4>
                                 <p @click="expanded = !expanded" :class="theme === 'light' ? 'text-neutral-600' : 'text-neutral-400'" class="text-[11px] leading-relaxed font-light mt-1 cursor-pointer" :class="{ 'line-clamp-2': !expanded }">
                                     {{ $notif['message'] }}
                                 </p>
                             </div>
+
+                            @if($orderId)
+                                <div class="mt-2 pt-2 border-t border-neutral-500/5 flex items-center justify-end">
+                                    @if(($notif['type'] ?? 'info') === 'warning')
+                                        <button 
+                                            type="button" 
+                                            @click="drawerOpen = true; checkoutMode = true; $wire.trackSpecificOrder({{ $orderId }}); notificationsOpen = false;" 
+                                            class="inline-flex items-center justify-center border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 rounded-full font-mono text-[9px] uppercase tracking-wider py-1.5 px-3.5 transition-all cursor-pointer font-bold shadow-sm"
+                                        >
+                                            Retry Payment
+                                        </button>
+                                    @else
+                                        <button 
+                                            type="button" 
+                                            @click="drawerOpen = true; checkoutMode = true; $wire.trackSpecificOrder({{ $orderId }}); notificationsOpen = false;" 
+                                            :class="theme === 'light' ? 'border-neutral-350 hover:bg-neutral-100 text-neutral-800' : 'border-[#C5A880]/30 hover:bg-[#C5A880]/10 text-[#C5A880]'"
+                                            class="inline-flex items-center justify-center border rounded-full font-mono text-[9px] uppercase tracking-wider py-1.5 px-3.5 transition-all cursor-pointer font-bold shadow-sm"
+                                        >
+                                            Track Order
+                                        </button>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     @empty
                         <div class="text-center py-12 text-neutral-500 text-xs flex flex-col items-center justify-center space-y-2">

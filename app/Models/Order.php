@@ -51,10 +51,40 @@ class Order extends Model
 
                 // Create user notification
                 if ($order->client && $order->client->user_id) {
+                    $title = 'Order Status Update';
+                    $message = "Your order #NB-ORD-{$order->id} status has been updated to " . strtoupper($newStatus) . ".";
+                    
+                    switch($newStatus) {
+                        case 'pending':
+                            $title = 'Order Placed';
+                            $message = "We have received your order #NB-ORD-{$order->id} and it is currently awaiting payment. Click to complete authorization.";
+                            break;
+                        case 'approved':
+                            $title = 'Curation Approved';
+                            $message = "Exquisite choice! Your order #NB-ORD-{$order->id} is approved. Our Master Florists are now hand-selecting your fresh Rift Valley stems.";
+                            break;
+                        case 'processing':
+                            $title = 'Atelier Design in Progress';
+                            $message = "Your curation #NB-ORD-{$order->id} is in full bloom. Our concierge team is crafting the floral composition and custom lettering.";
+                            break;
+                        case 'shipping':
+                            $title = 'Dispatch En Route';
+                            $message = "Our luxury courier is en route with your curation #NB-ORD-{$order->id}, maintaining strict climate controls for absolute freshness.";
+                            break;
+                        case 'delivered':
+                            $title = 'Delivered with Elegance';
+                            $message = "Delivered. Your curation #NB-ORD-{$order->id} has been hand-delivered. We hope it brings profound delight.";
+                            break;
+                        case 'cancelled':
+                            $title = 'Order Cancelled';
+                            $message = "Your order #NB-ORD-{$order->id} has been cancelled. Please contact our Concierge Desk if you require any assistance.";
+                            break;
+                    }
+
                     \App\Models\Notification::create([
                         'user_id' => $order->client->user_id,
-                        'title' => 'Order Status Updated',
-                        'message' => "Your order #NB-ORD-{$order->id} status has been updated to " . strtoupper($newStatus) . ".",
+                        'title' => $title,
+                        'message' => $message,
                         'type' => 'order',
                     ]);
                 }

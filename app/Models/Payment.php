@@ -64,6 +64,19 @@ class Payment extends Model
                         ]);
                     }
                 }
+
+                // Create user notification on payment failure
+                if ($newStatus === 'failed') {
+                    $order = $payment->order;
+                    if ($order && $order->client && $order->client->user_id) {
+                        \App\Models\Notification::create([
+                            'user_id' => $order->client->user_id,
+                            'title' => 'M-Pesa Payment Unsuccessful',
+                            'message' => "Your payment of " . number_format($payment->amount) . " KSH for order #NB-ORD-{$payment->order_id} was unsuccessful. Reason: " . ($payment->result_description ?? 'Declined by customer/provider') . ". Click to retry payment.",
+                            'type' => 'warning',
+                        ]);
+                    }
+                }
             }
         });
     }

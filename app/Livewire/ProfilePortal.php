@@ -57,12 +57,16 @@ class ProfilePortal extends Component
     protected $rules = [
         'name' => 'required|string|min:3',
         'email' => 'required|email',
-        'phone_number' => 'nullable|string',
+        'phone_number' => 'nullable|string|regex:/^(7|1)[0-9]{8}$/',
         'gender' => 'nullable|string|in:male,female,trans,other',
         'dob' => 'nullable|date',
         'kra_pin' => 'nullable|string|min:11|max:15',
         'default_delivery_address' => 'nullable|string|min:6',
         'default_region' => 'required|in:Nairobi,Kiambu',
+    ];
+
+    protected $validationMessages = [
+        'phone_number.regex' => 'Please enter a valid 9-digit Kenyan phone number (e.g. 712345678).',
     ];
 
     public function mount(): void
@@ -71,7 +75,17 @@ class ProfilePortal extends Component
         if ($user) {
             $this->name = $user->name;
             $this->email = $user->email;
-            $this->phone_number = $user->phone_number ?? '';
+            
+            // Clean/format loaded number
+            $phone = preg_replace('/\D/', '', $user->phone_number ?? '');
+            if (str_starts_with($phone, '254')) {
+                $phone = substr($phone, 3);
+            }
+            if (str_starts_with($phone, '0')) {
+                $phone = substr($phone, 1);
+            }
+            $this->phone_number = $phone;
+
             $this->gender = $user->gender ?? '';
             $this->dob = $user->dob ?? '';
             $this->kra_pin = $user->kra_pin ?? '';
@@ -97,7 +111,18 @@ class ProfilePortal extends Component
 
     public function updateProfile(): void
     {
-        $this->validate();
+        if ($this->phone_number) {
+            $cleaned = preg_replace('/\D/', '', $this->phone_number);
+            if (str_starts_with($cleaned, '254')) {
+                $cleaned = substr($cleaned, 3);
+            }
+            if (str_starts_with($cleaned, '0')) {
+                $cleaned = substr($cleaned, 1);
+            }
+            $this->phone_number = $cleaned;
+        }
+
+        $this->validate(null, $this->validationMessages);
 
         $user = auth()->user();
         if ($user) {

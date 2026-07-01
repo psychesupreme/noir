@@ -395,6 +395,20 @@
                         <p class="text-xs text-neutral-500 font-light mt-1">Configure user profile customization properties, email contacts, and default hub regions.</p>
                     </div>
 
+                    @if(empty($phone_number) || empty($default_delivery_address))
+                        <div class="p-4 border border-dashed border-[#C5A880]/30 bg-[#C5A880]/5 rounded-[24px] flex flex-col sm:flex-row gap-3 items-center justify-between text-xs font-mono">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-5 h-5 text-[#C5A880] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <div class="space-y-0.5">
+                                    <span class="text-[#C5A880] font-bold block uppercase tracking-wider">Additional Profile Details Needed</span>
+                                    <span class="text-neutral-500 text-[10px]">Please configure your phone number and delivery address below to enable M-Pesa payments and storefront checkouts.</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Dynamic Profile Header Card with Real-time Gender Avatar Selector -->
                     <div :class="theme === 'light' ? 'bg-white/50 border-neutral-200 text-neutral-900' : 'bg-neutral-900/30 text-white border-neutral-900/40'" class="border p-6 rounded-[32px] flex flex-col sm:flex-row gap-6 items-center backdrop-blur-md">
                         <div class="relative group shrink-0">
@@ -944,12 +958,12 @@
                             <div class="space-y-2 border-b border-neutral-500/5 pb-4">
                                 <label :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-400'" class="uppercase font-semibold transition-colors">Preferred Workspace Default Theme</label>
                                 <div class="grid grid-cols-2 gap-4 pt-1 max-w-sm">
-                                    <button type="button" wire:click="$set('preferred_theme', 'dark')" 
+                                    <button type="button" @click="changeTheme('dark')" wire:click="$set('preferred_theme', 'dark')" 
                                             :class="preferred_theme === 'dark' ? (theme === 'light' ? 'border-[#C5A880] bg-[#C5A880]/15 text-[#8c7355] font-bold shadow-sm' : 'border-[#C5A880] bg-[#C5A880]/20 text-[#C5A880] font-bold') : (theme === 'light' ? 'border-neutral-300 text-neutral-500 hover:border-neutral-400 hover:text-neutral-800' : 'border-neutral-800 text-neutral-500 hover:text-neutral-300')" 
                                             class="p-3 border rounded-2xl cursor-pointer text-center transition-all select-none">
                                         Onyx (Dark)
                                     </button>
-                                    <button type="button" wire:click="$set('preferred_theme', 'light')" 
+                                    <button type="button" @click="changeTheme('light')" wire:click="$set('preferred_theme', 'light')" 
                                             :class="preferred_theme === 'light' ? (theme === 'light' ? 'border-emerald-700 bg-emerald-50/50 text-emerald-800 font-bold shadow-sm' : 'border-[#B59A7A] bg-[#B59A7A]/20 text-[#B59A7A] font-bold') : (theme === 'light' ? 'border-neutral-300 text-neutral-500 hover:border-neutral-400 hover:text-neutral-800' : 'border-neutral-800 text-neutral-500 hover:text-neutral-300')" 
                                             class="p-3 border rounded-2xl cursor-pointer text-center transition-all select-none">
                                         Champagne (Light)

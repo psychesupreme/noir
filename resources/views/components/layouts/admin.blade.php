@@ -17,17 +17,18 @@
     <!-- Persistent Theme Bootstrap -->
     <script>
         (function() {
-            @auth
-                const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
-                let theme = (pref === 'onyx' || pref === 'dark') ? 'dark' : 'light';
-            @else
-                let theme = localStorage.getItem('nb_theme') || 'light';
-                if (theme === 'onyx' || theme === 'dark') {
-                    theme = 'dark';
-                } else {
+            let theme = 'light';
+            const storedTheme = localStorage.getItem('nb_theme');
+            if (storedTheme === 'dark' || storedTheme === 'light') {
+                theme = storedTheme;
+            } else {
+                @auth
+                    const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
+                    theme = (pref === 'onyx' || pref === 'dark') ? 'dark' : 'light';
+                @else
                     theme = 'light';
-                }
-            @endauth
+                @endauth
+            }
             document.documentElement.className = theme;
             document.documentElement.setAttribute('data-theme', theme);
         })();

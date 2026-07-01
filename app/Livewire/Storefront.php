@@ -777,6 +777,31 @@ class Storefront extends Component
         ]);
     }
 
+    public function trackSpecificOrder(int $orderId): void
+    {
+        $order = Order::find($orderId);
+        if ($order) {
+            // Security check: ensure the order belongs to the currently authenticated user
+            if ($order->client && $order->client->user_id === auth()->id()) {
+                $this->trackedOrderId = $orderId;
+                $this->orderSubmitted = true;
+                $this->mpesaErrorMessage = null;
+                
+                // Get the latest payment status for this order
+                $payment = $order->payments()->latest()->first();
+                if ($payment) {
+                    $this->activePaymentId = $payment->id;
+                    $this->paymentStatus = $payment->status;
+                    $this->mpesaReceiptNumber = $payment->mpesa_receipt_number;
+                } else {
+                    $this->activePaymentId = null;
+                    $this->paymentStatus = 'idle';
+                    $this->mpesaReceiptNumber = null;
+                }
+            }
+        }
+    }
+
     public function render()
     {
         $this->slides = \App\Services\HeroSettingsService::getSlides();
@@ -1035,8 +1060,11 @@ class Storefront extends Component
         session()->forget('noir_bloom_cart');
     }
 
-    protected function cleanLocalPhone(string $phone): string
+    protected function cleanLocalPhone(?string $phone): string
     {
+        if (empty($phone)) {
+            return '';
+        }
         $cleaned = preg_replace('/\D/', '', $phone);
         
         // Strip country code if present
