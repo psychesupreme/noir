@@ -23,27 +23,6 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 
-        // Register custom Microsoft and Apple Socialite drivers
-        try {
-            $socialite = $this->app->make(\Laravel\Socialite\Contracts\Factory::class);
-            
-            $socialite->extend('microsoft', function ($app) use ($socialite) {
-                $config = $app['config']['services.microsoft'];
-                return $socialite->buildProvider(
-                    \App\Services\Socialite\MicrosoftProvider::class,
-                    $config
-                );
-            });
-
-            $socialite->extend('apple', function ($app) use ($socialite) {
-                $config = $app['config']['services.apple'];
-                return $socialite->buildProvider(
-                    \App\Services\Socialite\AppleProvider::class,
-                    $config
-                );
-            });
-        } catch (\Exception $e) {
-            // Silence if socialite factory is not registerable in console/tests
-        }
+        // Custom Socialite extensions are no longer needed since we use Google natively.
     }
 }

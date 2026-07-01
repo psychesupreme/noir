@@ -45,44 +45,23 @@
 
         {{-- Social Sign-In buttons --}}
         <div class="space-y-3.5">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3 my-2">
                 <div class="w-full h-px bg-neutral-500/10"></div>
                 <span class="px-3 text-[9px] font-mono tracking-widest text-neutral-500 uppercase whitespace-nowrap">Automatic Sign In</span>
                 <div class="w-full h-px bg-neutral-500/10"></div>
             </div>
             
-            <div class="grid grid-cols-3 gap-3">
+            <div>
                 <a
                     href="{{ route('social.redirect', ['provider' => 'google']) }}"
                     :class="theme === 'light' ? 'border-neutral-250 bg-neutral-50/50 hover:bg-neutral-100 text-neutral-800' : 'border-neutral-800 bg-[#0F0F12]/60 hover:bg-[#121215] text-white'"
-                    class="border rounded-xl py-3 flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-sm z-10"
+                    class="border rounded-xl py-3.5 flex items-center justify-center gap-3 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-sm z-10 w-full font-mono text-[10px] uppercase tracking-wider font-medium"
                     title="Sign in automatically with Google"
                 >
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.555 0-6.437-2.883-6.437-6.437s2.882-6.437 6.437-6.437c1.558 0 2.978.558 4.093 1.487l3.08-3.081C19.167 2.155 15.897 1 12.24 1c-6.075 0-11 4.925-11 11s4.925 11 11 11c5.962 0 10.217-4.195 10.217-10.222 0-.616-.055-1.189-.164-1.592H12.24z"/>
                     </svg>
-                </a>
-                
-                <a
-                    href="{{ route('social.redirect', ['provider' => 'apple']) }}"
-                    :class="theme === 'light' ? 'border-neutral-250 bg-neutral-50/50 hover:bg-neutral-100 text-neutral-800' : 'border-neutral-800 bg-[#0F0F12]/60 hover:bg-[#121215] text-white'"
-                    class="border rounded-xl py-3 flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-sm z-10"
-                    title="Sign in automatically with Apple"
-                >
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.12.09 2.27-.56 2.95-1.39z"/>
-                    </svg>
-                </a>
-                
-                <a
-                    href="{{ route('social.redirect', ['provider' => 'microsoft']) }}"
-                    :class="theme === 'light' ? 'border-neutral-250 bg-neutral-50/50 hover:bg-neutral-100 text-neutral-800' : 'border-neutral-800 bg-[#0F0F12]/60 hover:bg-[#121215] text-white'"
-                    class="border rounded-xl py-3 flex items-center justify-center transition-all duration-300 hover:-translate-y-0.5 cursor-pointer shadow-sm z-10"
-                    title="Sign in automatically with Microsoft"
-                >
-                    <svg class="w-4 h-4" viewBox="0 0 23 23" fill="currentColor">
-                        <path d="M0 0h11v11H0z" fill="#f25022"/><path d="M12 0h11v11H12z" fill="#7fba00"/><path d="M0 12h11v11H0z" fill="#00a4ef"/><path d="M12 12h11v11H12z" fill="#ffb900"/>
-                    </svg>
+                    Continue with Google
                 </a>
             </div>
         </div>

@@ -19,15 +19,19 @@ class SocialAuthController extends Controller
      */
     public function redirect(string $provider)
     {
-        if (!in_array($provider, ['google', 'apple', 'microsoft'])) {
+        if (!in_array($provider, ['google'])) {
             abort(404, 'Provider not supported');
         }
 
         $clientId = config("services.{$provider}.client_id");
         $clientSecret = config("services.{$provider}.client_secret");
 
-        // If keys are not set
-        if (empty($clientId) || empty($clientSecret)) {
+        $isConfigured = !empty($clientId) && !empty($clientSecret)
+            && !str_contains($clientId, 'your_')
+            && !str_contains($clientSecret, 'your_');
+
+        // If keys are not set or are placeholders
+        if (!$isConfigured) {
             return view('auth.social.approval', [
                 'provider' => $provider,
                 'name' => ucfirst($provider),
@@ -53,7 +57,7 @@ class SocialAuthController extends Controller
      */
     public function callback(string $provider, Request $request)
     {
-        if (!in_array($provider, ['google', 'apple', 'microsoft'])) {
+        if (!in_array($provider, ['google'])) {
             abort(404);
         }
 
