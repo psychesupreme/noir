@@ -215,6 +215,6 @@ class CampaignIndex extends Component
             'scheduledCampaigns' => $scheduledCampaigns,
             'emailSent' => $emailSent,
             'smsSent' => $smsSent,
-        ])->layout('components.layouts.admin');
+        ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | Campaigns']);
     }
 }

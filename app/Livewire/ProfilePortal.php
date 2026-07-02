@@ -413,6 +413,6 @@ class ProfilePortal extends Component
             'wishlistProducts' => $wishlistProducts,
             'user' => $user,
             'cartCount' => $cartCount,
-        ])->layout('components.layouts.app');
+        ])->layout('components.layouts.app', ['title' => 'Atelier Noir & Bloom | My Profile']);
     }
 }

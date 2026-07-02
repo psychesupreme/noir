@@ -348,7 +348,7 @@ class ClientIndex extends Component
             'corporateClients' => $corporateClients,
             'nairobiClients' => $nairobiClients,
             'kiambuClients' => $kiambuClients,
-        ])->layout('components.layouts.admin');
+        ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | Clients']);
     }
 
     // ─── CRM Deal Management Methods ───

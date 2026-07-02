@@ -788,7 +788,7 @@
                 <div class="absolute inset-0 pointer-events-none mix-blend-multiply"
                      :class="{
                           'bg-gradient-to-r from-[#0B0B0D]/95 via-[#0B0B0D]/50 to-transparent': theme === 'dark',
-                          'bg-gradient-to-r from-[#FAF7F0]/95 via-[#FAF7F0]/60 to-transparent': theme === 'light'
+                          'bg-gradient-to-r from-[#FAF7F0]/98 via-[#FAF7F0]/85 via-50% to-transparent': theme === 'light'
                      }">
                 </div>
                 <!-- Secondary Color Burn Blending -->
@@ -800,14 +800,17 @@
                 </div>
 
                 <div class="max-w-xl space-y-4 z-10 animate-hero-rise">
-                    <span class="text-[12px] font-mono uppercase tracking-[0.4em] text-[#C5A880] block">{{ $slide['badge'] }}</span>
+                    <span class="text-[12px] font-mono uppercase tracking-[0.4em] block"
+                          :class="theme === 'light' ? 'text-[#8c7355] font-bold' : 'text-[#C5A880]'">
+                        {{ $slide['badge'] }}
+                    </span>
                     <h2 class="text-3xl sm:text-4xl md:text-5xl font-outfit font-semibold uppercase tracking-wider leading-none"
-                        :class="theme === 'light' ? 'text-neutral-900' : 'text-white'">
+                        :class="theme === 'light' ? 'text-black' : 'text-white'">
                         {{ $slide['title'] }}
                     </h2>
                     <div class="h-[1px] w-16 bg-[#C5A880]/40"></div>
-                    <p class="text-sm sm:text-base font-light leading-relaxed"
-                       :class="theme === 'light' ? 'text-neutral-700' : 'text-neutral-300'">
+                    <p class="text-sm sm:text-base leading-relaxed"
+                       :class="theme === 'light' ? 'text-neutral-900 font-medium' : 'text-neutral-300 font-light'">
                         {{ $slide['description'] }}
                     </p>
                     <div class="pt-4">
@@ -1295,16 +1298,16 @@
                                             </svg>
                                         </button>
                                         
-                                        <div class="absolute bottom-3 inset-x-3 flex justify-between items-end z-10">
-                                            <span class="bg-[#0B0B0D]/60 border border-white/5 text-neutral-200 px-2 py-0.5 rounded text-[10px] font-outfit uppercase tracking-widest backdrop-blur-md">
-                                                {{ $product->category }}
+                                    </div>
+                                    <div class="absolute bottom-1.5 inset-x-1.5 flex justify-between items-end z-10">
+                                        <span class="bg-[#0B0B0D]/60 border border-white/5 text-neutral-200 px-2 py-0.5 rounded text-[10px] font-outfit uppercase tracking-widest backdrop-blur-md">
+                                            {{ $product->category }}
+                                        </span>
+                                        @if($product->grade)
+                                            <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded text-[10px] font-outfit font-bold tracking-wide uppercase shadow-sm">
+                                                {{ $product->grade }}
                                             </span>
-                                            @if($product->grade)
-                                                <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded text-[10px] font-outfit font-bold tracking-wide uppercase shadow-sm">
-                                                    {{ $product->grade }}
-                                                </span>
-                                            @endif
-                                        </div>
+                                        @endif
                                     </div>
                                 </div>
  

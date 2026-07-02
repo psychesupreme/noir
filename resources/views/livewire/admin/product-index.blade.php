@@ -380,24 +380,39 @@
                         </div>
                     </div>
 
-                    {{-- Row: Category + Unit Type + Branch --}}
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {{-- Row: Category + Sub-category + Unit Type + Size Unit + Branch --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
                             <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Category *</label>
                             <select
-                                wire:model="category"
+                                wire:model.live="category"
                                 class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 cursor-pointer"
                             >
                                 <option value="stems">Stems</option>
                                 <option value="bundle">Bundle</option>
                                 <option value="bouquet">Bouquet</option>
                                 <option value="giftings">Giftings</option>
-                                <option value="wines">Wines</option>
-                                <option value="chocolate">Chocolate</option>
                                 <option value="specialization">Specialization</option>
                             </select>
                             @error('category') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>
+
+                        @if ($category === 'giftings')
+                            <div>
+                                <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Sub-category</label>
+                                <select
+                                    wire:model.live="subcategory"
+                                    class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 cursor-pointer"
+                                >
+                                    <option value="Wines">Wines</option>
+                                    <option value="Chocolate">Chocolate</option>
+                                    <option value="Cakes & Sweets">Cakes & Sweets</option>
+                                    <option value="Hampers">Hampers</option>
+                                </select>
+                                @error('subcategory') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+                        @endif
+
                         <div>
                             <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Unit Type *</label>
                             <select
@@ -417,6 +432,18 @@
                             </select>
                             @error('unit_type') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>
+
+                        <div>
+                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Size / Measurement Unit</label>
+                            <input
+                                wire:model="size_unit"
+                                type="text"
+                                class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 transition-colors"
+                                placeholder="e.g. litres, grams, pieces"
+                            >
+                            @error('size_unit') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+
                         <div>
                             @if (!$isEditing)
                                 <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Fulfilling Branch *</label>

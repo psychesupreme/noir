@@ -196,6 +196,6 @@ class AccountsReceivableIndex extends Component
             'aging0to30' => $aging0to30,
             'aging31to60' => $aging31to60,
             'aging60Plus' => $aging60Plus,
-        ])->layout('components.layouts.admin');
+        ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | Accounts Receivable']);
     }
 }

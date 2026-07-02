@@ -339,7 +339,7 @@
                                 <span class="text-xs truncate font-medium">Atelier Hand Curation Service</span>
                             </div>
                             <div class="flex items-center space-x-2 shrink-0">
-                                <span class="font-mono text-neutral-400 text-xs">1,500 KSH</span>
+                                <span class="font-mono text-neutral-400 text-xs">{{ number_format($handCurationProduct->price) }} KSH</span>
                                 <span class="text-neutral-600 text-[10px] ml-1 select-none cursor-not-allowed" title="Required service fee">🔒</span>
                             </div>
                         </div>
@@ -1354,7 +1354,7 @@
                         <span class="text-xs truncate font-medium">Atelier Hand Curation Service</span>
                     </div>
                     <div class="flex items-center space-x-2 shrink-0">
-                        <span class="font-mono text-neutral-400 text-xs">1,500 KSH</span>
+                        <span class="font-mono text-neutral-400 text-xs">{{ number_format($handCurationProduct->price) }} KSH</span>
                         <span class="text-neutral-600 text-[10px] ml-1 select-none cursor-not-allowed">🔒</span>
                     </div>
                 </div>

@@ -913,7 +913,7 @@ class Storefront extends Component
             'activeColor'     => '#E5E5E5',
             'userOrders'      => $userOrders,
             'hasMore'         => $products->count() < $totalCount,
-        ])->layout('components.layouts.app');
+        ])->layout('components.layouts.app', ['title' => 'Atelier Noir & Bloom | Premium Floral Curation']);
     }
 
     protected function compileCartItems(): array

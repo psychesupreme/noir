@@ -9,6 +9,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0B0B0D" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#FAF7F0" media="(prefers-color-scheme: light)">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
     <!-- SEO & Social Media Metadata Section -->
     @hasSection('meta')

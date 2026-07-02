@@ -170,6 +170,6 @@ class PaymentIndex extends Component
             'totalVolume' => $totalVolume,
             'pendingCount' => $pendingCount,
             'failedCount' => $failedCount,
-        ])->layout('components.layouts.admin');
+        ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | Payments']);
     }
 }

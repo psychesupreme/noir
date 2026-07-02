@@ -146,6 +146,6 @@ class TaxIndex extends Component
             'totalVat' => $totalVat,
             'successCount' => $successCount,
             'failedCount' => $failedCount,
-        ])->layout('components.layouts.admin');
+        ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | Tax & eTIMS']);
     }
 }

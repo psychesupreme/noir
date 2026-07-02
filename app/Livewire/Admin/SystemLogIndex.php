@@ -66,6 +66,6 @@ class SystemLogIndex extends Component
 
         return view('livewire.admin.system-log-index', [
             'logs' => $logs,
-        ])->layout('components.layouts.admin');
+        ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | System Logs']);
     }
 }

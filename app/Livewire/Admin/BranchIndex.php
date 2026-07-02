@@ -253,6 +253,6 @@ class BranchIndex extends Component
             'sourceProducts' => $sourceProducts,
             'totalBranches' => Branch::count(),
             'activeBranches' => Branch::where('is_active', true)->count(),
-        ])->layout('components.layouts.admin');
+        ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | Branches']);
     }
 }

@@ -373,6 +373,6 @@ class CurationBuilder extends Component
             'subtotal' => $this->subtotal,
             'activeScent' => $activeScent,
             'cartCount' => $cartCount
-        ])->layout('components.layouts.app');
+        ])->layout('components.layouts.app', ['title' => 'Atelier Noir & Bloom | Curation Studio']);
     }
 }

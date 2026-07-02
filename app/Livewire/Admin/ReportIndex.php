@@ -145,6 +145,6 @@ class ReportIndex extends Component
             'cogs' => $cogs,
             'wastage' => $wastage,
             'netProfit' => $netProfit,
-        ])->layout('components.layouts.admin');
+        ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | Reports']);
     }
 }

@@ -40,7 +40,7 @@ class ServicesGifts extends Component
             'services' => $services,
             'gifts' => $gifts,
             'cartCount' => $cartCount,
-        ])->layout('components.layouts.app');
+        ])->layout('components.layouts.app', ['title' => 'Atelier Noir & Bloom | Services & Gifts']);
     }
 
     public function loadProductReviews(int $productId): void

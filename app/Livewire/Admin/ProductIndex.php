@@ -41,7 +41,9 @@ class ProductIndex extends Component
     public int $cost_price = 0;
     public int $stock = 0;
     public string $category = 'stems';
+    public string $subcategory = '';
     public string $unit_type = 'arrangement';
+    public string $size_unit = '';
     public ?string $grade = null;
     public ?string $image_url = null;
     public $image_file = null;
@@ -68,8 +70,10 @@ class ProductIndex extends Component
             'price' => 'required|integer|min:1',
             'cost_price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
-            'category' => 'required|in:stems,bundle,bouquet,giftings,specialization,wines,chocolate',
+            'category' => 'required|in:stems,bundle,bouquet,giftings,specialization',
+            'subcategory' => 'nullable|string|max:50',
             'unit_type' => 'required|in:arrangement,stem,bundle,hamper,bottle,grams,kg,litres,oz,size',
+            'size_unit' => 'nullable|string|max:50',
             'grade' => 'nullable|string|max:20',
             'image_url' => 'nullable|string|max:500',
             'image_file' => 'nullable|image|max:2048',
@@ -96,6 +100,106 @@ class ProductIndex extends Component
     {
         unset($this->sizesList[$index]);
         $this->sizesList = array_values($this->sizesList);
+    }
+
+    public function updatedCategory($value): void
+    {
+        $basePrice = $this->price ?: 1500;
+        $baseCost = $this->cost_price ?: 600;
+        $baseStock = $this->stock ?: 20;
+
+        if ($value === 'stems') {
+            $this->unit_type = 'stem';
+            $this->subcategory = '';
+            $this->size_unit = 'pieces';
+            $this->sizesList = [
+                ['name' => 'Single Stem', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+                ['name' => 'Bunch (5 Stems)', 'price' => $basePrice * 4, 'cost_price' => $baseCost * 4, 'stock' => (int)floor($baseStock / 5)],
+                ['name' => 'Luxe (10 Stems)', 'price' => $basePrice * 8, 'cost_price' => $baseCost * 8, 'stock' => (int)floor($baseStock / 10)],
+            ];
+        } elseif ($value === 'bundle') {
+            $this->unit_type = 'bundle';
+            $this->subcategory = '';
+            $this->size_unit = 'pieces';
+            $this->sizesList = [
+                ['name' => 'Classic', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+                ['name' => 'Deluxe', 'price' => (int)floor($basePrice * 1.5), 'cost_price' => (int)floor($baseCost * 1.5), 'stock' => (int)floor($baseStock * 0.7)],
+                ['name' => 'Grand', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
+            ];
+        } elseif ($value === 'bouquet') {
+            $this->unit_type = 'arrangement';
+            $this->subcategory = '';
+            $this->size_unit = 'arrangement';
+            $this->sizesList = [
+                ['name' => 'Classic', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+                ['name' => 'Deluxe', 'price' => (int)floor($basePrice * 1.5), 'cost_price' => (int)floor($baseCost * 1.5), 'stock' => (int)floor($baseStock * 0.7)],
+                ['name' => 'Grand', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
+            ];
+        } elseif ($value === 'specialization') {
+            $this->unit_type = 'size';
+            $this->subcategory = '';
+            $this->size_unit = 'service';
+            $this->sizesList = [
+                ['name' => 'Standard', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+            ];
+        } elseif ($value === 'giftings') {
+            $this->subcategory = 'Wines';
+            $this->unit_type = 'bottle';
+            $this->size_unit = 'litres';
+            $this->sizesList = [
+                ['name' => '375ml Half', 'price' => (int)floor($basePrice * 0.6), 'cost_price' => (int)floor($baseCost * 0.6), 'stock' => $baseStock],
+                ['name' => '750ml Standard', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+                ['name' => '1.5L Magnum', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
+            ];
+        }
+    }
+
+    public function updatedSubcategory($value): void
+    {
+        $basePrice = $this->price ?: 1500;
+        $baseCost = $this->cost_price ?: 600;
+        $baseStock = $this->stock ?: 20;
+
+        if ($this->category === 'giftings') {
+            if ($value === 'Wines') {
+                $this->unit_type = 'bottle';
+                $this->size_unit = 'litres';
+                $this->sizesList = [
+                    ['name' => '375ml Half', 'price' => (int)floor($basePrice * 0.6), 'cost_price' => (int)floor($baseCost * 0.6), 'stock' => $baseStock],
+                    ['name' => '750ml Standard', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+                    ['name' => '1.5L Magnum', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
+                ];
+            } elseif ($value === 'Chocolate') {
+                $this->unit_type = 'grams';
+                $this->size_unit = 'grams';
+                $this->sizesList = [
+                    ['name' => '30g Petite', 'price' => (int)floor($basePrice * 0.3), 'cost_price' => (int)floor($baseCost * 0.3), 'stock' => $baseStock],
+                    ['name' => '100g Classic', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+                    ['name' => '400g Grand', 'price' => $basePrice * 3, 'cost_price' => $baseCost * 3, 'stock' => (int)floor($baseStock * 0.4)],
+                ];
+            } else {
+                $this->unit_type = 'hamper';
+                $this->size_unit = 'pieces';
+                $this->sizesList = [
+                    ['name' => 'Classic', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+                    ['name' => 'Deluxe', 'price' => (int)floor($basePrice * 1.5), 'cost_price' => (int)floor($baseCost * 1.5), 'stock' => (int)floor($baseStock * 0.7)],
+                    ['name' => 'Grand', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
+                ];
+            }
+        }
+    }
+
+    public function updatedUnitType($value): void
+    {
+        if ($this->category === 'giftings') {
+            if ($value === 'hamper' || $value === 'hampers') {
+                $this->subcategory = 'Hampers';
+            } elseif ($value === 'grams' || $value === 'chocolate') {
+                $this->subcategory = 'Chocolate';
+            } elseif ($value === 'bottle' || $value === 'wines') {
+                $this->subcategory = 'Wines';
+            }
+        }
     }
 
     public function updatingSearch(): void
@@ -136,8 +240,10 @@ class ProductIndex extends Component
         $this->price = $product->price;
         $this->cost_price = $product->cost_price;
         $this->stock = $product->stock;
-        $this->category = $product->category ?? 'retail';
+        $this->category = $product->category ?? 'stems';
+        $this->subcategory = $product->subcategory ?? '';
         $this->unit_type = $product->unit_type ?? 'arrangement';
+        $this->size_unit = $product->size_unit ?? '';
         $this->grade = $product->grade;
         $this->image_url = $product->image_url;
         $this->sizesList = $product->sizes ?? [];
@@ -238,14 +344,17 @@ class ProductIndex extends Component
     {
         $this->reset([
             'editingProductId', 'name', 'sku', 'description',
-            'price', 'cost_price', 'stock', 'category', 'unit_type', 'grade',
+            'price', 'cost_price', 'stock', 'category', 'subcategory',
+            'unit_type', 'size_unit', 'grade',
             'image_url', 'image_file', 'isEditing', 'selectedBranchId', 'sizesList'
         ]);
         $this->price = 0;
         $this->cost_price = 0;
         $this->stock = 0;
         $this->category = 'stems';
+        $this->subcategory = '';
         $this->unit_type = 'arrangement';
+        $this->size_unit = '';
         $this->sizesList = [];
     }
 
@@ -284,7 +393,7 @@ class ProductIndex extends Component
             'totalProducts' => Product::count(),
             'lowStockCount' => Product::where('stock', '<=', 10)->count(),
             'inventoryLogs' => \App\Models\InventoryLog::with(['product', 'user', 'branch'])->latest()->paginate(10, pageName: 'stockLogPage'),
-        ])->layout('components.layouts.admin');
+        ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | Products']);
     }
 }
 

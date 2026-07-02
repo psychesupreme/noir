@@ -105,6 +105,6 @@ class OrderIndex extends Component
         return view('livewire.admin.order-index', [
             'orders'   => $query->latest()->paginate(15),
             'branches' => Branch::where('is_active', true)->get()
-        ])->layout('components.layouts.admin');
+        ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | Orders']);
     }
 }

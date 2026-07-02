@@ -743,23 +743,55 @@ nav[role="navigation"] a {
 }
 
 nav[role="navigation"] a,
-nav[role="navigation"] span[aria-current="page"] > span,
 nav[role="navigation"] span[disabled] > span {
-  background-color: var(--bg-card) !important;
-  border-color: var(--border-base) !important;
-  color: var(--text-primary) !important;
+  background-color: #0F0F12 !important;
+  border-color: #262626 !important;
+  color: #A3A3A3 !important;
   transition: all 0.3s ease;
 }
 
+.light nav[role="navigation"] a,
+.light nav[role="navigation"] span[disabled] > span {
+  background-color: #F5EFE4 !important;
+  border-color: #D3C9B9 !important;
+  color: #1C1917 !important;
+}
+
 nav[role="navigation"] a:hover {
-  background-color: var(--brand-accent) !important;
-  color: var(--bg-base) !important;
-  border-color: var(--brand-accent) !important;
+  background-color: #C5A880 !important;
+  color: #000000 !important;
+  border-color: #C5A880 !important;
 }
 
 nav[role="navigation"] span[aria-current="page"] > span {
-  background-color: var(--brand-accent) !important;
-  color: var(--bg-base) !important;
-  border-color: var(--brand-accent) !important;
+  background-color: #C5A880 !important;
+  color: #000000 !important;
+  border-color: #C5A880 !important;
   font-weight: bold;
+}
+
+/* ==========================================================================
+   AUTH BUTTON STYLES — Immune to theme overrides
+   ========================================================================== */
+.auth-btn-light,
+.auth-btn-light *,
+.auth-btn-light span {
+  background-color: #0A0A0A !important;
+  color: #FFFFFF !important;
+}
+.auth-btn-light:hover,
+.auth-btn-light:hover * {
+  background-color: #C5A880 !important;
+  color: #000000 !important;
+}
+.auth-btn-dark,
+.auth-btn-dark *,
+.auth-btn-dark span {
+  background-color: #FFFFFF !important;
+  color: #0A0A0A !important;
+}
+.auth-btn-dark:hover,
+.auth-btn-dark:hover * {
+  background-color: #C5A880 !important;
+  color: #000000 !important;
 }

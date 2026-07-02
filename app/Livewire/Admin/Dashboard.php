@@ -113,7 +113,7 @@ class Dashboard extends Component
             ];
         });
 
-        return view('livewire.admin.dashboard', $stats)->layout('components.layouts.admin');
+        return view('livewire.admin.dashboard', $stats)->layout('components.layouts.admin', ['title' => 'Noir & Bloom | ERP Dashboard']);
     }
 }
 

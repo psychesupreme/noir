@@ -29,7 +29,9 @@ class Product extends Model
         'cost_price',
         'stock',
         'category',
+        'subcategory',
         'unit_type',
+        'size_unit',
         'grade',
         'image_url',
         'sizes',
@@ -234,19 +236,27 @@ class Product extends Model
             }
         }
 
-        $categoryLetter = match (strtolower($product->category ?: 'stems')) {
-            'stems' => 'S',
-            'bouquet', 'bouquets' => 'B',
-            'bundle' => 'U',
-            'giftings', 'gifting', 'hampers' => 'G',
-            'wines', 'wine' => 'N',
-            'chocolate', 'chocolates' => 'C',
-            'home_decor', 'decor' => 'D',
-            'specializtion', 'specialization', 'specializations' => 'P',
-            'retail' => 'R',
-            'wholesale' => 'W',
-            default => 'U',
-        };
+        $category = strtolower($product->category ?: 'stems');
+        $subcategory = strtolower($product->subcategory ?: '');
+        if ($category === 'giftings' && $subcategory === 'wines') {
+            $categoryLetter = 'N';
+        } elseif ($category === 'giftings' && $subcategory === 'chocolate') {
+            $categoryLetter = 'C';
+        } else {
+            $categoryLetter = match ($category) {
+                'stems' => 'S',
+                'bouquet', 'bouquets' => 'B',
+                'bundle' => 'U',
+                'giftings', 'gifting', 'hampers' => 'G',
+                'wines', 'wine' => 'N',
+                'chocolate', 'chocolates' => 'C',
+                'home_decor', 'decor' => 'D',
+                'specializtion', 'specialization', 'specializations' => 'P',
+                'retail' => 'R',
+                'wholesale' => 'W',
+                default => 'U',
+            };
+        }
 
         $prefix = $branchCode . '-' . $categoryLetter . '-';
         

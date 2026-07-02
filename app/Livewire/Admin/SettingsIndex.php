@@ -160,6 +160,6 @@ class SettingsIndex extends Component
         return view('livewire.admin.settings-index', [
             'users' => $usersQuery->latest()->paginate(8),
             'availableRoles' => UserRole::cases(),
-        ])->layout('components.layouts.admin');
+        ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | Settings']);
     }
 }
