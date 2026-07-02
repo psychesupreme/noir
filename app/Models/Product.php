@@ -238,9 +238,9 @@ class Product extends Model
 
         $category = strtolower($product->category ?: 'stems');
         $subcategory = strtolower($product->subcategory ?: '');
-        if ($category === 'giftings' && $subcategory === 'wines') {
+        if ($category === 'giftings' && (str_contains($subcategory, 'wine') || $subcategory === 'wines')) {
             $categoryLetter = 'N';
-        } elseif ($category === 'giftings' && $subcategory === 'chocolate') {
+        } elseif ($category === 'giftings' && (str_contains($subcategory, 'chocolate') || $subcategory === 'chocolate')) {
             $categoryLetter = 'C';
         } else {
             $categoryLetter = match ($category) {

@@ -553,11 +553,15 @@
                      'text-neutral-400': theme === 'dark',
                      'text-neutral-600': theme === 'light',
                  }">
-                <a href="{{ route('services-gifts') }}" class="hidden lg:inline-block transition-colors duration-300 select-none cursor-pointer"
-                   :class="{
-                       'hover:text-[#C5A880]': theme === 'dark',
-                       'hover:text-emerald-800': theme === 'light',
-                   }">Services</a>
+                 <a href="{{ route('services-gifts') }}" 
+                    class="hidden lg:flex items-center space-x-1.5 px-4 py-1.5 rounded-full border transition-all duration-300 select-none cursor-pointer font-medium text-xs tracking-wider"
+                    :class="{
+                        'border-[#C5A880]/30 hover:border-[#C5A880] hover:bg-[#C5A880]/5 text-[#C5A880]': theme === 'dark',
+                        'border-emerald-600/30 hover:border-emerald-600 hover:bg-emerald-600/5 text-emerald-800': theme === 'light'
+                    }">
+                    <span class="w-1.5 h-1.5 rounded-full animate-pulse" :class="theme === 'light' ? 'bg-emerald-600' : 'bg-[#C5A880]'"></span>
+                    <span>Services & Gifts</span>
+                 </a>
                 <a href="{{ route('curate') }}" 
                    class="hidden md:inline-block px-4 py-1.5 rounded-full font-medium transition-all duration-300 select-none cursor-pointer"
                    :class="{
@@ -755,7 +759,7 @@
                       startTimer() {
                           this.timer = setInterval(() => {
                               this.activeSlide = (this.activeSlide + 1) % this.slidesCount;
-                          }, 5000); // Accelerated transition timing
+                          }, 8000); // Slower luxury timing (8 seconds) to allow users to read
                       },
                       resetTimer() {
                           clearInterval(this.timer);
@@ -1252,15 +1256,15 @@
                             </div>
                         @else
                             <!-- Standard Cathedral Arch Layout -->
-                            <div x-data="{ selectedSize: 'standard', basePrice: {{ $product->price }}, numberFormat(val) { return new Intl.NumberFormat().format(val); } }" 
+                            <div x-data="{ basePrice: {{ $product->price }}, numberFormat(val) { return new Intl.NumberFormat().format(val); } }" 
                                  :class="theme === 'light' ? 'border-neutral-200 bg-white/70 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/50'"
-                                 class="flex flex-col p-3 rounded-t-[200px] rounded-b-[32px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5 group text-left backdrop-blur-md product-card theme-section animate-card-fade-in"
+                                 class="flex flex-col p-3 rounded-t-[200px] rounded-b-[24px] border relative transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5 group text-left backdrop-blur-md product-card theme-section animate-card-fade-in"
                                  style="animation-delay: {{ ($index % 6) * 100 }}ms;"
                             >
                                 <!-- Product Image Frame -->
                                 <div @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
-                                     class="p-1 border border-neutral-500/10 rounded-t-[190px] rounded-b-[28px] overflow-hidden relative cursor-pointer select-none">
-                                    <div class="aspect-[4/5] rounded-t-[180px] rounded-b-[24px] relative overflow-hidden bg-neutral-950/5">
+                                     class="p-1 border border-neutral-500/10 rounded-t-[190px] rounded-b-[20px] overflow-hidden relative cursor-pointer select-none">
+                                    <div class="aspect-[4/5] rounded-t-[180px] rounded-b-[16px] relative overflow-hidden bg-neutral-950/5">
                                         <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
                                              class="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-all duration-700 z-0" loading="lazy">
                                         
@@ -1298,16 +1302,16 @@
                                             </svg>
                                         </button>
                                         
-                                    </div>
-                                    <div class="absolute bottom-1.5 inset-x-1.5 flex justify-between items-end z-10">
-                                        <span class="bg-[#0B0B0D]/60 border border-white/5 text-neutral-200 px-2 py-0.5 rounded text-[10px] font-outfit uppercase tracking-widest backdrop-blur-md">
-                                            {{ $product->category }}
-                                        </span>
-                                        @if($product->grade)
-                                            <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded text-[10px] font-outfit font-bold tracking-wide uppercase shadow-sm">
-                                                {{ $product->grade }}
+                                        <div class="absolute bottom-3 inset-x-3 flex justify-between items-end z-10">
+                                            <span class="bg-[#0B0B0D]/60 border border-white/5 text-neutral-200 px-2 py-0.5 rounded text-[10px] font-outfit uppercase tracking-widest backdrop-blur-md">
+                                                {{ $product->category }}
                                             </span>
-                                        @endif
+                                            @if($product->grade)
+                                                <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded text-[10px] font-outfit font-bold tracking-wide uppercase shadow-sm">
+                                                    {{ $product->grade }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
  
@@ -1328,34 +1332,11 @@
                                         <div class="flex justify-between items-baseline pt-2 border-t border-neutral-500/10">
                                             <span class="text-[12px] uppercase tracking-[0.2em] text-neutral-400 font-outfit">Curation Price</span>
                                             <span class="font-outfit text-base font-semibold tracking-wide text-amber-500">
-                                                <span x-text="numberFormat(selectedSize === 'standard' ? basePrice : (selectedSize === 'deluxe' ? Math.round(basePrice * 1.5) : Math.round(basePrice * 2.2)))"></span> KSH
+                                                <span x-text="numberFormat(basePrice)"></span> KSH
                                             </span>
                                         </div>
 
-                                        <div class="max-h-none opacity-100 lg:max-h-0 lg:opacity-0 lg:group-hover:max-h-64 lg:group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden space-y-3">
-                                            @if($product->category !== 'stems')
-                                                <div class="space-y-1">
-                                                    <span class="text-[12px] uppercase tracking-wider text-neutral-500 font-outfit">Curated Size</span>
-                                                    <div class="flex items-center space-x-1.5">
-                                                        <button type="button" @click="selectedSize = 'standard'" 
-                                                                :class="selectedSize === 'standard' ? (theme === 'light' ? 'border-emerald-700 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 bg-white text-black font-semibold') : (theme === 'light' ? 'border-neutral-250 text-neutral-500 hover:text-neutral-700' : 'border-neutral-800/80 text-neutral-500 hover:text-neutral-300')" 
-                                                                @if($product->stock_standard <= 0) disabled title="Standard size out of stock" class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
-                                                            Std
-                                                         </button>
-                                                        <button type="button" @click="selectedSize = 'deluxe'" 
-                                                                :class="selectedSize === 'deluxe' ? (theme === 'light' ? 'border-emerald-700 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 bg-white text-black font-semibold') : (theme === 'light' ? 'border-neutral-250 text-neutral-500 hover:text-neutral-700' : 'border-neutral-800/80 text-neutral-500 hover:text-neutral-300')" 
-                                                                @if($product->stock_deluxe <= 0) disabled title="Deluxe size out of stock" class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
-                                                            Dlx
-                                                        </button>
-                                                        <button type="button" @click="selectedSize = 'grand'" 
-                                                                :class="selectedSize === 'grand' ? (theme === 'light' ? 'border-emerald-700 bg-emerald-50 text-emerald-800 font-semibold' : 'border-neutral-200 bg-white text-black font-semibold') : (theme === 'light' ? 'border-neutral-250 text-neutral-500 hover:text-neutral-700' : 'border-neutral-800/80 text-neutral-500 hover:text-neutral-300')" 
-                                                                @if($product->stock_grand <= 0) disabled title="Grand size out of stock" class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full opacity-30 cursor-not-allowed transition-all" @else class="px-2.5 py-0.5 border text-[11px] font-outfit uppercase tracking-wider rounded-full cursor-pointer transition-all" @endif>
-                                                            Gnd
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            @endif
-
+                                        <div class="max-h-none opacity-100 lg:max-h-0 lg:opacity-0 lg:group-hover:max-h-32 lg:group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden space-y-3">
                                             <button 
                                                 type="button"
                                                 @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"

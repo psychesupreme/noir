@@ -388,48 +388,74 @@
                                 wire:model.live="category"
                                 class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 cursor-pointer"
                             >
-                                <option value="stems">Stems</option>
-                                <option value="bundle">Bundle</option>
-                                <option value="bouquet">Bouquet</option>
-                                <option value="giftings">Giftings</option>
-                                <option value="specialization">Specialization</option>
+                                @foreach($categoriesDictionary as $key => $info)
+                                    <option value="{{ $key }}">{{ $info['name'] }}</option>
+                                @endforeach
+                                <option value="bundle">Bundle (Legacy)</option>
+                                <option value="specialization">Specialization (Legacy)</option>
                             </select>
                             @error('category') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
-                        @if ($category === 'giftings')
-                            <div>
-                                <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Sub-category</label>
+                        <div>
+                            <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Sub-category</label>
+                            @php
+                                $mappedCategory = $category;
+                                if ($category === 'bundle') $mappedCategory = 'bundles';
+                                if ($category === 'specialization') $mappedCategory = 'services';
+                                $subcats = $categoriesDictionary[$mappedCategory]['subcategories'] ?? [];
+                            @endphp
+                            @if(count($subcats) > 0)
                                 <select
                                     wire:model.live="subcategory"
                                     class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 cursor-pointer"
                                 >
-                                    <option value="Wines">Wines</option>
-                                    <option value="Chocolate">Chocolate</option>
-                                    <option value="Cakes & Sweets">Cakes & Sweets</option>
-                                    <option value="Hampers">Hampers</option>
+                                    @foreach(array_keys($subcats) as $subName)
+                                        <option value="{{ $subName }}">{{ $subName }}</option>
+                                    @endforeach
                                 </select>
-                                @error('subcategory') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
-                            </div>
-                        @endif
+                            @else
+                                <input
+                                    wire:model="subcategory"
+                                    type="text"
+                                    class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 transition-colors"
+                                    placeholder="Enter sub-category"
+                                >
+                            @endif
+                            @error('subcategory') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
+                        </div>
 
                         <div>
                             <label class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block mb-2">Unit Type *</label>
-                            <select
-                                wire:model="unit_type"
-                                class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 cursor-pointer"
-                            >
-                                <option value="arrangement">Arrangement</option>
-                                <option value="stem">Stem</option>
-                                <option value="bundle">Bundle</option>
-                                <option value="hamper">Hamper</option>
-                                <option value="bottle">Bottle</option>
-                                <option value="grams">Grams</option>
-                                <option value="kg">Kilograms (kg)</option>
-                                <option value="litres">Litres</option>
-                                <option value="oz">Ounces (oz)</option>
-                                <option value="size">Size (S/M/L)</option>
-                            </select>
+                            @php
+                                $unitOptions = $subcats[$subcategory] ?? [];
+                            @endphp
+                            @if(count($unitOptions) > 0)
+                                <select
+                                    wire:model="unit_type"
+                                    class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 cursor-pointer"
+                                >
+                                    @foreach($unitOptions as $unitOption)
+                                        <option value="{{ $unitOption }}">{{ ucfirst($unitOption) }}</option>
+                                    @endforeach
+                                </select>
+                            @else
+                                <select
+                                    wire:model="unit_type"
+                                    class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 cursor-pointer"
+                                >
+                                    <option value="arrangement">Arrangement</option>
+                                    <option value="stem">Stem</option>
+                                    <option value="bundle">Bundle</option>
+                                    <option value="hamper">Hamper</option>
+                                    <option value="bottle">Bottle</option>
+                                    <option value="grams">Grams</option>
+                                    <option value="kg">Kilograms (kg)</option>
+                                    <option value="litres">Litres</option>
+                                    <option value="oz">Ounces (oz)</option>
+                                    <option value="size">Size (S/M/L)</option>
+                                </select>
+                            @endif
                             @error('unit_type') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>
 

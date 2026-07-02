@@ -14,6 +14,89 @@ class ProductIndex extends Component
     use WithPagination;
     use WithFileUploads;
 
+    public array $categoriesDictionary = [
+        'stems' => [
+            'name' => 'Stems & Blooms',
+            'subcategories' => [
+                'Roses' => ['stem', 'bunch'],
+                'Lilies' => ['stem', 'bunch'],
+                'Orchids' => ['stem', 'pot'],
+            ]
+        ],
+        'bouquet' => [
+            'name' => 'Curated Bouquets',
+            'subcategories' => [
+                'Hand-tied Bouquets' => ['arrangement', 'wrap'],
+                'Boxed Arrangements' => ['box', 'arrangement'],
+                'Dome Bouquets' => ['arrangement', 'dome'],
+            ]
+        ],
+        'giftings' => [
+            'name' => 'Luxury Gifts',
+            'subcategories' => [
+                'Wines & Champagnes' => ['bottle', 'case'],
+                'Chocolates & Truffles' => ['box', 'grams'],
+                'Home Scents & Mists' => ['bottle', 'set'],
+            ]
+        ],
+        'home_decor' => [
+            'name' => 'Aesthetic Home Decor',
+            'subcategories' => [
+                'Ceramic & Glass Vases' => ['piece', 'set'],
+                'Aroma Diffusers' => ['piece', 'set'],
+                'Luxury Candles' => ['piece', 'pack'],
+            ]
+        ],
+        'services' => [
+            'name' => 'Bespoke Floral Services',
+            'subcategories' => [
+                'Corporate Subscriptions' => ['rotation', 'month'],
+                'Event Installations' => ['setup', 'event'],
+                'Hand Curation Desk' => ['session', 'consultation'],
+            ]
+        ],
+        'bundles' => [
+            'name' => 'Cohesive Combo Packages',
+            'subcategories' => [
+                'Flowers & Wine Combo' => ['bundle', 'set'],
+                'Sweet Romance Suite' => ['bundle', 'set'],
+                'Sympathy Comfort Pack' => ['bundle', 'set'],
+            ]
+        ],
+        'accessories' => [
+            'name' => 'Curation Accessories',
+            'subcategories' => [
+                'Satin Ribbons' => ['roll', 'meter'],
+                'Glitter & Spritz' => ['can', 'spray'],
+                'Greeting Cards' => ['piece', 'pack'],
+            ]
+        ],
+        'wholesale' => [
+            'name' => 'Bulk Export Flowers',
+            'subcategories' => [
+                'Export Grade Roses' => ['bunch', 'crate'],
+                'Foliage & Greens' => ['bunch', 'crate'],
+                'Wholesale Lilies' => ['bunch', 'crate'],
+            ]
+        ],
+        'preserves' => [
+            'name' => 'Everlasting Preserved Flowers',
+            'subcategories' => [
+                'Infinity Roses' => ['piece', 'box'],
+                'Dried Flower Bundles' => ['bunch', 'arrangement'],
+                'Glass Dome Preserves' => ['dome', 'piece'],
+            ]
+        ],
+        'subscriptions' => [
+            'name' => 'Consumer Floral Plans',
+            'subcategories' => [
+                'Weekly Home Bouquets' => ['delivery', 'month'],
+                'Bi-weekly Office Blooms' => ['delivery', 'month'],
+                'Monthly Luxury Suites' => ['delivery', 'quarter'],
+            ]
+        ],
+    ];
+
     // Filters
     public string $search = '';
     public string $categoryFilter = 'all';
@@ -70,9 +153,9 @@ class ProductIndex extends Component
             'price' => 'required|integer|min:1',
             'cost_price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
-            'category' => 'required|in:stems,bundle,bouquet,giftings,specialization',
+            'category' => 'required|in:stems,bouquet,giftings,home_decor,services,bundles,accessories,wholesale,preserves,subscriptions,bundle,specialization',
             'subcategory' => 'nullable|string|max:50',
-            'unit_type' => 'required|in:arrangement,stem,bundle,hamper,bottle,grams,kg,litres,oz,size',
+            'unit_type' => 'required|in:arrangement,stem,bundle,hamper,bottle,grams,kg,litres,oz,size,bunch,pot,wrap,box,dome,case,set,piece,pack,rotation,month,setup,event,session,consultation,roll,meter,can,spray,crate,delivery,quarter',
             'size_unit' => 'nullable|string|max:50',
             'grade' => 'nullable|string|max:20',
             'image_url' => 'nullable|string|max:500',
@@ -108,49 +191,23 @@ class ProductIndex extends Component
         $baseCost = $this->cost_price ?: 600;
         $baseStock = $this->stock ?: 20;
 
-        if ($value === 'stems') {
-            $this->unit_type = 'stem';
-            $this->subcategory = '';
-            $this->size_unit = 'pieces';
-            $this->sizesList = [
-                ['name' => 'Single Stem', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
-                ['name' => 'Bunch (5 Stems)', 'price' => $basePrice * 4, 'cost_price' => $baseCost * 4, 'stock' => (int)floor($baseStock / 5)],
-                ['name' => 'Luxe (10 Stems)', 'price' => $basePrice * 8, 'cost_price' => $baseCost * 8, 'stock' => (int)floor($baseStock / 10)],
-            ];
-        } elseif ($value === 'bundle') {
-            $this->unit_type = 'bundle';
-            $this->subcategory = '';
-            $this->size_unit = 'pieces';
-            $this->sizesList = [
-                ['name' => 'Classic', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
-                ['name' => 'Deluxe', 'price' => (int)floor($basePrice * 1.5), 'cost_price' => (int)floor($baseCost * 1.5), 'stock' => (int)floor($baseStock * 0.7)],
-                ['name' => 'Grand', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
-            ];
-        } elseif ($value === 'bouquet') {
-            $this->unit_type = 'arrangement';
-            $this->subcategory = '';
-            $this->size_unit = 'arrangement';
-            $this->sizesList = [
-                ['name' => 'Classic', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
-                ['name' => 'Deluxe', 'price' => (int)floor($basePrice * 1.5), 'cost_price' => (int)floor($baseCost * 1.5), 'stock' => (int)floor($baseStock * 0.7)],
-                ['name' => 'Grand', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
-            ];
+        $mappedValue = $value;
+        if ($value === 'bundle') {
+            $mappedValue = 'bundles';
         } elseif ($value === 'specialization') {
-            $this->unit_type = 'size';
-            $this->subcategory = '';
-            $this->size_unit = 'service';
-            $this->sizesList = [
-                ['name' => 'Standard', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
-            ];
-        } elseif ($value === 'giftings') {
-            $this->subcategory = 'Wines';
-            $this->unit_type = 'bottle';
-            $this->size_unit = 'litres';
-            $this->sizesList = [
-                ['name' => '375ml Half', 'price' => (int)floor($basePrice * 0.6), 'cost_price' => (int)floor($baseCost * 0.6), 'stock' => $baseStock],
-                ['name' => '750ml Standard', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
-                ['name' => '1.5L Magnum', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
-            ];
+            $mappedValue = 'services';
+        }
+
+        if (array_key_exists($mappedValue, $this->categoriesDictionary)) {
+            $subcats = $this->categoriesDictionary[$mappedValue]['subcategories'];
+            $firstSub = array_key_first($subcats);
+            $this->subcategory = $firstSub;
+            
+            $units = $subcats[$firstSub];
+            $this->unit_type = $units[0];
+            $this->size_unit = $this->getDefaultSizeUnit($this->unit_type);
+
+            $this->sizesList = $this->generateDefaultSizes($mappedValue, $this->subcategory, $this->unit_type, $basePrice, $baseCost, $baseStock);
         }
     }
 
@@ -160,31 +217,32 @@ class ProductIndex extends Component
         $baseCost = $this->cost_price ?: 600;
         $baseStock = $this->stock ?: 20;
 
-        if ($this->category === 'giftings') {
-            if ($value === 'Wines') {
-                $this->unit_type = 'bottle';
-                $this->size_unit = 'litres';
-                $this->sizesList = [
-                    ['name' => '375ml Half', 'price' => (int)floor($basePrice * 0.6), 'cost_price' => (int)floor($baseCost * 0.6), 'stock' => $baseStock],
-                    ['name' => '750ml Standard', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
-                    ['name' => '1.5L Magnum', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
-                ];
-            } elseif ($value === 'Chocolate') {
-                $this->unit_type = 'grams';
-                $this->size_unit = 'grams';
-                $this->sizesList = [
-                    ['name' => '30g Petite', 'price' => (int)floor($basePrice * 0.3), 'cost_price' => (int)floor($baseCost * 0.3), 'stock' => $baseStock],
-                    ['name' => '100g Classic', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
-                    ['name' => '400g Grand', 'price' => $basePrice * 3, 'cost_price' => $baseCost * 3, 'stock' => (int)floor($baseStock * 0.4)],
-                ];
-            } else {
-                $this->unit_type = 'hamper';
-                $this->size_unit = 'pieces';
-                $this->sizesList = [
-                    ['name' => 'Classic', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
-                    ['name' => 'Deluxe', 'price' => (int)floor($basePrice * 1.5), 'cost_price' => (int)floor($baseCost * 1.5), 'stock' => (int)floor($baseStock * 0.7)],
-                    ['name' => 'Grand', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
-                ];
+        $mappedValue = $this->category;
+        if ($this->category === 'bundle') {
+            $mappedValue = 'bundles';
+        } elseif ($this->category === 'specialization') {
+            $mappedValue = 'services';
+        }
+
+        // Support backward compatibility for Wine / Chocolate / Hamper tests setting subcategory to old values
+        if ($mappedValue === 'giftings') {
+            $normalized = strtolower($value);
+            if (str_contains($normalized, 'wine') || $normalized === 'wines') {
+                $value = 'Wines & Champagnes';
+            } elseif (str_contains($normalized, 'chocolate') || $normalized === 'chocolates') {
+                $value = 'Chocolates & Truffles';
+            } elseif (str_contains($normalized, 'hamper') || $normalized === 'hampers') {
+                $value = 'Home Scents & Mists';
+            }
+        }
+
+        if (array_key_exists($mappedValue, $this->categoriesDictionary)) {
+            $subcats = $this->categoriesDictionary[$mappedValue]['subcategories'];
+            if (array_key_exists($value, $subcats)) {
+                $units = $subcats[$value];
+                $this->unit_type = $units[0];
+                $this->size_unit = $this->getDefaultSizeUnit($this->unit_type);
+                $this->sizesList = $this->generateDefaultSizes($mappedValue, $value, $this->unit_type, $basePrice, $baseCost, $baseStock);
             }
         }
     }
@@ -193,13 +251,57 @@ class ProductIndex extends Component
     {
         if ($this->category === 'giftings') {
             if ($value === 'hamper' || $value === 'hampers') {
-                $this->subcategory = 'Hampers';
+                $this->subcategory = 'Home Scents & Mists';
             } elseif ($value === 'grams' || $value === 'chocolate') {
-                $this->subcategory = 'Chocolate';
+                $this->subcategory = 'Chocolates & Truffles';
             } elseif ($value === 'bottle' || $value === 'wines') {
-                $this->subcategory = 'Wines';
+                $this->subcategory = 'Wines & Champagnes';
             }
         }
+    }
+
+    private function getDefaultSizeUnit(string $unitType): string
+    {
+        return match ($unitType) {
+            'stem', 'bunch', 'pot', 'arrangement', 'wrap', 'box', 'dome', 'piece', 'pack', 'set', 'roll', 'meter', 'can', 'spray', 'crate' => 'pieces',
+            'bottle', 'delivery' => 'litres',
+            'grams' => 'grams',
+            'rotation', 'month', 'setup', 'event', 'session', 'consultation', 'quarter' => 'service',
+            default => 'pieces',
+        };
+    }
+
+    private function generateDefaultSizes(string $category, string $subcategory, string $unitType, int $basePrice, int $baseCost, int $baseStock): array
+    {
+        if ($category === 'stems') {
+            return [
+                ['name' => 'Single Stem', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+                ['name' => 'Bunch (5 Stems)', 'price' => $basePrice * 4, 'cost_price' => $baseCost * 4, 'stock' => (int)floor($baseStock / 5)],
+                ['name' => 'Luxe (10 Stems)', 'price' => $basePrice * 8, 'cost_price' => $baseCost * 8, 'stock' => (int)floor($baseStock / 10)],
+            ];
+        }
+
+        if ($category === 'giftings' && $subcategory === 'Wines & Champagnes') {
+            return [
+                ['name' => '375ml Half', 'price' => (int)floor($basePrice * 0.6), 'cost_price' => (int)floor($baseCost * 0.6), 'stock' => $baseStock],
+                ['name' => '750ml Standard', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+                ['name' => '1.5L Magnum', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
+            ];
+        }
+
+        if ($category === 'giftings' && $subcategory === 'Chocolates & Truffles') {
+            return [
+                ['name' => '30g Petite', 'price' => (int)floor($basePrice * 0.3), 'cost_price' => (int)floor($baseCost * 0.3), 'stock' => $baseStock],
+                ['name' => '100g Classic', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+                ['name' => '400g Grand', 'price' => $basePrice * 3, 'cost_price' => $baseCost * 3, 'stock' => (int)floor($baseStock * 0.4)],
+            ];
+        }
+
+        return [
+            ['name' => 'Classic', 'price' => $basePrice, 'cost_price' => $baseCost, 'stock' => $baseStock],
+            ['name' => 'Deluxe', 'price' => (int)floor($basePrice * 1.5), 'cost_price' => (int)floor($baseCost * 1.5), 'stock' => (int)floor($baseStock * 0.7)],
+            ['name' => 'Grand', 'price' => $basePrice * 2, 'cost_price' => $baseCost * 2, 'stock' => (int)floor($baseStock * 0.4)],
+        ];
     }
 
     public function updatingSearch(): void

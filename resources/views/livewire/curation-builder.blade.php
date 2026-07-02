@@ -68,7 +68,16 @@
 
             <div class="flex items-center space-x-6 text-sm font-mono font-semibold uppercase tracking-widest text-neutral-400">
                 <!-- Navigation links -->
-                <a href="{{ route('services-gifts') }}" class="hidden md:inline-block hover:text-[#C5A880] transition-colors duration-300 animate-nav-item select-none cursor-pointer" style="animation-delay: 200ms;">Services</a>
+                <a href="{{ route('services-gifts') }}" 
+                   class="hidden md:flex items-center space-x-1.5 px-4 py-2 rounded-full border transition-all duration-300 animate-nav-item select-none cursor-pointer font-semibold text-xs tracking-wider"
+                   :class="{
+                       'border-[#C5A880]/30 hover:border-[#C5A880] hover:bg-[#C5A880]/5 text-[#C5A880]': theme === 'dark',
+                       'border-emerald-600/30 hover:border-emerald-600 hover:bg-emerald-600/5 text-emerald-800': theme === 'light'
+                   }"
+                   style="animation-delay: 200ms;">
+                   <span class="w-1.5 h-1.5 rounded-full animate-pulse" :class="theme === 'light' ? 'bg-emerald-600' : 'bg-[#C5A880]'"></span>
+                   <span>Services & Gifts</span>
+                </a>
                 <a href="{{ route('curate') }}" 
                    class="hidden md:inline-block px-5 py-2.5 rounded-full border transition-all duration-300 animate-nav-item select-none cursor-pointer border-[#C5A880] bg-[#C5A880]/10 text-[#C5A880] font-semibold"
                    style="animation-delay: 250ms;">
