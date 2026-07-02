@@ -86,6 +86,23 @@
         quickViewProduct: null,
         quickViewSize: 'standard',
         numberFormat(val) { return new Intl.NumberFormat().format(val); },
+        getSizeLabel(product, size) {
+            if (!product || !product.category) return size;
+            const cat = product.category.toLowerCase();
+            if (cat === 'chocolate' || cat === 'chocolates') {
+                return size === 'standard' ? '30g Petite' : (size === 'deluxe' ? '100g Classic' : '400g Grand');
+            }
+            if (cat === 'wine' || cat === 'wines' || cat === 'champagne') {
+                return size === 'standard' ? '375ml Half' : (size === 'deluxe' ? '750ml Standard' : '1.5L Magnum');
+            }
+            if (cat === 'stems' || cat === 'stem') {
+                return size === 'standard' ? 'Single Stem' : (size === 'deluxe' ? 'Bunch (5 Stems)' : 'Luxe (10 Stems)');
+            }
+            if (cat === 'bouquets' || cat === 'bouquet' || cat === 'bundles' || cat === 'bundle') {
+                return size === 'standard' ? 'Classic' : (size === 'deluxe' ? 'Deluxe' : 'Grand');
+            }
+            return size.charAt(0).toUpperCase() + size.slice(1);
+        },
         
         /* Preloader & transition states */
         themeTransitioning: false,
@@ -2387,7 +2404,7 @@
                                 class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
                                 :disabled="quickViewProduct && quickViewProduct.stock_standard <= 0"
                             >
-                                <span class="block">Standard</span>
+                                <span class="block" x-text="getSizeLabel(quickViewProduct, 'standard')"></span>
                                 <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price) + ' KSH' : ''"></span>
                                 <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_standard <= 0">Out of Stock</span>
                             </button>
@@ -2397,7 +2414,7 @@
                                 class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
                                 :disabled="quickViewProduct && quickViewProduct.stock_deluxe <= 0"
                             >
-                                <span class="block">Deluxe</span>
+                                <span class="block" x-text="getSizeLabel(quickViewProduct, 'deluxe')"></span>
                                 <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 1.5)) + ' KSH' : ''"></span>
                                 <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_deluxe <= 0">Out of Stock</span>
                             </button>
@@ -2407,7 +2424,7 @@
                                 class="flex-1 min-w-[80px] px-3 py-2 border text-[11px] font-outfit uppercase tracking-wider rounded-xl transition-all cursor-pointer text-center"
                                 :disabled="quickViewProduct && quickViewProduct.stock_grand <= 0"
                             >
-                                <span class="block">Grand</span>
+                                <span class="block" x-text="getSizeLabel(quickViewProduct, 'grand')"></span>
                                 <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 2.2)) + ' KSH' : ''"></span>
                                 <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_grand <= 0">Out of Stock</span>
                             </button>
@@ -2430,116 +2447,37 @@
                 </div>
             </div>
 
-            <!-- Reviews Tab/Section -->
-            <div :class="theme === 'light' ? 'border-neutral-200' : 'border-[#C5A880]/15'" class="border-t pt-6 space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <h4 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-sm font-serif italic">Reviews &amp; Client Feedback</h4>
+            <!-- Historical Ratings Summary -->
+            <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-50/50' : 'border-[#C5A880]/10 bg-neutral-950/20'" class="border-t pt-4 pb-2 px-4 rounded-2xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <span :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs font-serif italic font-semibold">Historical Client Satisfaction</span>
                     <template x-if="quickViewProduct && quickViewProduct.average_rating > 0">
-                        <div :class="theme === 'light' ? 'bg-neutral-50 border-neutral-150 text-neutral-600' : 'bg-neutral-950/40 border-[#C5A880]/15 text-neutral-350'" class="flex flex-wrap gap-2 text-[9px] font-mono uppercase px-3 py-1.5 rounded-xl border">
-                            <span class="text-neutral-500">Avg Ratings:</span>
-                            <span class="text-amber-500 font-bold">Overall: <span x-text="quickViewProduct.average_rating"></span>★</span>
-                            <span :class="theme === 'light' ? 'text-emerald-800' : 'text-[#C5A880]'" class="font-bold">Quality: <span x-text="quickViewProduct.average_quality_rating"></span>★</span>
-                            <span :class="theme === 'light' ? 'text-emerald-800' : 'text-[#C5A880]'" class="font-bold">Freshness: <span x-text="quickViewProduct.average_freshness_rating"></span>★</span>
-                            <span :class="theme === 'light' ? 'text-emerald-800' : 'text-[#C5A880]'" class="font-bold">Value: <span x-text="quickViewProduct.average_value_rating"></span>★</span>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-amber-500 font-bold font-mono text-[11px]" x-text="quickViewProduct.average_rating + ' ★'"></span>
+                            <span class="text-neutral-500 text-[9px] font-mono font-light">(Based on client ledger reports)</span>
                         </div>
+                    </template>
+                    <template x-if="!quickViewProduct || !quickViewProduct.average_rating || quickViewProduct.average_rating == 0">
+                        <span class="text-neutral-500 text-[9px] font-mono font-light">New Release Curation</span>
                     </template>
                 </div>
                 
-                @if(session('success_review'))
-                    <div class="p-2.5 bg-emerald-500/10 border border-dashed border-emerald-500/25 text-emerald-500 text-[11px] font-mono rounded-xl">
-                        {{ session('success_review') }}
+                <template x-if="quickViewProduct && quickViewProduct.average_rating > 0">
+                    <div class="grid grid-cols-3 gap-3 text-center text-[9px] font-mono uppercase pt-1">
+                        <div :class="theme === 'light' ? 'bg-white border-neutral-200' : 'bg-neutral-900/40 border-neutral-800/80'" class="p-2 rounded-xl border">
+                            <span class="text-neutral-500 block mb-0.5">Quality &amp; Build</span>
+                            <span :class="theme === 'light' ? 'text-emerald-800' : 'text-[#C5A880]'" class="font-bold text-[10px]" x-text="quickViewProduct.average_quality_rating + ' ★'"></span>
+                        </div>
+                        <div :class="theme === 'light' ? 'bg-white border-neutral-200' : 'bg-neutral-900/40 border-neutral-800/80'" class="p-2 rounded-xl border">
+                            <span class="text-neutral-500 block mb-0.5">Freshness</span>
+                            <span :class="theme === 'light' ? 'text-emerald-800' : 'text-[#C5A880]'" class="font-bold text-[10px]" x-text="quickViewProduct.average_freshness_rating + ' ★'"></span>
+                        </div>
+                        <div :class="theme === 'light' ? 'bg-white border-neutral-200' : 'bg-neutral-900/40 border-neutral-800/80'" class="p-2 rounded-xl border">
+                            <span class="text-neutral-500 block mb-0.5">Aesthetic Value</span>
+                            <span :class="theme === 'light' ? 'text-emerald-800' : 'text-[#C5A880]'" class="font-bold text-[10px]" x-text="quickViewProduct.average_value_rating + ' ★'"></span>
+                        </div>
                     </div>
-                @endif
-                @if(session('error_review'))
-                    <div class="p-2.5 bg-rose-500/10 border border-dashed border-rose-500/25 text-rose-500 text-[11px] font-mono rounded-xl">
-                        {{ session('error_review') }}
-                    </div>
-                @endif
-
-                <!-- Review list -->
-                @php
-                    $reviews = $quickViewProductId ? \App\Models\Review::where('product_id', $quickViewProductId)->with('user')->latest()->get() : collect();
-                @endphp
-
-                <div class="space-y-3 max-h-48 overflow-y-auto pr-1">
-                    @forelse($reviews as $rev)
-                        <div :class="theme === 'light' ? 'bg-neutral-50 border-neutral-150 text-neutral-800' : 'bg-neutral-950/40 border-[#C5A880]/10 text-neutral-300'" class="p-3 rounded-2xl border space-y-1">
-                            <div class="flex items-center justify-between">
-                                <span :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-200'" class="text-[10px] font-semibold">{{ $rev->user ? $rev->user->name : 'Anonymous Client' }}</span>
-                                <div class="flex items-center space-x-0.5">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <span class="text-[10px] {{ $i <= $rev->rating ? 'text-amber-500' : 'text-neutral-700' }}">★</span>
-                                    @endfor
-                                </div>
-                            </div>
-                            <p :class="theme === 'light' ? 'text-neutral-700' : 'text-neutral-400'" class="text-[11px] font-light leading-relaxed">{{ $rev->comment }}</p>
-                            <span class="text-[8px] text-neutral-400 block font-mono">{{ $rev->created_at->format('d M Y') }}</span>
-                        </div>
-                    @empty
-                        <p class="text-[11px] text-neutral-400 italic">No reviews logged for this arrangement yet. Be the first to share your experience!</p>
-                    @endforelse
-                </div>
-
-                <!-- Submit Review Form -->
-                @auth
-                    <form wire:submit.prevent="submitProductReview" class="p-3 border border-neutral-200 rounded-2xl bg-neutral-50/50 space-y-3">
-                        <span class="text-[10px] font-bold text-neutral-750 uppercase tracking-wider block mb-1">Leave a Review</span>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] pb-1">
-                            <!-- Overall Rating -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-neutral-600 font-medium">Overall Rating</span>
-                                <div class="flex items-center space-x-1">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <button type="button" wire:click="$set('newReview.rating', {{ $i }})" class="text-xs focus:outline-none transition-transform hover:scale-125 {{ ($newReview['rating'] ?? 5) >= $i ? 'text-amber-500' : 'text-neutral-300' }}">★</button>
-                                    @endfor
-                                </div>
-                            </div>
-                            
-                            <!-- Quality & Build Rating -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-neutral-600 font-medium">Quality &amp; Build</span>
-                                <div class="flex items-center space-x-1">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <button type="button" wire:click="$set('newReview.quality_rating', {{ $i }})" class="text-xs focus:outline-none transition-transform hover:scale-125 {{ ($newReview['quality_rating'] ?? 5) >= $i ? 'text-amber-500' : 'text-neutral-300' }}">★</button>
-                                    @endfor
-                                </div>
-                            </div>
-
-                            <!-- Freshness & Presentation Rating -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-neutral-600 font-medium">Freshness &amp; Presentation</span>
-                                <div class="flex items-center space-x-1">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <button type="button" wire:click="$set('newReview.freshness_rating', {{ $i }})" class="text-xs focus:outline-none transition-transform hover:scale-125 {{ ($newReview['freshness_rating'] ?? 5) >= $i ? 'text-amber-500' : 'text-neutral-300' }}">★</button>
-                                    @endfor
-                                </div>
-                            </div>
-
-                            <!-- Value for Money Rating -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-neutral-600 font-medium">Value for Money</span>
-                                <div class="flex items-center space-x-1">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <button type="button" wire:click="$set('newReview.value_rating', {{ $i }})" class="text-xs focus:outline-none transition-transform hover:scale-125 {{ ($newReview['value_rating'] ?? 5) >= $i ? 'text-amber-500' : 'text-neutral-300' }}">★</button>
-                                    @endfor
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-1">
-                            <textarea wire:model="newReview.comment" placeholder="Describe your experience with this arrangement..." class="w-full text-xs p-2 border border-neutral-200 rounded-xl bg-white focus:outline-none focus:border-neutral-400 font-light" rows="2" required></textarea>
-                            @error('newReview.comment') <span class="text-rose-600 text-[9px] block">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="flex justify-end">
-                            <button type="submit" class="bg-emerald-800 hover:bg-emerald-950 text-white font-mono text-[9px] uppercase font-bold px-4 py-1.5 rounded-full cursor-pointer transition-colors">Submit Review</button>
-                        </div>
-                    </form>
-                @else
-                    <div class="p-3 bg-neutral-50 rounded-2xl text-center border border-neutral-100">
-                        <p class="text-[10px] text-neutral-500 font-light">Please <a href="/login" class="text-emerald-800 font-bold hover:underline">sign in</a> to submit reviews.</p>
-                    </div>
-                @endauth
+                </template>
             </div>
         </div>
 
@@ -2999,7 +2937,7 @@
                     <input 
                         type="text" 
                         wire:model.live.debounce.200ms="search"
-                        placeholder="Search items..."
+                        placeholder="Search fresh flowers, luxury hampers, wines, chocolates..."
                         :class="theme === 'light' ? 'bg-neutral-100 border-neutral-300 text-neutral-900 placeholder-neutral-500 focus:border-emerald-600 focus:ring-emerald-600/10' : 'bg-neutral-900/40 border-neutral-800 text-white placeholder-neutral-500 focus:border-[#C5A880] focus:ring-[#C5A880]/10'"
                         class="w-full pl-9 pr-4 py-2 border rounded-full text-xs font-sans focus:outline-none focus:ring-2 transition-all duration-300"
                     >
@@ -3007,6 +2945,53 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
+
+                {{-- Mobile Search Results Preview --}}
+                @if(!empty($search))
+                    @php
+                        $mobileSearchResults = \App\Models\Product::where('name', 'like', '%' . $search . '%')
+                            ->orWhere('category', 'like', '%' . $search . '%')
+                            ->take(5)
+                            ->get();
+                    @endphp
+                    <div :class="theme === 'light' ? 'bg-white border-neutral-200 shadow-md' : 'bg-neutral-900 border-neutral-800 shadow-xl'" class="mt-2 p-2.5 border rounded-2xl max-h-60 overflow-y-auto space-y-1.5 text-left transition-all duration-300">
+                        <span class="text-[9px] font-mono text-neutral-500 uppercase tracking-widest block px-2 pt-0.5">Matching Catalog Matches</span>
+                        @forelse($mobileSearchResults as $item)
+                            <div 
+                                @click="
+                                    mobileMenuOpen = false;
+                                    quickViewProduct = { 
+                                        id: {{ $item->id }}, 
+                                        name: {{ \Illuminate\Support\Js::from($item->name) }}, 
+                                        price: {{ $item->price }}, 
+                                        description: {{ \Illuminate\Support\Js::from($item->description) }}, 
+                                        image: {{ \Illuminate\Support\Js::from($item->image_url ?: '/media/default.jpg') }}, 
+                                        category: {{ \Illuminate\Support\Js::from($item->category) }}, 
+                                        stock_standard: {{ $item->stock }}, 
+                                        stock_deluxe: Math.floor({{ $item->stock }} * 0.7), 
+                                        stock_grand: Math.floor({{ $item->stock }} * 0.4), 
+                                        average_rating: {{ $item->average_rating ?? 0 }}, 
+                                        average_quality_rating: {{ $item->average_quality_rating ?? 0 }}, 
+                                        average_freshness_rating: {{ $item->average_freshness_rating ?? 0 }}, 
+                                        average_value_rating: {{ $item->average_value_rating ?? 0 }},
+                                        sizes: {{ \Illuminate\Support\Js::from($item->sizes ?? []) }}
+                                    }; 
+                                    quickViewSize = 'standard'; 
+                                    quickViewOpen = true;
+                                "
+                                class="flex items-center space-x-3.5 p-2 rounded-xl hover:bg-neutral-500/5 cursor-pointer transition-colors"
+                            >
+                                <img src="{{ $item->image_url ?: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=100' }}" class="w-8 h-8 rounded-lg object-cover" alt="{{ $item->name }}">
+                                <div class="flex-1 min-w-0">
+                                    <span :class="theme === 'light' ? 'text-neutral-900' : 'text-white'" class="text-xs font-semibold block truncate font-sans">{{ $item->name }}</span>
+                                    <span class="text-[9px] text-[#C5A880] font-mono block">{{ number_format($item->price) }} KSH &bull; {{ ucfirst($item->category) }}</span>
+                                </div>
+                            </div>
+                        @empty
+                            <span class="text-[10px] text-neutral-500 font-mono italic block py-2 text-center">No matches found for "{{ $search }}"</span>
+                        @endforelse
+                    </div>
+                @endif
 
                 {{-- Navigation Links --}}
                 <nav class="space-y-4 text-xs font-mono uppercase tracking-widest font-semibold">

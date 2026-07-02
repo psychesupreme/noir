@@ -131,6 +131,35 @@ class VendorIndex extends Component
         session()->flash('message', 'Vendor deleted successfully.');
     }
 
+    public function applyPreset(string $type): void
+    {
+        if ($type === 'flower') {
+            $this->name = 'Naivasha Petals & Rose Farm';
+            $this->contact_person = 'Procurement Lead';
+            $this->email = 'info@naivashapetals.co.ke';
+            $this->phone = '0711000222';
+            $this->address = 'Naivasha Highway, Rift Valley';
+            $this->payment_terms = 'Net 30';
+            $this->reliability_rating = 5;
+        } elseif ($type === 'wine') {
+            $this->name = 'Equator Cellars & Wine Imports';
+            $this->contact_person = 'Trade Manager';
+            $this->email = 'orders@equatorcellars.com';
+            $this->phone = '0202200300';
+            $this->address = 'Mombasa Road Business Hub, Nairobi';
+            $this->payment_terms = 'Net 14';
+            $this->reliability_rating = 4;
+        } elseif ($type === 'gifting') {
+            $this->name = 'Atelier Premium Boxes & Wrapping Ltd';
+            $this->contact_person = 'Operations Coordinator';
+            $this->email = 'supply@atelierboxes.co.ke';
+            $this->phone = '0722999888';
+            $this->address = 'Industrial Area, Gate 4, Nairobi';
+            $this->payment_terms = 'Cash on Delivery';
+            $this->reliability_rating = 3;
+        }
+    }
+
     public function render()
     {
         $query = Vendor::query();

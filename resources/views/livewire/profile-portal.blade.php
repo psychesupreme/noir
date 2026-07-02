@@ -258,9 +258,16 @@
             :class="(theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl') + (mobileShowMenu ? ' block' : ' hidden lg:block')" 
             class="w-full lg:w-64 shrink-0 lg:sticky lg:top-28 p-6 border rounded-[32px] backdrop-blur-xl space-y-6 text-left transition-all duration-500 self-start h-auto"
         >
-            <div class="border-b border-neutral-500/10 pb-4">
+            <div class="border-b border-neutral-500/10 pb-4 relative">
                 <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-neutral-500 block">Atelier Personal Portal</span>
                 <h4 :class="theme === 'light' ? 'text-neutral-800' : 'text-white'" class="text-xs font-semibold uppercase tracking-widest mt-1">Dashboard Portal</h4>
+                
+                <!-- Close Mobile Navigation Icon -->
+                <button @click="mobileShowMenu = false" class="lg:hidden absolute right-0 top-0 p-1 text-neutral-500 hover:text-neutral-300 focus:outline-none transition-colors" title="Close Menu">
+                    <svg class="w-4.5 h-4.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
             </div>
 
             <!-- Tab Buttons -->
@@ -378,12 +385,14 @@
         <div :class="!mobileShowMenu ? 'block' : 'hidden lg:block'" class="flex-1 w-full space-y-8 mb-20 text-left">
             
             <!-- Mobile back to listings menu button -->
-            <div class="lg:hidden mb-6" x-show="!mobileShowMenu">
-                <button @click="mobileShowMenu = true" :class="theme === 'light' ? 'bg-neutral-100 text-neutral-800 border-neutral-250 hover:bg-neutral-200' : 'bg-neutral-900 text-neutral-300 border-neutral-850 hover:bg-neutral-850'" class="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border font-mono text-[10px] uppercase tracking-widest transition-all cursor-pointer font-bold shadow-md">
-                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
+            <div class="lg:hidden mb-4 flex justify-start" x-show="!mobileShowMenu">
+                <button @click="mobileShowMenu = true" 
+                        :class="theme === 'light' ? 'bg-white/80 border-neutral-200 text-neutral-800 hover:bg-neutral-50' : 'bg-neutral-900/80 border-neutral-800 text-neutral-300 hover:bg-neutral-850'" 
+                        class="flex items-center space-x-1.5 py-1.5 px-3.5 rounded-full border backdrop-blur-md font-mono text-[9px] uppercase tracking-wider transition-all cursor-pointer shadow-sm font-bold">
+                    <svg class="w-3.5 h-3.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
                         <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>Show Portal Navigation Menu</span>
+                    <span>Portal Menu</span>
                 </button>
             </div>
             
@@ -461,11 +470,6 @@
                                     @error('phone_number') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="space-y-1.5">
-                                    <label class="text-neutral-500 uppercase">KRA PIN (Optional)</label>
-                                    <input type="text" wire:model="kra_pin" placeholder="A000000000Z" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans uppercase">
-                                    @error('kra_pin') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
-                                </div>
-                                <div class="space-y-1.5">
                                     <label class="text-neutral-500 uppercase">Gender (Optional)</label>
                                     <select wire:model="gender" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-3 py-2 focus:outline-none text-sm font-sans cursor-pointer">
                                         <option value="">Choose Gender</option>
@@ -502,6 +506,7 @@
                                             marker: null,
                                             searchQuery: '',
                                             searchResults: [],
+                                            isFullscreen: false,
                                             initMap() {
                                                 let lat = -1.2921;
                                                 let lng = 36.8219;
@@ -621,13 +626,29 @@
                                                     ></div>
                                                 </template>
                                             </div>
+                                        <!-- Leaflet Map Container & Controls -->
+                                        <div class="relative w-full">
+                                            <div 
+                                                id="profile-map"
+                                                style="min-height: 240px; width: 100%;"
+                                                :class="isFullscreen ? 'fixed inset-0 w-screen h-screen z-[9999] bg-[#050507]' : 'w-full h-48 rounded-2xl overflow-hidden border border-neutral-500/10 mt-1 z-10'"
+                                            ></div>
+
+                                            <!-- Fullscreen Toggle Button -->
+                                            <button x-show="!isFullscreen" type="button" @click="isFullscreen = !isFullscreen; setTimeout(() => { map.invalidateSize() }, 100)" :class="theme === 'light' ? 'bg-black/80 hover:bg-black text-white' : 'bg-black/90 hover:bg-[#C5A880]/20 hover:text-[#C5A880] border border-[#C5A880]/20'" class="absolute bottom-2.5 right-2.5 z-[20] px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider flex items-center space-x-1 shadow-md transition-all cursor-pointer">
+                                                <span>Fullscreen Map</span>
+                                            </button>
+
+                                            <!-- Fullscreen Floating Controls -->
+                                            <div x-show="isFullscreen" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[10000] flex items-center gap-2 bg-neutral-950/80 border border-neutral-800 p-2.5 rounded-2xl backdrop-blur-md shadow-2xl">
+                                                <button type="button" @click="isFullscreen = false; setTimeout(() => { map.invalidateSize() }, 100)" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-mono uppercase tracking-wider font-bold transition-all shadow-md cursor-pointer">
+                                                    Confirm Location
+                                                </button>
+                                                <button type="button" @click="isFullscreen = false; setTimeout(() => { map.invalidateSize() }, 100)" class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl text-[10px] font-mono uppercase tracking-wider font-bold transition-all border border-neutral-700 shadow-md cursor-pointer">
+                                                    Close Fullscreen
+                                                </button>
+                                            </div>
                                         </div>
-                                        
-                                        <!-- Leaflet Map Container -->
-                                        <div 
-                                            id="profile-map"
-                                            class="w-full h-48 rounded-2xl overflow-hidden border border-neutral-500/10 mt-1 z-10"
-                                        ></div>
                                     </div>
                                 </div>
                             </div>
@@ -712,11 +733,25 @@
                         <div class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl">{{ session('success_orders') }}</div>
                     @endif
 
+                    <!-- Status Filter Pills -->
+                    <div class="flex flex-wrap gap-2 pb-2">
+                        @foreach(['all' => 'All', 'pending' => 'Pending', 'approved' => 'Approved', 'processing' => 'Processing', 'delivered' => 'Delivered', 'cancelled' => 'Cancelled'] as $filterVal => $filterLabel)
+                            <button 
+                                wire:click="$set('selectedStatusFilter', '{{ $filterVal }}')"
+                                :class="$wire.selectedStatusFilter === '{{ $filterVal }}' ? (theme === 'light' ? 'bg-black text-white' : 'bg-[#C5A880] text-black font-semibold') : (theme === 'light' ? 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200' : 'bg-neutral-900 text-neutral-450 hover:text-white hover:bg-neutral-850')"
+                                class="px-3.5 py-1.5 rounded-full text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+                            >
+                                {{ $filterLabel }}
+                            </button>
+                        @endforeach
+                    </div>
+
                     <!-- Order History Logs -->
                     <div :class="theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
                         <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Purchase Ledger Records Matrix</h4>
                         
-                        <div class="overflow-x-auto">
+                        <!-- Desktop View Table -->
+                        <div class="overflow-x-auto hidden md:block">
                             <table class="w-full text-left text-xs font-mono">
                                 <thead>
                                     <tr class="text-neutral-500 border-b border-neutral-500/10">
@@ -798,11 +833,106 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="py-8 text-center text-neutral-500 font-light">No order records cataloged. Browse the storefront showroom to place your first dispatch request.</td>
+                                            <td colspan="6" class="py-8 text-center text-neutral-500 font-light">No order records cataloged.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Mobile View Collapsible Accordion Cards -->
+                        <div class="block md:hidden space-y-4">
+                            @forelse($userOrders as $ord)
+                                <div 
+                                    x-data="{ open: false }" 
+                                    :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-250 text-neutral-900 shadow-sm' : 'bg-neutral-950/40 border-neutral-850/80 text-white shadow-md'" 
+                                    class="border rounded-2xl overflow-hidden transition-all duration-300"
+                                >
+                                    <!-- Accordion Header -->
+                                    <div @click="open = !open" class="p-4 flex items-center justify-between cursor-pointer select-none">
+                                        <div class="space-y-1 text-left">
+                                            <span class="text-xs font-bold block">#NB-ORD-{{ str_pad($ord->id, 4, '0', STR_PAD_LEFT) }}</span>
+                                            <span class="text-[9px] text-neutral-500 block font-mono">{{ $ord->created_at->format('d M Y H:i') }}</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2.5">
+                                            <span class="text-xs text-amber-500 font-bold font-mono">{{ number_format($ord->total_amount) }} KSH</span>
+                                            <svg class="w-4 h-4 text-neutral-500 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <!-- Accordion Body -->
+                                    <div x-show="open" x-collapse class="border-t border-neutral-500/5 p-4 space-y-3.5 text-xs text-left" style="display: none;">
+                                        <!-- Items list -->
+                                        <div>
+                                            <span class="text-[9px] font-mono text-neutral-500 uppercase tracking-wider block mb-1">Curation Details</span>
+                                            <ul class="space-y-1.5 font-mono text-[11px]">
+                                                @foreach($ord->products as $p)
+                                                    <li class="flex justify-between border-b border-dashed border-neutral-500/5 pb-1">
+                                                        <span>{{ $p->pivot->quantity }}x {{ $p->name }} ({{ ucfirst($p->pivot->size ?? 'standard') }})</span>
+                                                        <span class="text-neutral-500">{{ number_format($p->pivot->price_at_sale * $p->pivot->quantity) }} KSH</span>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+
+                                        <!-- Status Badge -->
+                                        <div class="flex items-center justify-between font-mono">
+                                            <span class="text-[9px] text-neutral-500 uppercase tracking-wider">Fulfillment Status</span>
+                                            @php
+                                                $stCls = match($ord->status) {
+                                                    'pending' => 'text-amber-400 bg-amber-950/20 border-amber-900/40',
+                                                    'approved' => 'text-blue-400 bg-blue-950/20 border-blue-900/40',
+                                                    'processing' => 'text-violet-400 bg-violet-950/20 border-violet-900/40',
+                                                    'delivered' => 'text-emerald-400 bg-emerald-950/20 border-emerald-900/40',
+                                                    default => 'text-neutral-450 bg-neutral-950/20 border-neutral-900/40'
+                                                };
+                                            @endphp
+                                            <span class="px-2 py-0.5 border text-[9px] uppercase tracking-wider rounded-md {{ $stCls }} font-bold">
+                                                {{ $ord->status }}
+                                            </span>
+                                        </div>
+
+                                        <!-- Action Controls -->
+                                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-500/5">
+                                            @if($ord->status === 'delivered')
+                                                 @if($ord->rating)
+                                                     <div class="flex flex-col items-end space-y-0.5">
+                                                         <div class="flex items-center space-x-0.5">
+                                                             @for($i = 1; $i <= 5; $i++)
+                                                                 <span class="text-xs {{ $i <= $ord->rating ? 'text-[#C5A880]' : 'text-neutral-600' }} font-bold">★</span>
+                                                             @endfor
+                                                         </div>
+                                                     </div>
+                                                 @else
+                                                     <button wire:click="openRatingModal({{ $ord->id }})" class="bg-[#C5A880]/15 hover:bg-[#C5A880]/30 text-[#C5A880] px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase transition-all border border-[#C5A880]/20 cursor-pointer">
+                                                         Rate Order
+                                                     </button>
+                                                 @endif
+                                            @else
+                                                <button @click="selectedOrder = { id: {{ $ord->id }}, status: '{{ $ord->status }}', created: '{{ $ord->created_at->format('d M Y H:i') }}', total: '{{ number_format($ord->total_amount) }}', instructions: '{{ addslashes($ord->special_instructions) }}', distance_km: '{{ $ord->getRouteDetails()['distance_km'] ?? '' }}', duration_min: '{{ $ord->getRouteDetails()['duration_min'] ?? '' }}', hub_name: '{{ $ord->getRouteDetails()['hub_name'] ?? '' }}' }" class="bg-neutral-500/10 hover:bg-neutral-500/20 px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase cursor-pointer transition-all border border-neutral-500/10">
+                                                    Track Order
+                                                </button>
+                                            @endif
+
+                                            @php
+                                                $completedPayment = $ord->payments->first(fn($p) => $p->status === 'completed');
+                                                $arInvoice = \App\Models\AccountsReceivableInvoice::where('order_id', $ord->id)->first();
+                                            @endphp
+                                            @if($completedPayment || $arInvoice)
+                                                <a href="{{ URL::signedRoute('receipt.download', ['order' => $ord->id]) }}" target="_blank" class="bg-[#C5A880] hover:bg-[#B59A7A] text-black px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase transition-all block">
+                                                    Invoice
+                                                </a>
+                                            @else
+                                                <span class="text-[9px] text-neutral-500 font-light block italic">Pending Pay</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="p-6 text-center text-neutral-500 font-light text-xs font-mono">No order records found matching this status filter.</div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -953,7 +1083,7 @@
                             <div class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl">{{ session('success_settings') }}</div>
                         @endif
 
-                        <div class="space-y-4 text-xs font-mono">
+                        <div class="space-y-6 text-xs font-mono">
                             <!-- Theme selector setting -->
                             <div class="space-y-2 border-b border-neutral-500/5 pb-4">
                                 <label :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-400'" class="uppercase font-semibold transition-colors">Preferred Workspace Default Theme</label>
@@ -971,8 +1101,45 @@
                                 </div>
                             </div>
 
+                            <!-- Design Customization Defaults -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-neutral-500/5 pb-5">
+                                <div class="space-y-1.5 text-left">
+                                    <label :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-400'" class="uppercase font-semibold block transition-colors">Default Curation Ribbon</label>
+                                    <select wire:model="pref_ribbon_color" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black' : 'bg-[#0F0F12] border-neutral-800 text-white'" class="w-full border rounded-xl px-3 py-2 focus:outline-none text-xs font-mono cursor-pointer">
+                                        <option value="None">No Ribbon Accent</option>
+                                        <option value="Black">Onyx Black Silk Ribbon</option>
+                                        <option value="Emerald">Forest Emerald Satin Ribbon</option>
+                                        <option value="Gold">Atelier Champagne Gold Ribbon</option>
+                                        <option value="Burgundy">Deep Burgundy Velvet Ribbon</option>
+                                    </select>
+                                </div>
+                                <div class="space-y-1.5 text-left">
+                                    <label :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-400'" class="uppercase font-semibold block transition-colors">Greeting Card Calligraphy</label>
+                                    <select wire:model="pref_print_style" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black' : 'bg-[#0F0F12] border-neutral-800 text-white'" class="w-full border rounded-xl px-3 py-2 focus:outline-none text-xs font-mono cursor-pointer">
+                                        <option value="handwritten">Artisanal Handwritten Script</option>
+                                        <option value="serif">Printed Classic Roman Serif</option>
+                                        <option value="blank">Blank Card (Self Written)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Corporate B2B Account Billing Details -->
+                            <div :class="theme === 'light' ? 'bg-neutral-50/60 border-neutral-200' : 'bg-neutral-900/30 border-neutral-800/80'" class="p-4 border rounded-2xl space-y-3.5 text-left">
+                                <span class="text-[10px] font-mono text-[#C5A880] uppercase tracking-wider block font-bold">&bull; Corporate Billing Account Details</span>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="space-y-1.5">
+                                        <label class="text-neutral-500 uppercase block">Company Name</label>
+                                        <input type="text" wire:model="company_name" placeholder="e.g. Acme Corporation" :class="theme === 'light' ? 'bg-white border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none text-xs font-sans">
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-neutral-500 uppercase block">KRA PIN (Corporate / Net 30)</label>
+                                        <input type="text" wire:model="kra_pin" placeholder="e.g. P051234567Z" :class="theme === 'light' ? 'bg-white border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-3 py-1.5 focus:outline-none text-xs font-sans uppercase">
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Notification Toggles -->
-                            <div class="space-y-3.5">
+                            <div class="space-y-3.5 text-left pt-2">
                                 <label :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-400'" class="uppercase font-semibold block mb-1 transition-colors">Communication Toggles</label>
                                 
                                 <label class="flex items-center space-x-3 cursor-pointer group">
@@ -1004,7 +1171,7 @@
                                 </label>
                             </div>
 
-                            <button type="button" wire:click="updateSettings" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full py-2.5 rounded-xl transition-all duration-300 font-bold uppercase cursor-pointer mt-4">
+                            <button type="button" wire:click="updateSettings" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'" class="w-full py-2.5 rounded-xl transition-all duration-300 font-bold uppercase cursor-pointer mt-4">
                                 Save Atelier Settings
                             </button>
                         </div>

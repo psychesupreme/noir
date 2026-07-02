@@ -14,6 +14,7 @@ class ProfilePortal extends Component
     use \App\Livewire\Traits\HasNotificationsAndTheme;
     // Tabs: details, security, orders, wishlist, settings, logistics
     public string $activeTab = 'details';
+    public string $selectedStatusFilter = 'all';
 
     // Profile Details Form
     public string $name = '';
@@ -36,6 +37,9 @@ class ProfilePortal extends Component
     public bool $notification_concierge = false;
     public bool $notification_newsletter = false;
     public string $preferred_theme = 'dark';
+    public string $company_name = '';
+    public string $pref_ribbon_color = 'None';
+    public string $pref_print_style = 'handwritten';
 
     // Logistics status update success feedback (for staff tab)
     public ?int $updatedOrderId = null;
@@ -92,6 +96,10 @@ class ProfilePortal extends Component
             $this->default_delivery_address = $user->default_delivery_address ?? '';
             $this->default_region = $user->default_region ?? 'Nairobi';
 
+            // Load Client specific corporate name
+            $client = Client::where('email', $user->email)->first();
+            $this->company_name = $client->company_name ?? '';
+
             // Load settings
             $settings = $user->settings ?? [];
             $this->notification_email = $settings['notification_email'] ?? true;
@@ -99,6 +107,9 @@ class ProfilePortal extends Component
             $this->notification_concierge = $settings['notification_concierge'] ?? false;
             $this->notification_newsletter = $settings['notification_newsletter'] ?? false;
             
+            $this->pref_ribbon_color = $settings['pref_ribbon_color'] ?? 'None';
+            $this->pref_print_style = $settings['pref_print_style'] ?? 'handwritten';
+
             $theme = $settings['preferred_theme'] ?? 'dark';
             $this->preferred_theme = ($theme === 'onyx' || $theme === 'dark') ? 'dark' : 'light';
         }
@@ -132,7 +143,6 @@ class ProfilePortal extends Component
                 'phone_number' => $this->phone_number,
                 'gender' => $this->gender ?: null,
                 'dob' => $this->dob ?: null,
-                'kra_pin' => strtoupper($this->kra_pin),
                 'default_delivery_address' => $this->default_delivery_address,
                 'default_region' => $this->default_region,
             ]);
@@ -158,6 +168,10 @@ class ProfilePortal extends Component
 
     public function updateSettings(): void
     {
+        $this->validate([
+            'kra_pin' => 'nullable|string|min:11|max:15',
+        ]);
+
         $user = auth()->user();
         if ($user) {
             $settings = $user->settings ?? [];
@@ -166,10 +180,29 @@ class ProfilePortal extends Component
             $settings['notification_concierge'] = $this->notification_concierge;
             $settings['notification_newsletter'] = $this->notification_newsletter;
             $settings['preferred_theme'] = $this->preferred_theme;
+            $settings['pref_ribbon_color'] = $this->pref_ribbon_color;
+            $settings['pref_print_style'] = $this->pref_print_style;
 
             $user->update([
-                'settings' => $settings
+                'settings' => $settings,
+                'kra_pin' => strtoupper($this->kra_pin) ?: null,
             ]);
+
+            // Sync with CRM Client table
+            Client::updateOrCreate(
+                ['email' => $user->email],
+                [
+                    'user_id' => $user->id,
+                    'contact_name' => $user->name,
+                    'phone' => $user->phone_number,
+                    'gender' => $user->gender,
+                    'dob' => $user->dob,
+                    'kra_pin' => $user->kra_pin,
+                    'company_name' => $this->company_name ?: null,
+                    'delivery_address' => $user->default_delivery_address,
+                    'region' => $user->default_region,
+                ]
+            );
 
             session()->flash('success_settings', 'Atelier preferences saved successfully.');
             $this->dispatch('theme-settings-changed', $this->preferred_theme);
@@ -351,7 +384,11 @@ class ProfilePortal extends Component
             // Load Client order history
             $client = Client::where('email', $user->email)->first();
             if ($client) {
-                $userOrders = $client->orders()->with(['products', 'payments'])->latest()->get();
+                $query = $client->orders()->with(['products', 'payments'])->latest();
+                if ($this->selectedStatusFilter !== 'all') {
+                    $query->where('status', $this->selectedStatusFilter);
+                }
+                $userOrders = $query->get();
             }
 
             // Load Wishlist products

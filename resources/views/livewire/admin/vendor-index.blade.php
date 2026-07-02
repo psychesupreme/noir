@@ -352,6 +352,22 @@
                         </h3>
 
                         <form wire:submit.prevent="save" class="space-y-4">
+                            @if(!$isEditMode)
+                            <div class="p-3 bg-neutral-900/50 border border-neutral-900 rounded-sm mb-4">
+                                <label class="block text-[9px] uppercase tracking-wider text-[#C5A880] mb-2 font-mono font-bold">&bull; Auto-Fill Default Vendor Template</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" wire:click="applyPreset('flower')" class="px-2.5 py-1.5 border border-emerald-800/40 bg-emerald-950/20 text-emerald-400 hover:bg-emerald-950/40 text-[10px] font-mono rounded-sm cursor-pointer select-none">
+                                        [Flower Farm Preset]
+                                    </button>
+                                    <button type="button" wire:click="applyPreset('wine')" class="px-2.5 py-1.5 border border-purple-800/40 bg-purple-950/20 text-purple-400 hover:bg-purple-950/40 text-[10px] font-mono rounded-sm cursor-pointer select-none">
+                                        [Wine Distributor]
+                                    </button>
+                                    <button type="button" wire:click="applyPreset('gifting')" class="px-2.5 py-1.5 border border-amber-800/40 bg-amber-950/20 text-[#C5A880] hover:bg-amber-950/40 text-[10px] font-mono rounded-sm cursor-pointer select-none">
+                                        [Gifting / Box Depot]
+                                    </button>
+                                </div>
+                            </div>
+                            @endif
                             {{-- Name --}}
                             <div>
                                 <label class="block text-[10px] uppercase tracking-wider text-neutral-500 mb-1.5">Supplier Company Name</label>
