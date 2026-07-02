@@ -1,3 +1,27 @@
+@php
+if (!function_exists('toJsObject')) {
+    function toJsObject($product) {
+        return \Illuminate\Support\Js::from([
+            'id' => $product->id,
+            'name' => $product->name,
+            'price' => $product->price,
+            'price_standard' => $product->price_standard,
+            'price_deluxe' => $product->price_deluxe,
+            'price_grand' => $product->price_grand,
+            'description' => $product->description,
+            'image' => $product->backdrop_url ?? $product->image_url ?? '/media/default.jpg',
+            'category' => $product->category,
+            'stock_standard' => $product->stock_standard,
+            'stock_deluxe' => $product->stock_deluxe,
+            'stock_grand' => $product->stock_grand,
+            'average_rating' => $product->average_rating,
+            'average_quality_rating' => $product->average_quality_rating,
+            'average_freshness_rating' => $product->average_freshness_rating,
+            'average_value_rating' => $product->average_value_rating,
+        ]);
+    }
+}
+@endphp
 @section('meta')
     <meta name="description" content="Explore Atelier Noir & Bloom's specialized corporate floral services, wedding designs, workspace subscriptions, and premium gifting hampers. Order directly online.">
     <meta name="keywords" content="wedding flowers Kenya, corporate flower subscription Nairobi, flower subscriptions Kiambu, custom gift hampers Nairobi, luxury event florist">
@@ -528,7 +552,7 @@
                     >
                         <!-- Left side: Squared Image Frame -->
                         <div class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center">
-                            <img src="{{ $srv->image_url }}" alt="{{ $srv->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 z-0 cursor-pointer" @click="quickViewProduct = { id: {{ $srv->id }}, name: {{ \Illuminate\Support\Js::from($srv->name) }}, price: {{ $srv->price }}, description: {{ \Illuminate\Support\Js::from($srv->description) }}, image: {{ \Illuminate\Support\Js::from($srv->backdrop_url) }}, category: {{ \Illuminate\Support\Js::from($srv->category) }}, stock_standard: {{ $srv->stock_standard }}, stock_deluxe: {{ $srv->stock_deluxe }}, stock_grand: {{ $srv->stock_grand }} }; quickViewSize = 'standard'; quickViewOpen = true;" loading="lazy">
+                            <img src="{{ $srv->image_url }}" alt="{{ $srv->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 z-0 cursor-pointer" @click="quickViewProduct = {{ toJsObject($srv) }}; quickViewSize = 'standard'; quickViewOpen = true;" loading="lazy">
                             
                             @auth
                                 @php
@@ -552,17 +576,22 @@
                                 </svg>
                             </button>
 
-                            <div class="absolute bottom-2 left-2 z-10">
-                                <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded-full text-[8px] font-mono font-bold tracking-wider uppercase shadow-md">
-                                    {{ $srv->grade ?? 'Service' }}
+                            <div class="absolute bottom-2 inset-x-2 flex justify-between items-center z-10">
+                                <span class="bg-[#0B0B0D]/65 border border-white/10 text-neutral-350 px-1.5 py-0.5 rounded text-[8px] font-mono uppercase tracking-wider backdrop-blur-md">
+                                    {{ $srv->category }}
                                 </span>
+                                @if($srv->grade)
+                                    <span class="bg-[#C5A880] text-black px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold tracking-wider uppercase shadow-md">
+                                        {{ $srv->grade }}
+                                    </span>
+                                @endif
                             </div>
                         </div>
                         <!-- Right details -->
                         <div class="flex-1 pl-3 flex flex-col justify-between overflow-hidden">
                             <div class="space-y-1 overflow-hidden">
                                 <span class="text-[9px] uppercase tracking-[0.2em] text-[#C5A880] font-mono block font-bold truncate">Specialization</span>
-                                <h4 class="text-sm font-serif italic tracking-wide leading-tight truncate text-current cursor-pointer hover:underline" @click="quickViewProduct = { id: {{ $srv->id }}, name: {{ \Illuminate\Support\Js::from($srv->name) }}, price: {{ $srv->price }}, description: {{ \Illuminate\Support\Js::from($srv->description) }}, image: {{ \Illuminate\Support\Js::from($srv->backdrop_url) }}, category: {{ \Illuminate\Support\Js::from($srv->category) }}, stock_standard: {{ $srv->stock_standard }}, stock_deluxe: {{ $srv->stock_deluxe }}, stock_grand: {{ $srv->stock_grand }} }; quickViewSize = 'standard'; quickViewOpen = true;">{{ $srv->name }}</h4>
+                                <h4 class="text-sm font-serif italic tracking-wide leading-tight truncate text-current cursor-pointer hover:underline" @click="quickViewProduct = {{ toJsObject($srv) }}; quickViewSize = 'standard'; quickViewOpen = true;">{{ $srv->name }}</h4>
                                 <p class="text-neutral-500 font-light text-[11px] leading-snug line-clamp-2">{{ $srv->description }}</p>
                             </div>
 
@@ -624,7 +653,7 @@
                         class="flex flex-col p-3 rounded-[32px] border relative transition-all duration-500 hover:-translate-y-1 group backdrop-blur-md"
                     >
                         <div class="aspect-[1/1] rounded-[24px] relative overflow-hidden bg-neutral-950/5">
-                            <img src="{{ $gift->image_url }}" alt="{{ $gift->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 cursor-pointer" @click="quickViewProduct = { id: {{ $gift->id }}, name: {{ \Illuminate\Support\Js::from($gift->name) }}, price: {{ $gift->price }}, description: {{ \Illuminate\Support\Js::from($gift->description) }}, image: {{ \Illuminate\Support\Js::from($gift->backdrop_url) }}, category: {{ \Illuminate\Support\Js::from($gift->category) }}, stock_standard: {{ $gift->stock_standard }}, stock_deluxe: {{ $gift->stock_deluxe }}, stock_grand: {{ $gift->stock_grand }} }; quickViewSize = 'standard'; quickViewOpen = true;" loading="lazy">
+                            <img src="{{ $gift->image_url }}" alt="{{ $gift->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 cursor-pointer" @click="quickViewProduct = {{ toJsObject($gift) }}; quickViewSize = 'standard'; quickViewOpen = true;" loading="lazy">
                             
                             @auth
                                 @php
@@ -648,15 +677,24 @@
                                 </svg>
                             </button>
 
-                            <div class="absolute bottom-3 left-3">
-                                <span class="bg-black/50 text-neutral-300 border border-white/10 px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider">
-                                    {{ $gift->unit_type }}
+                            <div class="absolute bottom-3 inset-x-3 flex justify-between items-center z-10">
+                                <span class="bg-[#0B0B0D]/65 border border-white/10 text-neutral-300 px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider backdrop-blur-md">
+                                    {{ $gift->category }}
                                 </span>
+                                @if($gift->grade)
+                                    <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded-full text-[9px] font-mono font-bold tracking-wider uppercase shadow-md">
+                                        {{ $gift->grade }}
+                                    </span>
+                                @else
+                                    <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded-full text-[9px] font-mono font-bold tracking-wider uppercase shadow-md">
+                                        {{ $gift->unit_type }}
+                                    </span>
+                                @endif
                             </div>
                         </div>
                         <div class="px-2 pt-4 pb-2 flex-1 flex flex-col justify-between">
                             <div class="space-y-1">
-                                <h4 class="text-base font-serif italic tracking-wide leading-snug cursor-pointer hover:underline" @click="quickViewProduct = { id: {{ $gift->id }}, name: {{ \Illuminate\Support\Js::from($gift->name) }}, price: {{ $gift->price }}, description: {{ \Illuminate\Support\Js::from($gift->description) }}, image: {{ \Illuminate\Support\Js::from($gift->backdrop_url) }}, category: {{ \Illuminate\Support\Js::from($gift->category) }}, stock_standard: {{ $gift->stock_standard }}, stock_deluxe: {{ $gift->stock_deluxe }}, stock_grand: {{ $gift->stock_grand }} }; quickViewSize = 'standard'; quickViewOpen = true;">{{ $gift->name }}</h4>
+                                <h4 class="text-base font-serif italic tracking-wide leading-snug cursor-pointer hover:underline" @click="quickViewProduct = {{ toJsObject($gift) }}; quickViewSize = 'standard'; quickViewOpen = true;">{{ $gift->name }}</h4>
                                 <p class="text-neutral-500 font-light text-xs line-clamp-2">{{ $gift->description }}</p>
                                 
                                 <!-- Social Sharing Direct Links for SMM -->
@@ -865,7 +903,7 @@
                                 :disabled="quickViewProduct && quickViewProduct.stock_standard <= 0"
                             >
                                 <span class="block">Standard</span>
-                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price) + ' KSH' : ''"></span>
+                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price_standard) + ' KSH' : ''"></span>
                                 <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_standard <= 0">Out of Stock</span>
                             </button>
                             <!-- Deluxe -->
@@ -875,7 +913,7 @@
                                 :disabled="quickViewProduct && quickViewProduct.stock_deluxe <= 0"
                             >
                                 <span class="block">Deluxe</span>
-                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 1.5)) + ' KSH' : ''"></span>
+                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price_deluxe) + ' KSH' : ''"></span>
                                 <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_deluxe <= 0">Out of Stock</span>
                             </button>
                             <!-- Grand -->
@@ -885,7 +923,7 @@
                                 :disabled="quickViewProduct && quickViewProduct.stock_grand <= 0"
                             >
                                 <span class="block">Grand</span>
-                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 2.2)) + ' KSH' : ''"></span>
+                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price_grand) + ' KSH' : ''"></span>
                                 <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_grand <= 0">Out of Stock</span>
                             </button>
                         </div>
@@ -997,7 +1035,7 @@
             <div>
                 <span class="text-[10px] text-neutral-500 uppercase tracking-wider block">Price</span>
                 <span :class="theme === 'light' ? 'text-neutral-850' : 'text-[#C5A880]'" class="text-base font-bold font-mono">
-                    <span x-text="quickViewProduct ? numberFormat(quickViewSize === 'standard' ? quickViewProduct.price : (quickViewSize === 'deluxe' ? Math.round(quickViewProduct.price * 1.5) : Math.round(quickViewProduct.price * 2.2))) : ''"></span> KSH
+                    <span x-text="quickViewProduct ? numberFormat(quickViewSize === 'standard' ? quickViewProduct.price_standard : (quickViewSize === 'deluxe' ? quickViewProduct.price_deluxe : quickViewProduct.price_grand)) : ''"></span> KSH
                 </span>
             </div>
             

@@ -501,13 +501,15 @@ class Storefront extends Component
                 $finalPrice = null;
                 $costPriceAtSale = 0;
                 
-                if ($product->sizes && is_array($product->sizes)) {
-                    foreach ($product->sizes as $s) {
-                        if (strtolower($s['name']) === strtolower($size)) {
-                            $finalPrice = (int)$s['price'];
-                            $costPriceAtSale = (int)($s['cost_price'] ?? 0);
-                            break;
-                        }
+                if ($product->sizes && is_array($product->sizes) && count($product->sizes) >= 3) {
+                    $idx = match($size) {
+                        'deluxe' => 1,
+                        'grand' => 2,
+                        default => 0,
+                    };
+                    if (isset($product->sizes[$idx])) {
+                        $finalPrice = (int)$product->sizes[$idx]['price'];
+                        $costPriceAtSale = (int)($product->sizes[$idx]['cost_price'] ?? 0);
                     }
                 }
                 
@@ -854,9 +856,6 @@ class Storefront extends Component
                     default   => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600',
                 };
             }
-            $product->stock_standard = $product->stock;
-            $product->stock_deluxe = (int) floor($product->stock * 0.7);
-            $product->stock_grand = (int) floor($product->stock * 0.4);
             return $product;
         });
 
@@ -938,12 +937,14 @@ class Storefront extends Component
             $product = $products->get($id);
             if ($product) {
                 $finalPrice = null;
-                if ($product->sizes && is_array($product->sizes)) {
-                    foreach ($product->sizes as $s) {
-                        if (strtolower($s['name']) === strtolower($size)) {
-                            $finalPrice = (int)$s['price'];
-                            break;
-                        }
+                if ($product->sizes && is_array($product->sizes) && count($product->sizes) >= 3) {
+                    $idx = match($size) {
+                        'deluxe' => 1,
+                        'grand' => 2,
+                        default => 0,
+                    };
+                    if (isset($product->sizes[$idx])) {
+                        $finalPrice = (int)$product->sizes[$idx]['price'];
                     }
                 }
 
@@ -958,8 +959,21 @@ class Storefront extends Component
 
                 $clonedProduct = clone $product;
                 $clonedProduct->price = $finalPrice;
+                
+                $sizeNameLabel = ucfirst($size);
+                if ($product->sizes && is_array($product->sizes) && count($product->sizes) >= 3) {
+                    $idx = match($size) {
+                        'deluxe' => 1,
+                        'grand' => 2,
+                        default => 0,
+                    };
+                    if (isset($product->sizes[$idx])) {
+                        $sizeNameLabel = $product->sizes[$idx]['name'];
+                    }
+                }
+
                 if ($size !== 'standard') {
-                    $clonedProduct->name = $product->name . ' (' . ucfirst($size) . ')';
+                    $clonedProduct->name = $product->name . ' (' . $sizeNameLabel . ')';
                 }
 
                 $items[] = [

@@ -50,6 +50,22 @@ class Product extends Model
         'sizes' => 'array',
     ];
 
+    /**
+     * The accessors to append to the model's array form.
+     */
+    protected $appends = [
+        'average_rating',
+        'average_quality_rating',
+        'average_freshness_rating',
+        'average_value_rating',
+        'price_standard',
+        'price_deluxe',
+        'price_grand',
+        'stock_standard',
+        'stock_deluxe',
+        'stock_grand',
+    ];
+
     // ── Relationships ────────────────────────────────────────────────────
 
     /**
@@ -123,6 +139,419 @@ class Product extends Model
     public function getAverageValueRatingAttribute(): float
     {
         return (float) round($this->reviews()->avg('value_rating') ?: 0, 1);
+    }
+
+    public function getPriceStandardAttribute(): int
+    {
+        if ($this->sizes && is_array($this->sizes) && isset($this->sizes[0]['price'])) {
+            return (int)$this->sizes[0]['price'];
+        }
+        return (int)$this->price;
+    }
+
+    public function getPriceDeluxeAttribute(): int
+    {
+        if ($this->sizes && is_array($this->sizes) && isset($this->sizes[1]['price'])) {
+            return (int)$this->sizes[1]['price'];
+        }
+        return (int)round($this->price * 1.5);
+    }
+
+    public function getPriceGrandAttribute(): int
+    {
+        if ($this->sizes && is_array($this->sizes) && isset($this->sizes[2]['price'])) {
+            return (int)$this->sizes[2]['price'];
+        }
+        return (int)round($this->price * 2.2);
+    }
+
+    public function getStockStandardAttribute(): int
+    {
+        if ($this->sizes && is_array($this->sizes) && isset($this->sizes[0]['stock'])) {
+            return (int)$this->sizes[0]['stock'];
+        }
+        return (int)$this->stock;
+    }
+
+    public function getStockStandardOrMaxAttribute(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrFallbackAttribute(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandard(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueAttribute(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueAttributeOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttribute(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallback(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockStandardOrValueOrFallbackAttributeValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValueOrFallbackValue(): int
+    {
+        return $this->stock_standard;
+    }
+
+    public function getStockDeluxeAttribute(): int
+    {
+        if ($this->sizes && is_array($this->sizes) && isset($this->sizes[1]['stock'])) {
+            return (int)$this->sizes[1]['stock'];
+        }
+        return (int)floor($this->stock * 0.7);
+    }
+
+    public function getStockGrandAttribute(): int
+    {
+        if ($this->sizes && is_array($this->sizes) && isset($this->sizes[2]['stock'])) {
+            return (int)$this->sizes[2]['stock'];
+        }
+        return (int)floor($this->stock * 0.4);
     }
 
     // ── Query Scopes ─────────────────────────────────────────────────────

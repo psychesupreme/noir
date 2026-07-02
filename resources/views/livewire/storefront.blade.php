@@ -1,3 +1,27 @@
+@php
+if (!function_exists('toJsObject')) {
+    function toJsObject($product) {
+        return \Illuminate\Support\Js::from([
+            'id' => $product->id,
+            'name' => $product->name,
+            'price' => $product->price,
+            'price_standard' => $product->price_standard,
+            'price_deluxe' => $product->price_deluxe,
+            'price_grand' => $product->price_grand,
+            'description' => $product->description,
+            'image' => $product->backdrop_url ?? $product->image_url ?? '/media/default.jpg',
+            'category' => $product->category,
+            'stock_standard' => $product->stock_standard,
+            'stock_deluxe' => $product->stock_deluxe,
+            'stock_grand' => $product->stock_grand,
+            'average_rating' => $product->average_rating,
+            'average_quality_rating' => $product->average_quality_rating,
+            'average_freshness_rating' => $product->average_freshness_rating,
+            'average_value_rating' => $product->average_value_rating,
+        ]);
+    }
+}
+@endphp
 @section('meta')
     <meta name="description" content="Explore Atelier Noir & Bloom's premium floral curations, Naivasha Rift Valley wholesale stems, and custom luxury gift hampers. Detailed proforma invoices and instant M-Pesa checkout.">
     <meta name="keywords" content="premium bouquets, naivasha roses, flower shop Nairobi, luxury gift hampers Kenya, flower delivery Nairobi, detailed proforma invoices, safaricom mpesa checkout">
@@ -501,7 +525,7 @@
                                 <div class="space-y-1">
                                     @forelse($suggestions as $prod)
                                         <button type="button" 
-                                                @click="quickViewProduct = { id: {{ $prod->id }}, name: {{ \Illuminate\Support\Js::from($prod->name) }}, price: {{ $prod->price }}, description: {{ \Illuminate\Support\Js::from($prod->description) }}, image: {{ \Illuminate\Support\Js::from($prod->image_url ?: '/media/default.jpg') }}, category: {{ \Illuminate\Support\Js::from($prod->category) }}, stock_standard: {{ $prod->stock }}, stock_deluxe: Math.floor({{ $prod->stock }} * 0.7), stock_grand: Math.floor({{ $prod->stock }} * 0.4), average_rating: {{ $prod->average_rating }}, average_quality_rating: {{ $prod->average_quality_rating }}, average_freshness_rating: {{ $prod->average_freshness_rating }}, average_value_rating: {{ $prod->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true; focused = false;" 
+                                                @click="quickViewProduct = {{ toJsObject($prod) }}; quickViewSize = 'standard'; quickViewOpen = true; focused = false;" 
                                                 :class="theme === 'light' ? 'hover:bg-neutral-100' : 'hover:bg-white/5'"
                                                 class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer"
                                         >
@@ -903,7 +927,7 @@
                         @endphp
                         <div :class="theme === 'light' ? 'bg-white/80 border-neutral-200/50 text-neutral-900 shadow-sm' : 'bg-[#0F0F12]/80 border-neutral-900/60 text-white'"
                              class="flex items-center space-x-3 p-3 rounded-xl border transition-all duration-300 hover:border-[#C5A880] cursor-pointer theme-section hover:-translate-y-0.5 hover:shadow-md w-full select-none"
-                             @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                             @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
                         >
                             <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-950/5 relative">
                                 <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover" loading="lazy">
@@ -1147,7 +1171,7 @@
                                  style="animation-delay: {{ ($index % 6) * 100 }}ms;"
                             >
                                 <!-- Left side: Squared Image Frame -->
-                                <div @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                                <div @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                      class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center cursor-pointer select-none">
                                     <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
                                          class="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-all duration-700 z-0" loading="lazy">
@@ -1186,15 +1210,20 @@
                                         </svg>
                                     </button>
 
-                                    <div class="absolute bottom-2 left-2 z-10">
-                                        <span class="bg-[#C5A880] text-black px-2 py-0.5 rounded-full text-[8px] font-outfit font-bold tracking-wider uppercase shadow-md">
-                                            {{ $product->grade ?? 'Service' }}
+                                    <div class="absolute bottom-2 inset-x-2 flex justify-between items-center z-10">
+                                        <span class="bg-[#0B0B0D]/65 border border-white/10 text-neutral-200 px-1.5 py-0.5 rounded text-[8px] font-outfit uppercase tracking-widest backdrop-blur-md">
+                                            {{ $product->category }}
                                         </span>
+                                        @if($product->grade)
+                                            <span class="bg-[#C5A880] text-black px-1.5 py-0.5 rounded-full text-[8px] font-outfit font-bold tracking-wider uppercase shadow-md">
+                                                {{ $product->grade }}
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                                 <!-- Right side: Details -->
                                 <div class="flex-1 pl-3 flex flex-col justify-between overflow-hidden">
-                                    <div @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                                    <div @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                          class="space-y-1 overflow-hidden cursor-pointer select-none">
                                         <span class="text-[9px] uppercase tracking-[0.2em] text-[#C5A880] font-outfit block font-bold truncate">Specialization</span>
                                         <h3 :class="theme === 'light' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-sm font-serif italic tracking-wide leading-tight truncate">
@@ -1244,7 +1273,7 @@
                                             </div>
 
                                             <button type="button"
-                                               @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                                               @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                                :class="theme === 'light' ? 'bg-black text-white hover:bg-[#B59A7A] hover:text-black' : 'bg-white text-black hover:bg-[#C5A880] hover:text-black'"
                                                class="px-3 py-1.5 rounded-full text-[9px] font-outfit uppercase font-bold tracking-wider transition-all duration-300 shadow-md cursor-pointer"
                                             >
@@ -1262,7 +1291,7 @@
                                  style="animation-delay: {{ ($index % 6) * 100 }}ms;"
                             >
                                 <!-- Product Image Frame -->
-                                <div @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                                <div @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                      class="p-1 border border-neutral-500/10 rounded-t-[190px] rounded-b-[20px] overflow-hidden relative cursor-pointer select-none">
                                     <div class="aspect-[4/5] rounded-t-[180px] rounded-b-[16px] relative overflow-hidden bg-neutral-950/5">
                                         <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
@@ -1317,7 +1346,7 @@
  
                                 <!-- Details Section -->
                                 <div class="px-2 pt-4 pb-2 flex-1 flex flex-col justify-between">
-                                    <div @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                                    <div @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                          class="space-y-1.5 cursor-pointer select-none">
                                         <span class="text-[12px] uppercase tracking-[0.3em] text-neutral-400 font-outfit block font-light">Atelier Noir & Bloom</span>
                                         <h3 :class="theme === 'light' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-xl font-serif italic tracking-wider leading-snug">
@@ -1339,7 +1368,7 @@
                                         <div class="max-h-none opacity-100 lg:max-h-0 lg:opacity-0 lg:group-hover:max-h-32 lg:group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden space-y-3">
                                             <button 
                                                 type="button"
-                                                @click="quickViewProduct = { id: {{ $product->id }}, name: {{ \Illuminate\Support\Js::from($product->name) }}, price: {{ $product->price }}, description: {{ \Illuminate\Support\Js::from($product->description) }}, image: {{ \Illuminate\Support\Js::from($product->backdrop_url ?? $product->image_url) }}, category: {{ \Illuminate\Support\Js::from($product->category) }}, stock_standard: {{ $product->stock_standard ?? $product->stock }}, stock_deluxe: {{ $product->stock_deluxe ?? (int) floor($product->stock * 0.7) }}, stock_grand: {{ $product->stock_grand ?? (int) floor($product->stock * 0.4) }}, average_rating: {{ $product->average_rating }}, average_quality_rating: {{ $product->average_quality_rating }}, average_freshness_rating: {{ $product->average_freshness_rating }}, average_value_rating: {{ $product->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true;"
+                                                @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                                 class="w-full text-[12px] font-semibold tracking-[0.2em] uppercase py-2.5 rounded-full flex items-center justify-center font-outfit bg-emerald-800 text-white hover:bg-emerald-900 transition-colors shadow-sm cursor-pointer"
                                             >
                                                 <span>Select Details</span>
@@ -2391,7 +2420,7 @@
                                 :disabled="quickViewProduct && quickViewProduct.stock_standard <= 0"
                             >
                                 <span class="block" x-text="getSizeLabel(quickViewProduct, 'standard')"></span>
-                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price) + ' KSH' : ''"></span>
+                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price_standard) + ' KSH' : ''"></span>
                                 <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_standard <= 0">Out of Stock</span>
                             </button>
                             <!-- Deluxe -->
@@ -2401,7 +2430,7 @@
                                 :disabled="quickViewProduct && quickViewProduct.stock_deluxe <= 0"
                             >
                                 <span class="block" x-text="getSizeLabel(quickViewProduct, 'deluxe')"></span>
-                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 1.5)) + ' KSH' : ''"></span>
+                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price_deluxe) + ' KSH' : ''"></span>
                                 <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_deluxe <= 0">Out of Stock</span>
                             </button>
                             <!-- Grand -->
@@ -2411,7 +2440,7 @@
                                 :disabled="quickViewProduct && quickViewProduct.stock_grand <= 0"
                             >
                                 <span class="block" x-text="getSizeLabel(quickViewProduct, 'grand')"></span>
-                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(Math.round(quickViewProduct.price * 2.2)) + ' KSH' : ''"></span>
+                                <span class="block text-[9px] opacity-75 font-light" x-text="quickViewProduct ? numberFormat(quickViewProduct.price_grand) + ' KSH' : ''"></span>
                                 <span class="block text-[8px] mt-0.5 text-red-500 font-semibold" x-show="quickViewProduct && quickViewProduct.stock_grand <= 0">Out of Stock</span>
                             </button>
                         </div>
@@ -2471,7 +2500,7 @@
             <div>
                 <span class="text-[10px] text-neutral-500 uppercase tracking-wider block">Price</span>
                 <span :class="theme === 'light' ? 'text-neutral-850' : 'text-[#C5A880]'" class="text-base font-bold font-mono">
-                    <span x-text="quickViewProduct ? numberFormat(quickViewSize === 'standard' ? quickViewProduct.price : (quickViewSize === 'deluxe' ? Math.round(quickViewProduct.price * 1.5) : Math.round(quickViewProduct.price * 2.2))) : ''"></span> KSH
+                    <span x-text="quickViewProduct ? numberFormat(quickViewSize === 'standard' ? quickViewProduct.price_standard : (quickViewSize === 'deluxe' ? quickViewProduct.price_deluxe : quickViewProduct.price_grand)) : ''"></span> KSH
                 </span>
             </div>
             
@@ -2845,7 +2874,7 @@
                         <div class="flex items-center space-x-3 shrink-0">
                             <button 
                                 type="button"
-                                @click="quickViewProduct = { id: {{ $wProd->id }}, name: {{ \Illuminate\Support\Js::from($wProd->name) }}, price: {{ $wProd->price }}, description: {{ \Illuminate\Support\Js::from($wProd->description) }}, image: {{ \Illuminate\Support\Js::from($wProd->image_url ?: '/media/default.jpg') }}, category: {{ \Illuminate\Support\Js::from($wProd->category) }}, stock_standard: {{ $wProd->stock }}, stock_deluxe: Math.floor({{ $wProd->stock }} * 0.7), stock_grand: Math.floor({{ $wProd->stock }} * 0.4), average_rating: {{ $wProd->average_rating }}, average_quality_rating: {{ $wProd->average_quality_rating }}, average_freshness_rating: {{ $wProd->average_freshness_rating }}, average_value_rating: {{ $wProd->average_value_rating }} }; quickViewSize = 'standard'; quickViewOpen = true; wishlistOpen = false;"
+                                @click="quickViewProduct = {{ toJsObject($wProd) }}; quickViewSize = 'standard'; quickViewOpen = true; wishlistOpen = false;"
                                 :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'"
                                 class="px-3.5 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-wider font-bold cursor-pointer transition-colors shadow-sm"
                             >

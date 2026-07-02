@@ -488,12 +488,22 @@ class ProductIndex extends Component
 
         $query->orderBy($this->sortField, $this->sortDirection);
 
+        $defaultGradings = ['Grade A', 'Premium', 'Grade B', 'Standard', 'Consultation', 'Event Styling', 'Subscription', 'Premium Service'];
+        $dbGradings = Product::whereNotNull('grade')
+            ->where('grade', '!=', '')
+            ->distinct()
+            ->orderBy('grade')
+            ->pluck('grade')
+            ->toArray();
+        $existingGradings = array_values(array_unique(array_merge($defaultGradings, $dbGradings)));
+
         return view('livewire.admin.product-index', [
             'products' => $query->paginate(12),
             'occasions' => Occasion::all(),
             'branches' => Branch::all(),
             'totalProducts' => Product::count(),
             'lowStockCount' => Product::where('stock', '<=', 10)->count(),
+            'existingGradings' => $existingGradings,
             'inventoryLogs' => \App\Models\InventoryLog::with(['product', 'user', 'branch'])->latest()->paginate(10, pageName: 'stockLogPage'),
         ])->layout('components.layouts.admin', ['title' => 'Noir & Bloom | Products']);
     }

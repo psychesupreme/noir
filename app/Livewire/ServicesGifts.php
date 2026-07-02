@@ -19,17 +19,11 @@ class ServicesGifts extends Component
     {
         $services = Product::whereIn('category', ['specializtion', 'specialization', 'specializations'])->get()->map(function($product) {
             $product->backdrop_url = $product->image_url ?: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=600';
-            $product->stock_standard = $product->stock;
-            $product->stock_deluxe = (int) floor($product->stock * 0.7);
-            $product->stock_grand = (int) floor($product->stock * 0.4);
             return $product;
         });
 
         $gifts = Product::whereIn('category', ['giftings', 'bundle', 'hampers', 'home_decor'])->get()->map(function($product) {
             $product->backdrop_url = $product->image_url ?: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=600';
-            $product->stock_standard = $product->stock;
-            $product->stock_deluxe = (int) floor($product->stock * 0.7);
-            $product->stock_grand = (int) floor($product->stock * 0.4);
             return $product;
         });
         

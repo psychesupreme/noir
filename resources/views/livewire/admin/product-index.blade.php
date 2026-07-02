@@ -496,9 +496,15 @@
                             <input
                                 wire:model="grade"
                                 type="text"
+                                list="existing-gradings"
                                 class="w-full bg-[#0A0A0A] border border-neutral-800 rounded-sm px-3 py-2 text-sm text-white focus:outline-none focus:border-neutral-600 transition-colors"
-                                placeholder="Grade A (Export)"
+                                placeholder="Grade A (Export) or choose..."
                             >
+                            <datalist id="existing-gradings">
+                                @foreach($existingGradings as $g)
+                                    <option value="{{ $g }}"></option>
+                                @endforeach
+                            </datalist>
                             @error('grade') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>
                         <div>
