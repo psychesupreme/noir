@@ -19,9 +19,19 @@
 
     {{-- Alert Messages --}}
     @if (session()->has('message'))
-        <div class="bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 p-4 rounded-sm text-xs font-mono flex items-center justify-between">
+        <div x-data="{ show: true }"
+             x-show="show"
+             x-init="setTimeout(() => show = false, 5000)"
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition ease-in duration-300 transform"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+             class="bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 p-4 rounded-sm text-xs font-mono flex items-center justify-between"
+        >
             <span>{{ session('message') }}</span>
-            <button class="hover:text-white" onclick="this.parentElement.remove()">✕</button>
+            <button class="hover:text-white" @click="show = false">✕</button>
         </div>
     @endif
 

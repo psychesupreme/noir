@@ -461,7 +461,17 @@
                         </div>
 
                         @if (session()->has('deal_message'))
-                            <div class="p-3 bg-emerald-950/30 text-emerald-400 border border-emerald-900/30 text-xs rounded-sm font-mono">
+                            <div x-data="{ show: true }"
+                                 x-show="show"
+                                 x-init="setTimeout(() => show = false, 5000)"
+                                 x-transition:enter="transition ease-out duration-300 transform"
+                                 x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave="transition ease-in duration-300 transform"
+                                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                                 class="p-3 bg-emerald-950/30 text-emerald-400 border border-emerald-900/30 text-xs rounded-sm font-mono"
+                            >
                                 {{ session('deal_message') }}
                             </div>
                         @endif
@@ -540,7 +550,17 @@
                             <span class="text-[10px] uppercase tracking-[0.2em] font-mono text-neutral-500 block border-b border-neutral-900 pb-2">Log CRM Interaction</span>
                             
                             @if (session()->has('timeline_message'))
-                                <div class="p-3 bg-emerald-950/30 text-emerald-400 border border-emerald-900/30 text-xs rounded-sm font-mono">
+                                <div x-data="{ show: true }"
+                                     x-show="show"
+                                     x-init="setTimeout(() => show = false, 5000)"
+                                     x-transition:enter="transition ease-out duration-300 transform"
+                                     x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave="transition ease-in duration-300 transform"
+                                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                                     class="p-3 bg-emerald-950/30 text-emerald-400 border border-emerald-900/30 text-xs rounded-sm font-mono"
+                                >
                                     {{ session('timeline_message') }}
                                 </div>
                             @endif

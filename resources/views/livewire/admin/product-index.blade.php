@@ -44,6 +44,8 @@
                     <option value="bundle">Bundle</option>
                     <option value="bouquet">Bouquet</option>
                     <option value="giftings">Giftings</option>
+                    <option value="wines">Wines</option>
+                    <option value="chocolate">Chocolate</option>
                     <option value="specialization">Specialization</option>
                 </select>
 
@@ -390,6 +392,8 @@
                                 <option value="bundle">Bundle</option>
                                 <option value="bouquet">Bouquet</option>
                                 <option value="giftings">Giftings</option>
+                                <option value="wines">Wines</option>
+                                <option value="chocolate">Chocolate</option>
                                 <option value="specialization">Specialization</option>
                             </select>
                             @error('category') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
@@ -404,6 +408,12 @@
                                 <option value="stem">Stem</option>
                                 <option value="bundle">Bundle</option>
                                 <option value="hamper">Hamper</option>
+                                <option value="bottle">Bottle</option>
+                                <option value="grams">Grams</option>
+                                <option value="kg">Kilograms (kg)</option>
+                                <option value="litres">Litres</option>
+                                <option value="oz">Ounces (oz)</option>
+                                <option value="size">Size (S/M/L)</option>
                             </select>
                             @error('unit_type') <span class="text-rose-400 text-[10px] font-mono mt-1 block">{{ $message }}</span> @enderror
                         </div>

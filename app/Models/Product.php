@@ -239,6 +239,8 @@ class Product extends Model
             'bouquet', 'bouquets' => 'B',
             'bundle' => 'U',
             'giftings', 'gifting', 'hampers' => 'G',
+            'wines', 'wine' => 'N',
+            'chocolate', 'chocolates' => 'C',
             'home_decor', 'decor' => 'D',
             'specializtion', 'specialization', 'specializations' => 'P',
             'retail' => 'R',

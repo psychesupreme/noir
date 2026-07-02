@@ -725,3 +725,41 @@ body.bg-scroll-locked .main-content-wrapper {
 .dark .border-neutral-350 { border-color: #262626 !important; }
 .dark .border-neutral-450 { border-color: #262626 !important; }
 .dark .border-neutral-850 { border-color: #262626 !important; }
+
+/* ==========================================================================
+   PAGINATION CONTRAST VISIBILITY FOR LUXURY THEMES
+   ========================================================================== */
+nav[role="navigation"] {
+  background: transparent !important;
+}
+
+nav[role="navigation"] p {
+  color: var(--text-secondary) !important;
+}
+
+nav[role="navigation"] span, 
+nav[role="navigation"] a {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
+
+nav[role="navigation"] a,
+nav[role="navigation"] span[aria-current="page"] > span,
+nav[role="navigation"] span[disabled] > span {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-base) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.3s ease;
+}
+
+nav[role="navigation"] a:hover {
+  background-color: var(--brand-accent) !important;
+  color: var(--bg-base) !important;
+  border-color: var(--brand-accent) !important;
+}
+
+nav[role="navigation"] span[aria-current="page"] > span {
+  background-color: var(--brand-accent) !important;
+  color: var(--bg-base) !important;
+  border-color: var(--brand-accent) !important;
+  font-weight: bold;
+}

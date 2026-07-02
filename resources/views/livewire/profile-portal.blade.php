@@ -449,7 +449,19 @@
                         <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Personal Information Parameters</h4>
                         
                         @if(session('success_profile'))
-                            <div class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl">{{ session('success_profile') }}</div>
+                            <div x-data="{ show: true }"
+                                 x-show="show"
+                                 x-init="setTimeout(() => show = false, 5000)"
+                                 x-transition:enter="transition ease-out duration-300 transform"
+                                 x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave="transition ease-in duration-300 transform"
+                                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                                 class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl"
+                            >
+                                {{ session('success_profile') }}
+                            </div>
                         @endif
 
                         <form wire:submit.prevent="updateProfile" class="space-y-4 text-xs font-mono">
@@ -498,16 +510,18 @@
                                     <input type="text" wire:model="default_delivery_address" placeholder="Estate, Complex, Street Name" :class="theme === 'light' ? 'bg-white/80 border-neutral-250 text-black focus:border-[#B59A7A]' : 'bg-[#0F0F12] border-neutral-800 text-white focus:border-neutral-600'" class="w-full border rounded-xl px-4 py-2 focus:outline-none text-sm font-sans">
                                     @error('default_delivery_address') <span class="text-rose-500 text-[10px]">{{ $message }}</span> @enderror
                                 </div>
-                                <div class="space-y-1.5 md:col-span-2" wire:ignore>
-                                    <label class="text-neutral-500 uppercase block">Interactive Location Locator Map (Click/drag marker to update coordinates for free)</label>
+                                <div class="space-y-2 md:col-span-2" wire:ignore>
+                                    <label class="text-neutral-500 uppercase block">Interactive Location Locator Map</label>
                                     <div 
                                         x-data="{
+                                            mapLoaded: false,
                                             map: null,
                                             marker: null,
                                             searchQuery: '',
                                             searchResults: [],
                                             isFullscreen: false,
                                             initMap() {
+                                                if (this.map) return;
                                                 let lat = -1.2921;
                                                 let lng = 36.8219;
                                                 
@@ -535,12 +549,11 @@
                                                         this.updateCoords(e.latlng.lat, e.latlng.lng);
                                                     });
 
-                                                    // ResizeObserver ensures Leaflet renders properly inside modal transitions/tabs
                                                     const observer = new ResizeObserver(() => {
                                                         this.map.invalidateSize();
                                                     });
                                                     observer.observe(document.getElementById('profile-map'));
-                                                }, 400);
+                                                }, 150);
 
                                                 $watch('$wire.default_region', (val) => {
                                                     let centerCoords = val === 'Kiambu' ? [-1.1578, 36.8407] : [-1.2921, 36.8219];
@@ -586,72 +599,89 @@
                                                     .catch(() => {});
                                             }
                                         }"
-                                        x-init="initMap()"
                                         class="relative"
                                     >
-                                        <!-- Map Search Autocomplete Input -->
-                                        <div class="relative z-40 mb-2">
-                                            <div class="flex gap-2">
-                                                <input 
-                                                    type="text" 
-                                                    x-model="searchQuery" 
-                                                    @keydown.enter.prevent="searchLocation()"
-                                                    placeholder="Search location (e.g. Westlands)..." 
-                                                    :class="theme === 'light' ? 'bg-white border-neutral-250 text-black placeholder-neutral-400' : 'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600'"
-                                                    class="flex-1 border rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-neutral-400 font-sans"
-                                                >
-                                                <button 
-                                                    type="button" 
-                                                    @click="searchLocation()"
-                                                    :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'"
-                                                    class="px-3.5 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold"
-                                                >
-                                                    Find
-                                                </button>
+                                        <!-- Map Activation Card (Lazy load) -->
+                                        <div x-show="!mapLoaded" :class="theme === 'light' ? 'bg-neutral-50/60 border-neutral-200' : 'bg-neutral-900/30 border-neutral-800/80'" class="p-6 border rounded-2xl flex flex-col items-center justify-center text-center space-y-3 transition-colors duration-300">
+                                            <div class="w-10 h-10 rounded-full bg-[#C5A880]/15 flex items-center justify-center text-[#C5A880]">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
                                             </div>
-                                            <!-- Autocomplete Results Dropdown -->
-                                            <div 
-                                                x-show="searchResults.length > 0" 
-                                                @click.away="searchResults = []"
-                                                :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-250 text-neutral-900 shadow-lg' : 'bg-[#0F0F12] border-neutral-800 text-white shadow-lg'"
-                                                class="absolute left-0 right-0 z-[1000] mt-1 max-h-48 overflow-y-auto border rounded-xl text-xs"
-                                                style="display: none;"
-                                            >
-                                                <template x-for="res in searchResults" :key="res.place_id">
-                                                    <div 
-                                                        @click="selectResult(res)"
-                                                        :class="theme === 'light' ? 'hover:bg-neutral-200/50' : 'hover:bg-white/10'"
-                                                        class="px-3 py-2 cursor-pointer transition-colors border-b last:border-b-0 border-neutral-500/10 font-sans"
-                                                        x-text="res.display_name"
-                                                    ></div>
-                                                </template>
+                                            <div>
+                                                <span :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-200'" class="text-xs font-semibold block font-sans">Interactive Geolocation Map</span>
+                                                <span class="text-[10px] text-neutral-500 block font-mono mt-0.5">Click/drag marker to select precise delivery coordinates.</span>
                                             </div>
-                                        <!-- Leaflet Map Container & Controls -->
-                                        <div class="relative w-full">
-                                            <div 
-                                                id="profile-map"
-                                                style="min-height: 240px; width: 100%;"
-                                                :class="isFullscreen ? 'fixed inset-0 w-screen h-screen z-[9999] bg-[#050507]' : 'w-full h-48 rounded-2xl overflow-hidden border border-neutral-500/10 mt-1 z-10'"
-                                            ></div>
-
-                                            <!-- Fullscreen Toggle Button -->
-                                            <button x-show="!isFullscreen" type="button" @click="isFullscreen = !isFullscreen; setTimeout(() => { map.invalidateSize() }, 100)" :class="theme === 'light' ? 'bg-black/80 hover:bg-black text-white' : 'bg-black/90 hover:bg-[#C5A880]/20 hover:text-[#C5A880] border border-[#C5A880]/20'" class="absolute bottom-2.5 right-2.5 z-[20] px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider flex items-center space-x-1 shadow-md transition-all cursor-pointer">
-                                                <span>Fullscreen Map</span>
+                                            <button type="button" @click="mapLoaded = true; initMap()" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'" class="px-4 py-2 rounded-xl text-[10px] font-mono uppercase tracking-wider font-bold transition-all cursor-pointer select-none">
+                                                Activate Map Locator
                                             </button>
+                                        </div>
 
-                                            <!-- Fullscreen Floating Controls -->
-                                            <div x-show="isFullscreen" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[10000] flex items-center gap-2 bg-neutral-950/80 border border-neutral-800 p-2.5 rounded-2xl backdrop-blur-md shadow-2xl">
-                                                <button type="button" @click="isFullscreen = false; setTimeout(() => { map.invalidateSize() }, 100)" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-mono uppercase tracking-wider font-bold transition-all shadow-md cursor-pointer">
-                                                    Confirm Location
+                                        <div x-show="mapLoaded" style="display: none;">
+                                            <!-- Map Search Autocomplete Input -->
+                                            <div class="relative z-40 mb-2">
+                                                <div class="flex gap-2">
+                                                    <input 
+                                                        type="text" 
+                                                        x-model="searchQuery" 
+                                                        @keydown.enter.prevent="searchLocation()"
+                                                        placeholder="Search location (e.g. Westlands)..." 
+                                                        :class="theme === 'light' ? 'bg-white border-neutral-250 text-black placeholder-neutral-400' : 'bg-[#0F0F12] border-neutral-800 text-white placeholder-neutral-600'"
+                                                        class="w-full border rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-neutral-400 font-sans"
+                                                    >
+                                                    <button 
+                                                        type="button" 
+                                                        @click="searchLocation()"
+                                                        :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'"
+                                                        class="px-3.5 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-wider cursor-pointer font-bold"
+                                                    >
+                                                        Find
+                                                    </button>
+                                                </div>
+                                                <!-- Autocomplete Results Dropdown -->
+                                                <div 
+                                                    x-show="searchResults.length > 0" 
+                                                    @click.away="searchResults = []"
+                                                    :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-250 text-neutral-900 shadow-lg' : 'bg-[#0F0F12] border-neutral-800 text-white shadow-lg'"
+                                                    class="absolute left-0 right-0 z-[1000] mt-1 max-h-48 overflow-y-auto border rounded-xl text-xs"
+                                                    style="display: none;"
+                                                >
+                                                    <template x-for="res in searchResults" :key="res.place_id">
+                                                        <div 
+                                                            @click="selectResult(res)"
+                                                            :class="theme === 'light' ? 'hover:bg-neutral-200/50' : 'hover:bg-white/10'"
+                                                            class="px-3 py-2 cursor-pointer transition-colors border-b last:border-b-0 border-neutral-500/10 font-sans"
+                                                            x-text="res.display_name"
+                                                        ></div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            <!-- Leaflet Map Container & Controls -->
+                                            <div class="relative w-full">
+                                                <div 
+                                                    id="profile-map"
+                                                    style="min-height: 240px; width: 100%;"
+                                                    :class="isFullscreen ? 'fixed inset-0 w-screen h-screen z-[9999] bg-[#050507]' : 'w-full h-48 rounded-2xl overflow-hidden border border-neutral-500/10 mt-1 z-10'"
+                                                ></div>
+
+                                                <!-- Fullscreen Toggle Button -->
+                                                <button x-show="!isFullscreen" type="button" @click="isFullscreen = !isFullscreen; setTimeout(() => { map.invalidateSize() }, 100)" :class="theme === 'light' ? 'bg-black/80 hover:bg-black text-white' : 'bg-black/90 hover:bg-[#C5A880]/20 hover:text-[#C5A880] border border-[#C5A880]/20'" class="absolute bottom-2.5 right-2.5 z-[20] px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-wider flex items-center space-x-1 shadow-md transition-all cursor-pointer">
+                                                    <span>Fullscreen Map</span>
                                                 </button>
-                                                <button type="button" @click="isFullscreen = false; setTimeout(() => { map.invalidateSize() }, 100)" class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl text-[10px] font-mono uppercase tracking-wider font-bold transition-all border border-neutral-700 shadow-md cursor-pointer">
-                                                    Close Fullscreen
-                                                </button>
+
+                                                <!-- Fullscreen Floating Controls -->
+                                                <div x-show="isFullscreen" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[10000] flex items-center gap-2 bg-neutral-950/80 border border-neutral-800 p-2.5 rounded-2xl backdrop-blur-md shadow-2xl">
+                                                    <button type="button" @click="isFullscreen = false; setTimeout(() => { map.invalidateSize() }, 100)" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-mono uppercase tracking-wider font-bold transition-all shadow-md cursor-pointer">
+                                                        Confirm Location
+                                                    </button>
+                                                    <button type="button" @click="isFullscreen = false; setTimeout(() => { map.invalidateSize() }, 100)" class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl text-[10px] font-mono uppercase tracking-wider font-bold transition-all border border-neutral-700 shadow-md cursor-pointer">
+                                                        Close Fullscreen
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
 
                             <button type="submit" :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-800' : 'bg-white text-black hover:bg-neutral-200'" class="w-full py-2.5 rounded-xl transition-all duration-300 font-bold uppercase cursor-pointer">
                                 Save Profile Changes
@@ -675,9 +705,33 @@
                             <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Reset Security Credentials</h4>
                             
                             @if(session('success_password'))
-                                <div class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl mb-3">{{ session('success_password') }}</div>
+                                <div x-data="{ show: true }"
+                                     x-show="show"
+                                     x-init="setTimeout(() => show = false, 5000)"
+                                     x-transition:enter="transition ease-out duration-300 transform"
+                                     x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave="transition ease-in duration-300 transform"
+                                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                                     class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl mb-3"
+                                >
+                                    {{ session('success_password') }}
+                                </div>
                             @elseif(session('error_password'))
-                                <div class="p-3 border border-dashed border-rose-850 bg-rose-950/20 text-rose-400 text-xs font-mono rounded-xl mb-3">{{ session('error_password') }}</div>
+                                <div x-data="{ show: true }"
+                                     x-show="show"
+                                     x-init="setTimeout(() => show = false, 5000)"
+                                     x-transition:enter="transition ease-out duration-300 transform"
+                                     x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave="transition ease-in duration-300 transform"
+                                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                     x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                                     class="p-3 border border-dashed border-rose-850 bg-rose-950/20 text-rose-400 text-xs font-mono rounded-xl mb-3"
+                                >
+                                    {{ session('error_password') }}
+                                </div>
                             @endif
 
                             <form wire:submit.prevent="updatePassword" class="space-y-4 text-xs font-mono">
@@ -730,7 +784,19 @@
                     </div>
 
                     @if(session('success_orders'))
-                        <div class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl">{{ session('success_orders') }}</div>
+                        <div x-data="{ show: true }"
+                             x-show="show"
+                             x-init="setTimeout(() => show = false, 5000)"
+                             x-transition:enter="transition ease-out duration-300 transform"
+                             x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave="transition ease-in duration-300 transform"
+                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                             class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl"
+                        >
+                            {{ session('success_orders') }}
+                        </div>
                     @endif
 
                     <!-- Status Filter Pills -->
@@ -1021,7 +1087,19 @@
                     </div>
 
                     @if(session('success_wishlist'))
-                        <div class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl">{{ session('success_wishlist') }}</div>
+                        <div x-data="{ show: true }"
+                             x-show="show"
+                             x-init="setTimeout(() => show = false, 5000)"
+                             x-transition:enter="transition ease-out duration-300 transform"
+                             x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave="transition ease-in duration-300 transform"
+                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                             class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl"
+                        >
+                            {{ session('success_wishlist') }}
+                        </div>
                     @endif
 
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -1080,7 +1158,19 @@
                         <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Personal Preferences</h4>
                         
                         @if(session('success_settings'))
-                            <div class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl">{{ session('success_settings') }}</div>
+                            <div x-data="{ show: true }"
+                                 x-show="show"
+                                 x-init="setTimeout(() => show = false, 5000)"
+                                 x-transition:enter="transition ease-out duration-300 transform"
+                                 x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave="transition ease-in duration-300 transform"
+                                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                                 class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl"
+                            >
+                                {{ session('success_settings') }}
+                            </div>
                         @endif
 
                         <div class="space-y-6 text-xs font-mono">
@@ -1124,6 +1214,7 @@
                             </div>
 
                             <!-- Corporate B2B Account Billing Details -->
+                            @if(auth()->check() && auth()->user()->account_tier === \App\Enums\UserRole::Corporate)
                             <div :class="theme === 'light' ? 'bg-neutral-50/60 border-neutral-200' : 'bg-neutral-900/30 border-neutral-800/80'" class="p-4 border rounded-2xl space-y-3.5 text-left">
                                 <span class="text-[10px] font-mono text-[#C5A880] uppercase tracking-wider block font-bold">&bull; Corporate Billing Account Details</span>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1137,6 +1228,7 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
 
                             <!-- Notification Toggles -->
                             <div class="space-y-3.5 text-left pt-2">
@@ -1188,7 +1280,19 @@
                     </div>
 
                     @if(session('success_logistics'))
-                        <div class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl">{{ session('success_logistics') }}</div>
+                        <div x-data="{ show: true }"
+                             x-show="show"
+                             x-init="setTimeout(() => show = false, 5000)"
+                             x-transition:enter="transition ease-out duration-300 transform"
+                             x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave="transition ease-in duration-300 transform"
+                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                             class="p-3 border border-dashed border-emerald-800 bg-emerald-950/20 text-emerald-400 text-xs font-mono rounded-xl"
+                        >
+                            {{ session('success_logistics') }}
+                        </div>
                     @endif
 
                     <div :class="theme === 'light' ? 'border-neutral-200 bg-white/45 shadow-sm' : 'border-neutral-900/60 bg-[#0C0C0E]/40 shadow-2xl'" class="border p-6 rounded-[32px] space-y-4 backdrop-blur-xl">
