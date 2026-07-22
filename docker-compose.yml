@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: noir-bloom-app
+    container_name: noir-bloom-app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      APP_KEY: base64:tRJ9wkpaME4WglvNXITB29W78wyKnynbH37dSYmP7wQ=
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: noir_bloom
+      DB_USERNAME: root
+      DB_PASSWORD: root_db_password
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: sync
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: noir-bloom-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: noir_bloom
+      MYSQL_ROOT_PASSWORD: root_db_password
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
