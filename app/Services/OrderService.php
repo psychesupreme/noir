@@ -91,13 +91,25 @@ class OrderService
                 TransmitEtimsInvoiceJob::dispatch($invoice)->afterCommit();
             }
 
-            // 5. Send Transactional Email Receipt
+            // 5. Send Transactional Email Receipt & Transactional SMS Alert
             if ($order->client && !empty($order->client->email)) {
                 try {
                     \Illuminate\Support\Facades\Mail::to($order->client->email)
                         ->queue(new \App\Mail\OrderReceiptMail($order));
-                } catch (\Exception $e) {
-                    Log::error("Failed to queue order receipt email for order #{$order->id}: " . $e->getMessage());
+                } catch (\Throwable $e) {
+                    Log::warning("Resend Email warning for order #{$order->id}: " . $e->getMessage());
+                }
+            }
+
+            if ($order->client && !empty($order->client->phone)) {
+                try {
+                    $smsService = app(\App\Services\AfricasTalkingService::class);
+                    $smsService->sendSms(
+                        $order->client->phone,
+                        "Your Noir & Bloom order #NB-ORD-" . str_pad($order->id, 4, '0', STR_PAD_LEFT) . " has been approved! Track status online."
+                    );
+                } catch (\Throwable $e) {
+                    Log::warning("Africa's Talking SMS warning for order #{$order->id}: " . $e->getMessage());
                 }
             }
 

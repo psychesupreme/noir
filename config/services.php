@@ -36,14 +36,17 @@ return [
     ],
 
     'mpesa' => [
-        'environment'  => env('MPESA_ENVIRONMENT', 'sandbox'),
-        'key'          => env('MPESA_CONSUMER_KEY'),
-        'secret'       => env('MPESA_CONSUMER_SECRET'),
-        'shortcode'    => env('MPESA_SHORTCODE', '174379'),
-        'passkey'      => env('MPESA_PASSKEY'),
-        'callback_url' => env('MPESA_CALLBACK_URL'),
-        'validate_ip'  => env('MPESA_VALIDATE_IP', false),
-        'allowed_ips'  => env('MPESA_ALLOWED_IPS', ''),
+        'env'             => env('MPESA_ENV', env('MPESA_ENVIRONMENT', 'sandbox')),
+        'environment'     => env('MPESA_ENV', env('MPESA_ENVIRONMENT', 'sandbox')),
+        'key'             => env('MPESA_CONSUMER_KEY'),
+        'consumer_key'    => env('MPESA_CONSUMER_KEY'),
+        'secret'          => env('MPESA_CONSUMER_SECRET'),
+        'consumer_secret' => env('MPESA_CONSUMER_SECRET'),
+        'shortcode'       => env('MPESA_SHORTCODE', '174379'),
+        'passkey'         => env('MPESA_PASSKEY'),
+        'callback_url'    => env('MPESA_CALLBACK_URL', 'https://noir-bloom-erp.fly.dev/api/v1/mpesa/callback'),
+        'validate_ip'     => env('MPESA_VALIDATE_IP', false),
+        'allowed_ips'     => env('MPESA_ALLOWED_IPS', ''),
     ],
 
     'google' => [
@@ -53,9 +56,18 @@ return [
     ],
 
     'africastalking' => [
-        'username' => env('AFRICASTALKING_USERNAME', 'sandbox'),
-        'api_key'  => env('AFRICASTALKING_API_KEY'),
-        'from'     => env('AFRICASTALKING_FROM', 'NOIRBLOOM'),
+        'username'  => env('AFRICASTALKING_USERNAME', 'sandbox'),
+        'api_key'   => env('AFRICASTALKING_API_KEY'),
+        'from'      => env('AFRICASTALKING_SENDER_ID', env('AFRICASTALKING_FROM', 'NOIRBLOOM')),
+        'sender_id' => env('AFRICASTALKING_SENDER_ID', env('AFRICASTALKING_FROM', 'NOIRBLOOM')),
+    ],
+
+    'etims' => [
+        'enabled'     => env('ETIMS_ENABLED', false),
+        'env'         => env('ETIMS_ENV', env('ETIMS_ENVIRONMENT', 'sandbox')),
+        'environment' => env('ETIMS_ENV', env('ETIMS_ENVIRONMENT', 'sandbox')),
+        'serial'      => env('ETIMS_DEVICE_SERIAL', 'MOCK-ESD-001'),
+        'pin'         => env('ETIMS_PIN', env('ETIMS_TAXPAYER_PIN', 'P000000000A')),
     ],
 
 ];
