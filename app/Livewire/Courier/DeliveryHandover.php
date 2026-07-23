@@ -34,9 +34,9 @@ class DeliveryHandover extends Component
 
         // Require photo if order is not already delivered and no photo uploaded yet
         if (!$this->isDelivered && !$this->order->pod_photo_path) {
-            $rules['photo'] = 'required|image|max:10240'; // max 10MB
+            $rules['photo'] = 'required|image|mimes:jpeg,png,jpg,webp|max:5120';
         } else {
-            $rules['photo'] = 'nullable|image|max:10240';
+            $rules['photo'] = 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120';
         }
 
         $this->validate($rules);

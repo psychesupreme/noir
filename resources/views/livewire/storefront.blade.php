@@ -1377,41 +1377,116 @@ if (!function_exists('toJsObject')) {
                     @endif
                 </div>
 
-                <!-- Deals, Offers & Discounts (Positioned directly underneath primary product cards grid) -->
+                <!-- Deals, Offers & Discounts Auto-Sliding Carousel -->
                 @if($offerProducts->count() > 0)
-                    <div class="w-full py-6 shrink-0 z-10 relative animate-layer-3 my-4">
-                        <div class="w-full py-4 border-y backdrop-blur-sm transition-colors duration-500 px-4 md:px-6 rounded-2xl border"
-                             :class="theme === 'light' ? 'bg-white/40 border-neutral-200/60' : 'bg-neutral-950/30 border-neutral-900/60'">
-                            <div class="flex items-center justify-between mb-3 px-2">
-                                <div class="text-[10px] uppercase tracking-widest text-[#C5A880] font-mono font-bold">Featured Deals, Discounts &amp; Special Offers</div>
-                                <span class="text-[9px] font-mono text-rose-500 font-semibold uppercase tracking-wider animate-pulse">Limited Stock Savings</span>
+                    <div class="w-full py-8 shrink-0 z-10 relative animate-layer-3 my-6">
+                        <div class="w-full py-6 border-y backdrop-blur-xl transition-colors duration-500 px-4 md:px-8 rounded-3xl border bg-zinc-950/40 border-amber-500/20 shadow-2xl">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3 px-2">
+                                <div>
+                                    <h3 class="text-xl sm:text-2xl font-serif tracking-wide text-zinc-100 font-semibold flex items-center gap-2">
+                                        <span>Exclusive Deals &amp; Luxury Special Offers</span>
+                                        <span class="text-amber-400 text-lg">✨</span>
+                                    </h3>
+                                    <p class="text-xs text-neutral-400 font-sans mt-1 font-light">Bespoke arrangements, rare flora, and artisan gifts at preferred rates.</p>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-mono text-rose-400 font-semibold uppercase tracking-wider px-3.5 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 animate-pulse">
+                                        Limited Time Savings
+                                    </span>
+                                </div>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                                @foreach($offerProducts as $product)
-                                    @php
-                                        $originalPrice = (int) round($product->price * 1.18);
-                                        $discountPercent = 15;
-                                    @endphp
-                                    <div :class="theme === 'light' ? 'bg-white/80 border-neutral-200/50 text-neutral-900 shadow-sm' : 'bg-[#0F0F12]/80 border-neutral-900/60 text-white'"
-                                         class="flex items-center space-x-3 p-3 rounded-xl border transition-all duration-300 hover:border-[#C5A880] cursor-pointer theme-section hover:-translate-y-0.5 hover:shadow-md w-full select-none"
-                                         @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
-                                    >
-                                        <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-950/5 relative">
-                                            <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover" loading="lazy">
-                                            <div class="absolute top-0.5 left-0.5 bg-rose-600 text-white text-[7px] font-bold px-1 py-0.5 rounded-sm shadow-sm">
-                                                -{{ $discountPercent }}% OFF
+
+                            <!-- Auto-sliding Carousel Engine -->
+                            <div x-data="{ 
+                                     activeIndex: 0, 
+                                     total: {{ $offerProducts->count() }}, 
+                                     timer: null, 
+                                     startAutoplay() { 
+                                         if (this.timer) clearInterval(this.timer);
+                                         this.timer = setInterval(() => { this.next(); }, 4000); 
+                                     },
+                                     stopAutoplay() { 
+                                         if (this.timer) clearInterval(this.timer); 
+                                     },
+                                     next() {
+                                         this.activeIndex = (this.activeIndex + 1) % this.total;
+                                     },
+                                     prev() {
+                                         this.activeIndex = (this.activeIndex - 1 + this.total) % this.total;
+                                     }
+                                 }" 
+                                 x-init="startAutoplay()"
+                                 @mouseenter="stopAutoplay()" 
+                                 @mouseleave="startAutoplay()"
+                                 class="relative w-full overflow-hidden group rounded-2xl p-2"
+                            >
+                                <div class="flex transition-transform duration-700 ease-in-out gap-6"
+                                     :style="'transform: translateX(-' + (activeIndex * 320) + 'px)'">
+                                    @foreach($offerProducts as $product)
+                                        @php
+                                            $originalPrice = (int) round($product->price * 1.18);
+                                            $discountPercent = 15;
+                                        @endphp
+                                        <div @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
+                                             class="w-72 h-72 sm:w-80 sm:h-80 aspect-square rounded-2xl overflow-hidden relative group/card border border-amber-500/20 bg-zinc-900 shrink-0 cursor-pointer shadow-xl transition-all duration-500 hover:border-amber-400/50 hover:shadow-amber-500/10 hover:-translate-y-1 select-none"
+                                        >
+                                            <img src="{{ $product->backdrop_url }}" 
+                                                 alt="{{ $product->name }}" 
+                                                 loading="lazy" 
+                                                 decoding="async" 
+                                                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'600\' viewBox=\'0 0 600 600\'><rect width=\'100%\' height=\'100%\' fill=\'%2318181b\'/><path d=\'M300 200 C320 260 380 280 380 320 C380 360 340 400 300 400 C260 400 220 360 220 320 C220 280 280 260 300 200 Z\' fill=\'%23d4af37\' opacity=\'0.3\'/></svg>';" 
+                                                 class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" />
+                                            
+                                            <!-- Gold/Rose Discount Badge -->
+                                            <div class="absolute top-3 left-3 z-20 flex flex-col gap-1">
+                                                <span class="bg-gradient-to-r from-rose-600 to-amber-600 text-white text-xs font-mono font-bold px-3 py-1 rounded-full shadow-lg border border-white/20">
+                                                    -{{ $discountPercent }}% OFF
+                                                </span>
+                                                <span class="bg-black/70 backdrop-blur-md text-amber-300 text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-full border border-amber-500/30">
+                                                    SPECIAL OFFER
+                                                </span>
+                                            </div>
+
+                                            <!-- Card Info Overlay -->
+                                            <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-5 transition-opacity duration-300">
+                                                <span class="text-[9px] uppercase tracking-widest text-amber-400 font-mono font-bold block">{{ str_replace('_', ' ', $product->category) }}</span>
+                                                <h4 class="font-serif tracking-wide text-zinc-100 text-base sm:text-lg font-semibold truncate mt-1 group-hover/card:text-amber-300 transition-colors">{{ $product->name }}</h4>
+                                                
+                                                <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+                                                    <div class="flex items-baseline space-x-2 font-sans">
+                                                        <span class="text-xs text-neutral-400 line-through font-mono">{{ number_format($originalPrice) }} KSH</span>
+                                                        <span class="text-sm font-semibold text-amber-400 font-sans tracking-tight">{{ number_format($product->price) }} KSH</span>
+                                                    </div>
+                                                    <button type="button" class="px-3.5 py-1.5 rounded-full text-[10px] font-sans uppercase font-bold tracking-wider bg-amber-500 text-black hover:bg-amber-400 transition-all shadow-md">
+                                                        View Deal
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="flex-1 min-w-0 text-left whitespace-normal font-sans">
-                                            <span class="text-[8px] uppercase tracking-widest text-[#C5A880] font-outfit block font-bold">{{ str_replace('_', ' ', $product->category) }}</span>
-                                            <h4 class="font-serif italic text-xs tracking-wide truncate mt-0.5">{{ $product->name }}</h4>
-                                            <div class="flex items-center space-x-2 mt-0.5 font-mono text-[9px]">
-                                                <span class="text-neutral-505 line-through">{{ number_format($originalPrice) }} KSH</span>
-                                                <span class="text-amber-500 font-bold">{{ number_format($product->price) }} KSH</span>
-                                            </div>
-                                        </div>
+                                    @endforeach
+                                </div>
+
+                                <!-- Slider Controls & Indicators -->
+                                <div class="flex items-center justify-between mt-6 px-2">
+                                    <div class="flex items-center space-x-2">
+                                        <template x-for="i in total" :key="i">
+                                            <button @click="activeIndex = i - 1"
+                                                    :class="activeIndex === (i - 1) ? 'w-6 bg-amber-400' : 'w-2 bg-neutral-600 hover:bg-neutral-400'"
+                                                    class="h-2 rounded-full transition-all duration-300 cursor-pointer focus:outline-none"
+                                                    :title="'Go to slide ' + i">
+                                            </button>
+                                        </template>
                                     </div>
-                                @endforeach
+                                    
+                                    <div class="flex items-center space-x-3">
+                                        <button @click="prev()" class="w-8 h-8 rounded-full border border-neutral-700 bg-zinc-900 text-neutral-300 hover:text-amber-400 hover:border-amber-500/50 flex items-center justify-center transition-all cursor-pointer shadow-md">
+                                            &larr;
+                                        </button>
+                                        <button @click="next()" class="w-8 h-8 rounded-full border border-neutral-700 bg-zinc-900 text-neutral-300 hover:text-amber-400 hover:border-amber-500/50 flex items-center justify-center transition-all cursor-pointer shadow-md">
+                                            &rarr;
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

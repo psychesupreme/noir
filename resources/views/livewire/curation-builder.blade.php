@@ -241,7 +241,7 @@
         <!-- Left Panel: Fixed Visual Anchor & Invoice Summary (Locked on Desktop) -->
         <div x-data="{ showTopPreviewMobile: false }"
              :class="showTopPreviewMobile ? 'h-auto' : 'h-auto lg:h-[calc(100vh-8rem)]'"
-             class="w-full lg:w-5/12 lg:sticky lg:top-28 lg:max-h-[760px] lg:min-h-[580px] lg:overflow-y-auto scrollbar-none rounded-3xl border border-neutral-800/20 relative flex flex-col justify-between p-4 sm:p-6 bg-black/10 backdrop-blur-md shadow-2xl transition-all duration-300">
+             class="w-full lg:w-5/12 lg:sticky lg:top-28 sm:lg:top-32 z-30 lg:max-h-[760px] lg:min-h-[580px] lg:overflow-y-auto scrollbar-none my-6 lg:my-8 max-w-md mx-auto lg:max-w-none bg-zinc-900/90 backdrop-blur-xl border border-amber-500/20 rounded-3xl p-6 shadow-2xl shadow-black/50 relative flex flex-col justify-between transition-all duration-300">
             
             <!-- Mobile Toggle Header (Visible only on Mobile) -->
             <div class="lg:hidden flex items-center justify-between cursor-pointer select-none py-1" @click="showTopPreviewMobile = !showTopPreviewMobile">
