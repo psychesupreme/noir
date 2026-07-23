@@ -1,16 +1,9 @@
-@php
-    $initialTheme = 'light';
-    if (auth()->check()) {
-        $pref = auth()->user()->settings['preferred_theme'] ?? 'light';
-        $initialTheme = ($pref === 'onyx' || $pref === 'dark') ? 'dark' : 'light';
-    }
-@endphp
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ $initialTheme }}" data-theme="{{ $initialTheme }}">
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark h-full bg-zinc-950">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0B0B0D" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#FAF7F0" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#09090b">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
@@ -95,32 +88,8 @@
     <!-- Tailwind CSS v4 Build Layer & Livewire Asset Core -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
-
-    <!-- Persistent Theme Bootstrap -->
-    <script>
-        (function() {
-            let theme = 'light';
-            const storedTheme = localStorage.getItem('nb_theme');
-            if (storedTheme === 'dark' || storedTheme === 'light') {
-                theme = storedTheme;
-            } else {
-                @auth
-                    const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
-                    theme = (pref === 'onyx' || pref === 'dark') ? 'dark' : 'light';
-                @else
-                    theme = 'light';
-                @endauth
-            }
-            document.documentElement.className = theme;
-            document.documentElement.setAttribute('data-theme', theme);
-            const bgColors = { 'dark': '#0A0908', 'light': '#FAF7F0' };
-            const textColors = { 'dark': '#E4E4E7', 'light': '#1C1C20' };
-            if (bgColors[theme]) document.documentElement.style.backgroundColor = bgColors[theme];
-            if (textColors[theme]) document.documentElement.style.color = textColors[theme];
-        })();
-    </script>
 </head>
-<body class="bg-bg-base text-text-primary antialiased font-sans transition-colors duration-500 selection:bg-rose-950 selection:text-rose-200">
+<body class="bg-zinc-950 text-zinc-100 font-sans antialiased min-h-screen selection:bg-amber-900 selection:text-amber-100">
 
     <!-- Livewire 3 injects your full-page component directly here -->
     {{ $slot }}

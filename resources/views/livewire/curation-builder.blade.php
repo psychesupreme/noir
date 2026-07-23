@@ -236,260 +236,13 @@
     </header>
 
     <!-- Main split workspace -->
-    <main class="flex-1 pt-28 pb-32 px-4 md:px-6 z-10 flex flex-col lg:flex-row lg:items-start gap-6 max-w-7xl mx-auto w-full">
-        
-        <!-- Left Panel: Fixed Visual Anchor & Invoice Summary (Locked on Desktop) -->
-        <div x-data="{ showTopPreviewMobile: false }"
-             :class="showTopPreviewMobile ? 'h-auto' : 'h-auto lg:h-[calc(100vh-8rem)]'"
-             class="w-full lg:w-5/12 lg:sticky lg:top-28 sm:lg:top-32 z-30 lg:max-h-[760px] lg:min-h-[580px] lg:overflow-y-auto scrollbar-none my-6 lg:my-8 max-w-md mx-auto lg:max-w-none bg-zinc-900/90 backdrop-blur-xl border border-amber-500/20 rounded-3xl p-6 shadow-2xl shadow-black/50 relative flex flex-col justify-between transition-all duration-300">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-32 z-10 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            <!-- Mobile Toggle Header (Visible only on Mobile) -->
-            <div class="lg:hidden flex items-center justify-between cursor-pointer select-none py-1" @click="showTopPreviewMobile = !showTopPreviewMobile">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl overflow-hidden bg-black/40 border border-neutral-800/40 flex items-center justify-center shrink-0">
-                        <img :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage()) || 'data:image/svg+xml;charset=utf-8,%3Csvg xmlns%3D%27http%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%27 width%3D%27256%27 height%3D%27256%27 viewBox%3D%270 0 256 256%27%3E%3Crect width%3D%27100%25%27 height%3D%27100%25%27 fill%3D%27%230E0E12%27%2F%3E%3Ctext x%3D%2750%25%27 y%3D%2750%25%27 dominant-baseline%3D%27middle%27 text-anchor%3D%27middle%27 fill%3D%27%23C5A880%27 font-size%3D%2724%27%3E%E2%9C%A8%3C%2Ftext%3E%3C%2Fsvg%3E'" 
-                             class="w-full h-full object-cover">
-                    </div>
-                    <div class="text-left">
-                        <span class="text-[9px] font-mono text-[#C5A880] uppercase tracking-widest block font-bold">Curation Desk</span>
-                        <span class="text-xs font-bold text-white font-mono" x-text="subtotal.toLocaleString() + ' KSH'"></span>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <span class="text-[9px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-[#C5A880]" x-text="showTopPreviewMobile ? 'Hide Preview' : 'Show Preview'"></span>
-                </div>
-            </div>
-
-            <!-- Content Container (Always visible on desktop, toggleable on mobile) -->
-            <div :class="showTopPreviewMobile ? 'block' : 'hidden lg:block'" class="mt-4 lg:mt-0 space-y-4 flex-grow flex flex-col justify-between">
-                <div class="space-y-4">
-                <!-- Visual Preview Header -->
-                <div class="z-20 flex justify-between items-center w-full">
-                    <span class="text-[10px] font-mono tracking-widest text-[#C5A880] uppercase">Visual Preview</span>
-                    <div class="flex bg-black/45 border border-neutral-800/50 p-1 rounded-full text-[9px] font-mono">
-                        <button @click="viewMode = 'arrangement'" :class="viewMode === 'arrangement' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-3 py-1 rounded-full transition-all cursor-pointer">Flowers</button>
-                        <button @click="viewMode = 'presentation'" :class="viewMode === 'presentation' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-3 py-1 rounded-full transition-all cursor-pointer">Wrapping</button>
-                        <button @click="viewMode = 'note'" :class="viewMode === 'note' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-3 py-1 rounded-full transition-all cursor-pointer">Note</button>
-                    </div>
-                </div>
-
-                <!-- Preview Image Display -->
-                <div class="w-full h-[320px] rounded-2xl border border-neutral-800/10 overflow-hidden relative flex items-center justify-center bg-black/20 shadow-inner">
-                    <!-- Empty Desk State -->
-                    <div x-show="isCurationEmpty() && !hoveredImage && viewMode !== 'note'" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 transition-all duration-500">
-                        <div class="w-12 h-12 rounded-full border border-neutral-850 flex items-center justify-center mb-4 bg-white/5 backdrop-blur-sm">
-                            <span class="text-xl">✨</span>
-                        </div>
-                        <span class="text-xs font-mono tracking-widest text-[#C5A880] uppercase font-bold">Curation Desk Empty</span>
-                        <p class="text-[10px] text-neutral-450 mt-2 max-w-[220px] leading-relaxed">Select fresh blooms or packaging options to begin designing your signature arrangement.</p>
-                    </div>
-
-                    <!-- Blurred Background Layer for Rich depth -->
-                    <div x-show="(!isCurationEmpty() || hoveredImage) && viewMode !== 'note'" class="absolute inset-0 scale-110 blur-xl opacity-30 pointer-events-none transition-all duration-500">
-                        <img :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage())" alt="" class="w-full h-full object-cover">
-                    </div>
-                    
-                    <!-- Centered Contained Image -->
-                    <img x-show="(!isCurationEmpty() || hoveredImage) && viewMode !== 'note'" :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage())" alt="Preview" class="relative z-10 w-full h-full object-contain p-4 transition-all duration-500">
-                    
-                    <!-- Hovered Item Label Overlay -->
-                    <div x-show="hoveredName && viewMode !== 'note'" x-transition class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-mono tracking-widest text-[#C5A880] uppercase z-20 border border-neutral-800/50">
-                        Viewing: <span class="text-white" x-text="hoveredName"></span>
-                    </div>
-
-                    <!-- Note Preview Card -->
-                    <div x-show="viewMode === 'note'" x-transition.opacity class="absolute inset-0 z-20 flex items-center justify-center p-6 bg-[#070709]/80 backdrop-blur-md">
-                        <div class="w-full max-w-[260px] h-[190px] rounded-lg shadow-[0_15px_30px_rgba(0,0,0,0.5)] p-4 border flex flex-col justify-between transition-all duration-300"
-                             :class="{
-                                 'bg-[#FAF8F5] border-[#C5A880]/30 text-neutral-800': $wire.cardPrintPreference === 'handwritten',
-                                 'bg-white border-neutral-200 text-neutral-900': $wire.cardPrintPreference === 'typography'
-                             }">
-                            <div class="w-full h-full border border-dashed border-[#C5A880]/20 p-2 flex flex-col justify-between relative overflow-hidden">
-                                <!-- Card Header/Logo -->
-                                <div class="text-center">
-                                    <span class="text-[8px] font-mono tracking-[0.3em] uppercase text-[#C5A880]/80">Noir & Bloom</span>
-                                    <div class="w-8 h-[1px] bg-[#C5A880]/30 mx-auto mt-0.5"></div>
-                                </div>
-                                
-                                <!-- Card Message -->
-                                <div class="flex-1 flex items-center justify-center text-center px-1 overflow-y-auto min-h-0">
-                                    <template x-if="!hasCard">
-                                        <p class="text-[9px] text-neutral-400 font-mono uppercase tracking-wider">Greeting Card Disabled</p>
-                                    </template>
-                                    <template x-if="hasCard && (!cardMessage || cardMessage.trim() === '')">
-                                        <p class="text-[10px] text-neutral-400 italic">Write your premium message...</p>
-                                    </template>
-                                    <template x-if="hasCard && cardMessage && cardMessage.trim() !== ''">
-                                        <p class="text-sm leading-relaxed break-words max-h-full overflow-y-auto"
-                                           :style="$wire.cardPrintPreference === 'handwritten' ? 'font-family: \'Great Vibes\', \'Georgia\', cursive; font-size: 17px; color: #1c1917;' : 'font-family: \'Playfair Display\', \'Georgia\', serif; font-size: 11px; color: #1c1917;'">
-                                            <span x-text="cardMessage"></span>
-                                        </p>
-                                    </template>
-                                </div>
-
-                                <!-- Card Footer Decor -->
-                                <div class="text-center text-[7px] font-mono tracking-widest text-[#C5A880]/50 uppercase">
-                                    Bespoke Curation
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Atelier Receipt Ledger -->
-                <div class="border-t border-neutral-800/30 pt-4 space-y-3">
-                    <span class="text-[9px] uppercase tracking-[0.2em] font-mono text-[#C5A880] block font-bold">Atelier Curation Ledger</span>
-                    
-                    <div class="space-y-1.5 text-xs font-light max-h-[160px] lg:max-h-[220px] overflow-y-auto pr-1 scrollbar-none my-2">
-                        <!-- Locked Hand Curation Service Fee -->
-                        <div class="flex justify-between items-center text-neutral-300 py-1.5 border-b border-neutral-800/10 hover:bg-white/5 px-2 rounded transition-colors">
-                            <div class="flex items-center space-x-2 truncate">
-                                <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
-                                <span class="text-xs truncate font-medium">Atelier Hand Curation Service</span>
-                            </div>
-                            <div class="flex items-center space-x-2 shrink-0">
-                                <span class="font-mono text-neutral-400 text-xs">{{ number_format($this->curationFee) }} KSH</span>
-                                <span class="text-neutral-600 text-[10px] ml-1 select-none cursor-not-allowed" title="Required service fee">🔒</span>
-                            </div>
-                        </div>
-
-                        <!-- Curation Occasion -->
-                        <div class="flex justify-between items-center text-neutral-300 py-1.5 border-b border-neutral-800/10 hover:bg-white/5 px-2 rounded transition-colors">
-                            <div class="flex items-center space-x-2 truncate">
-                                <span class="text-xs truncate font-medium">Occasion: <span class="font-semibold text-[#C5A880]" x-text="getOccasionLabel()"></span></span>
-                            </div>
-                            <div class="flex items-center space-x-2 shrink-0">
-                                <span class="text-neutral-500 text-[10px] italic">Included</span>
-                            </div>
-                        </div>
-                        <!-- Stems items -->
-                        <template x-for="(qty, id) in localStems" :key="id">
-                            <div x-show="qty > 0" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
-                                <div class="flex items-center space-x-2 truncate">
-                                    <div class="flex items-center bg-black/40 rounded-full border border-neutral-800/50 p-0.5 space-x-1 shrink-0">
-                                        <button @click="$wire.adjustStemQuantity(id, -1)" class="w-4 h-4 rounded-full hover:bg-[#C5A880] hover:text-black text-neutral-400 flex items-center justify-center text-[9px] transition-all cursor-pointer font-bold select-none border border-neutral-700/20">-</button>
-                                        <span class="font-mono text-[#C5A880] text-[10px] font-bold px-1" x-text="qty"></span>
-                                        <button @click="$wire.adjustStemQuantity(id, 1)" class="w-4 h-4 rounded-full hover:bg-[#C5A880] hover:text-black text-neutral-400 flex items-center justify-center text-[9px] transition-all cursor-pointer font-bold select-none border border-neutral-700/20">+</button>
-                                    </div>
-                                    <span class="text-xs truncate font-medium" x-text="getStemName(id)"></span>
-                                </div>
-                                <div class="flex items-center space-x-2 shrink-0">
-                                    <span class="font-mono text-neutral-400 text-xs" x-text="(getStemPrice(id) * qty).toLocaleString() + ' KSH'"></span>
-                                    <button @click="$wire.adjustStemQuantity(id, -qty)" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- Wrapping -->
-                        <div x-show="selectedWrappingId" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
-                            <div class="flex items-center space-x-2 truncate">
-                                <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
-                                <span class="text-xs truncate font-medium" x-text="getWrappingName()"></span>
-                            </div>
-                            <div class="flex items-center space-x-2 shrink-0">
-                                <span class="font-mono text-neutral-400 text-xs" x-text="getWrappingPrice().toLocaleString() + ' KSH'"></span>
-                                <button type="button" @click="$wire.selectWrapping(null)" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
-                            </div>
-                        </div>
-
-                        <!-- Glitter Accent -->
-                        <div x-show="hasGlitter" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
-                            <div class="flex items-center space-x-2 truncate">
-                                <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
-                                <span class="text-xs truncate font-medium">Glitter Petal Dusting</span>
-                            </div>
-                            <div class="flex items-center space-x-2 shrink-0">
-                                <span class="font-mono text-neutral-400 text-xs" x-text="(400).toLocaleString() + ' KSH'"></span>
-                                <button @click="$wire.toggleGlitter()" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
-                            </div>
-                        </div>
-
-                        <!-- Ribbon Accent -->
-                        <div x-show="selectedRibbonId" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
-                            <div class="flex items-center space-x-2 truncate">
-                                <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
-                                <span class="text-xs truncate font-medium" x-text="getRibbonName() + ' Ribbon'"></span>
-                            </div>
-                            <div class="flex items-center space-x-2 shrink-0">
-                                <span class="font-mono text-neutral-400 text-xs" x-text="getRibbonPrice().toLocaleString() + ' KSH'"></span>
-                                <button @click="$wire.selectRibbon(selectedRibbonId)" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
-                            </div>
-                        </div>
-
-                        <!-- Scent Mist -->
-                        <div x-show="selectedMistId" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
-                            <div class="flex items-center space-x-2 truncate">
-                                <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
-                                <span class="text-xs truncate font-medium" x-text="'Fragrance Mist (' + getMistName() + ')'"></span>
-                            </div>
-                            <div class="flex items-center space-x-2 shrink-0">
-                                <span class="font-mono text-neutral-400 text-xs" x-text="getMistPrice().toLocaleString() + ' KSH'"></span>
-                                <button @click="$wire.selectMist(selectedMistId)" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
-                            </div>
-                        </div>
-
-                        <!-- Gifts / Treats -->
-                        <template x-for="(qty, id) in localGifts" :key="'gift-'+id">
-                            <div x-show="qty > 0" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
-                                <div class="flex items-center space-x-2 truncate">
-                                    <div class="flex items-center bg-black/40 rounded-full border border-neutral-800/50 p-0.5 space-x-1 shrink-0">
-                                        <button @click="$wire.adjustGiftQuantity(id, -1)" class="w-4 h-4 rounded-full hover:bg-[#C5A880] hover:text-black text-neutral-400 flex items-center justify-center text-[9px] transition-all cursor-pointer font-bold select-none border border-neutral-700/20">-</button>
-                                        <span class="font-mono text-[#C5A880] text-[10px] font-bold px-1" x-text="qty"></span>
-                                        <button @click="$wire.adjustGiftQuantity(id, 1)" class="w-4 h-4 rounded-full hover:bg-[#C5A880] hover:text-black text-neutral-400 flex items-center justify-center text-[9px] transition-all cursor-pointer font-bold select-none border border-neutral-700/20">+</button>
-                                    </div>
-                                    <span class="text-xs truncate font-medium" x-text="getGiftName(id)"></span>
-                                </div>
-                                <div class="flex items-center space-x-2 shrink-0">
-                                    <span class="font-mono text-neutral-400 text-xs" x-text="(getGiftPrice(id) * qty).toLocaleString() + ' KSH'"></span>
-                                    <button @click="$wire.adjustGiftQuantity(id, -qty)" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- Greeting Calligraphy Note -->
-                        <div x-show="hasCard" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
-                            <div class="flex items-center space-x-2 truncate">
-                                <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
-                                <span class="text-xs truncate font-medium">Calligraphy Card Note</span>
-                            </div>
-                            <div class="flex items-center space-x-2 shrink-0">
-                                <span class="font-mono text-neutral-400 text-xs" x-text="(500).toLocaleString() + ' KSH'"></span>
-                                <button @click="$wire.toggleCard()" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Note text preview -->
-                    <div x-show="hasCard && cardMessage.trim().length > 0" class="bg-amber-950/10 border border-amber-900/20 p-2.5 rounded-lg text-[10px] text-neutral-400 italic font-mono max-h-[60px] overflow-y-auto">
-                        "&ldquo;<span x-text="cardMessage"></span>&rdquo;"
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer Details & Add to Cart -->
-            <div class="border-t border-neutral-800/30 pt-4 mt-4 space-y-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <span class="text-[9px] uppercase tracking-wider text-neutral-450 block font-mono">Total Bouquet Value</span>
-                        <span class="text-xl md:text-2xl font-mono font-semibold tracking-tight text-[#C5A880]">
-                            <span x-text="subtotal.toLocaleString()"></span> KSH
-                        </span>
-                    </div>
-                    <button 
-                        wire:click="addToCart" 
-                        class="px-6 py-3 rounded-full bg-white text-black hover:bg-neutral-200 transition-all duration-300 shadow-md font-semibold tracking-widest uppercase text-[10px] cursor-pointer select-none"
-                    >
-                        Add to Cart
-                    </button>
-                </div>
-            </div>
-            </div>
-        </div>
-
-        <!-- Right Panel: Scrollable Configuration flow -->
-        <div class="w-full lg:w-7/12 space-y-12">
+            <!-- Left Panel: Selection Steps (Stems, Wrappings, Mists, Add-ons) -->
+            <div class="lg:col-span-7 xl:col-span-8 space-y-8 w-full">
             
-            <!-- Floating Navigation Quick-links -->
+            <!-- Selection Steps Quicklinks Header -->
             <div :class="theme === 'light' ? 'bg-[#FAF7F0]/90 border-neutral-200 shadow-sm' : 'bg-[#09090D]/90 border-neutral-800/60 shadow-xl'" class="sticky top-24 backdrop-blur-md border p-1 rounded-full z-40 flex items-center justify-between text-[9px] font-mono tracking-widest uppercase overflow-x-auto scrollbar-none gap-1">
                 <button 
                     @click="scrollToSection('section-occasion')" 
@@ -1268,7 +1021,257 @@
         </div>
     </div>
 
-    <!-- Mobile Ledger Drawer Overlay -->
+    <!-- Right Panel: Floating Sticky Curation Desk -->
+    <div class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-28 z-30 w-full">
+        <div x-data="{ showTopPreviewMobile: false }"
+             class="w-full rounded-3xl border border-amber-500/20 bg-zinc-900/90 backdrop-blur-xl p-6 shadow-2xl shadow-black/50 relative flex flex-col justify-between transition-all duration-300">
+            
+            <!-- Mobile Toggle Header (Visible only on Mobile) -->
+            <div class="lg:hidden flex items-center justify-between cursor-pointer select-none py-1" @click="showTopPreviewMobile = !showTopPreviewMobile">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl overflow-hidden bg-black/40 border border-neutral-800/40 flex items-center justify-center shrink-0">
+                        <img :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage()) || 'data:image/svg+xml;charset=utf-8,%3Csvg xmlns%3D%27http%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%27 width%3D%27256%27 height%3D%27256%27 viewBox%3D%270 0 256 256%27%3E%3Crect width%3D%27100%25%27 height%3D%27100%25%27 fill%3D%27%230E0E12%27%2F%3E%3Ctext x%3D%2750%25%27 y%3D%2750%25%27 dominant-baseline%3D%27middle%27 text-anchor%3D%27middle%27 fill%3D%27%23C5A880%27 font-size%3D%2724%27%3E%E2%9C%A8%3C%2Ftext%3E%3C%2Fsvg%3E'" 
+                             class="w-full h-full object-cover">
+                    </div>
+                    <div class="text-left">
+                        <span class="text-[9px] font-mono text-[#C5A880] uppercase tracking-widest block font-bold">Curation Desk</span>
+                        <span class="text-xs font-bold text-white font-mono" x-text="subtotal.toLocaleString() + ' KSH'"></span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-[9px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-[#C5A880]" x-text="showTopPreviewMobile ? 'Hide Preview' : 'Show Preview'"></span>
+                </div>
+            </div>
+
+            <!-- Content Container (Always visible on desktop, toggleable on mobile) -->
+            <div :class="showTopPreviewMobile ? 'block' : 'hidden lg:block'" class="mt-4 lg:mt-0 space-y-4 flex-grow flex flex-col justify-between">
+                <div class="space-y-4">
+                    <!-- Visual Preview Header -->
+                    <div class="z-20 flex justify-between items-center w-full">
+                        <span class="text-[10px] font-mono tracking-widest text-[#C5A880] uppercase">Visual Preview</span>
+                        <div class="flex bg-black/45 border border-neutral-800/50 p-1 rounded-full text-[9px] font-mono">
+                            <button @click="viewMode = 'arrangement'" :class="viewMode === 'arrangement' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-3 py-1 rounded-full transition-all cursor-pointer">Flowers</button>
+                            <button @click="viewMode = 'presentation'" :class="viewMode === 'presentation' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-3 py-1 rounded-full transition-all cursor-pointer">Wrapping</button>
+                            <button @click="viewMode = 'note'" :class="viewMode === 'note' ? 'bg-[#C5A880] text-black font-bold' : 'text-neutral-400 hover:text-white'" class="px-3 py-1 rounded-full transition-all cursor-pointer">Note</button>
+                        </div>
+                    </div>
+
+                    <!-- Preview Image Display -->
+                    <div class="w-full h-[320px] rounded-2xl border border-neutral-800/10 overflow-hidden relative flex items-center justify-center bg-black/20 shadow-inner">
+                        <!-- Empty Desk State -->
+                        <div x-show="isCurationEmpty() && !hoveredImage && viewMode !== 'note'" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 transition-all duration-500">
+                            <div class="w-12 h-12 rounded-full border border-neutral-850 flex items-center justify-center mb-4 bg-white/5 backdrop-blur-sm">
+                                <span class="text-xl">✨</span>
+                            </div>
+                            <span class="text-xs font-mono tracking-widest text-[#C5A880] uppercase font-bold">Curation Desk Empty</span>
+                            <p class="text-[10px] text-neutral-450 mt-2 max-w-[220px] leading-relaxed">Select fresh blooms or packaging options to begin designing your signature arrangement.</p>
+                        </div>
+
+                        <!-- Blurred Background Layer for Rich depth -->
+                        <div x-show="(!isCurationEmpty() || hoveredImage) && viewMode !== 'note'" class="absolute inset-0 scale-110 blur-xl opacity-30 pointer-events-none transition-all duration-500">
+                            <img :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage())" alt="" class="w-full h-full object-cover">
+                        </div>
+                        
+                        <!-- Centered Contained Image -->
+                        <img x-show="(!isCurationEmpty() || hoveredImage) && viewMode !== 'note'" :src="hoveredImage || (viewMode === 'arrangement' ? getStemImage() : getWrapImage())" alt="Preview" class="relative z-10 w-full h-full object-contain p-4 transition-all duration-500">
+                        
+                        <!-- Hovered Item Label Overlay -->
+                        <div x-show="hoveredName && viewMode !== 'note'" x-transition class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-mono tracking-widest text-[#C5A880] uppercase z-20 border border-neutral-800/50">
+                            Viewing: <span class="text-white" x-text="hoveredName"></span>
+                        </div>
+
+                        <!-- Note Preview Card -->
+                        <div x-show="viewMode === 'note'" x-transition.opacity class="absolute inset-0 z-20 flex items-center justify-center p-6 bg-[#070709]/80 backdrop-blur-md">
+                            <div class="w-full max-w-[260px] h-[190px] rounded-lg shadow-[0_15px_30px_rgba(0,0,0,0.5)] p-4 border flex flex-col justify-between transition-all duration-300"
+                                 :class="{
+                                     'bg-[#FAF8F5] border-[#C5A880]/30 text-neutral-800': $wire.cardPrintPreference === 'handwritten',
+                                     'bg-white border-neutral-200 text-neutral-900': $wire.cardPrintPreference === 'typography'
+                                 }">
+                                <div class="w-full h-full border border-dashed border-[#C5A880]/20 p-2 flex flex-col justify-between relative overflow-hidden">
+                                    <!-- Card Header/Logo -->
+                                    <div class="text-center">
+                                        <span class="text-[8px] font-mono tracking-[0.3em] uppercase text-[#C5A880]/80">Noir &amp; Bloom</span>
+                                        <div class="w-8 h-[1px] bg-[#C5A880]/30 mx-auto mt-0.5"></div>
+                                    </div>
+                                    
+                                    <!-- Card Message -->
+                                    <div class="flex-1 flex items-center justify-center text-center px-1 overflow-y-auto min-h-0">
+                                        <template x-if="!hasCard">
+                                            <p class="text-[9px] text-neutral-400 font-mono uppercase tracking-wider">Greeting Card Disabled</p>
+                                        </template>
+                                        <template x-if="hasCard && (!cardMessage || cardMessage.trim() === '')">
+                                            <p class="text-[10px] text-neutral-400 italic">Write your premium message...</p>
+                                        </template>
+                                        <template x-if="hasCard && cardMessage && cardMessage.trim() !== ''">
+                                            <p class="text-sm leading-relaxed break-words max-h-full overflow-y-auto"
+                                               :style="$wire.cardPrintPreference === 'handwritten' ? 'font-family: \'Great Vibes\', \'Georgia\', cursive; font-size: 17px; color: #1c1917;' : 'font-family: \'Playfair Display\', \'Georgia\', serif; font-size: 11px; color: #1c1917;'">
+                                                <span x-text="cardMessage"></span>
+                                            </p>
+                                        </template>
+                                    </div>
+
+                                    <!-- Card Footer Decor -->
+                                    <div class="text-center text-[7px] font-mono tracking-widest text-[#C5A880]/50 uppercase">
+                                        Bespoke Curation
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Atelier Receipt Ledger -->
+                    <div class="border-t border-neutral-800/30 pt-4 space-y-3">
+                        <span class="text-[9px] uppercase tracking-[0.2em] font-mono text-[#C5A880] block font-bold">Atelier Curation Ledger</span>
+                        
+                        <div class="space-y-1.5 text-xs font-light max-h-[160px] lg:max-h-[220px] overflow-y-auto pr-1 scrollbar-none my-2">
+                            <!-- Locked Hand Curation Service Fee -->
+                            <div class="flex justify-between items-center text-neutral-300 py-1.5 border-b border-neutral-800/10 hover:bg-white/5 px-2 rounded transition-colors">
+                                <div class="flex items-center space-x-2 truncate">
+                                    <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
+                                    <span class="text-xs truncate font-medium">Atelier Hand Curation Service</span>
+                                </div>
+                                <div class="flex items-center space-x-2 shrink-0">
+                                    <span class="font-mono text-neutral-400 text-xs">{{ number_format($this->curationFee) }} KSH</span>
+                                    <span class="text-neutral-600 text-[10px] ml-1 select-none cursor-not-allowed" title="Required service fee">🔒</span>
+                                </div>
+                            </div>
+
+                            <!-- Curation Occasion -->
+                            <div class="flex justify-between items-center text-neutral-300 py-1.5 border-b border-neutral-800/10 hover:bg-white/5 px-2 rounded transition-colors">
+                                <div class="flex items-center space-x-2 truncate">
+                                    <span class="text-xs truncate font-medium">Occasion: <span class="font-semibold text-[#C5A880]" x-text="getOccasionLabel()"></span></span>
+                                </div>
+                                <div class="flex items-center space-x-2 shrink-0">
+                                    <span class="text-neutral-500 text-[10px] italic">Included</span>
+                                </div>
+                            </div>
+                            <!-- Stems items -->
+                            <template x-for="(qty, id) in localStems" :key="id">
+                                <div x-show="qty > 0" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
+                                    <div class="flex items-center space-x-2 truncate">
+                                        <div class="flex items-center bg-black/40 rounded-full border border-neutral-800/50 p-0.5 space-x-1 shrink-0">
+                                            <button @click="$wire.adjustStemQuantity(id, -1)" class="w-4 h-4 rounded-full hover:bg-[#C5A880] hover:text-black text-neutral-400 flex items-center justify-center text-[9px] transition-all cursor-pointer font-bold select-none border border-neutral-700/20">-</button>
+                                            <span class="font-mono text-[#C5A880] text-[10px] font-bold px-1" x-text="qty"></span>
+                                            <button @click="$wire.adjustStemQuantity(id, 1)" class="w-4 h-4 rounded-full hover:bg-[#C5A880] hover:text-black text-neutral-400 flex items-center justify-center text-[9px] transition-all cursor-pointer font-bold select-none border border-neutral-700/20">+</button>
+                                        </div>
+                                        <span class="text-xs truncate font-medium" x-text="getStemName(id)"></span>
+                                    </div>
+                                    <div class="flex items-center space-x-2 shrink-0">
+                                        <span class="font-mono text-neutral-400 text-xs" x-text="(getStemPrice(id) * qty).toLocaleString() + ' KSH'"></span>
+                                        <button @click="$wire.adjustStemQuantity(id, -qty)" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Wrapping -->
+                            <div x-show="selectedWrappingId" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
+                                <div class="flex items-center space-x-2 truncate">
+                                    <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
+                                    <span class="text-xs truncate font-medium" x-text="getWrappingName()"></span>
+                                </div>
+                                <div class="flex items-center space-x-2 shrink-0">
+                                    <span class="font-mono text-neutral-400 text-xs" x-text="getWrappingPrice().toLocaleString() + ' KSH'"></span>
+                                    <button type="button" @click="$wire.selectWrapping(null)" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Glitter Accent -->
+                            <div x-show="hasGlitter" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
+                                <div class="flex items-center space-x-2 truncate">
+                                    <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
+                                    <span class="text-xs truncate font-medium">Glitter Petal Dusting</span>
+                                </div>
+                                <div class="flex items-center space-x-2 shrink-0">
+                                    <span class="font-mono text-neutral-400 text-xs" x-text="(400).toLocaleString() + ' KSH'"></span>
+                                    <button @click="$wire.toggleGlitter()" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Ribbon Accent -->
+                            <div x-show="selectedRibbonId" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
+                                <div class="flex items-center space-x-2 truncate">
+                                    <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
+                                    <span class="text-xs truncate font-medium" x-text="getRibbonName() + ' Ribbon'"></span>
+                                </div>
+                                <div class="flex items-center space-x-2 shrink-0">
+                                    <span class="font-mono text-neutral-400 text-xs" x-text="getRibbonPrice().toLocaleString() + ' KSH'"></span>
+                                    <button @click="$wire.selectRibbon(selectedRibbonId)" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Scent Mist -->
+                            <div x-show="selectedMistId" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
+                                <div class="flex items-center space-x-2 truncate">
+                                    <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
+                                    <span class="text-xs truncate font-medium" x-text="'Fragrance Mist (' + getMistName() + ')'"></span>
+                                </div>
+                                <div class="flex items-center space-x-2 shrink-0">
+                                    <span class="font-mono text-neutral-400 text-xs" x-text="getMistPrice().toLocaleString() + ' KSH'"></span>
+                                    <button @click="$wire.selectMist(selectedMistId)" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Gifts / Treats -->
+                            <template x-for="(qty, id) in localGifts" :key="'gift-'+id">
+                                <div x-show="qty > 0" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
+                                    <div class="flex items-center space-x-2 truncate">
+                                        <div class="flex items-center bg-black/40 rounded-full border border-neutral-800/50 p-0.5 space-x-1 shrink-0">
+                                            <button @click="$wire.adjustGiftQuantity(id, -1)" class="w-4 h-4 rounded-full hover:bg-[#C5A880] hover:text-black text-neutral-400 flex items-center justify-center text-[9px] transition-all cursor-pointer font-bold select-none border border-neutral-700/20">-</button>
+                                            <span class="font-mono text-[#C5A880] text-[10px] font-bold px-1" x-text="qty"></span>
+                                            <button @click="$wire.adjustGiftQuantity(id, 1)" class="w-4 h-4 rounded-full hover:bg-[#C5A880] hover:text-black text-neutral-400 flex items-center justify-center text-[9px] transition-all cursor-pointer font-bold select-none border border-neutral-700/20">+</button>
+                                        </div>
+                                        <span class="text-xs truncate font-medium" x-text="getGiftName(id)"></span>
+                                    </div>
+                                    <div class="flex items-center space-x-2 shrink-0">
+                                        <span class="font-mono text-neutral-400 text-xs" x-text="(getGiftPrice(id) * qty).toLocaleString() + ' KSH'"></span>
+                                        <button @click="$wire.adjustGiftQuantity(id, -qty)" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Greeting Calligraphy Note -->
+                            <div x-show="hasCard" class="flex justify-between items-center text-neutral-300 py-1 border-b border-neutral-800/10 last:border-0 hover:bg-white/5 px-2 rounded transition-colors">
+                                <div class="flex items-center space-x-2 truncate">
+                                    <span class="font-mono text-[#C5A880] text-xs font-semibold px-1">1x</span>
+                                    <span class="text-xs truncate font-medium">Calligraphy Card Note</span>
+                                </div>
+                                <div class="flex items-center space-x-2 shrink-0">
+                                    <span class="font-mono text-neutral-400 text-xs" x-text="(500).toLocaleString() + ' KSH'"></span>
+                                    <button @click="$wire.toggleCard()" class="text-neutral-500 hover:text-red-400 transition cursor-pointer text-[10px] ml-1 select-none">✕</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Note text preview -->
+                        <div x-show="hasCard && cardMessage.trim().length > 0" class="bg-amber-950/10 border border-amber-900/20 p-2.5 rounded-lg text-[10px] text-neutral-400 italic font-mono max-h-[60px] overflow-y-auto">
+                            "&ldquo;<span x-text="cardMessage"></span>&rdquo;"
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Details & Add to Cart -->
+                <div class="border-t border-neutral-800/30 pt-4 mt-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[9px] uppercase tracking-wider text-neutral-450 block font-mono">Total Bouquet Value</span>
+                            <span class="text-xl md:text-2xl font-mono font-semibold tracking-tight text-[#C5A880]">
+                                <span x-text="subtotal.toLocaleString()"></span> KSH
+                            </span>
+                        </div>
+                        <button 
+                            wire:click="addToCart" 
+                            class="px-6 py-3 rounded-full bg-white text-black hover:bg-neutral-200 transition-all duration-300 shadow-md font-semibold tracking-widest uppercase text-[10px] cursor-pointer select-none"
+                        >
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</main>
     <div 
         x-show="showMobileLedger"
         x-transition:enter="transition ease-out duration-300"

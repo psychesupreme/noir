@@ -1417,9 +1417,26 @@ if (!function_exists('toJsObject')) {
                                  }" 
                                  x-init="startAutoplay()"
                                  @mouseenter="stopAutoplay()" 
-                                 @mouseleave="startAutoplay()"
-                                 class="relative w-full overflow-hidden group rounded-2xl p-2"
+                                 @mouseleave="startAutoplay()"                                class="relative w-full overflow-hidden group rounded-2xl p-2"
                             >
+                                <!-- Left Navigation Arrow -->
+                                <button @click="prev()" 
+                                        type="button"
+                                        class="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-zinc-900/80 hover:bg-zinc-800 text-amber-400 border border-amber-500/20 p-3 rounded-full shadow-lg transition-all cursor-pointer flex items-center justify-center backdrop-blur-md"
+                                        title="Previous Slide"
+                                >
+                                    &larr;
+                                </button>
+
+                                <!-- Right Navigation Arrow -->
+                                <button @click="next()" 
+                                        type="button"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-zinc-900/80 hover:bg-zinc-800 text-amber-400 border border-amber-500/20 p-3 rounded-full shadow-lg transition-all cursor-pointer flex items-center justify-center backdrop-blur-md"
+                                        title="Next Slide"
+                                >
+                                    &rarr;
+                                </button>
+
                                 <div class="flex transition-transform duration-700 ease-in-out gap-6"
                                      :style="'transform: translateX(-' + (activeIndex * 320) + 'px)'">
                                     @foreach($offerProducts as $product)
@@ -1434,7 +1451,7 @@ if (!function_exists('toJsObject')) {
                                                  alt="{{ $product->name }}" 
                                                  loading="lazy" 
                                                  decoding="async" 
-                                                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'600\' viewBox=\'0 0 600 600\'><rect width=\'100%\' height=\'100%\' fill=\'%2318181b\'/><path d=\'M300 200 C320 260 380 280 380 320 C380 360 340 400 300 400 C260 400 220 360 220 320 C220 280 280 260 300 200 Z\' fill=\'%23d4af37\' opacity=\'0.3\'/></svg>';" 
+                                                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'600\' viewBox=\'0 0 600 600\'><rect width=\'100%\' height=\'100%\' fill=\'%2318181b\'/><path d=\'M300 200 C320 260 380 280 380 320 C380 360 340 400 300 400 C260 400 220 360 220 320 C220 280 260 300 200 Z\' fill=\'%23d4af37\' opacity=\'0.3\'/></svg>';" 
                                                  class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" />
                                             
                                             <!-- Gold/Rose Discount Badge -->
@@ -1464,28 +1481,6 @@ if (!function_exists('toJsObject')) {
                                             </div>
                                         </div>
                                     @endforeach
-                                </div>
-
-                                <!-- Slider Controls & Indicators -->
-                                <div class="flex items-center justify-between mt-6 px-2">
-                                    <div class="flex items-center space-x-2">
-                                        <template x-for="i in total" :key="i">
-                                            <button @click="activeIndex = i - 1"
-                                                    :class="activeIndex === (i - 1) ? 'w-6 bg-amber-400' : 'w-2 bg-neutral-600 hover:bg-neutral-400'"
-                                                    class="h-2 rounded-full transition-all duration-300 cursor-pointer focus:outline-none"
-                                                    :title="'Go to slide ' + i">
-                                            </button>
-                                        </template>
-                                    </div>
-                                    
-                                    <div class="flex items-center space-x-3">
-                                        <button @click="prev()" class="w-8 h-8 rounded-full border border-neutral-700 bg-zinc-900 text-neutral-300 hover:text-amber-400 hover:border-amber-500/50 flex items-center justify-center transition-all cursor-pointer shadow-md">
-                                            &larr;
-                                        </button>
-                                        <button @click="next()" class="w-8 h-8 rounded-full border border-neutral-700 bg-zinc-900 text-neutral-300 hover:text-amber-400 hover:border-amber-500/50 flex items-center justify-center transition-all cursor-pointer shadow-md">
-                                            &rarr;
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
                         </div>
