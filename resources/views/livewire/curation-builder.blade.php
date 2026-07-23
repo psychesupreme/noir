@@ -1022,7 +1022,7 @@
     </div>
 
     <!-- Right Panel: Floating Sticky Curation Desk -->
-    <div class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-28 z-30 w-full">
+    <div class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-28 sm:lg:top-32 my-4 lg:my-6 z-30 w-full">
         <div x-data="{ showTopPreviewMobile: false }"
              class="w-full rounded-3xl border border-amber-500/20 bg-zinc-900/90 backdrop-blur-xl p-6 shadow-2xl shadow-black/50 relative flex flex-col justify-between transition-all duration-300">
             
@@ -1057,7 +1057,7 @@
                     </div>
 
                     <!-- Preview Image Display -->
-                    <div class="w-full h-[320px] rounded-2xl border border-neutral-800/10 overflow-hidden relative flex items-center justify-center bg-black/20 shadow-inner">
+                    <div class="w-full min-h-[320px] sm:min-h-[400px] rounded-3xl border border-amber-500/20 bg-zinc-900/80 overflow-hidden relative flex items-center justify-center shadow-inner">
                         <!-- Empty Desk State -->
                         <div x-show="isCurationEmpty() && !hoveredImage && viewMode !== 'note'" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 transition-all duration-500">
                             <div class="w-12 h-12 rounded-full border border-neutral-850 flex items-center justify-center mb-4 bg-white/5 backdrop-blur-sm">

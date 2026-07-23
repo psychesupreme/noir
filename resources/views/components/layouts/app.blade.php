@@ -85,14 +85,53 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
+    <!-- Global Theme Persistence (localStorage) -->
+    <script>
+      if (localStorage.getItem('theme') === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
+
     <!-- Tailwind CSS v4 Build Layer & Livewire Asset Core -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
 <body class="bg-zinc-950 text-zinc-100 font-sans antialiased min-h-screen selection:bg-amber-900 selection:text-amber-100">
 
-    <!-- Livewire 3 injects your full-page component directly here -->
-    {{ $slot }}
+    <div class="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
+        <!-- Uniform Navbar Component -->
+        <x-navbar />
+
+        <!-- Windows 11 Style Floating Toast Notifications -->
+        <div x-data="{ show: false, message: '', type: 'info' }"
+             x-on:notify.window="
+               show = true; 
+               message = $event.detail.message; 
+               type = $event.detail.type || 'info'; 
+               setTimeout(() => show = false, 3500)
+             "
+             x-show="show"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 -translate-y-6 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 -translate-y-6 scale-95"
+             class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] min-w-[280px] max-w-md px-5 py-3 rounded-2xl shadow-2xl border border-amber-500/30 bg-zinc-900/90 backdrop-blur-xl text-zinc-100 flex items-center space-x-3"
+             style="display: none;">
+          <div class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></div>
+          <span x-text="message" class="text-sm font-sans font-medium"></span>
+        </div>
+
+        <main class="flex-1 w-full">
+            {{ $slot }}
+        </main>
+
+        <!-- Uniform Footer Component -->
+        <x-footer />
+    </div>
 
     @livewireScripts
 </body>
