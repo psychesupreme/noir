@@ -1,63 +1,136 @@
-# Noir & Bloom Atelier | Luxury Floral ERP & Curation Platform
+# Noir & Bloom Atelier 🌸✨
+### Luxury Floriculture ERP, Bespoke Curation & Logistics Platform
 
-Noir & Bloom is an enterprise ERP, logistics, and bespoke floral curation system built for Kenya's luxury floriculture market.
+[![Laravel](https://img.shields.io/badge/Laravel-11%20%2F%2012-FF2D20.svg?style=flat&logo=laravel&logoColor=white)](https://laravel.com/)
+[![Livewire](https://img.shields.io/badge/Livewire-3.x-4E56A6.svg?style=flat&logo=livewire&logoColor=white)](https://livewire.laravel.com/)
+[![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.x-06B6D4.svg?style=flat&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%20%2F%20SQLite-4169E1.svg?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Compliance](https://img.shields.io/badge/Compliance-KRA%20eTIMS%20QR%20Vector-00A651.svg?style=flat)]()
+[![Deployment](https://img.shields.io/badge/Deployed%20on-Fly.io-7A5AF8.svg?style=flat&logo=flydotio&logoColor=white)](https://noir-bloom-erp.fly.dev)
 
----
-
-## 1. Architectural Highlights
-
-- **Framework**: Laravel 11 / 12 & Livewire 3
-- **Database**: PostgreSQL / SQLite with 4 Squashed Domain Baseline Migrations
-- **Email Driver**: Resend Official Driver (`resend/resend-laravel`)
-- **PDF & Tax Invoicing**: Barryvdh DOMPDF & KRA eTIMS QR Code Vector Integration
-- **Caching**: Tagged Storefront & Catalog Caching with Event-Driven Model Invalidation (`StorefrontCacheService`)
-- **Media Engine**: Direct High-Performance Unsplash CDN Image Integration (`w=600&q=80`) — No external Unsplash API keys required
+**Noir & Bloom Atelier** is a bespoke enterprise ERP, cold-chain inventory logistics, and floral curation system engineered for Kenya's luxury floriculture and gifting market. It pairs an artisan storefront experience with an enterprise operational backplane—managing raw flower stems, branch allocations, automated KRA eTIMS statutory tax invoicing, courier proof-of-delivery (PoD), and wastage controls.
 
 ---
 
-## 2. Kenyan Market Pricing Structure (KES)
+## 🌟 Core System Capabilities
 
-- **Single Flower Stems**: KES 250 – KES 450 per stem (e.g. Naivasha Red Roses @ KES 350)
-- **Bespoke Hand-tied Bouquets**:
-  - **Standard**: KES 2,500
-  - **Deluxe**: KES 5,500
-  - **Grand**: KES 12,000
-- **Luxury Hampers & Giftings**: KES 6,500 – KES 35,000
-- **Atelier Hand Curation Service Fee**:
-  - **Base / Small Curation**: KES 150
-  - **Medium Curation**: KES 350
-  - **Grand Luxury Curation**: KES 750
-- **Add-on Accessories**:
-  - **Calligraphy Greeting Card**: KES 200
-  - **Glass Vase**: KES 1,200
-  - **Premium Satin Ribbon**: KES 150
+### 1. Luxury Floral Curation & Pricing Architecture
+* **Stem & Arrangement Dynamics**: Supports single flower stems (e.g. Naivasha Red Roses @ KES 350), hand-tied bespoke bouquets (Standard KES 2,500 to Grand KES 12,000), and luxury curated hampers (up to KES 35,000).
+* **Tiered Atelier Assembly Service**:
+  * **Base / Small Curation**: KES 150
+  * **Medium Curation**: KES 350
+  * **Grand Luxury Curation**: KES 750
+* **Add-on Accessory Integration**: Calligraphy greeting cards, handcrafted glass vases, and premium satin ribbons dynamically bundled with orders.
 
----
+### 2. Statutory Compliance & KRA eTIMS Invoicing
+* **Vector QR Code Generation**: Generates compliant Kenya Revenue Authority (KRA) eTIMS QR codes embedded directly into PDF invoices.
+* **Automated PDF Engine**: Powered by Barryvdh DOMPDF with custom artisan styling and tax breakdown (16% VAT, zero-rated exports).
+* **Transactional Email Delivery**: High-deliverability transactional order confirmations and eTIMS tax invoices dispatched via the official **Resend** driver (`resend/resend-laravel`).
 
-## 3. Database Migration Baseline Architecture
+### 3. Inventory, Spoilage & Cold-Chain Logistics
+* **Multi-Branch Inventory**: Stock allocation across distinct branches, cold storage rooms, and florist design tables.
+* **Vendor Purchase Orders**: Full vendor lifecycle management from purchase order requisition to receiving and stock replenishment.
+* **Event-Driven Spoilage & Wastage Tracking**: Wilting, stem damage, and handling loss logged through the inventory portal.
+* **Real-Time Storefront Invalidation**: `WastageLog::saved` model events trigger immediate invalidation via `StorefrontCacheService::flush()` to maintain strict live catalog availability.
 
-The database schema has been consolidated into 4 clean domain migrations:
+### 4. Courier Logistics & Mobile Proof of Delivery (PoD)
+* **Mobile Courier Portal** (`/courier/orders/{order}`): Lightweight responsive interface for delivery drivers.
+* **Photo Proof of Delivery**: Direct camera upload verifying delivery condition and recipient handover.
+* **Recipient Verification**: Digital signature capture, handover confirmation notes, and instant transition to `delivered` status.
 
-1. `0001_01_01_000000_create_users_and_clients_tables.php`
-   - Handles `users`, `password_reset_tokens`, `sessions`, `clients`, `personal_access_tokens`, `notifications`, `system_logs`, `cache`, `jobs`.
-2. `2026_01_01_000001_create_products_branches_inventory_tables.php`
-   - Handles `branches`, `products`, `occasions`, `occasion_product`, `branch_product_stock`, `inventory_logs`, `vendors`, `purchase_orders`, `purchase_order_items`.
-3. `2026_01_01_000002_create_orders_payments_etims_tables.php`
-   - Handles `orders`, `order_product`, `payments`, `etims_invoices`.
-4. `2026_01_01_000003_create_crm_ar_wastage_reviews_tables.php`
-   - Handles `deals`, `crm_timeline_logs`, `accounts_receivable_invoices`, `accounts_receivable_payments`, `wastage_logs`, `reviews`.
+### 5. CRM & Accounts Receivable (A/R)
+* **B2B Corporate Accounts**: Deal pipeline tracking for corporate floral arrangements, hotel contracts, and wedding curations.
+* **Accounts Receivable Ledger**: Invoice issuance, payment tracking, aged debt reporting, and customer lifetime value analytics.
 
 ---
 
-## 4. Local Setup & Seeding
+## 🏗️ Consolidated Database Architecture
 
+The database schema has been engineered into 4 clean domain baseline migrations to eliminate migration bloat:
+
+```text
+database/migrations/
+├── 0001_01_01_000000_create_users_and_clients_tables.php
+│   └── Users, password reset tokens, sessions, clients, personal access tokens, notifications, system logs, cache, jobs.
+├── 2026_01_01_000001_create_products_branches_inventory_tables.php
+│   └── Branches, products, occasions, occasion_product, branch_product_stock, inventory logs, vendors, purchase orders.
+├── 2026_01_01_000002_create_orders_payments_etims_tables.php
+│   └── Orders, order_product items, payment transactions, and eTIMS tax invoices.
+└── 2026_01_01_000003_create_crm_ar_wastage_reviews_tables.php
+    └── CRM deals, timeline logs, A/R invoices, A/R payments, wastage logs, and customer reviews.
+```
+
+---
+
+## 💻 Local Setup & Development
+
+### Prerequisites
+* PHP 8.3+
+* Composer
+* Node.js 20+ & NPM
+* PostgreSQL or SQLite
+
+### Installation Steps
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/psychesupreme/noir.git
+   cd noir
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. **Configure environment:**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Run migrations and seed realistic demo data:**
+   ```bash
+   npm run build
+   php artisan migrate:fresh --seed
+   ```
+
+5. **Start development servers:**
+   ```bash
+   php artisan serve
+   ```
+
+**Default Admin Credentials:**
+* **Email:** `admin@noirandbloom.co.ke`
+* **Password:** `password`
+
+---
+
+## 🧪 Automated Testing
+
+Run the automated test suite verifying Livewire components, inventory calculations, and order workflows:
 ```bash
-composer install
-npm install && npm run build
-php artisan migrate:fresh --seed
 php artisan test
 ```
 
-Default Admin Credentials:
-- **Email**: `admin@noirandbloom.co.ke`
-- **Password**: `password`
+---
+
+## 🚀 Fly.io Production Deployment
+
+The platform is containerized and configured for one-command deployment to **Fly.io**:
+
+```bash
+# Deploy container to Fly.io
+fly deploy
+
+# Run remote database migrations and seeds
+fly ssh console -C "php artisan migrate:fresh --seed --force"
+```
+
+* **Live Staging / Demo**: [https://noir-bloom-erp.fly.dev](https://noir-bloom-erp.fly.dev)
+
+---
+
+## 📄 License
+Proprietary & Confidential. All rights reserved.
