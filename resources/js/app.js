@@ -1,9 +1,3 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-
-window.THREE = THREE;
-window.OrbitControls = OrbitControls;
-
 document.addEventListener('alpine:init', () => {
     // ── Background SVG Animation (Storefront) ──────────────────────────────
     Alpine.data('storefrontAmbient', () => ({

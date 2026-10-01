@@ -31,24 +31,20 @@ class CurationBuilder extends Component
 
     public function mount()
     {
-        $stems = Product::where('category', 'stems')->pluck('id');
-        foreach ($stems as $stemId) {
-            $this->selectedStems[$stemId] = 0;
-        }
+        $items = Product::where('category', 'stems')
+            ->orWhere(function ($q) {
+                $q->where('category', 'giftings')
+                  ->whereIn('unit_type', ['bottle', 'box', 'jewelry']);
+            })
+            ->select('id', 'category')
+            ->get();
 
-        $wines = Product::where('category', 'giftings')->where('unit_type', 'bottle')->pluck('id');
-        foreach ($wines as $wineId) {
-            $this->selectedGifts[$wineId] = 0;
-        }
-
-        $chocolates = Product::where('category', 'giftings')->where('unit_type', 'box')->pluck('id');
-        foreach ($chocolates as $chocId) {
-            $this->selectedGifts[$chocId] = 0;
-        }
-
-        $jewelry = Product::where('category', 'giftings')->where('unit_type', 'jewelry')->pluck('id');
-        foreach ($jewelry as $jewelId) {
-            $this->selectedGifts[$jewelId] = 0;
+        foreach ($items as $item) {
+            if ($item->category === 'stems') {
+                $this->selectedStems[$item->id] = 0;
+            } else {
+                $this->selectedGifts[$item->id] = 0;
+            }
         }
 
         $this->calculateSubtotal();

@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\Cache;
 class StorefrontCacheService
 {
     public const TAG = 'storefront';
+    public const KNOWN_KEYS = 'storefront_registered_cache_keys';
 
     /**
-     * Remember data in cache using tags if supported by driver, with fallback for file/array stores.
+     * Remember data in cache using tags if supported by driver, with registered fallback for file/database/array stores.
      */
     public static function remember(string $key, int $ttl, \Closure $callback)
     {
@@ -21,11 +22,30 @@ class StorefrontCacheService
             // Fallback to standard cache
         }
 
+        // Track key for non-taggable drivers
+        self::registerKey($key);
+
         return Cache::remember($key, $ttl, $callback);
     }
 
     /**
-     * Flush all storefront, catalog, and curation cache tags/keys.
+     * Track dynamic cache key so non-taggable stores can flush cleanly.
+     */
+    protected static function registerKey(string $key): void
+    {
+        try {
+            $keys = Cache::get(self::KNOWN_KEYS, []);
+            if (!in_array($key, $keys, true)) {
+                $keys[] = $key;
+                Cache::put(self::KNOWN_KEYS, $keys, 86400);
+            }
+        } catch (\Throwable $e) {
+            // Suppress tracking failures
+        }
+    }
+
+    /**
+     * Flush all storefront, catalog, and curation cache tags/keys without nuking whole app cache.
      */
     public static function flush(): void
     {
@@ -37,20 +57,36 @@ class StorefrontCacheService
             // Ignore tag errors
         }
 
-        Cache::forget('storefront_products_catalog');
-        Cache::forget('storefront_total_count');
-        Cache::forget('occasions_all');
-        Cache::forget('curation_builder_stems');
-        Cache::forget('curation_builder_wrappings');
-        Cache::forget('curation_builder_mists');
-        Cache::forget('curation_builder_wines');
-        Cache::forget('curation_builder_chocolates');
-        Cache::forget('curation_builder_jewelry');
-        Cache::forget('curation_builder_ribbons');
-        Cache::forget('curation_glitter_product');
-        Cache::forget('curation_card_product');
+        // Forget all dynamically registered keys
+        try {
+            $registeredKeys = Cache::get(self::KNOWN_KEYS, []);
+            foreach ($registeredKeys as $k) {
+                Cache::forget($k);
+            }
+            Cache::forget(self::KNOWN_KEYS);
+        } catch (\Throwable $e) {
+            // Ignore
+        }
 
-        // Flush repository cache store to guarantee invalidation on file/array drivers
-        Cache::flush();
+        // Static known catalog keys
+        $staticKeys = [
+            'storefront_products_catalog',
+            'storefront_total_count',
+            'storefront_offer_products',
+            'occasions_all',
+            'curation_builder_stems',
+            'curation_builder_wrappings',
+            'curation_builder_mists',
+            'curation_builder_wines',
+            'curation_builder_chocolates',
+            'curation_builder_jewelry',
+            'curation_builder_ribbons',
+            'curation_glitter_product',
+            'curation_card_product',
+        ];
+
+        foreach ($staticKeys as $k) {
+            Cache::forget($k);
+        }
     }
 }

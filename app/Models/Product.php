@@ -441,4 +441,31 @@ class Product extends Model
             \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
         });
     }
+
+    /**
+     * Convert product to structured JSON representation for Alpine.js quick-views.
+     */
+    public function toJsObject(): string
+    {
+        return \Illuminate\Support\Js::from([
+            'id' => $this->id,
+            'name' => $this->name,
+            'price' => $this->price,
+            'price_standard' => $this->price_standard,
+            'price_deluxe' => $this->price_deluxe,
+            'price_grand' => $this->price_grand,
+            'description' => $this->description,
+            'image' => $this->backdrop_url ?? $this->image_url ?? '/media/default.jpg',
+            'category' => $this->category,
+            'stock_standard' => $this->stock_standard,
+            'stock_deluxe' => $this->stock_deluxe,
+            'stock_grand' => $this->stock_grand,
+            'average_rating' => $this->average_rating,
+            'average_quality_rating' => $this->average_quality_rating,
+            'average_freshness_rating' => $this->average_freshness_rating,
+            'average_value_rating' => $this->average_value_rating,
+            'photographer_name' => $this->photographer_name,
+            'photographer_username' => $this->photographer_username,
+        ]);
+    }
 }

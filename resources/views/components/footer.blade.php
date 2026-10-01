@@ -23,7 +23,7 @@
                 <h4 class="font-serif tracking-wide text-zinc-100 text-sm font-semibold uppercase">Atelier Services</h4>
                 <ul class="space-y-2 text-xs font-light">
                     <li><a href="/" class="hover:text-amber-400 transition-colors">Curated Storefront</a></li>
-                    <li><a href="/curation" class="hover:text-amber-400 transition-colors">Bespoke Curation Studio</a></li>
+                    <li><a href="/curate" class="hover:text-amber-400 transition-colors">Bespoke Curation Studio</a></li>
                     <li><a href="/services-gifts" class="hover:text-amber-400 transition-colors">Corporate &amp; Executive Gifts</a></li>
                     <li><a href="/profile-portal" class="hover:text-amber-400 transition-colors">Client Portal &amp; Orders</a></li>
                 </ul>

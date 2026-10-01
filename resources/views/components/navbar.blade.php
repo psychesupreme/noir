@@ -42,7 +42,7 @@
             </a>
 
             <!-- 4. Curation Studio link -->
-            <a href="/curation" 
+            <a href="/curate" 
                class="hidden md:inline-block px-3.5 py-1.5 rounded-full border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/10 text-amber-400 font-medium transition-all">
                Curation Studio
             </a>

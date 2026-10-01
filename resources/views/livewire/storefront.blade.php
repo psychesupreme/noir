@@ -1,29 +1,3 @@
-@php
-if (!function_exists('toJsObject')) {
-    function toJsObject($product) {
-        return \Illuminate\Support\Js::from([
-            'id' => $product->id,
-            'name' => $product->name,
-            'price' => $product->price,
-            'price_standard' => $product->price_standard,
-            'price_deluxe' => $product->price_deluxe,
-            'price_grand' => $product->price_grand,
-            'description' => $product->description,
-            'image' => $product->backdrop_url ?? $product->image_url ?? '/media/default.jpg',
-            'category' => $product->category,
-            'stock_standard' => $product->stock_standard,
-            'stock_deluxe' => $product->stock_deluxe,
-            'stock_grand' => $product->stock_grand,
-            'average_rating' => $product->average_rating,
-            'average_quality_rating' => $product->average_quality_rating,
-            'average_freshness_rating' => $product->average_freshness_rating,
-            'average_value_rating' => $product->average_value_rating,
-            'photographer_name' => $product->photographer_name,
-            'photographer_username' => $product->photographer_username,
-        ]);
-    }
-}
-@endphp
 @section('meta')
     <meta name="description" content="Explore Atelier Noir & Bloom's premium floral curations, Naivasha Rift Valley wholesale stems, and custom luxury gift hampers. Detailed proforma invoices and instant M-Pesa checkout.">
     <meta name="keywords" content="premium bouquets, naivasha roses, flower shop Nairobi, luxury gift hampers Kenya, flower delivery Nairobi, detailed proforma invoices, safaricom mpesa checkout">
@@ -442,337 +416,7 @@ if (!function_exists('toJsObject')) {
 
     <!-- Fine Linen Organic Grid Overlay -->
     <div class="absolute inset-0 pointer-events-none fine-linen z-0 opacity-[0.03]"></div>
-    <header 
-        class="fixed top-0 inset-x-0 w-full h-24 z-50 transition-all duration-500 flex items-center shadow-md hover:shadow-lg group backdrop-blur-xl animate-layer-1 theme-section"
-        :class="{
-            'bg-[#050507]/80 border-b border-neutral-800/60 shadow-2xl text-white': theme === 'dark',
-            'bg-[#FAF7F0]/80 border-b border-neutral-200 shadow-md text-neutral-900': theme === 'light',
-        }"
-    >
-        {{-- Bottom Glow Line --}}
-        <div class="absolute bottom-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent to-transparent"
-             :class="{
-                 'via-[#C5A880]/30': theme === 'dark',
-                 'via-emerald-600/30': theme === 'light',
-             }"></div>
-        <div class="max-w-8xl w-full mx-auto px-6 flex items-center justify-between gap-4 sm:gap-6">
-            {{-- Mobile Menu Hamburger --}}
-            <button @click="mobileMenuOpen = true" 
-                    class="lg:hidden transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center rounded-full shadow-sm shrink-0" 
-                    :class="{
-                        'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
-                        'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
-                    }"
-                    title="Menu"
-            >
-                <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
-                    <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
 
-            <a href="/" class="shrink-0 flex items-center select-none cursor-pointer group/brand transition-transform duration-300 hover:scale-[1.02]">
-                <div class="flex flex-col text-left leading-none">
-                    <span class="text-[10px] font-mono tracking-[0.35em] uppercase font-bold brand-title-atelier transition-colors duration-500"
-                          :class="{
-                              'text-[#C5A880]': theme === 'dark',
-                              'text-emerald-700': theme === 'light',
-                          }">Atelier</span>
-                    <span class="text-base sm:text-lg md:text-xl font-extrabold uppercase tracking-[0.18em] font-outfit mt-0.5 brand-title-main transition-colors duration-500"
-                          :class="{
-                              'text-white': theme === 'dark',
-                              'text-neutral-900': theme === 'light',
-                          }">Noir & Bloom</span>
-                </div>
-            </a>
-            
-            {{-- Prominent Header Search Bar (FNP-style) --}}
-            <div class="flex-1 max-w-lg mx-auto hidden md:block">
-                <div class="relative group" x-data="{ focused: false }" @click.away="focused = false">
-                    <input 
-                        type="text" 
-                        wire:model.live.debounce.400ms="search"
-                        @focus="focused = true"
-                        placeholder="Search fresh flowers, luxury hampers, cakes, combinations..."
-                        :class="{
-                            'bg-neutral-900/40 border-neutral-700 text-white placeholder-neutral-500 focus:border-[#C5A880] focus:ring-[#C5A880]/10': theme === 'dark',
-                            'bg-neutral-50 border-neutral-200 text-neutral-800 placeholder-neutral-400 focus:border-emerald-600 focus:ring-emerald-600/10': theme === 'light',
-                        }"
-                        class="w-full border hover:border-emerald-600 focus:bg-white rounded-full pl-10 pr-4 py-2 text-xs font-light font-sans focus:outline-none focus:ring-2 transition-all duration-300 shadow-sm"
-                    >
-                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none transition-colors"
-                         :class="{
-                             'text-[#C5A880] group-focus-within:text-[#C5A880]': theme === 'dark',
-                             'text-neutral-400 group-focus-within:text-emerald-700': theme === 'light',
-                         }">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
-                        </svg>
-                    </div>
-
-                    @if(!empty($search))
-                        <div x-show="focused"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
-                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                             x-transition:leave="transition ease-in duration-150"
-                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                             x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
-                             :class="theme === 'light' ? 'bg-white border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#0F0F12] border-neutral-900 text-white shadow-2xl'"
-                             class="absolute left-0 right-0 mt-2 border rounded-2xl z-50 text-left overflow-hidden divide-y divide-neutral-500/10 font-sans shadow-2xl"
-                             style="display: none;"
-                        >
-                            <!-- Product Suggestions -->
-                            <div class="p-3 space-y-2">
-                                <span class="text-[9px] font-mono uppercase tracking-wider text-neutral-500 block">Matching Arrangements</span>
-                                <div class="space-y-1">
-                                    @forelse($suggestions as $prod)
-                                        <button type="button" 
-                                                @click="quickViewProduct = {{ toJsObject($prod) }}; quickViewSize = 'standard'; quickViewOpen = true; focused = false;" 
-                                                :class="theme === 'light' ? 'hover:bg-neutral-100' : 'hover:bg-white/5'"
-                                                class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer"
-                                        >
-                                            <div class="flex items-center space-x-2.5 truncate">
-                                                <div class="w-8 h-8 rounded-lg overflow-hidden bg-neutral-100 shrink-0">
-                                                    <img src="{{ $prod->image_url }}" alt="" class="w-full h-full object-cover">
-                                                </div>
-                                                <div class="truncate">
-                                                    <span class="font-medium text-xs block truncate" :class="theme === 'light' ? 'text-neutral-800' : 'text-white'">{{ $prod->name }}</span>
-                                                    <span class="text-[8px] text-neutral-500 uppercase tracking-widest">{{ str_replace('_', ' ', $prod->category) }}</span>
-                                                </div>
-                                            </div>
-                                            <span class="font-mono text-[10px] text-neutral-450 shrink-0">{{ number_format($prod->price) }} KSH</span>
-                                        </button>
-                                    @empty
-                                        <span class="text-xs text-neutral-450 italic px-2 block py-1">No matching arrangements found.</span>
-                                    @endforelse
-                                </div>
-                            </div>
-                            
-                            <!-- Categories -->
-                            @php
-                                $matchingCategories = collect(['stems', 'bouquet', 'giftings', 'bundle'])->filter(fn($c) => str_contains($c, strtolower($search)));
-                            @endphp
-                            @if($matchingCategories->isNotEmpty())
-                                <div class="p-3 space-y-2">
-                                    <span class="text-[9px] font-mono uppercase tracking-wider text-neutral-500 block">Suggested Categories</span>
-                                    <div class="flex flex-wrap gap-1.5">
-                                        @foreach($matchingCategories as $cat)
-                                            <button type="button" 
-                                                    wire:click="selectCategory('{{ $cat }}')"
-                                                    @click="focused = false; document.getElementById('product-showroom').scrollIntoView({behavior: 'smooth'});"
-                                                    :class="theme === 'light' ? 'border-neutral-250 bg-neutral-50 hover:bg-neutral-100 text-neutral-700' : 'border-neutral-800 bg-neutral-900/40 hover:bg-neutral-900 text-neutral-300'"
-                                                    class="px-3 py-1.5 border rounded-full text-[9px] font-mono uppercase tracking-wider cursor-pointer"
-                                            >
-                                                Category: {{ $cat }}
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-4 text-[12px] font-mono uppercase tracking-widest"
-                 :class="{
-                     'text-neutral-400': theme === 'dark',
-                     'text-neutral-600': theme === 'light',
-                 }">
-                 <a href="{{ route('services-gifts') }}" 
-                    class="hidden lg:flex items-center space-x-1.5 px-4 py-1.5 rounded-full border transition-all duration-300 select-none cursor-pointer font-medium text-xs tracking-wider"
-                    :class="{
-                        'border-[#C5A880]/30 hover:border-[#C5A880] hover:bg-[#C5A880]/5 text-[#C5A880]': theme === 'dark',
-                        'border-emerald-600/30 hover:border-emerald-600 hover:bg-emerald-600/5 text-emerald-800': theme === 'light'
-                    }">
-                    <span class="w-1.5 h-1.5 rounded-full animate-pulse" :class="theme === 'light' ? 'bg-emerald-600' : 'bg-[#C5A880]'"></span>
-                    <span>Services & Gifts</span>
-                 </a>
-                <a href="{{ route('curate') }}" 
-                   class="hidden md:inline-block px-4 py-1.5 rounded-full font-medium transition-all duration-300 select-none cursor-pointer"
-                   :class="{
-                       'border border-[#C5A880]/30 hover:border-[#C5A880] hover:bg-[#C5A880]/5 text-[#C5A880]': theme === 'dark',
-                       'border border-emerald-600/30 hover:border-emerald-600 hover:bg-emerald-600/5 text-emerald-800': theme === 'light'
-                   }">
-                   Curation Studio
-                </a>
-
-                {{-- Theme Switcher Dropdown (Header) --}}
-                <div x-data="{ themeMenuOpen: false }" class="hidden md:inline-block relative text-left select-none animate-nav-item">
-                    <button @click="themeMenuOpen = !themeMenuOpen" 
-                            class="px-4 py-2 border rounded-full text-xs font-medium tracking-[0.1em] transition-all flex items-center space-x-2 cursor-pointer"
-                            :class="{
-                                'border-neutral-800 bg-neutral-900/40 text-neutral-350 hover:text-white': theme === 'dark',
-                                'border-neutral-250 bg-neutral-50 text-neutral-700 hover:text-neutral-900': theme === 'light',
-                            }"
-                    >
-                        <span class="w-2.5 h-2.5 rounded-full"
-                              :class="{
-                                  'bg-[#C5A880]': theme === 'dark',
-                                  'bg-emerald-600': theme === 'light',
-                              }"></span>
-                        <span class="uppercase font-mono text-[10px] tracking-widest" x-text="theme"></span>
-                        <svg class="w-3 h-3 stroke-current fill-none transition-transform duration-300" :class="{ 'rotate-180': themeMenuOpen }" viewBox="0 0 24 24" stroke-width="2">
-                            <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </button>
-                    <!-- Dropdown Panel -->
-                    <div x-show="themeMenuOpen"
-                         @click.away="themeMenuOpen = false"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
-                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                         x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                         x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
-                         :class="{
-                             'bg-[#0F0F12]/95 border-neutral-900 text-white shadow-2xl': theme === 'dark',
-                             'bg-white/95 border-neutral-200 text-neutral-900 shadow-xl': theme === 'light',
-                         }"
-                         class="absolute right-0 mt-2.5 w-64 rounded-2xl border p-4.5 z-50 backdrop-blur-md space-y-3"
-                         style="display: none;"
-                    >
-                        <div class="border-b border-neutral-500/10 pb-1.5">
-                            <span class="text-[9px] font-mono uppercase tracking-[0.2em] text-neutral-500">Theme Swatches</span>
-                        </div>
-                        <div class="space-y-2 text-[11px] font-sans">
-                            <!-- Onyx Option -->
-                            <button @click="changeTheme('dark'); themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
-                                <div class="flex items-center space-x-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#C5A880]"></span>
-                                    <div>
-                                        <span class="font-bold font-mono tracking-wider block text-[10px] uppercase">Onyx Theme</span>
-                                        <span class="text-[8px] text-neutral-500 font-light block mt-0.5">Obsidian mode with deep gold accents.</span>
-                                    </div>
-                                </div>
-                            </button>
-                            <!-- Champagne Option -->
-                            <button @click="changeTheme('light'); themeMenuOpen = false;" class="w-full flex items-center justify-between p-2 rounded-xl transition-all text-left cursor-pointer hover:bg-neutral-500/5">
-                                <div class="flex items-center space-x-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                                    <div>
-                                        <span class="font-bold font-mono tracking-wider block text-[10px] uppercase">Champagne Theme</span>
-                                        <span class="text-[8px] text-neutral-500 font-light block mt-0.5">Creamy light mode with emerald highlights.</span>
-                                    </div>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Notification Bell button --}}
-                <button @click="notificationsOpen = true" 
-                        class="hidden md:flex transition-colors cursor-pointer select-none relative w-9 h-9 items-center justify-center rounded-full shadow-sm" 
-                        :class="{
-                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
-                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
-                        }"
-                        title="View Notifications"
-                >
-                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    @if($unreadNotificationsCount > 0)
-                        <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-white text-[9px] font-bold font-sans shadow-md animate-pulse"
-                              :class="{
-                                  'bg-[#C5A880]': theme === 'dark',
-                                  'bg-emerald-600': theme === 'light',
-                              }">
-                            {{ $unreadNotificationsCount }}
-                        </span>
-                    @endif
-                </button>
-
-                {{-- Wishlist Button --}}
-                <button @click="wishlistOpen = true" 
-                        class="hidden md:flex transition-colors cursor-pointer select-none relative w-9 h-9 items-center justify-center rounded-full shadow-sm" 
-                        :class="{
-                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
-                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
-                        }"
-                        title="View Wishlist"
-                >
-                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    @auth
-                        @php
-                            $wCount = count(auth()->user()->settings['wishlist'] ?? []);
-                        @endphp
-                        @if($wCount > 0)
-                            <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-white text-[9px] font-bold font-sans shadow-md"
-                                  :class="{
-                                      'bg-rose-500': true
-                                  }">
-                                {{ $wCount }}
-                            </span>
-                        @endif
-                    @endauth
-                </button>
-
-                {{-- Shopping Bag button --}}
-                <button @click="drawerOpen = true; checkoutMode = false;" 
-                        class="transition-colors cursor-pointer select-none relative w-9 h-9 flex items-center justify-center rounded-full shadow-sm" 
-                        :class="{
-                            'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880]': theme === 'dark',
-                            'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-700': theme === 'light',
-                        }"
-                        title="View Curation Drawer"
-                >
-                    <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2">
-                        <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    @if($cartCount > 0)
-                        <span class="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-white text-[9px] font-bold font-sans shadow-md"
-                              :class="{
-                                  'bg-[#C5A880]': theme === 'dark',
-                                  'bg-emerald-600': theme === 'light',
-                              }">
-                            {{ $cartCount }}
-                        </span>
-                    @endif
-                </button>
-
-                <!-- Simplified Profile Portal Button -->
-                <div class="relative inline-block text-left animate-nav-item" style="animation-delay: 500ms;">
-                    @auth
-                        <!-- Initials-based Monogram Avatar Button -->
-                        <button @click="profileOpen = true" 
-                                class="transition-all cursor-pointer select-none w-8 h-8 flex items-center justify-center rounded-full shadow-sm"
-                                :class="{
-                                    'hover:border-[#C5A880] border border-neutral-700 bg-neutral-900/40': theme === 'dark',
-                                    'hover:border-emerald-600 border border-neutral-200 bg-neutral-100': theme === 'light',
-                                }"
-                                title="Profile Portal Options"
-                        >
-                            <span class="text-[10px] font-mono font-bold tracking-wider uppercase"
-                                  :class="{
-                                      'text-[#C5A880]': theme === 'dark',
-                                      'text-emerald-800': theme === 'light',
-                                  }">
-                                {{ collect(explode(' ', auth()->user()->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('') }}
-                            </span>
-                        </button>
-                    @else
-                        <!-- Log In / Sign In Button for Guests -->
-                        <button @click="profileOpen = true" 
-                                class="transition-all duration-300 hover:scale-[1.03] cursor-pointer select-none px-4 h-8 flex items-center justify-center space-x-1.5 rounded-full text-[11px] font-sans font-light tracking-widest uppercase"
-                                :class="{
-                                    'border border-neutral-700 bg-neutral-900/40 text-neutral-350 hover:text-[#C5A880] hover:border-[#C5A880]': theme === 'dark',
-                                    'border border-neutral-200 bg-neutral-50 text-neutral-700 hover:text-emerald-800 hover:border-emerald-600': theme === 'light',
-                                }"
-                                title="Log In or Sign In"
-                        >
-                            <svg class="w-3.5 h-3.5 stroke-current fill-none transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 24 24" stroke-width="1.5">
-                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3M15 12" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <span class="hidden sm:inline">Sign In</span>
-                        </button>
-                    @endauth
-                </div>
-            </div>
-        </div>
-    </header>
     <!-- Interactive Advertisements Carousel (5 Luxury Slides with auto-grading overlays, hover indicators, and Roman numerals) -->
     <div class="w-full px-0 pt-32 pb-4 shrink-0 animate-layer-2">
         <section x-data="{ 
@@ -1121,7 +765,7 @@ if (!function_exists('toJsObject')) {
                                  style="animation-delay: {{ ($index % 6) * 100 }}ms;"
                             >
                                 <!-- Left side: Squared Image Frame -->
-                                <div @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
+                                <div @click="quickViewProduct = {{ $product->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                      class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center cursor-pointer select-none">
                                     <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
                                          class="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-all duration-700 z-0" loading="lazy" decoding="async">
@@ -1173,7 +817,7 @@ if (!function_exists('toJsObject')) {
                                 </div>
                                 <!-- Right side: Details -->
                                 <div class="flex-1 pl-3 flex flex-col justify-between overflow-hidden">
-                                    <div @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
+                                    <div @click="quickViewProduct = {{ $product->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                          class="space-y-1 overflow-hidden cursor-pointer select-none">
                                         <span class="text-[9px] uppercase tracking-[0.2em] text-[#C5A880] font-outfit block font-bold truncate">Specialization</span>
                                         <h3 :class="theme === 'light' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-sm font-serif italic tracking-wide leading-tight truncate">
@@ -1223,7 +867,7 @@ if (!function_exists('toJsObject')) {
                                             </div>
 
                                             <button type="button"
-                                               @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
+                                               @click="quickViewProduct = {{ $product->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                                :class="theme === 'light' ? 'bg-black text-white hover:bg-[#B59A7A] hover:text-black' : 'bg-white text-black hover:bg-[#C5A880] hover:text-black'"
                                                class="px-3 py-1.5 rounded-full text-[9px] font-outfit uppercase font-bold tracking-wider transition-all duration-300 shadow-md cursor-pointer"
                                             >
@@ -1241,7 +885,7 @@ if (!function_exists('toJsObject')) {
                                  style="animation-delay: {{ ($index % 6) * 100 }}ms;"
                             >
                                 <!-- Product Image Frame -->
-                                <div @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
+                                <div @click="quickViewProduct = {{ $product->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                      class="p-1 border border-neutral-500/10 rounded-t-[190px] rounded-b-[20px] overflow-hidden relative cursor-pointer select-none">
                                     <div class="aspect-[4/5] rounded-t-[180px] rounded-b-[16px] relative overflow-hidden bg-neutral-950/5">
                                         <img src="{{ $product->backdrop_url }}" alt="{{ $product->name }}" 
@@ -1300,7 +944,7 @@ if (!function_exists('toJsObject')) {
  
                                 <!-- Details Section -->
                                 <div class="px-2 pt-4 pb-2 flex-1 flex flex-col justify-between">
-                                    <div @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
+                                    <div @click="quickViewProduct = {{ $product->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                          class="space-y-1.5 cursor-pointer select-none">
                                         <span class="text-[12px] uppercase tracking-[0.3em] text-neutral-400 font-outfit block font-light">Atelier Noir & Bloom</span>
                                         <h3 :class="theme === 'light' ? 'text-neutral-900 font-medium' : 'text-white'" class="text-xl font-serif italic tracking-wider leading-snug">
@@ -1322,7 +966,7 @@ if (!function_exists('toJsObject')) {
                                         <div class="max-h-none opacity-100 lg:max-h-0 lg:opacity-0 lg:group-hover:max-h-32 lg:group-hover:opacity-100 transition-all duration-500 ease-in-out overflow-hidden space-y-3">
                                             <button 
                                                 type="button"
-                                                @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
+                                                @click="quickViewProduct = {{ $product->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                                 class="w-full text-[12px] font-semibold tracking-[0.2em] uppercase py-2.5 rounded-full flex items-center justify-center font-outfit bg-emerald-800 text-white hover:bg-emerald-900 transition-colors shadow-sm cursor-pointer"
                                             >
                                                 <span>Select Details</span>
@@ -1444,7 +1088,7 @@ if (!function_exists('toJsObject')) {
                                             $originalPrice = (int) round($product->price * 1.18);
                                             $discountPercent = 15;
                                         @endphp
-                                        <div @click="quickViewProduct = {{ toJsObject($product) }}; quickViewSize = 'standard'; quickViewOpen = true;"
+                                        <div @click="quickViewProduct = {{ $product->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true;"
                                              class="w-72 h-72 sm:w-80 sm:h-80 aspect-square rounded-2xl overflow-hidden relative group/card border border-amber-500/20 bg-zinc-900 shrink-0 cursor-pointer shadow-xl transition-all duration-500 hover:border-amber-400/50 hover:shadow-amber-500/10 hover:-translate-y-1 select-none"
                                         >
                                             <img src="{{ $product->backdrop_url }}" 
@@ -1561,146 +1205,6 @@ if (!function_exists('toJsObject')) {
 
         </div>
 
-    <!-- Luxury Atelier Footer -->
-    <footer 
-        :class="{
-            'border-neutral-900 bg-[#070709] text-neutral-400': theme === 'dark',
-            'border-neutral-200 bg-[#EBEBEF] text-neutral-600': theme === 'light',
-        }"
-        class="border-t mt-12 py-6 px-6 transition-colors duration-500 z-10 relative theme-section"
-    >
-        <div class="max-w-5xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-            <!-- Col 1: Brand & Info -->
-            <div class="space-y-2.5">
-                <div class="flex items-baseline space-x-2">
-                    <span class="text-[10px] font-mono tracking-[0.4em] text-neutral-500 uppercase">Atelier</span>
-                    <h4 :class="theme === 'light' ? 'text-black' : 'text-white'" class="text-sm font-semibold uppercase tracking-[0.35em] transition-colors">Noir & Bloom</h4>
-                </div>
-                <p class="text-xs font-light leading-relaxed max-w-xs">
-                    Premium floral curation, bespoke gifting suites, and high-end events concierge. Sourcing directly from Rift Valley growers.
-                </p>
-            </div>
-
-            <!-- Col 2: Showroom & Catalog -->
-            <div class="space-y-2.5">
-                <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Showroom</h5>
-                <ul class="space-y-2 text-xs font-light">
-                    <li><button wire:click="selectCategory('bouquet')" class="hover:underline cursor-pointer">Bespoke Retail Arrays</button></li>
-                    <li><button wire:click="selectCategory('stems')" class="hover:underline cursor-pointer">Wholesale Graded Stems</button></li>
-                    <li><button wire:click="selectCategory('giftings')" class="hover:underline cursor-pointer">Luxury Giftings</button></li>
-                    <li><button @click="profileOpen = true" class="hover:underline cursor-pointer">Atelier Loyalty Circle</button></li>
-                </ul>
-            </div>
-
-            <!-- Col 3: Hours & Support -->
-            <div class="space-y-2.5">
-                <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">Concierge Dispatch</h5>
-                <ul class="space-y-2 text-xs font-light">
-                    <li><span class="block text-neutral-500">Operating Hours</span> Mon &mdash; Sat: 07:00 &mdash; 20:00</li>
-                    <li>Sunday: 09:00 &mdash; 17:00</li>
-                    <li class="pt-2"><span class="block text-neutral-500 font-mono text-[11px] uppercase tracking-wider">Hotline Direct</span> +254 (0) 712354697</li>
-                    <li>concierge@noirbloom.co.ke</li>
-                </ul>
-            </div>
-
-            <!-- Col 4: Newsletter & Dispatch Bulletin -->
-            <div class="space-y-2.5">
-                <h5 :class="theme === 'light' ? 'text-neutral-900' : 'text-neutral-300'" class="text-[12px] font-mono uppercase tracking-[0.2em] font-semibold">The Atelier Bulletin</h5>
-                <p class="text-xs font-light leading-relaxed">
-                    Subscribe for seasonal curation updates, wholesale catalog changes, and exclusive releases.
-                </p>
-                <div class="flex items-center space-x-2 pt-1">
-                    <input 
-                        type="email" 
-                        placeholder="you@company.co.ke" 
-                        :class="theme === 'light' ? 'bg-white border-neutral-300 text-black placeholder-neutral-400 focus:border-neutral-500' : 'bg-neutral-900/60 border-neutral-800 text-white placeholder-neutral-700 focus:border-neutral-700'"
-                        class="flex-1 text-xs px-3.5 py-2.5 border rounded-xl focus:outline-none transition-all"
-                    >
-                    <button 
-                        :class="theme === 'light' ? 'bg-neutral-950 text-white hover:bg-black' : 'bg-white text-black hover:bg-neutral-200'"
-                        class="px-4 py-2.5 text-[11px] font-mono uppercase tracking-wider font-semibold rounded-full transition-all"
-                    >
-                        Join
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div :class="theme === 'light' ? 'border-neutral-200/60 text-neutral-500' : 'border-neutral-900 text-neutral-600'" class="max-w-5xl w-full mx-auto border-t mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-[12px] font-mono uppercase tracking-wider gap-4">
-            <p>&copy; {{ date('Y') }} Atelier Noir & Bloom. All rights reserved.</p>
-            
-            {{-- Social Media Icons --}}
-            <div class="flex items-center space-x-3.5">
-                {{-- Instagram --}}
-                <a href="https://instagram.com/noirandbloom" target="_blank" rel="noopener"
-                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
-                   :class="{
-                       'border-neutral-800 text-neutral-500 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.3)]': theme === 'dark',
-                       'border-neutral-200 text-neutral-400 hover:text-[#E1306C] hover:border-[#E1306C] hover:shadow-[0_0_15px_rgba(225,48,108,0.25)]': theme === 'light',
-                   }"
-                   title="Follow us on Instagram">
-                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
-                    </svg>
-                </a>
-                {{-- Facebook --}}
-                <a href="https://facebook.com/noirandbloom" target="_blank" rel="noopener"
-                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
-                   :class="{
-                       'border-neutral-800 text-neutral-500 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.3)]': theme === 'dark',
-                       'border-neutral-200 text-neutral-400 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-[0_0_15px_rgba(24,119,242,0.25)]': theme === 'light',
-                   }"
-                   title="Follow us on Facebook">
-                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/>
-                    </svg>
-                </a>
-                {{-- X (Twitter) --}}
-                <a href="https://twitter.com/NoirAndBloom" target="_blank" rel="noopener"
-                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
-                   :class="{
-                       'border-neutral-800 text-neutral-500 hover:text-white hover:border-white hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]': theme === 'dark',
-                       'border-neutral-200 text-neutral-400 hover:text-black hover:border-black hover:shadow-[0_0_15px_rgba(0,0,0,0.15)]': theme === 'light',
-                   }"
-                   title="Follow us on X (Twitter)">
-                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                </a>
-                {{-- Pinterest --}}
-                <a href="https://pinterest.com/noirandbloom" target="_blank" rel="noopener"
-                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
-                   :class="{
-                       'border-neutral-800 text-neutral-500 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.3)]': theme === 'dark',
-                       'border-neutral-200 text-neutral-400 hover:text-[#E60023] hover:border-[#E60023] hover:shadow-[0_0_15px_rgba(230,0,35,0.25)]': theme === 'light',
-                   }"
-                   title="Follow us on Pinterest">
-                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.395-5.92 1.395-5.92s-.36-.715-.36-1.777c0-1.664.962-2.907 2.162-2.907 1.02 0 1.513.766 1.513 1.682 0 1.026-.65 2.558-.99 3.978-.282 1.187.592 2.155 1.764 2.155 2.113 0 3.738-2.23 3.738-5.447 0-2.848-2.049-4.839-4.969-4.839-3.385 0-5.372 2.54-5.372 5.163 0 1.023.392 2.122.882 2.719.098.118.113.22.083.342-.09.378-.292 1.189-.331 1.348-.052.21-.173.253-.399.148-1.492-.695-2.423-2.88-2.423-4.636 0-3.774 2.744-7.24 7.907-7.24 4.15 0 7.375 2.957 7.375 6.9 0 4.124-2.597 7.443-6.204 7.443-1.213 0-2.355-.63-2.744-1.373l-.747 2.847c-.269 1.027-.997 2.316-1.488 3.118 4.417 1.282 9.21.365 12.825-2.525C22.617 19.387 24 15.86 24 11.987 24 5.367 18.63 0 12.017 0z"/>
-                    </svg>
-                </a>
-                {{-- WhatsApp --}}
-                <a href="https://wa.me/254712354697" target="_blank" rel="noopener"
-                   class="w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300 hover:scale-110 hover:-translate-y-0.5"
-                   :class="{
-                       'border-neutral-800 text-neutral-500 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.3)]': theme === 'dark',
-                       'border-neutral-200 text-neutral-400 hover:text-[#25D366] hover:border-[#25D366] hover:shadow-[0_0_15px_rgba(37,211,102,0.25)]': theme === 'light',
-                   }"
-                   title="Chat with us on WhatsApp">
-                    <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
-                        <path d="M19.005 3.175C17.252 1.42 14.927.453 12.443.453 7.429.453 3.353 4.53 3.353 9.544c0 1.602.418 3.167 1.213 4.544L2.247 22.25l8.36-2.193c1.332.726 2.828 1.11 4.363 1.112h.006c5.011 0 9.088-4.076 9.088-9.09 0-2.43-.946-4.714-2.703-6.471l-.356-.356zm-6.562 16.92c-1.442-.002-2.857-.388-4.095-1.116l-.294-.174-5.043 1.323 1.347-4.923-.19-.304c-.8-1.272-1.222-2.742-1.22-4.26.002-4.42 3.6-8.016 8.026-8.016 2.14 0 4.153.834 5.666 2.348 1.513 1.513 2.345 3.526 2.343 5.67-.004 4.42-3.601 8.018-8.026 8.018l-.534-.016zm4.414-6.027c-.242-.12-1.432-.707-1.654-.788-.222-.08-.383-.12-.544.12-.16.242-.624.788-.765.947-.14.16-.282.18-.523.06-.24-.12-1.018-.374-1.94-1.196-.718-.64-1.202-1.43-1.343-1.67-.14-.242-.015-.373.106-.493.11-.108.242-.282.363-.423.12-.14.16-.242.242-.403.08-.16.04-.302-.02-.423-.06-.12-.544-1.31-.746-1.794-.197-.473-.396-.408-.544-.416-.14-.007-.302-.007-.463-.007s-.423.06-.644.302c-.22.242-.845.826-.845 2.015 0 1.19.865 2.338.986 2.5.12.16 1.704 2.602 4.13 3.65.577.248.995.397 1.353.51.58.185 1.107.159 1.523.097.464-.068 1.432-.585 1.633-1.15.202-.564.202-1.047.14-1.15-.06-.102-.222-.162-.463-.282z"/>
-                    </svg>
-                </a>
-            </div>
-
-
-            <div class="flex space-x-6">
-                <a href="#" :class="theme === 'light' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Terms of Curation</a>
-                <a href="#" :class="theme === 'light' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Logistics Policy</a>
-                <a href="#" :class="theme === 'light' ? 'hover:text-neutral-800' : 'hover:text-neutral-400'" class="transition-colors">Invoice Request</a>
-            </div>
-        </div>
-    </footer>
 
     <!-- No Account Drawer here (Profile details managed inside dedicated /profile-portal) -->
     </div> <!-- Close transformed layout transition container here to lift curation modal out of transformed context -->
@@ -2963,7 +2467,7 @@ if (!function_exists('toJsObject')) {
                         <div class="flex items-center space-x-3 shrink-0">
                             <button 
                                 type="button"
-                                @click="quickViewProduct = {{ toJsObject($wProd) }}; quickViewSize = 'standard'; quickViewOpen = true; wishlistOpen = false;"
+                                @click="quickViewProduct = {{ $wProd->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true; wishlistOpen = false;"
                                 :class="theme === 'light' ? 'bg-black text-white hover:bg-neutral-850' : 'bg-white text-black hover:bg-neutral-200'"
                                 class="px-3.5 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-wider font-bold cursor-pointer transition-colors shadow-sm"
                             >

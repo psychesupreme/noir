@@ -42,6 +42,14 @@ else
         echo "Running migrations..."
         php /var/www/html/artisan migrate --force
     fi
+
+    # Conditionally enable queue worker only when async driver is configured
+    if [ "$QUEUE_CONNECTION" != "sync" ] && [ -n "$QUEUE_CONNECTION" ]; then
+        echo "Enabling background queue worker for connection: $QUEUE_CONNECTION..."
+        sed -i 's/autostart=false/autostart=true/g' /etc/supervisor/conf.d/supervisord.conf
+        sed -i 's/autorestart=false/autorestart=true/g' /etc/supervisor/conf.d/supervisord.conf
+    fi
+
     echo "Starting Supervisord..."
     exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
 fi
