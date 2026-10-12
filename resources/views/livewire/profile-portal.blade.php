@@ -3,6 +3,10 @@
 @endsection
 
 <div 
+    @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
     x-data="{ 
         theme: (() => {
             try {
@@ -216,7 +220,11 @@
             
             <!-- DETAILS TAB -->
             @if($activeTab === 'details')
-                <div class="space-y-6 animate-card-fade-in" x-data="{ gender: @entangle('gender'), name: @entangle('name') }">
+                <div class="space-y-6 animate-card-fade-in" @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
+    x-data="{ gender: @entangle('gender'), name: @entangle('name') }">
                     <div class="border-b border-neutral-500/10 pb-4">
                         <h3 class="text-3xl font-serif italic tracking-wider leading-tight">Personal Details</h3>
                         <p class="text-xs text-neutral-500 font-light mt-1">Configure user profile customization properties, email contacts, and default hub regions.</p>
@@ -267,7 +275,11 @@
                         <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Personal Information Parameters</h4>
                         
                         @if(session('success_profile'))
-                            <div x-data="{ show: true }"
+                            <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
+    x-data="{ show: true }"
                                  x-show="show"
                                  x-init="setTimeout(() => show = false, 5000)"
                                  x-transition:enter="transition ease-out duration-300 transform"
@@ -331,7 +343,11 @@
                                 <div class="space-y-2 md:col-span-2" wire:ignore>
                                     <label class="text-neutral-500 uppercase block">Interactive Location Locator Map</label>
                                     <div 
-                                        x-data="{
+                                        @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
+    x-data="{
                                             mapLoaded: false,
                                             map: null,
                                             marker: null,
@@ -523,7 +539,11 @@
                             <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Reset Security Credentials</h4>
                             
                             @if(session('success_password'))
-                                <div x-data="{ show: true }"
+                                <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
+    x-data="{ show: true }"
                                      x-show="show"
                                      x-init="setTimeout(() => show = false, 5000)"
                                      x-transition:enter="transition ease-out duration-300 transform"
@@ -537,7 +557,11 @@
                                     {{ session('success_password') }}
                                 </div>
                             @elseif(session('error_password'))
-                                <div x-data="{ show: true }"
+                                <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
+    x-data="{ show: true }"
                                      x-show="show"
                                      x-init="setTimeout(() => show = false, 5000)"
                                      x-transition:enter="transition ease-out duration-300 transform"
@@ -602,7 +626,11 @@
                     </div>
 
                     @if(session('success_orders'))
-                        <div x-data="{ show: true }"
+                        <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
+    x-data="{ show: true }"
                              x-show="show"
                              x-init="setTimeout(() => show = false, 5000)"
                              x-transition:enter="transition ease-out duration-300 transform"
@@ -728,7 +756,11 @@
                         <div class="block md:hidden space-y-4">
                             @forelse($userOrders as $ord)
                                 <div 
-                                    x-data="{ open: false }" 
+                                    @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
+    x-data="{ open: false }" 
                                     :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-250 text-neutral-900 shadow-sm' : 'bg-neutral-950/40 border-neutral-850/80 text-white shadow-md'" 
                                     class="border rounded-2xl overflow-hidden transition-all duration-300"
                                 >
@@ -905,7 +937,11 @@
                     </div>
 
                     @if(session('success_wishlist'))
-                        <div x-data="{ show: true }"
+                        <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
+    x-data="{ show: true }"
                              x-show="show"
                              x-init="setTimeout(() => show = false, 5000)"
                              x-transition:enter="transition ease-out duration-300 transform"
@@ -976,7 +1012,11 @@
                         <h4 class="text-md font-mono uppercase tracking-wider text-[#C5A880] font-bold pb-2 border-b border-neutral-500/5">&bull; Personal Preferences</h4>
                         
                         @if(session('success_settings'))
-                            <div x-data="{ show: true }"
+                            <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
+    x-data="{ show: true }"
                                  x-show="show"
                                  x-init="setTimeout(() => show = false, 5000)"
                                  x-transition:enter="transition ease-out duration-300 transform"
@@ -1098,7 +1138,11 @@
                     </div>
 
                     @if(session('success_logistics'))
-                        <div x-data="{ show: true }"
+                        <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
+    x-data="{ show: true }"
                              x-show="show"
                              x-init="setTimeout(() => show = false, 5000)"
                              x-transition:enter="transition ease-out duration-300 transform"
@@ -1404,7 +1448,11 @@
                             };
                         @endphp
                         <div 
-                            x-data="{ expanded: false }" 
+                            @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
+    x-data="{ expanded: false }" 
                             @mouseenter="if (!{{ $notif['is_read'] ? 'true' : 'false' }}) { $wire.markNotificationAsRead({{ $notif['id'] }}) }"
                             class="border p-4 rounded-2xl transition-all {{ $notifCls }} flex flex-col gap-2 relative group text-xs"
                         >

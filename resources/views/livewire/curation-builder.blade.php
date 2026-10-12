@@ -1,5 +1,9 @@
 <div 
-    x-data="curationStudio"
+    x-data="curationStudio()"
+    @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
     :class="{
         'bg-[#0B0B0D] text-[#E4E4E7]': theme === 'dark',
         'bg-[#FAF7F0] text-[#1C1C20]': theme === 'light',
@@ -116,7 +120,7 @@
                     <template x-for="occ in [
                         { id: 'birthday', label: 'Birthday Celebration', desc: 'Festive & vibrant hues', img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&q=80&w=300' },
                         { id: 'anniversary', label: 'Anniversary & Love', desc: 'Romantic deep reds & pastels', img: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&q=80&w=300' },
-                        { id: 'graduation', label: 'Graduation & Success', desc: 'Bright, celebratory blends', img: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=300' },
+                        { id: 'graduation', label: 'Graduation & Success', desc: 'Bright, celebratory blends', img: 'https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&q=80&w=300' },
                         { id: 'romance', label: 'Romantic Gesture', desc: 'Classic expressions of passion', img: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&q=80&w=300' },
                         { id: 'vase_bundle', label: 'Vase Bundle (Home/Office)', desc: 'Elegant, structural defaults', img: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&q=80&w=300' },
                         { id: 'sympathy', label: 'Sympathy & Comfort', desc: 'Serene whites & soft tones', img: 'https://images.unsplash.com/photo-1528255671579-01b9e182ed1d?auto=format&fit=crop&q=80&w=300' }
@@ -1145,8 +1149,8 @@
     </div>
 
     <script>
-        document.addEventListener('alpine:init', function() {
-            Alpine.data('curationStudio', function() {
+        (function() {
+            function createCurationStudio() {
                 return {
                     theme: (() => {
                         try {
@@ -1160,30 +1164,41 @@
                             return 'light';
                         }
                     })(),
+                    changeTheme(targetTheme) {
+                        this.theme = targetTheme;
+                    },
                     profileOpen: false,
                     notificationsOpen: false,
                     mobileMenuOpen: false,
                     viewMode: 'arrangement',
-                    selectedStems: @entangle('selectedStems'),
-                    selectedWrappingId: @entangle('selectedWrappingId'),
-                    hasGlitter: @entangle('hasGlitter'),
-                    selectedRibbonId: @entangle('selectedRibbonId'),
-                    selectedMistId: @entangle('selectedMistId'),
-                    selectedGifts: @entangle('selectedGifts'),
-                    hasCard: @entangle('hasCard'),
-                    cardMessage: @entangle('cardMessage'),
-                    subtotal: @entangle('subtotal'),
-                    curationOccasion: @entangle('curationOccasion'),
+                    selectedStems: @js($selectedStems),
+                    selectedWrappingId: @js($selectedWrappingId),
+                    hasGlitter: @js($hasGlitter),
+                    selectedRibbonId: @js($selectedRibbonId),
+                    selectedMistId: @js($selectedMistId),
+                    selectedGifts: @js($selectedGifts),
+                    hasCard: @js($hasCard),
+                    cardMessage: @js($cardMessage),
+                    subtotal: Number(@js($subtotal)) || 0,
+                    curationOccasion: @js($curationOccasion),
                     hoveredImage: null,
                     hoveredName: null,
                     activeSection: 'section-blooms',
                     showMobileLedger: false,
                     hoverTheme: null,
+                    availableStems: @json($availableStems),
+                    availableWrappings: @json($availableWrappings),
+                    availableRibbons: @json($availableRibbons),
+                    availableMists: @json($availableMists),
+                    availableWines: @json($availableWines),
+                    availableChocolates: @json($availableChocolates),
+                    availableJewelry: @json($availableJewelry),
+
                     get localStems() {
-                        return Object.assign({}, this.selectedStems);
+                        return Object.assign({}, this.selectedStems || {});
                     },
                     get localGifts() {
-                        return Object.assign({}, this.selectedGifts);
+                        return Object.assign({}, this.selectedGifts || {});
                     },
 
                     getOccasionLabel() {
@@ -1218,6 +1233,20 @@
                         @endauth
                         var self = this;
 
+                        // Synchronize Alpine state whenever Livewire finishes a network update
+                        if (this.$wire) {
+                            this.$watch('$wire.selectedStems', function(val) { if (val) self.selectedStems = val; });
+                            this.$watch('$wire.selectedWrappingId', function(val) { self.selectedWrappingId = val; });
+                            this.$watch('$wire.hasGlitter', function(val) { self.hasGlitter = !!val; });
+                            this.$watch('$wire.selectedRibbonId', function(val) { self.selectedRibbonId = val; });
+                            this.$watch('$wire.selectedMistId', function(val) { self.selectedMistId = val; });
+                            this.$watch('$wire.selectedGifts', function(val) { if (val) self.selectedGifts = val; });
+                            this.$watch('$wire.hasCard', function(val) { self.hasCard = !!val; });
+                            this.$watch('$wire.cardMessage', function(val) { self.cardMessage = val || ''; });
+                            this.$watch('$wire.subtotal', function(val) { self.subtotal = Number(val) || 0; });
+                            this.$watch('$wire.curationOccasion', function(val) { if (val) self.curationOccasion = val; });
+                        }
+
                         this.$watch('theme', function(val) {
                             localStorage.setItem('nb_theme', val);
                             document.documentElement.className = val;
@@ -1238,9 +1267,11 @@
                             if (textColors[val]) {
                                 document.documentElement.style.color = textColors[val];
                             }
-                            @auth
-                                self.$wire.updatePreferredTheme(val);
-                            @endauth
+                            if (self.$wire) {
+                                @auth
+                                    self.$wire.updatePreferredTheme(val);
+                                @endauth
+                            }
                         });
 
                         // IntersectionObserver for Scroll Spy
@@ -1268,7 +1299,7 @@
                     },
 
                     getStemImage() {
-                        var stems = @json($availableStems);
+                        var stems = this.availableStems || [];
                         var activeId = null;
                         for (var id in this.localStems) {
                             if (this.localStems[id] > 0) {
@@ -1284,73 +1315,73 @@
                     },
 
                     getWrapImage() {
-                        var wraps = @json($availableWrappings);
+                        var wraps = this.availableWrappings || [];
                         var self = this;
                         var active = wraps.find(function(w) { return w.id == self.selectedWrappingId; });
                         return active ? active.image_url : '/media/wraps/wrap.jpg';
                     },
 
                     getWrappingName() {
-                        var wraps = @json($availableWrappings);
+                        var wraps = this.availableWrappings || [];
                         var self = this;
                         var active = wraps.find(function(w) { return w.id == self.selectedWrappingId; });
                         return active ? active.name : 'None';
                     },
 
                     getWrappingPrice() {
-                        var wraps = @json($availableWrappings);
+                        var wraps = this.availableWrappings || [];
                         var self = this;
                         var active = wraps.find(function(w) { return w.id == self.selectedWrappingId; });
                         return active ? active.price : 0;
                     },
 
                     getRibbonName() {
-                        var ribbons = @json($availableRibbons);
+                        var ribbons = this.availableRibbons || [];
                         var self = this;
                         var active = ribbons.find(function(r) { return r.id == self.selectedRibbonId; });
                         return active ? active.name.replace(' Ribbon', '').replace(' Satin', '') : 'None';
                     },
 
                     getRibbonPrice() {
-                        var ribbons = @json($availableRibbons);
+                        var ribbons = this.availableRibbons || [];
                         var self = this;
                         var active = ribbons.find(function(r) { return r.id == self.selectedRibbonId; });
                         return active ? active.price : 0;
                     },
 
                     getMistPrice() {
-                        var mists = @json($availableMists);
+                        var mists = this.availableMists || [];
                         var self = this;
                         var active = mists.find(function(m) { return m.id == self.selectedMistId; });
                         return active ? active.price : 0;
                     },
 
                     getStemName(id) {
-                        var stems = @json($availableStems);
+                        var stems = this.availableStems || [];
                         var stem = stems.find(function(s) { return s.id == id; });
                         return stem ? stem.name.replace('Naivasha Volcanic ', '').replace('Naivasha Pure ', '').replace('Naivasha ', '').replace('Limuru Pure ', '').replace('Limuru ', '').replace(' (Grade A)', '') : '';
                     },
 
                     getStemPrice(id) {
-                        var stems = @json($availableStems);
+                        var stems = this.availableStems || [];
                         var stem = stems.find(function(s) { return s.id == id; });
                         return stem ? stem.price : 0;
                     },
 
                     getGiftName(id) {
-                        var gifts = @json($availableWines).concat(@json($availableChocolates)).concat(@json($availableJewelry));
+                        var gifts = (this.availableWines || []).concat(this.availableChocolates || []).concat(this.availableJewelry || []);
                         var gift = gifts.find(function(g) { return g.id == id; });
                         return gift ? gift.name.replace(' Premium', '').replace(' Gourmet', '').replace(' Luxury', '') : '';
                     },
 
                     getGiftPrice(id) {
-                        var gifts = @json($availableWines).concat(@json($availableChocolates)).concat(@json($availableJewelry));
+                        var gifts = (this.availableWines || []).concat(this.availableChocolates || []).concat(this.availableJewelry || []);
                         var gift = gifts.find(function(g) { return g.id == id; });
                         return gift ? gift.price : 0;
                     },
 
                     getSelectedStemsSummary() {
-                        var stems = @json($availableStems);
+                        var stems = this.availableStems || [];
                         var parts = [];
                         for (var id in this.localStems) {
                             var qty = this.localStems[id];
@@ -1381,7 +1412,7 @@
                     },
 
                     getMistName() {
-                        var mists = @json($availableMists);
+                        var mists = this.availableMists || [];
                         var self = this;
                         var active = mists.find(function(m) { return m.id == self.selectedMistId; });
                         return active ? active.name.replace('Atelier ', '').replace(' Mist', '') : 'None';
@@ -1395,8 +1426,17 @@
                         return count;
                     }
                 };
-            });
-        });
+            }
+
+            window.curationStudio = createCurationStudio;
+            if (window.Alpine) {
+                Alpine.data('curationStudio', createCurationStudio);
+            } else {
+                document.addEventListener('alpine:init', function() {
+                    Alpine.data('curationStudio', createCurationStudio);
+                });
+            }
+        })();
     </script>
 
                 <!-- Backdrop for Profile Modal -->

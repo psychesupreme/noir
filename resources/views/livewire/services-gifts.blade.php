@@ -1,29 +1,3 @@
-@php
-if (!function_exists('toJsObject')) {
-    function toJsObject($product) {
-        return \Illuminate\Support\Js::from([
-            'id' => $product->id,
-            'name' => $product->name,
-            'price' => $product->price,
-            'price_standard' => $product->price_standard,
-            'price_deluxe' => $product->price_deluxe,
-            'price_grand' => $product->price_grand,
-            'description' => $product->description,
-            'image' => $product->backdrop_url ?? $product->image_url ?? '/media/default.jpg',
-            'category' => $product->category,
-            'stock_standard' => $product->stock_standard,
-            'stock_deluxe' => $product->stock_deluxe,
-            'stock_grand' => $product->stock_grand,
-            'average_rating' => $product->average_rating,
-            'average_quality_rating' => $product->average_quality_rating,
-            'average_freshness_rating' => $product->average_freshness_rating,
-            'average_value_rating' => $product->average_value_rating,
-            'photographer_name' => $product->photographer_name,
-            'photographer_username' => $product->photographer_username,
-        ]);
-    }
-}
-@endphp
 @section('meta')
     <meta name="description" content="Explore Atelier Noir & Bloom's specialized corporate floral services, wedding designs, workspace subscriptions, and premium gifting hampers. Order directly online.">
     <meta name="keywords" content="wedding flowers Kenya, corporate flower subscription Nairobi, flower subscriptions Kiambu, custom gift hampers Nairobi, luxury event florist">
@@ -123,7 +97,11 @@ if (!function_exists('toJsObject')) {
 @endsection
 
 <div 
-    @wishlist-updated.window="wishlistIds = $event.detail.wishlistIds || []"
+    @wishlist-updated.window="wishlistIds = .detail.wishlistIds || []"
+    @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
     x-data="{ 
         theme: (() => {
             try {
@@ -344,7 +322,7 @@ if (!function_exists('toJsObject')) {
                     >
                         <!-- Left side: Squared Image Frame -->
                         <div class="w-[105px] sm:w-[125px] aspect-square rounded-2xl relative overflow-hidden bg-neutral-950/5 p-1 border border-neutral-500/10 shrink-0 self-center">
-                            <img src="{{ $srv->image_url }}" alt="{{ $srv->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 z-0 cursor-pointer" @click="quickViewProduct = {{ toJsObject($srv) }}; quickViewSize = 'standard'; quickViewOpen = true;" loading="lazy">
+                            <img src="{{ $srv->image_url }}" alt="{{ $srv->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 z-0 cursor-pointer" @click="quickViewProduct = {{ $srv->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true;" loading="lazy">
                             
                             @auth
                                 @php
@@ -383,7 +361,7 @@ if (!function_exists('toJsObject')) {
                         <div class="flex-1 pl-3 flex flex-col justify-between overflow-hidden">
                             <div class="space-y-1 overflow-hidden">
                                 <span class="text-[9px] uppercase tracking-[0.2em] text-[#C5A880] font-mono block font-bold truncate">Specialization</span>
-                                <h4 class="text-sm font-serif italic tracking-wide leading-tight truncate text-current cursor-pointer hover:underline" @click="quickViewProduct = {{ toJsObject($srv) }}; quickViewSize = 'standard'; quickViewOpen = true;">{{ $srv->name }}</h4>
+                                <h4 class="text-sm font-serif italic tracking-wide leading-tight truncate text-current cursor-pointer hover:underline" @click="quickViewProduct = {{ $srv->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true;">{{ $srv->name }}</h4>
                                 <p class="text-neutral-500 font-light text-[11px] leading-snug line-clamp-2">{{ $srv->description }}</p>
                             </div>
 
@@ -445,7 +423,7 @@ if (!function_exists('toJsObject')) {
                         class="flex flex-col p-3 rounded-[32px] border relative transition-all duration-500 hover:-translate-y-1 group backdrop-blur-md"
                     >
                         <div class="aspect-[1/1] rounded-[24px] relative overflow-hidden bg-neutral-950/5">
-                            <img src="{{ $gift->image_url }}" alt="{{ $gift->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 cursor-pointer" @click="quickViewProduct = {{ toJsObject($gift) }}; quickViewSize = 'standard'; quickViewOpen = true;" loading="lazy">
+                            <img src="{{ $gift->image_url }}" alt="{{ $gift->name }}" class="absolute inset-0 w-full h-full object-cover transition-all duration-750 group-hover:scale-105 cursor-pointer" @click="quickViewProduct = {{ $gift->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true;" loading="lazy">
                             
                             @auth
                                 @php
@@ -486,7 +464,7 @@ if (!function_exists('toJsObject')) {
                         </div>
                         <div class="px-2 pt-4 pb-2 flex-1 flex flex-col justify-between">
                             <div class="space-y-1">
-                                <h4 class="text-base font-serif italic tracking-wide leading-snug cursor-pointer hover:underline" @click="quickViewProduct = {{ toJsObject($gift) }}; quickViewSize = 'standard'; quickViewOpen = true;">{{ $gift->name }}</h4>
+                                <h4 class="text-base font-serif italic tracking-wide leading-snug cursor-pointer hover:underline" @click="quickViewProduct = {{ $gift->toJsObject() }}; quickViewSize = 'standard'; quickViewOpen = true;">{{ $gift->name }}</h4>
                                 <p class="text-neutral-500 font-light text-xs line-clamp-2">{{ $gift->description }}</p>
                                 
                                 <!-- Social Sharing Direct Links for SMM -->

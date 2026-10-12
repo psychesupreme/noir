@@ -60,7 +60,12 @@
 @endsection
 
 <div class="relative min-h-screen flex flex-col justify-between" 
-    @wishlist-updated.window="wishlistIds = $event.detail.wishlistIds || []"
+    @wishlist-updated.window="wishlistIds = .detail.wishlistIds || []"
+    @toggle-cart.window="drawerOpen = !drawerOpen; checkoutMode = false;"
+    @toggle-notifications.window="notificationsOpen = !notificationsOpen"
+    @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
+    @theme-changed.window="theme = .detail"
+    @theme-settings-changed.window="theme = .detail"
     x-data="{ 
         drawerOpen: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
         checkoutMode: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
@@ -656,7 +661,7 @@
                                     ['key' => 'bouquet', 'label' => 'Flowers', 'img' => 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=200'],
                                     ['key' => 'giftings', 'label' => 'Cakes & Sweets', 'img' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=200'],
                                     ['key' => 'wines', 'label' => 'Wines', 'img' => 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=200'],
-                                    ['key' => 'chocolate', 'label' => 'Chocolate', 'img' => 'https://images.unsplash.com/photo-1548907040-4d42b52115a1?auto=format&fit=crop&q=80&w=200'],
+                                    ['key' => 'chocolate', 'label' => 'Chocolate', 'img' => 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&q=80&w=200'],
                                     ['key' => 'bundle', 'label' => 'Plants & Vases', 'img' => 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80&w=200'],
                                     ['key' => 'stems', 'label' => 'Stems', 'img' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=200'],
                                     ['key' => 'specialization', 'label' => 'Bespoke Services', 'img' => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=200']

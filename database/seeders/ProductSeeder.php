@@ -69,7 +69,7 @@ class ProductSeeder extends Seeder
             'unit_type' => 'stem',
             'size_unit' => 'pieces',
             'grade' => 'Grade A',
-            'image_url' => 'https://images.unsplash.com/photo-1533604131587-35661a153243?auto=format&fit=crop&w=600&q=80',
+            'image_url' => 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=600&q=80',
             'sizes' => [
                 ['name' => 'Single Stem', 'price' => 300, 'cost_price' => 120, 'stock' => 450],
                 ['name' => 'Bunch (5 Stems)', 'price' => 1500, 'cost_price' => 600, 'stock' => 90],
@@ -150,7 +150,7 @@ class ProductSeeder extends Seeder
             'unit_type' => 'arrangement',
             'size_unit' => 'pieces',
             'grade' => 'Premium',
-            'image_url' => 'https://images.unsplash.com/photo-1587334206502-747683070c77?auto=format&fit=crop&w=600&q=80',
+            'image_url' => 'https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?auto=format&fit=crop&w=600&q=80',
             'sizes' => [
                 ['name' => 'Standard', 'price' => 2500, 'cost_price' => 1000, 'stock' => 45],
                 ['name' => 'Deluxe', 'price' => 5500, 'cost_price' => 2200, 'stock' => 31],
@@ -343,7 +343,7 @@ class ProductSeeder extends Seeder
             'unit_type' => 'arrangement',
             'size_unit' => 'pieces',
             'grade' => 'Executive',
-            'image_url' => 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=600&q=80',
+            'image_url' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=600&q=80',
             'sizes' => [
                 ['name' => 'Standard', 'price' => 35000, 'cost_price' => 16000, 'stock' => 15],
             ]
