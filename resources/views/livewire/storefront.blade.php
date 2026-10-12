@@ -60,12 +60,12 @@
 @endsection
 
 <div class="relative min-h-screen flex flex-col justify-between" 
-    @wishlist-updated.window="wishlistIds = .detail.wishlistIds || []"
+    @wishlist-updated.window="wishlistIds = ($event.detail && $event.detail.wishlistIds) || []"
     @toggle-cart.window="drawerOpen = !drawerOpen; checkoutMode = false;"
     @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ 
         drawerOpen: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
         checkoutMode: {{ $autoOpenDrawer ? 'true' : 'false' }}, 
@@ -415,10 +415,6 @@
 
     <div class="flex-1 flex flex-col justify-between relative z-10">
 
-    <!-- Interactive SVG ambient floral background overlay -->
-
-    <svg id="flower-ambient-svg" wire:ignore x-data="storefrontAmbient" class="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden" style="perspective: 800px; transform-style: preserve-3d;"></svg>
-
     <!-- Fine Linen Organic Grid Overlay -->
     <div class="absolute inset-0 pointer-events-none fine-linen z-0 opacity-[0.03]"></div>
 
@@ -628,63 +624,56 @@
 
             <!-- Right Column: Showroom Segment Selector & Product Grid -->
             <div class="flex-1 w-full min-w-0 space-y-6">
-                <!-- FNP-Style Circular Category Navigation Menu with Loop Marquee -->
-                <div class="w-full py-4 shrink-0 relative z-10 animate-layer-3 overflow-hidden border-y backdrop-blur-sm transition-colors duration-500 mb-6 flex items-center"
-                     :class="theme === 'light' ? 'bg-white/30 border-neutral-200/50' : 'bg-neutral-950/20 border-neutral-900/60'">
+                <!-- FNP-Style Circular Category Navigation Menu with Responsive Scroll Bar -->
+                <div class="w-full py-3 shrink-0 relative z-10 overflow-hidden border-y backdrop-blur-sm transition-colors duration-500 mb-6 flex items-center"
+                     :class="theme === 'light' ? 'bg-white/40 border-neutral-200/60' : 'bg-neutral-950/40 border-neutral-800/80'">
                     
-                    <!-- Sticky "All" Category Circle -->
-                    <div class="sticky left-0 z-20 shrink-0 pr-6 pl-4 flex items-center border-r border-neutral-500/10 transition-colors duration-500"
-                         :class="theme === 'light' ? 'bg-[#FAF7F0]' : 'bg-[#050507]'">
-                        <button wire:click="selectCategory('all')" class="inline-flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
+                    <!-- Scrollable Category Row -->
+                    <div class="w-full overflow-x-auto scrollbar-none py-1 px-4 flex items-center space-x-6 sm:space-x-8">
+                        <!-- "All" Category Pill -->
+                        <button type="button" wire:click="selectCategory('all')" class="inline-flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
                             <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
                                  :class="{
-                                     'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === 'all',
+                                     'border-[#C5A880] ring-2 ring-[#C5A880]/30 scale-105 shadow-md': @js($selectedCategory) === 'all',
                                      'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== 'all' && theme === 'dark',
-                                     'border-neutral-250 hover:border-[#B59A7A] hover:scale-105': @js($selectedCategory) !== 'all' && theme === 'light'
+                                     'border-neutral-300 hover:border-[#B59A7A] hover:scale-105': @js($selectedCategory) !== 'all' && theme === 'light'
                                  }">
-                                <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=200" alt="All" class="w-full h-full object-cover" loading="lazy">
+                                <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=200" alt="All" class="w-full h-full object-cover pointer-events-none" loading="lazy">
                             </div>
                             <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
                                   :class="{
-                                      'text-[#C5A880]': @js($selectedCategory) === 'all',
+                                      'text-[#C5A880] font-bold': @js($selectedCategory) === 'all',
                                       'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== 'all' && theme === 'dark',
-                                      'text-neutral-750 group-hover:text-[#B59A7A]': @js($selectedCategory) !== 'all' && theme === 'light'
+                                      'text-neutral-700 group-hover:text-[#B59A7A]': @js($selectedCategory) !== 'all' && theme === 'light'
                                   }">All</span>
                         </button>
-                    </div>
 
-                    <!-- Scrolling/Sliding Marquee container for other categories -->
-                    <div class="flex-1 overflow-hidden relative">
-                        <div class="flex whitespace-nowrap space-x-12 w-max animate-marquee py-2 pl-6">
-                            @for($i = 0; $i < 4; $i++)
-                                @foreach([
-                                    ['key' => 'bouquet', 'label' => 'Flowers', 'img' => 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=200'],
-                                    ['key' => 'giftings', 'label' => 'Cakes & Sweets', 'img' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=200'],
-                                    ['key' => 'wines', 'label' => 'Wines', 'img' => 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=200'],
-                                    ['key' => 'chocolate', 'label' => 'Chocolate', 'img' => 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&q=80&w=200'],
-                                    ['key' => 'bundle', 'label' => 'Plants & Vases', 'img' => 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80&w=200'],
-                                    ['key' => 'stems', 'label' => 'Stems', 'img' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=200'],
-                                    ['key' => 'specialization', 'label' => 'Bespoke Services', 'img' => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=200']
-                                ] as $catItem)
-                                    <button wire:click="selectCategory('{{ $catItem['key'] }}')" class="inline-flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
-                                        <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
-                                             :class="{
-                                                 'border-[#C5A880] scale-105 shadow-md': @js($selectedCategory) === '{{ $catItem['key'] }}',
-                                                 'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'dark',
-                                                 'border-neutral-250 hover:border-[#B59A7A] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'light'
-                                             }">
-                                            <img src="{{ $catItem['img'] }}" alt="{{ $catItem['label'] }}" class="w-full h-full object-cover" loading="lazy">
-                                        </div>
-                                        <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
-                                              :class="{
-                                                  'text-[#C5A880]': @js($selectedCategory) === '{{ $catItem['key'] }}',
-                                                  'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'dark',
-                                                  'text-neutral-750 group-hover:text-[#B59A7A]': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'light'
-                                              }">{{ $catItem['label'] }}</span>
-                                    </button>
-                                @endforeach
-                            @endfor
-                        </div>
+                        @foreach([
+                            ['key' => 'bouquet', 'label' => 'Flowers', 'img' => 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=200'],
+                            ['key' => 'giftings', 'label' => 'Hampers', 'img' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=200'],
+                            ['key' => 'wines', 'label' => 'Wines & Spirits', 'img' => 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=200'],
+                            ['key' => 'chocolate', 'label' => 'Chocolates', 'img' => 'https://images.unsplash.com/photo-1481391319762-47dff72954d9?auto=format&fit=crop&q=80&w=200'],
+                            ['key' => 'bundle', 'label' => 'Plants & Vases', 'img' => 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&q=80&w=200'],
+                            ['key' => 'stems', 'label' => 'Fresh Stems', 'img' => 'https://images.unsplash.com/photo-1596436889106-be35e843f974?auto=format&fit=crop&q=80&w=200'],
+                            ['key' => 'specialization', 'label' => 'Bespoke Services', 'img' => 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&q=80&w=200']
+                        ] as $catItem)
+                            <button type="button" wire:click="selectCategory('{{ $catItem['key'] }}')" class="inline-flex flex-col items-center gap-1.5 group shrink-0 focus:outline-none cursor-pointer">
+                                <div class="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden border-2 transition-all duration-300 shadow-sm relative"
+                                     :class="{
+                                         'border-[#C5A880] ring-2 ring-[#C5A880]/30 scale-105 shadow-md': @js($selectedCategory) === '{{ $catItem['key'] }}',
+                                         'border-neutral-700/60 hover:border-[#C5A880] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'dark',
+                                         'border-neutral-300 hover:border-[#B59A7A] hover:scale-105': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'light'
+                                     }">
+                                    <img src="{{ $catItem['img'] }}" alt="{{ $catItem['label'] }}" class="w-full h-full object-cover pointer-events-none" loading="lazy">
+                                </div>
+                                <span class="text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors"
+                                      :class="{
+                                          'text-[#C5A880] font-bold': @js($selectedCategory) === '{{ $catItem['key'] }}',
+                                          'text-neutral-400 group-hover:text-white': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'dark',
+                                          'text-neutral-700 group-hover:text-[#B59A7A]': @js($selectedCategory) !== '{{ $catItem['key'] }}' && theme === 'light'
+                                      }">{{ $catItem['label'] }}</span>
+                            </button>
+                        @endforeach
                     </div>
                 </div>
 
@@ -1215,7 +1204,7 @@
     </div> <!-- Close transformed layout transition container here to lift curation modal out of transformed context -->
     
     <!-- Backdrop for Curation Drawer -->
-    <div x-show="drawerOpen" @click="drawerOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
+    <div x-show="drawerOpen" @click="drawerOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" style="display: none;"></div>
     
     <!-- Floating Cart Overlay Panel (Center Modal) -->
     <div 
@@ -1916,7 +1905,7 @@
 
 
 <!-- Floating Chat Widget -->
-    <div x-show="!drawerOpen" x-transition class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
+    <div x-show="!drawerOpen" x-transition class="fixed bottom-6 right-6 z-50 flex flex-col-reverse items-end font-sans">
         <!-- Jumping Animated Circular Icon Button -->
         <button 
             @click="chatOpen = !chatOpen" 
@@ -1943,7 +1932,7 @@
             </span>
         </button>
  
-        <div x-show="chatOpen" style="display: none;" x-transition :class="theme === 'light' ? 'bg-[#FAF7F0]/95 border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#121110]/95 border border-[#C5A880]/20 text-white shadow-[0_30px_100px_rgba(0,0,0,0.65)]'" class="mt-3 w-80 md:w-96 h-[420px] rounded-3xl flex flex-col justify-between overflow-hidden backdrop-blur-xl">
+        <div x-show="chatOpen" style="display: none;" x-transition :class="theme === 'light' ? 'bg-[#FAF7F0]/95 border-neutral-200 text-neutral-900 shadow-xl' : 'bg-[#121110]/95 border border-[#C5A880]/20 text-white shadow-[0_30px_100px_rgba(0,0,0,0.65)]'" class="mb-3 w-80 md:w-96 h-[420px] rounded-3xl flex flex-col justify-between overflow-hidden backdrop-blur-xl">
             <div :class="theme === 'light' ? 'border-neutral-200 bg-neutral-100/50 text-neutral-900' : 'border-neutral-850 bg-[#0A0908]/90 text-white'" class="p-4 border-b flex items-center justify-between text-left">
                 <div>
                     <span :class="theme === 'light' ? 'text-neutral-800' : 'text-neutral-300'" class="text-xs uppercase font-mono tracking-wider font-semibold">Aura Concierge AI</span>
@@ -1968,7 +1957,7 @@
     </div>
 
     <!-- Product Detail Modal (FNP-style) -->
-    <div x-show="quickViewOpen" @click="quickViewOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+    <div x-show="quickViewOpen" @click="quickViewOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
     
     <div
         x-show="quickViewOpen"
@@ -2130,7 +2119,7 @@
     </div>
 
                 <!-- Backdrop for Profile Modal -->
-    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
+    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Profile Overlay Panel (Center Modal) -->
     <div 
@@ -2290,7 +2279,7 @@
 
 
         <!-- Backdrop for Notifications Modal -->
-    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
+    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Notifications Overlay Panel (Center Modal) -->
     <div 

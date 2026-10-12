@@ -5,8 +5,8 @@
 <div 
     @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ 
         theme: (() => {
             try {
@@ -222,8 +222,8 @@
             @if($activeTab === 'details')
                 <div class="space-y-6 animate-card-fade-in" @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ gender: @entangle('gender'), name: @entangle('name') }">
                     <div class="border-b border-neutral-500/10 pb-4">
                         <h3 class="text-3xl font-serif italic tracking-wider leading-tight">Personal Details</h3>
@@ -277,8 +277,8 @@
                         @if(session('success_profile'))
                             <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ show: true }"
                                  x-show="show"
                                  x-init="setTimeout(() => show = false, 5000)"
@@ -345,8 +345,8 @@
                                     <div 
                                         @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{
                                             mapLoaded: false,
                                             map: null,
@@ -541,8 +541,8 @@
                             @if(session('success_password'))
                                 <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ show: true }"
                                      x-show="show"
                                      x-init="setTimeout(() => show = false, 5000)"
@@ -559,8 +559,8 @@
                             @elseif(session('error_password'))
                                 <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ show: true }"
                                      x-show="show"
                                      x-init="setTimeout(() => show = false, 5000)"
@@ -628,8 +628,8 @@
                     @if(session('success_orders'))
                         <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ show: true }"
                              x-show="show"
                              x-init="setTimeout(() => show = false, 5000)"
@@ -758,8 +758,8 @@
                                 <div 
                                     @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ open: false }" 
                                     :class="theme === 'light' ? 'bg-[#FAF7F0] border-neutral-250 text-neutral-900 shadow-sm' : 'bg-neutral-950/40 border-neutral-850/80 text-white shadow-md'" 
                                     class="border rounded-2xl overflow-hidden transition-all duration-300"
@@ -939,8 +939,8 @@
                     @if(session('success_wishlist'))
                         <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ show: true }"
                              x-show="show"
                              x-init="setTimeout(() => show = false, 5000)"
@@ -1014,8 +1014,8 @@
                         @if(session('success_settings'))
                             <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ show: true }"
                                  x-show="show"
                                  x-init="setTimeout(() => show = false, 5000)"
@@ -1140,8 +1140,8 @@
                     @if(session('success_logistics'))
                         <div @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ show: true }"
                              x-show="show"
                              x-init="setTimeout(() => show = false, 5000)"
@@ -1246,7 +1246,7 @@
 
 
                 <!-- Backdrop for Profile Modal -->
-    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
+    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Profile Overlay Panel (Center Modal) -->
     <div 
@@ -1406,7 +1406,7 @@
 
 
         <!-- Backdrop for Notifications Modal -->
-    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
+    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Notifications Overlay Panel (Center Modal) -->
     <div 
@@ -1450,8 +1450,8 @@
                         <div 
                             @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ expanded: false }" 
                             @mouseenter="if (!{{ $notif['is_read'] ? 'true' : 'false' }}) { $wire.markNotificationAsRead({{ $notif['id'] }}) }"
                             class="border p-4 rounded-2xl transition-all {{ $notifCls }} flex flex-col gap-2 relative group text-xs"
@@ -1524,7 +1524,7 @@
     <!-- Centered Rating Modal -->
     @if($ratingOrderId)
         <!-- Backdrop for Rating Modal -->
-        <div class="fixed inset-0 z-45 bg-black/40 backdrop-blur-xl" wire:click="$set('ratingOrderId', null)"></div>
+        <div class="fixed inset-0 z-40 bg-black/40 backdrop-blur-xl" wire:click="$set('ratingOrderId', null)"></div>
 
         <!-- Rating Overlay Panel (Center Modal) -->
         <div 

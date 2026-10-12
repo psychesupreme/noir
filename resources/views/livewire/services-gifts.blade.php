@@ -97,11 +97,11 @@
 @endsection
 
 <div 
-    @wishlist-updated.window="wishlistIds = .detail.wishlistIds || []"
+    @wishlist-updated.window="wishlistIds = ($event.detail && $event.detail.wishlistIds) || []"
     @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     x-data="{ 
         theme: (() => {
             try {
@@ -496,7 +496,7 @@
 
 
     <!-- Product Detail Modal (FNP-style) -->
-    <div x-show="quickViewOpen" @click="quickViewOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+    <div x-show="quickViewOpen" @click="quickViewOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
     
     <div
         x-show="quickViewOpen"
@@ -710,7 +710,7 @@
     </div>
 
                 <!-- Backdrop for Profile Modal -->
-    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
+    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Profile Overlay Panel (Center Modal) -->
     <div 
@@ -870,7 +870,7 @@
 
 
         <!-- Backdrop for Notifications Modal -->
-    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
+    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Notifications Overlay Panel (Center Modal) -->
     <div 

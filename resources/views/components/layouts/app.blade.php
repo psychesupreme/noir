@@ -98,9 +98,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="bg-zinc-950 text-zinc-100 font-sans antialiased min-h-screen selection:bg-amber-900 selection:text-amber-100">
+<body class="bg-[#FAF7F0] text-[#1C1C20] dark:bg-zinc-950 dark:text-zinc-100 font-sans antialiased min-h-screen selection:bg-amber-900 selection:text-amber-100 transition-colors duration-300">
 
-    <div class="min-h-screen flex flex-col bg-zinc-950 text-zinc-100">
+    <div class="min-h-screen flex flex-col bg-[#FAF7F0] text-[#1C1C20] dark:bg-zinc-950 dark:text-zinc-100 transition-colors duration-300">
         <!-- Uniform Navbar Component -->
         <x-navbar />
 

@@ -1,9 +1,299 @@
+<script>
+        (function() {
+            function createCurationStudio() {
+                return {
+                    theme: (() => {
+                        try {
+                            @auth
+                                const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
+                                if (pref) return (pref === 'onyx' || pref === 'dark') ? 'dark' : 'light';
+                            @endauth
+                            const stored = localStorage.getItem('nb_theme');
+                            return (stored === 'onyx' || stored === 'dark') ? 'dark' : 'light';
+                        } catch (e) {
+                            return 'light';
+                        }
+                    })(),
+                    changeTheme(targetTheme) {
+                        this.theme = targetTheme;
+                    },
+                    profileOpen: false,
+                    notificationsOpen: false,
+                    mobileMenuOpen: false,
+                    viewMode: 'arrangement',
+                    selectedStems: @js($selectedStems),
+                    selectedWrappingId: @js($selectedWrappingId),
+                    hasGlitter: @js($hasGlitter),
+                    selectedRibbonId: @js($selectedRibbonId),
+                    selectedMistId: @js($selectedMistId),
+                    selectedGifts: @js($selectedGifts),
+                    hasCard: @js($hasCard),
+                    cardMessage: @js($cardMessage),
+                    subtotal: Number(@js($subtotal)) || 0,
+                    curationOccasion: @js($curationOccasion),
+                    hoveredImage: null,
+                    hoveredName: null,
+                    activeSection: 'section-blooms',
+                    showMobileLedger: false,
+                    hoverTheme: null,
+                    availableStems: @json($availableStems),
+                    availableWrappings: @json($availableWrappings),
+                    availableRibbons: @json($availableRibbons),
+                    availableMists: @json($availableMists),
+                    availableWines: @json($availableWines),
+                    availableChocolates: @json($availableChocolates),
+                    availableJewelry: @json($availableJewelry),
+
+                    get localStems() {
+                        return Object.assign({}, this.selectedStems || {});
+                    },
+                    get localGifts() {
+                        return Object.assign({}, this.selectedGifts || {});
+                    },
+
+                    getOccasionLabel() {
+                        var labels = {
+                            birthday: 'Birthday Celebration',
+                            anniversary: 'Anniversary & Love',
+                            graduation: 'Graduation & Success',
+                            romance: 'Romantic Gesture',
+                            vase_bundle: 'Vase Bundle',
+                            sympathy: 'Sympathy & Comfort'
+                        };
+                        return labels[this.curationOccasion] || 'Bespoke Curation';
+                    },
+
+                    isCurationEmpty() {
+                        return this.getTotalStemCount() === 0 
+                            && !this.selectedWrappingId 
+                            && !this.selectedRibbonId 
+                            && !this.selectedMistId 
+                            && !this.hasGlitter 
+                            && this.getTotalGiftCount() === 0 
+                            && !this.hasCard;
+                    },
+
+                    init() {
+                        var storedTheme = localStorage.getItem('nb_theme');
+                        @auth
+                            const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
+                            this.theme = (pref === 'onyx' || pref === 'dark') ? 'dark' : ((pref === 'light') ? 'light' : ((storedTheme === 'onyx' || storedTheme === 'dark') ? 'dark' : 'light'));
+                        @else
+                            this.theme = (storedTheme === 'onyx' || storedTheme === 'dark') ? 'dark' : 'light';
+                        @endauth
+                        var self = this;
+
+                        // Synchronize Alpine state whenever Livewire finishes a network update
+                        if (this.$wire) {
+                            this.$watch('$wire.selectedStems', function(val) { if (val) self.selectedStems = val; });
+                            this.$watch('$wire.selectedWrappingId', function(val) { self.selectedWrappingId = val; });
+                            this.$watch('$wire.hasGlitter', function(val) { self.hasGlitter = !!val; });
+                            this.$watch('$wire.selectedRibbonId', function(val) { self.selectedRibbonId = val; });
+                            this.$watch('$wire.selectedMistId', function(val) { self.selectedMistId = val; });
+                            this.$watch('$wire.selectedGifts', function(val) { if (val) self.selectedGifts = val; });
+                            this.$watch('$wire.hasCard', function(val) { self.hasCard = !!val; });
+                            this.$watch('$wire.cardMessage', function(val) { self.cardMessage = val || ''; });
+                            this.$watch('$wire.subtotal', function(val) { self.subtotal = Number(val) || 0; });
+                            this.$watch('$wire.curationOccasion', function(val) { if (val) self.curationOccasion = val; });
+                        }
+
+                        this.$watch('theme', function(val) {
+                            localStorage.setItem('nb_theme', val);
+                            document.documentElement.className = val;
+                            document.documentElement.setAttribute('data-theme', val);
+                            self.$dispatch('theme-changed', val);
+                            
+                            const bgColors = {
+                                'dark': '#0B0B0D',
+                                'light': '#FAF7F0',
+                            };
+                            const textColors = {
+                                'dark': '#E4E4E7',
+                                'light': '#1C1C20',
+                            };
+                            if (bgColors[val]) {
+                                document.documentElement.style.backgroundColor = bgColors[val];
+                            }
+                            if (textColors[val]) {
+                                document.documentElement.style.color = textColors[val];
+                            }
+                            if (self.$wire) {
+                                @auth
+                                    self.$wire.updatePreferredTheme(val);
+                                @endauth
+                            }
+                        });
+
+                        // IntersectionObserver for Scroll Spy
+                        if ('IntersectionObserver' in window) {
+                            var options = {
+                                root: null,
+                                rootMargin: '-10% 0px -70% 0px',
+                                threshold: 0
+                            };
+                            var observer = new IntersectionObserver(function(entries) {
+                                entries.forEach(function(entry) {
+                                    if (entry.isIntersecting) {
+                                        self.activeSection = entry.target.id;
+                                    }
+                                });
+                            }, options);
+                            var sections = ['section-occasion', 'section-blooms', 'section-wrapping', 'section-scent', 'section-gifts', 'section-card'];
+                            sections.forEach(function(id) {
+                                var el = document.getElementById(id);
+                                if (el) {
+                                    observer.observe(el);
+                                }
+                            });
+                        }
+                    },
+
+                    getStemImage() {
+                        var stems = this.availableStems || [];
+                        var activeId = null;
+                        for (var id in this.localStems) {
+                            if (this.localStems[id] > 0) {
+                                activeId = id;
+                                break;
+                            }
+                        }
+                        if (!activeId) {
+                            activeId = {{ $availableStems->first()->id ?? 'null' }};
+                        }
+                        var active = stems.find(function(s) { return s.id == activeId; });
+                        return active ? active.image_url : '/media/flowers/redrosestem.jpg';
+                    },
+
+                    getWrapImage() {
+                        var wraps = this.availableWrappings || [];
+                        var self = this;
+                        var active = wraps.find(function(w) { return w.id == self.selectedWrappingId; });
+                        return active ? active.image_url : '/media/wraps/wrap.jpg';
+                    },
+
+                    getWrappingName() {
+                        var wraps = this.availableWrappings || [];
+                        var self = this;
+                        var active = wraps.find(function(w) { return w.id == self.selectedWrappingId; });
+                        return active ? active.name : 'None';
+                    },
+
+                    getWrappingPrice() {
+                        var wraps = this.availableWrappings || [];
+                        var self = this;
+                        var active = wraps.find(function(w) { return w.id == self.selectedWrappingId; });
+                        return active ? active.price : 0;
+                    },
+
+                    getRibbonName() {
+                        var ribbons = this.availableRibbons || [];
+                        var self = this;
+                        var active = ribbons.find(function(r) { return r.id == self.selectedRibbonId; });
+                        return active ? active.name.replace(' Ribbon', '').replace(' Satin', '') : 'None';
+                    },
+
+                    getRibbonPrice() {
+                        var ribbons = this.availableRibbons || [];
+                        var self = this;
+                        var active = ribbons.find(function(r) { return r.id == self.selectedRibbonId; });
+                        return active ? active.price : 0;
+                    },
+
+                    getMistPrice() {
+                        var mists = this.availableMists || [];
+                        var self = this;
+                        var active = mists.find(function(m) { return m.id == self.selectedMistId; });
+                        return active ? active.price : 0;
+                    },
+
+                    getStemName(id) {
+                        var stems = this.availableStems || [];
+                        var stem = stems.find(function(s) { return s.id == id; });
+                        return stem ? stem.name.replace('Naivasha Volcanic ', '').replace('Naivasha Pure ', '').replace('Naivasha ', '').replace('Limuru Pure ', '').replace('Limuru ', '').replace(' (Grade A)', '') : '';
+                    },
+
+                    getStemPrice(id) {
+                        var stems = this.availableStems || [];
+                        var stem = stems.find(function(s) { return s.id == id; });
+                        return stem ? stem.price : 0;
+                    },
+
+                    getGiftName(id) {
+                        var gifts = (this.availableWines || []).concat(this.availableChocolates || []).concat(this.availableJewelry || []);
+                        var gift = gifts.find(function(g) { return g.id == id; });
+                        return gift ? gift.name.replace(' Premium', '').replace(' Gourmet', '').replace(' Luxury', '') : '';
+                    },
+
+                    getGiftPrice(id) {
+                        var gifts = (this.availableWines || []).concat(this.availableChocolates || []).concat(this.availableJewelry || []);
+                        var gift = gifts.find(function(g) { return g.id == id; });
+                        return gift ? gift.price : 0;
+                    },
+
+                    getSelectedStemsSummary() {
+                        var stems = this.availableStems || [];
+                        var parts = [];
+                        for (var id in this.localStems) {
+                            var qty = this.localStems[id];
+                            if (qty > 0) {
+                                var stem = stems.find(function(s) { return s.id == id; });
+                                if (stem) {
+                                    var shortName = stem.name.replace('Naivasha Volcanic ', '').replace('Naivasha Pure ', '').replace('Naivasha ', '').replace('Limuru Pure ', '').replace('Limuru ', '').replace(' (Grade A)', '');
+                                    parts.push(qty + 'x ' + shortName);
+                                }
+                            }
+                        }
+                        return parts.length > 0 ? parts.join(', ') : 'No Stems';
+                    },
+
+                    getTotalStemCount() {
+                        var count = 0;
+                        for (var id in this.localStems) {
+                            count += parseInt(this.localStems[id] || 0);
+                        }
+                        return count;
+                    },
+
+                    scrollToSection(id) {
+                        var el = document.getElementById(id);
+                        if (el) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    },
+
+                    getMistName() {
+                        var mists = this.availableMists || [];
+                        var self = this;
+                        var active = mists.find(function(m) { return m.id == self.selectedMistId; });
+                        return active ? active.name.replace('Atelier ', '').replace(' Mist', '') : 'None';
+                    },
+
+                    getTotalGiftCount() {
+                        var count = 0;
+                        for (var id in this.localGifts) {
+                            count += parseInt(this.localGifts[id] || 0);
+                        }
+                        return count;
+                    }
+                };
+            }
+
+            window.curationStudio = createCurationStudio;
+            if (window.Alpine) {
+                Alpine.data('curationStudio', createCurationStudio);
+            } else {
+                document.addEventListener('alpine:init', function() {
+                    Alpine.data('curationStudio', createCurationStudio);
+                });
+            }
+        })();
+    </script>
 <div 
     x-data="curationStudio()"
     @toggle-notifications.window="notificationsOpen = !notificationsOpen"
     @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen"
-    @theme-changed.window="theme = .detail"
-    @theme-settings-changed.window="theme = .detail"
+    @theme-changed.window="theme = $event.detail"
+    @theme-settings-changed.window="theme = $event.detail"
     :class="{
         'bg-[#0B0B0D] text-[#E4E4E7]': theme === 'dark',
         'bg-[#FAF7F0] text-[#1C1C20]': theme === 'light',
@@ -1148,299 +1438,10 @@
         </div>
     </div>
 
-    <script>
-        (function() {
-            function createCurationStudio() {
-                return {
-                    theme: (() => {
-                        try {
-                            @auth
-                                const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
-                                if (pref) return (pref === 'onyx' || pref === 'dark') ? 'dark' : 'light';
-                            @endauth
-                            const stored = localStorage.getItem('nb_theme');
-                            return (stored === 'onyx' || stored === 'dark') ? 'dark' : 'light';
-                        } catch (e) {
-                            return 'light';
-                        }
-                    })(),
-                    changeTheme(targetTheme) {
-                        this.theme = targetTheme;
-                    },
-                    profileOpen: false,
-                    notificationsOpen: false,
-                    mobileMenuOpen: false,
-                    viewMode: 'arrangement',
-                    selectedStems: @js($selectedStems),
-                    selectedWrappingId: @js($selectedWrappingId),
-                    hasGlitter: @js($hasGlitter),
-                    selectedRibbonId: @js($selectedRibbonId),
-                    selectedMistId: @js($selectedMistId),
-                    selectedGifts: @js($selectedGifts),
-                    hasCard: @js($hasCard),
-                    cardMessage: @js($cardMessage),
-                    subtotal: Number(@js($subtotal)) || 0,
-                    curationOccasion: @js($curationOccasion),
-                    hoveredImage: null,
-                    hoveredName: null,
-                    activeSection: 'section-blooms',
-                    showMobileLedger: false,
-                    hoverTheme: null,
-                    availableStems: @json($availableStems),
-                    availableWrappings: @json($availableWrappings),
-                    availableRibbons: @json($availableRibbons),
-                    availableMists: @json($availableMists),
-                    availableWines: @json($availableWines),
-                    availableChocolates: @json($availableChocolates),
-                    availableJewelry: @json($availableJewelry),
-
-                    get localStems() {
-                        return Object.assign({}, this.selectedStems || {});
-                    },
-                    get localGifts() {
-                        return Object.assign({}, this.selectedGifts || {});
-                    },
-
-                    getOccasionLabel() {
-                        var labels = {
-                            birthday: 'Birthday Celebration',
-                            anniversary: 'Anniversary & Love',
-                            graduation: 'Graduation & Success',
-                            romance: 'Romantic Gesture',
-                            vase_bundle: 'Vase Bundle',
-                            sympathy: 'Sympathy & Comfort'
-                        };
-                        return labels[this.curationOccasion] || 'Bespoke Curation';
-                    },
-
-                    isCurationEmpty() {
-                        return this.getTotalStemCount() === 0 
-                            && !this.selectedWrappingId 
-                            && !this.selectedRibbonId 
-                            && !this.selectedMistId 
-                            && !this.hasGlitter 
-                            && this.getTotalGiftCount() === 0 
-                            && !this.hasCard;
-                    },
-
-                    init() {
-                        var storedTheme = localStorage.getItem('nb_theme');
-                        @auth
-                            const pref = '{{ auth()->user()->settings["preferred_theme"] ?? "" }}';
-                            this.theme = (pref === 'onyx' || pref === 'dark') ? 'dark' : ((pref === 'light') ? 'light' : ((storedTheme === 'onyx' || storedTheme === 'dark') ? 'dark' : 'light'));
-                        @else
-                            this.theme = (storedTheme === 'onyx' || storedTheme === 'dark') ? 'dark' : 'light';
-                        @endauth
-                        var self = this;
-
-                        // Synchronize Alpine state whenever Livewire finishes a network update
-                        if (this.$wire) {
-                            this.$watch('$wire.selectedStems', function(val) { if (val) self.selectedStems = val; });
-                            this.$watch('$wire.selectedWrappingId', function(val) { self.selectedWrappingId = val; });
-                            this.$watch('$wire.hasGlitter', function(val) { self.hasGlitter = !!val; });
-                            this.$watch('$wire.selectedRibbonId', function(val) { self.selectedRibbonId = val; });
-                            this.$watch('$wire.selectedMistId', function(val) { self.selectedMistId = val; });
-                            this.$watch('$wire.selectedGifts', function(val) { if (val) self.selectedGifts = val; });
-                            this.$watch('$wire.hasCard', function(val) { self.hasCard = !!val; });
-                            this.$watch('$wire.cardMessage', function(val) { self.cardMessage = val || ''; });
-                            this.$watch('$wire.subtotal', function(val) { self.subtotal = Number(val) || 0; });
-                            this.$watch('$wire.curationOccasion', function(val) { if (val) self.curationOccasion = val; });
-                        }
-
-                        this.$watch('theme', function(val) {
-                            localStorage.setItem('nb_theme', val);
-                            document.documentElement.className = val;
-                            document.documentElement.setAttribute('data-theme', val);
-                            self.$dispatch('theme-changed', val);
-                            
-                            const bgColors = {
-                                'dark': '#0B0B0D',
-                                'light': '#FAF7F0',
-                            };
-                            const textColors = {
-                                'dark': '#E4E4E7',
-                                'light': '#1C1C20',
-                            };
-                            if (bgColors[val]) {
-                                document.documentElement.style.backgroundColor = bgColors[val];
-                            }
-                            if (textColors[val]) {
-                                document.documentElement.style.color = textColors[val];
-                            }
-                            if (self.$wire) {
-                                @auth
-                                    self.$wire.updatePreferredTheme(val);
-                                @endauth
-                            }
-                        });
-
-                        // IntersectionObserver for Scroll Spy
-                        if ('IntersectionObserver' in window) {
-                            var options = {
-                                root: null,
-                                rootMargin: '-10% 0px -70% 0px',
-                                threshold: 0
-                            };
-                            var observer = new IntersectionObserver(function(entries) {
-                                entries.forEach(function(entry) {
-                                    if (entry.isIntersecting) {
-                                        self.activeSection = entry.target.id;
-                                    }
-                                });
-                            }, options);
-                            var sections = ['section-occasion', 'section-blooms', 'section-wrapping', 'section-scent', 'section-gifts', 'section-card'];
-                            sections.forEach(function(id) {
-                                var el = document.getElementById(id);
-                                if (el) {
-                                    observer.observe(el);
-                                }
-                            });
-                        }
-                    },
-
-                    getStemImage() {
-                        var stems = this.availableStems || [];
-                        var activeId = null;
-                        for (var id in this.localStems) {
-                            if (this.localStems[id] > 0) {
-                                activeId = id;
-                                break;
-                            }
-                        }
-                        if (!activeId) {
-                            activeId = {{ $availableStems->first()->id ?? 'null' }};
-                        }
-                        var active = stems.find(function(s) { return s.id == activeId; });
-                        return active ? active.image_url : '/media/flowers/redrosestem.jpg';
-                    },
-
-                    getWrapImage() {
-                        var wraps = this.availableWrappings || [];
-                        var self = this;
-                        var active = wraps.find(function(w) { return w.id == self.selectedWrappingId; });
-                        return active ? active.image_url : '/media/wraps/wrap.jpg';
-                    },
-
-                    getWrappingName() {
-                        var wraps = this.availableWrappings || [];
-                        var self = this;
-                        var active = wraps.find(function(w) { return w.id == self.selectedWrappingId; });
-                        return active ? active.name : 'None';
-                    },
-
-                    getWrappingPrice() {
-                        var wraps = this.availableWrappings || [];
-                        var self = this;
-                        var active = wraps.find(function(w) { return w.id == self.selectedWrappingId; });
-                        return active ? active.price : 0;
-                    },
-
-                    getRibbonName() {
-                        var ribbons = this.availableRibbons || [];
-                        var self = this;
-                        var active = ribbons.find(function(r) { return r.id == self.selectedRibbonId; });
-                        return active ? active.name.replace(' Ribbon', '').replace(' Satin', '') : 'None';
-                    },
-
-                    getRibbonPrice() {
-                        var ribbons = this.availableRibbons || [];
-                        var self = this;
-                        var active = ribbons.find(function(r) { return r.id == self.selectedRibbonId; });
-                        return active ? active.price : 0;
-                    },
-
-                    getMistPrice() {
-                        var mists = this.availableMists || [];
-                        var self = this;
-                        var active = mists.find(function(m) { return m.id == self.selectedMistId; });
-                        return active ? active.price : 0;
-                    },
-
-                    getStemName(id) {
-                        var stems = this.availableStems || [];
-                        var stem = stems.find(function(s) { return s.id == id; });
-                        return stem ? stem.name.replace('Naivasha Volcanic ', '').replace('Naivasha Pure ', '').replace('Naivasha ', '').replace('Limuru Pure ', '').replace('Limuru ', '').replace(' (Grade A)', '') : '';
-                    },
-
-                    getStemPrice(id) {
-                        var stems = this.availableStems || [];
-                        var stem = stems.find(function(s) { return s.id == id; });
-                        return stem ? stem.price : 0;
-                    },
-
-                    getGiftName(id) {
-                        var gifts = (this.availableWines || []).concat(this.availableChocolates || []).concat(this.availableJewelry || []);
-                        var gift = gifts.find(function(g) { return g.id == id; });
-                        return gift ? gift.name.replace(' Premium', '').replace(' Gourmet', '').replace(' Luxury', '') : '';
-                    },
-
-                    getGiftPrice(id) {
-                        var gifts = (this.availableWines || []).concat(this.availableChocolates || []).concat(this.availableJewelry || []);
-                        var gift = gifts.find(function(g) { return g.id == id; });
-                        return gift ? gift.price : 0;
-                    },
-
-                    getSelectedStemsSummary() {
-                        var stems = this.availableStems || [];
-                        var parts = [];
-                        for (var id in this.localStems) {
-                            var qty = this.localStems[id];
-                            if (qty > 0) {
-                                var stem = stems.find(function(s) { return s.id == id; });
-                                if (stem) {
-                                    var shortName = stem.name.replace('Naivasha Volcanic ', '').replace('Naivasha Pure ', '').replace('Naivasha ', '').replace('Limuru Pure ', '').replace('Limuru ', '').replace(' (Grade A)', '');
-                                    parts.push(qty + 'x ' + shortName);
-                                }
-                            }
-                        }
-                        return parts.length > 0 ? parts.join(', ') : 'No Stems';
-                    },
-
-                    getTotalStemCount() {
-                        var count = 0;
-                        for (var id in this.localStems) {
-                            count += parseInt(this.localStems[id] || 0);
-                        }
-                        return count;
-                    },
-
-                    scrollToSection(id) {
-                        var el = document.getElementById(id);
-                        if (el) {
-                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                    },
-
-                    getMistName() {
-                        var mists = this.availableMists || [];
-                        var self = this;
-                        var active = mists.find(function(m) { return m.id == self.selectedMistId; });
-                        return active ? active.name.replace('Atelier ', '').replace(' Mist', '') : 'None';
-                    },
-
-                    getTotalGiftCount() {
-                        var count = 0;
-                        for (var id in this.localGifts) {
-                            count += parseInt(this.localGifts[id] || 0);
-                        }
-                        return count;
-                    }
-                };
-            }
-
-            window.curationStudio = createCurationStudio;
-            if (window.Alpine) {
-                Alpine.data('curationStudio', createCurationStudio);
-            } else {
-                document.addEventListener('alpine:init', function() {
-                    Alpine.data('curationStudio', createCurationStudio);
-                });
-            }
-        })();
-    </script>
+    
 
                 <!-- Backdrop for Profile Modal -->
-    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
+    <div x-show="profileOpen" @click="profileOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Profile Overlay Panel (Center Modal) -->
     <div 
@@ -1600,7 +1601,7 @@
 
 
         <!-- Backdrop for Notifications Modal -->
-    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-45 bg-black/60 backdrop-blur-md" style="display: none;"></div>
+    <div x-show="notificationsOpen" @click="notificationsOpen = false" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-md" style="display: none;"></div>
 
     <!-- Notifications Overlay Panel (Center Modal) -->
     <div 

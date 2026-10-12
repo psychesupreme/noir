@@ -896,13 +896,38 @@ class Storefront extends Component
             ->whereNotIn('category', ['specializtion', 'specialization', 'specializations']);
 
         if ($this->selectedCategory !== 'all') {
-            $cats = match (strtolower($this->selectedCategory)) {
-                'bouquet', 'bouquets' => ['bouquet', 'bouquets'],
-                'giftings', 'gifting', 'hampers' => ['giftings', 'gifting', 'hampers'],
-                'specializtion', 'specialization', 'specializations' => ['specializtion', 'specialization', 'specializations'],
-                default => [$this->selectedCategory],
-            };
-            $query->whereIn('category', $cats);
+            $catLower = strtolower($this->selectedCategory);
+            if (in_array($catLower, ['wines', 'wine', 'spirits'])) {
+                $query->where(function ($q) {
+                    $q->where('category', 'wines')
+                      ->orWhere('subcategory', 'like', '%Wine%')
+                      ->orWhere('name', 'like', '%Wine%')
+                      ->orWhere('name', 'like', '%Champagne%');
+                });
+            } elseif (in_array($catLower, ['chocolate', 'chocolates', 'sweets'])) {
+                $query->where(function ($q) {
+                    $q->where('category', 'chocolate')
+                      ->orWhere('subcategory', 'like', '%Chocolate%')
+                      ->orWhere('name', 'like', '%Chocolate%')
+                      ->orWhere('name', 'like', '%Truffle%')
+                      ->orWhere('name', 'like', '%Ferrero%');
+                });
+            } elseif (in_array($catLower, ['bouquet', 'bouquets', 'flowers'])) {
+                $query->where(function ($q) {
+                    $q->whereIn('category', ['bouquet', 'bouquets'])
+                      ->orWhere('subcategory', 'like', '%Bouquet%');
+                });
+            } elseif (in_array($catLower, ['giftings', 'gifting', 'hampers'])) {
+                $query->whereIn('category', ['giftings', 'gifting', 'hampers']);
+            } elseif (in_array($catLower, ['bundle', 'bundles', 'plants', 'vases'])) {
+                $query->whereIn('category', ['bundle', 'bundles'])
+                      ->orWhere('subcategory', 'like', '%Vase%');
+            } elseif (in_array($catLower, ['stems', 'stem'])) {
+                $query->whereIn('category', ['stems', 'stem'])
+                      ->orWhere('subcategory', 'like', '%Rose%');
+            } else {
+                $query->where('category', $this->selectedCategory);
+            }
         }
 
         if (!empty($this->search)) {

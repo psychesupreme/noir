@@ -24,21 +24,94 @@
             </div>
         </a>
 
-        <!-- 2. Search bar input / trigger (Uses name="find" for Storefront #[Url(as: 'find')]) -->
-        <div class="flex-1 max-w-md mx-auto hidden md:block">
+        <!-- 2. Search bar input / trigger with Instant Live Suggestions -->
+        <div class="flex-1 max-w-md mx-auto hidden md:block" 
+             x-data="{
+                query: '',
+                results: [],
+                loading: false,
+                open: false,
+                debounceTimer: null,
+                search() {
+                    clearTimeout(this.debounceTimer);
+                    if (this.query.trim().length < 2) {
+                        this.results = [];
+                        this.open = false;
+                        return;
+                    }
+                    this.loading = true;
+                    this.debounceTimer = setTimeout(() => {
+                        fetch('/api/v1/products?search=' + encodeURIComponent(this.query))
+                            .then(res => res.json())
+                            .then(data => {
+                                this.results = data.data || [];
+                                this.loading = false;
+                                this.open = true;
+                            })
+                            .catch(() => {
+                                this.loading = false;
+                            });
+                    }, 250);
+                }
+             }"
+             @click.away="open = false"
+        >
             <form action="/" method="GET" class="relative group">
                 <input 
                     type="text" 
                     name="find"
+                    x-model="query"
+                    @input="search()"
+                    @focus="if (results.length > 0) open = true"
                     placeholder="Search fresh flowers, luxury hampers, gifts..."
-                    class="w-full bg-zinc-900/60 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 rounded-full pl-10 pr-4 py-2 text-xs font-sans focus:outline-none transition-all duration-300 shadow-sm"
+                    autocomplete="off"
+                    class="w-full bg-zinc-900/60 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500/20 rounded-full pl-10 pr-10 py-2 text-xs font-sans focus:outline-none transition-all duration-300 shadow-sm"
                 />
                 <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none text-amber-400/80">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
                     </svg>
                 </div>
+                <!-- Loading spinner indicator -->
+                <div x-show="loading" class="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center pointer-events-none" style="display: none;">
+                    <svg class="animate-spin h-3.5 w-3.5 text-amber-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
             </form>
+
+            <!-- Search Auto-suggest Dropdown Results -->
+            <div x-show="open && results.length > 0" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 translate-y-1 scale-98"
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-1 scale-98"
+                 class="absolute mt-2 w-full max-w-md bg-zinc-900/95 border border-zinc-800 rounded-2xl shadow-2xl backdrop-blur-xl overflow-hidden z-[100]"
+                 style="display: none;"
+            >
+                <div class="px-3 pt-2.5 pb-1 border-b border-zinc-800/60 flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+                    <span>Suggested Products</span>
+                    <a :href="'/?find=' + encodeURIComponent(query)" class="text-amber-400 hover:underline">View All &rarr;</a>
+                </div>
+                <div class="max-h-72 overflow-y-auto divide-y divide-zinc-800/40">
+                    <template x-for="item in results.slice(0, 5)" :key="item.id">
+                        <a :href="'/?find=' + encodeURIComponent(item.name)" 
+                           class="flex items-center space-x-3 p-3 hover:bg-zinc-800/60 transition-colors group cursor-pointer text-left">
+                            <img :src="item.image_url || 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=100'" 
+                                 :alt="item.name" 
+                                 class="w-10 h-10 rounded-lg object-cover border border-zinc-800 group-hover:border-amber-500/40 shrink-0">
+                            <div class="flex-1 min-w-0">
+                                <span class="text-xs font-semibold text-zinc-100 group-hover:text-amber-400 transition-colors block truncate" x-text="item.name"></span>
+                                <span class="text-[10px] font-mono text-zinc-400" x-text="(item.formatted_price || (item.price + ' KSH')) + ' • ' + (item.category ? item.category.toUpperCase() : '')"></span>
+                            </div>
+                            <span class="text-xs text-zinc-500 group-hover:text-amber-400 transition-colors">&rarr;</span>
+                        </a>
+                    </template>
+                </div>
+            </div>
         </div>
 
         <!-- Right Side Nav Items -->
